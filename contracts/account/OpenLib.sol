@@ -35,7 +35,7 @@ library OpenLib {
             l.restrictedReasons == 0 &&
             PolicyMath.pulseOk(l) &&
             l.assets[asset].configured &&
-            !(sub == S.OUT_APPROVE && amount == type(uint256).max); // unlimited approval: always K+P
+            amount <= S.MAX_AMOUNT; // above it — the unlimited approval (type(uint256).max) included — always K+P
     }
 
     // ─────────────────────────────── generic call (default deny) ───────────────────────────────
@@ -169,6 +169,11 @@ library OpenLib {
 
     // ─────────────────────────────── co-signature checks ───────────────────────────────
 
+    /// @notice Challenge c of an op, recomputed from its content (F0.15).
+    function challengeOfOp(uint256 opId) external view returns (uint64) {
+        return PolicyMath.challengeOf(opId, PolicyMath.opHashOf(opId, S.layout().ops[opId]));
+    }
+
     function checkLane(uint256 opId, bytes32 guessHandle, bytes calldata cosig) external view {
         bytes32 digest = _digest(LANE_TAG, keccak256(abi.encode(opId, guessHandle)));
         if (!_isCosigner(S.layout(), digest, cosig)) revert Errors.BadSignature();
@@ -210,15 +215,14 @@ library OpenLib {
         op.ownerEpoch = l.ownerEpoch;
         op.escEpoch = l.escEpoch;
         op.status = S.Status.NeedsPin;
-        bytes32 opHash = keccak256(abi.encode(opId, kind, sub, target, cp, amount, keccak256(data)));
         if (h0 != 0 || h1 != 0 || h2 != 0) {
             op.h0 = h0;
             op.h1 = h1;
             op.h2 = h2;
-            opHash = keccak256(abi.encode(opHash, h0, h1, h2));
         }
-        op.opHash = opHash;
-        emit IAccountEvents.OpOpened(opId, uint8(kind), sub, target, cp, amount, PolicyMath.challengeOf(opId, opHash));
+        // F0.15: the content hash is not stored; PolicyMath.opHashOf recomputes it from the same fields
+        bytes32 oh = PolicyMath.opHash(opId, kind, sub, target, cp, amount, keccak256(data), [h0, h1, h2]);
+        emit IAccountEvents.OpOpened(opId, uint8(kind), sub, target, cp, amount, PolicyMath.challengeOf(opId, oh));
     }
 
     function _isCosigner(S.Layout storage l, bytes32 digest, bytes calldata sig) private view returns (bool) {

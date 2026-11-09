@@ -9,7 +9,10 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const cli = join(root, "node_modules", "hardhat", "internal", "cli", "cli.js");
-const only = process.argv.slice(2);
+// --record: also write the evidence files under results/ (the tests check WRITE_RESULTS) and the run summary.
+const record = process.argv.includes("--record");
+if (record) process.env.WRITE_RESULTS = "1";
+const only = process.argv.slice(2).filter((a) => a !== "--record");
 const files = (only.length ? only : readdirSync(join(root, "test")).filter((f) => f.endsWith(".test.ts")).sort()).map((f) =>
   f.startsWith("test/") ? f : `test/${f}`,
 );
@@ -46,5 +49,5 @@ for (const f of files) {
 console.table(summary);
 mkdirSync(join(root, "results"), { recursive: true });
 writeFileSync(join(root, "results", "test-run.log"), log);
-writeFileSync(join(root, "results", "test-summary.json"), JSON.stringify({ evidence: "[Mock]", date: new Date().toISOString(), summary }, null, 2));
+if (record) writeFileSync(join(root, "results", "test-summary.json"), JSON.stringify({ evidence: "[Mock]", date: new Date().toISOString(), summary }, null, 2));
 process.exit(failed ? 1 : 0);

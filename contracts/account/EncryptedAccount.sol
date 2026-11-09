@@ -242,7 +242,7 @@ contract EncryptedAccount is IAccount, IERC1271, ReentrancyGuardTransient, IAcco
     /// @notice Challenge c of an op; the client encrypts (h + c) mod 2^64 (Section 13.2). Clients should take c from
     ///         the `OpOpened` event of the opening receipt instead (K53): a lagging RPC read is then impossible.
     function challengeOf(uint256 opId) public view returns (uint64) {
-        return PolicyMath.challengeOf(opId, S.layout().ops[opId].opHash);
+        return OpenLib.challengeOfOp(opId);
     }
 
     /// @notice K-track guess (K signed via EntryPoint, or K's EOA directly).
@@ -476,7 +476,7 @@ contract EncryptedAccount is IAccount, IERC1271, ReentrancyGuardTransient, IAcco
     }
 
     function getGuess(uint256 opId) external view returns (S.Guess memory) {
-        return S.layout().guesses[opId];
+        return PinLib.guessOf(opId);
     }
 
     function opCount() external view returns (uint256) {

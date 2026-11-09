@@ -8,6 +8,7 @@ import {
   DAY,
   ETH,
   HOUR,
+  RECORD,
   Stack,
   coder,
   createAccount,
@@ -53,12 +54,13 @@ describe("E9/E19/E7 — cost model [Mock]", function () {
   });
 
   after(() => {
+    console.table(rows);
+    if (!RECORD) return; // results/ is evidence: written only by `npm run test:record`
     const dir = path.join(__dirname, "..", "results");
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(path.join(dir, "cost-model-mock.json"), JSON.stringify({ evidence: "[Mock]", generatedAt: new Date().toISOString(), rows }, null, 2));
     const csv = ["flow,gas,hcu_total,hcu_depth,note", ...rows.map((r) => `"${r.flow}",${r.gas},${r.hcuTotal},${r.hcuDepth},"${r.note ?? ""}"`)].join("\n");
     fs.writeFileSync(path.join(dir, "cost-model-mock.csv"), csv + "\n");
-    console.table(rows);
   });
 
   it("gas and HCU per flow (setup, K-only transfer, PIN, execution, settings)", async () => {

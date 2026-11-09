@@ -69,7 +69,7 @@ async function main() {
   const opId: bigint = ev.args.opId;
   const cReceipt = BigInt(ev.args.challenge);
   const cRpcAtBlock = BigInt(await e1.challengeOf(opId, { blockTag: open.tx.blockNumber }));
-  const cStale = BigInt(await e1.challengeOf(opId, { blockTag: open.tx.blockNumber - 1 })); // block before the op appears: opHash = 0
+  const cStale = BigInt(await e1.challengeOf(opId, { blockTag: open.tx.blockNumber - 1 })); // block before the op appears: its fields are still empty
   let staleRevert = "";
   try {
     await e1.submitGuess.staticCall(opId, cStale, ethers.ZeroHash, "0x01", { blockTag: "latest" });

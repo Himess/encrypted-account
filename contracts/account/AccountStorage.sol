@@ -69,6 +69,11 @@ library AccountStorage {
     uint256 internal constant N_RECIPIENTS = 30;
     uint256 internal constant N_SPENDERS = 10;
 
+    /// @dev F0.15: the pending counters are packed. An outflow above MAX_AMOUNT (in practice an unlimited approval) never
+    ///      takes the K-only path, is always in the PIN path's long delay class, and is counted as MAX_AMOUNT in
+    ///      `pinCommitted` / `pinSpent` (PolicyMath.capped).
+    uint256 internal constant MAX_AMOUNT = type(uint112).max;
+
     bytes32 internal constant CHALLENGE_TAG = 0x0d1c148eec8692966a336c305b85d4a8336f91bf6ae5b3ba097a041e3b5ae264; // keccak256("encrypted-account/challenge/v1")
 
     struct Delays {
@@ -88,34 +93,41 @@ library AccountStorage {
     /// @dev K43 wrong-guess score. Every guess adds +1 when it is submitted (before the result exists, I10); a
     ///      correct result refunds exactly that +1, so a correct PIN never lowers the score (I20). The score decays
     ///      by 1 at every DECAY_PERIOD boundary of a fixed calendar (PolicyMath.score), so the owner's own correct
-    ///      PINs do not hold the decay back. Back-off is derived from (lastAt, score) and never stored.
+    ///      PINs do not hold the decay back. F0.15: the end of the back-off is stored when a guess is submitted and
+    ///      recomputed on a correct result, so a decay boundary never shortens a running back-off. One slot, which
+    ///      never returns to zero once the track has been used.
     struct Track {
         uint32 score; // stored score, valid as of `decayEpoch`
         uint32 decayEpoch; // calendar index (timestamp / DECAY_PERIOD) at which `score` was last normalised
-        uint64 lastAt; // last attempt; the anonymous tracks share max(lastAt) (K56)
-        uint256 pendingOp; // single in-flight guess per track
+        uint64 lastAt; // last attempt
+        uint64 waitUntil; // stored end of this track's back-off; the anonymous tracks share max(waitUntil) (K56)
+        uint64 pendingOp; // single in-flight guess per track (0 = none)
     }
 
+    /// @dev One record per track, reused (F0.15): a guess rewrites the slots of its track instead of opening new ones.
     struct Guess {
         bytes32 okH; // ebool, publicly decryptable: okReal OR okDuress
-        bytes32 bigH; // ebool, publicly decryptable: okAny AND (pinSpent + amount > L_big)  (outflows only)
+        bytes32 bigH; // ebool, publicly decryptable: okAny AND (pinSpent + amount > L_big); valid only if hasBig
         bytes32 duressFlagH; // ebool, never public: okDuress AND NOT okReal (silent alarm → guardian)
+        bytes32 inputH; // last input handle on this track: the same input twice in a row is rejected (I5)
         address bondPayer;
         uint96 bond;
+        uint64 opId; // the op this record belongs to
         uint8 track;
         bool pending;
         bool setStrikes; // this guess raised R_STRIKES provisionally (undone if it turns out correct)
+        bool hasBig; // bigH belongs to this guess (outflows only)
     }
 
     struct AssetCfg {
         bool configured;
         uint64 epoch; // day index of the counters below
         uint64 gen; // (ownerEpoch, escEpoch) of `reserved` / `pinCommitted`: an owner change or an escape orphans them
-        uint256 unit; // token base units per encrypted unit (64-bit range, see PolicyLib.scaleUp)
+        uint112 reserved; // K-only outflows waiting for their `ok` bit (F0.15: shares the slot with `configured`)
+        uint128 unit; // token base units per encrypted unit (64-bit range, see PolicyLib.scaleUp)
+        uint128 pinCommitted; // PIN-path outflows verified but not yet executed (F0.15: shares the slot with `unit`)
         uint256 spent; // K-only outflows (incl. approvals) in this epoch — invariant: scaled(spent) <= tau
-        uint256 reserved; // K-only outflows waiting for their `ok` bit
         uint256 pinSpent; // PIN-path outflows executed in this epoch
-        uint256 pinCommitted; // PIN-path outflows verified but not yet executed
         uint256 instantBudget; // optional public "instant bucket" per epoch (default 0 = off)
         uint256 instantSpent;
         uint256 openLimit; // B variant (F0.11): public K-only limit per epoch, counted in `spent` (0 = K-only path off)
@@ -139,10 +151,11 @@ library AccountStorage {
         uint32 escEpoch; // escape generation at opening: an escape cancels every op opened before it (K54)
         uint64 epochDay; // epoch of the K-only reservation
         uint64 readyAt;
+        uint8 guessTrack; // track of the latest guess (F0.15: guesses live in per-track records)
         address target; // asset / token / call target
         address counterparty; // recipient or spender
         uint256 amount; // outflow amount or ETH value of a call
-        bytes32 opHash; // binds the PIN challenge to the op content
+        // F0.15: the content hash that binds the PIN challenge is recomputed from the fields above (PolicyMath.opHashOf)
         bytes32 h0; // evaluation `ok` handle, or stored encrypted payload
         bytes32 h1;
         bytes32 h2;
@@ -164,6 +177,7 @@ library AccountStorage {
         bool pinSet;
         bool recoveryEnabled;
         bool autoKnown;
+        bool openMode; // B variant (F0.11): set by EncryptedAccountB only (F0.15: in the flags slot, no slot of its own)
         uint8 restrictedReasons;
         uint32 ownerEpoch;
         uint32 pulsePeriod; // 0 = off
@@ -179,8 +193,8 @@ library AccountStorage {
         euint64 pinH; // Enc(first64(Argon2id(PIN, salt)))
         euint64 duressH; // Enc(duress fingerprint) or Enc(oblivious random)
         Track[3] tracks;
-        mapping(bytes32 => bool) usedInput;
-        mapping(uint256 => Guess) guesses;
+        mapping(bytes32 => bool) usedInput; // one-time co-signer digests (PIN reset); guesses use Guess.inputH (F0.15)
+        Guess[3] trackGuesses; // one reused record per track (F0.15)
         mapping(uint256 => Op) ops;
         // known sets (fixed size, encrypted)
         eaddress[30] knownR;
@@ -193,9 +207,8 @@ library AccountStorage {
         // misc
         mapping(bytes32 => bool) approvedHashes; // ERC-1271, only via K+P
         mapping(address => uint256) refunds; // recovery-track bonds of successful guesses
-        // B variant (F0.11, EncryptedAccountB only; appended so that A's layout is untouched): the known lists are
-        // public. Every entry, also one added by hand and never used, is visible on-chain (OpenKnownChanged).
-        bool openMode;
+        // B variant (F0.11, EncryptedAccountB only): the known lists are public. Every entry, also one added by hand
+        // and never used, is visible on-chain (OpenKnownChanged).
         mapping(address => uint64) openKnownR; // activation time; 0 = not on the list
         mapping(address => uint64) openKnownS;
     }

@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { ethers as E } from "ethers";
 import * as fs from "fs";
 import * as path from "path";
-import { A, ETH, R, Stack, TRACK, alignDecay, coder, createAccount, deployStack, encGuess, errs, ethers, finalizeGuess, guess, requestTransfer, time } from "./helpers";
+import { A, ETH, R, RECORD, Stack, TRACK, alignDecay, coder, createAccount, deployStack, encGuess, errs, ethers, finalizeGuess, guess, requestTransfer, time } from "./helpers";
 
 /**
  * F0.10 step 1 — Y1 (Round 2 report §2): the counter-reset loop. This test requires the FIXED behavior (I20); it
@@ -92,7 +92,7 @@ describe("F0.10.1 — Y1: does a correct PIN reset the attacker's wrong-guess co
       thiefRevertName,
       baseline: "results/y1-baseline.json (Round 1: the score/shared budget was reset, the attacker guessed without back-off)",
     };
-    fs.writeFileSync(path.join(__dirname, "..", "results", "y1-f010.json"), JSON.stringify(observed, null, 2));
+    if (RECORD) fs.writeFileSync(path.join(__dirname, "..", "results", "y1-f010.json"), JSON.stringify(observed, null, 2)); // only `npm run test:record`
     console.log("      Y1 observation:", JSON.stringify({ scoreKept: observed.scoreKeptOnSuccess, unrestricted: observed.restrictionLiftedByOwnerPin, thiefCanGuessNow, thiefWaitS: observed.thiefWaitS }));
 
     // I20: a correct PIN does not reset the wrong-guess score → the attacker's guess must hit the back-off

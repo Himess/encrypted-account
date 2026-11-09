@@ -7,6 +7,8 @@ import * as hre from "hardhat";
 import { guessValue, pinFingerprint, randomUint64 } from "../sdk/src";
 
 export const ethers = hre.ethers;
+/** Tests write their evidence files under results/ only when recording (`npm run test:record`). */
+export const RECORD = process.env.WRITE_RESULTS === "1";
 export { FhevmType, time };
 
 export const ETH = E.ZeroAddress;

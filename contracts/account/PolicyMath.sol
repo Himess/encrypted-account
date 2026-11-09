@@ -18,6 +18,12 @@ library PolicyMath {
         return amount == 0 ? 0 : (amount - 1) / unit + 1;
     }
 
+    /// @notice Amount an outflow adds to `pinCommitted` / `pinSpent` (F0.15). The cap keeps the packed counters and their
+    ///         sums in range; a capped outflow is always in the long delay class anyway (PinLib._bigClass).
+    function capped(uint256 amount) internal pure returns (uint256) {
+        return amount > S.MAX_AMOUNT ? S.MAX_AMOUNT : amount;
+    }
+
     function currentEpoch() internal view returns (uint64) {
         return uint64(block.timestamp / EPOCH_LENGTH);
     }
@@ -61,17 +67,21 @@ library PolicyMath {
         t.decayEpoch = decayNow();
     }
 
-    /// @notice Earliest time of the next attempt on `track`. The anonymous tracks (K-track, recovery track) share
-    ///         one budget derived from the sum of their scores and their latest attempt; it is not stored (K56).
+    /// @notice Earliest time of the next attempt on `track` (F0.15, stored wait): the back-off end saved when a guess
+    ///         was submitted, recomputed on a correct result, so a decay boundary never shortens a running back-off.
+    ///         The anonymous tracks (K-track, recovery track) share one budget: the later of their stored ends (K56).
     ///         The authenticated lane has its own score and clock.
     function nextAllowed(S.Layout storage l, uint8 track) internal view returns (uint64) {
-        if (track == S.TRACK_LANE) {
-            S.Track storage t = l.tracks[S.TRACK_LANE];
-            return t.lastAt + backoff(score(t));
-        }
-        S.Track storage k = l.tracks[S.TRACK_OWNER];
-        S.Track storage r = l.tracks[S.TRACK_RECOVERY];
-        return (k.lastAt > r.lastAt ? k.lastAt : r.lastAt) + backoff(score(k) + score(r));
+        if (track == S.TRACK_LANE) return l.tracks[S.TRACK_LANE].waitUntil;
+        uint64 k = l.tracks[S.TRACK_OWNER].waitUntil;
+        uint64 r = l.tracks[S.TRACK_RECOVERY].waitUntil;
+        return k > r ? k : r;
+    }
+
+    /// @notice Score that sets a new back-off on `track`: the lane's own score, or the anonymous tracks' sum (K56).
+    function budgetScore(S.Layout storage l, uint8 track) internal view returns (uint32) {
+        if (track == S.TRACK_LANE) return score(l.tracks[S.TRACK_LANE]);
+        return score(l.tracks[S.TRACK_OWNER]) + score(l.tracks[S.TRACK_RECOVERY]);
     }
 
     /// @notice Recovery-track bond: doubles with every point of the recovery-track score.
@@ -125,9 +135,25 @@ library PolicyMath {
         return op.escEpoch == l.escEpoch && op.ownerEpoch == l.ownerEpoch;
     }
 
+    /// @notice Content hash of an op from the fields fixed when it was opened (F0.15: recomputed instead of stored).
+    ///         The encrypted payload handles of admin / reset ops belong to it; an outflow's h0 does not (it later holds
+    ///         the evaluation result).
+    function opHash(uint256 opId, S.Kind kind, uint8 sub, address target, address cp, uint256 amount, bytes32 dataHash, bytes32[3] memory h)
+        internal
+        pure
+        returns (bytes32 oh)
+    {
+        oh = keccak256(abi.encode(opId, kind, sub, target, cp, amount, dataHash));
+        if (kind != S.Kind.Outflow && (h[0] != 0 || h[1] != 0 || h[2] != 0)) oh = keccak256(abi.encode(oh, h[0], h[1], h[2]));
+    }
+
+    function opHashOf(uint256 opId, S.Op storage op) internal view returns (bytes32) {
+        return opHash(opId, op.kind, op.sub, op.target, op.counterparty, op.amount, keccak256(op.data), [op.h0, op.h1, op.h2]);
+    }
+
     /// @notice Challenge c of an op; the client encrypts (h + c) mod 2^64 (Section 13.2).
-    function challengeOf(uint256 opId, bytes32 opHash) internal view returns (uint64) {
-        return uint64(uint256(keccak256(abi.encode(S.CHALLENGE_TAG, block.chainid, address(this), opId, opHash))));
+    function challengeOf(uint256 opId, bytes32 contentHash) internal view returns (uint64) {
+        return uint64(uint256(keccak256(abi.encode(S.CHALLENGE_TAG, block.chainid, address(this), opId, contentHash))));
     }
 
     /// @notice Optional PIN pulse (K26): K-only spending is valid for `pulsePeriod` after the last PIN success.

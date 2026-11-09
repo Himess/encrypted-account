@@ -16,6 +16,7 @@ import {
   debugAddr,
   debugBool,
   debugU64,
+  defaultDelays,
   deployStack,
   errs,
   ethers,
@@ -187,6 +188,34 @@ describe("F0.4 — Anomaly policy: hidden limit, random tripwire, encrypted know
     // approve(0): restrictive → K-only, immediate
     await (await acct.connect(owner).requestApprove(usdc, dex.address, 0n, false)).wait();
     expect(await stack.usdc.allowance(addr, dex.address)).to.eq(0n);
+  });
+
+  it("F0.15: an unlimited approval on the PIN path takes the long delay and does not block later PIN outflows of the same token", async () => {
+    const acct = await fresh();
+    const usdc = await stack.usdc.getAddress();
+    const addr = await acct.getAddress();
+    const d = await defaultDelays(stack);
+    const pinOutflow = async (send: Promise<any>) => {
+      const id = await opIdFromReceipt(acct, await (await send).wait());
+      await guessAndFinalize(acct, owner, stack.chainId, id, PIN);
+      return id;
+    };
+    const unlimited = await pinOutflow(acct.connect(owner).requestApprove(usdc, dex.address, E.MaxUint256, true));
+    const op = await acct.getOp(unlimited);
+    expect(op.status).to.eq(Status.Delayed);
+    expect(op.readyAt - BigInt(await time.latest())).to.eq(BigInt(d.bigTransfer)); // always the long delay class
+    // while it is committed, and after it ran: another PIN outflow of the token is still verified
+    // (before F0.15 the committed / spent sum overflowed and submitGuess reverted until the epoch rolled)
+    const second = await pinOutflow(acct.connect(owner).requestTransfer(usdc, bob.address, 5_000_000n, true));
+    expect((await acct.getOp(second)).status).to.eq(Status.Delayed);
+    await time.increase(Number(d.bigTransfer));
+    await (await acct.executeOp(unlimited)).wait();
+    expect(await stack.usdc.allowance(addr, dex.address)).to.eq(E.MaxUint256);
+    const third = await pinOutflow(acct.connect(owner).requestTransfer(usdc, bob.address, 5_000_000n, true));
+    expect((await acct.getOp(third)).status).to.eq(Status.Delayed);
+    await (await acct.executeOp(second)).wait();
+    const st = await acct.assetState(usdc);
+    expect(st.pinCommitted).to.eq(5_000_000n); // only `third` is still committed
   });
 
   it("default deny (11.5, I11): token transfer/approve selectors and the FHE infrastructure are forbidden in a generic call; a generic call takes K+P + a delay", async () => {

@@ -38,7 +38,7 @@ library OpsLib {
 
         S.AssetCfg storage cfg = l.assets[op.target];
         PolicyMath.sync(l, cfg);
-        cfg.reserved -= op.amount;
+        cfg.reserved -= uint112(op.amount); // fits: PolicyLib.evaluate reserved it only within uint112
         // A restriction or an expired pulse that happened meanwhile also stops K-only execution.
         if (ok && l.restrictedReasons == 0 && PolicyMath.pulseOk(l)) {
             PolicyMath.rollEpoch(cfg);
@@ -80,7 +80,7 @@ library OpsLib {
         if (op.kind == S.Kind.Outflow) {
             S.AssetCfg storage cfg = l.assets[op.target];
             PolicyMath.sync(l, cfg);
-            cfg.pinCommitted += op.amount;
+            cfg.pinCommitted += uint128(PolicyMath.capped(op.amount));
         } else if (op.kind == S.Kind.Admin && op.sub == S.A_ROTATE_OWNER) {
             l.rotationsPending += 1; // K45: closes the K-track (if D / helper exists) until it runs or is cancelled
         }
@@ -113,9 +113,10 @@ library OpsLib {
         if (op.kind == S.Kind.Outflow) {
             S.AssetCfg storage cfg = l.assets[op.target];
             PolicyMath.sync(l, cfg);
-            cfg.pinCommitted -= op.amount;
+            uint256 c = PolicyMath.capped(op.amount);
+            cfg.pinCommitted -= uint128(c);
             PolicyMath.rollEpoch(cfg);
-            cfg.pinSpent += op.amount;
+            cfg.pinSpent += c;
             _performOutflow(op.sub, op.target, op.counterparty, op.amount);
             if (l.autoKnown) {
                 if (l.openMode) {
@@ -259,8 +260,8 @@ library OpsLib {
             if (st == S.Status.Evaluating || (st == S.Status.Delayed && t.kind == S.Kind.Outflow)) {
                 S.AssetCfg storage cfg = l.assets[t.target];
                 PolicyMath.sync(l, cfg);
-                if (st == S.Status.Evaluating) cfg.reserved -= t.amount;
-                else cfg.pinCommitted -= t.amount;
+                if (st == S.Status.Evaluating) cfg.reserved -= uint112(t.amount);
+                else cfg.pinCommitted -= uint128(PolicyMath.capped(t.amount));
             } else if (st == S.Status.Delayed && t.kind == S.Kind.Admin && t.sub == S.A_ROTATE_OWNER && l.rotationsPending != 0) {
                 l.rotationsPending -= 1; // K45: the lock opens when the last pending rotation is cancelled
             }
@@ -280,6 +281,7 @@ library OpsLib {
         S.Track storage k = l.tracks[S.TRACK_OWNER];
         k.score = 0;
         k.decayEpoch = PolicyMath.decayNow();
+        k.waitUntil = 0; // F0.15: the old key's stored back-off does not bind the new key
         emit IAccountEvents.OwnerChanged(newOwner, l.ownerEpoch);
     }
 

@@ -64,7 +64,7 @@ function pSuccess(n: number): number {
 }
 
 type Scenario = "none" | "rotate" | "escape" | "unrestrict";
-type Variant = { sem: "v03" | "K43"; table: Table; k44: boolean; k45: boolean; hasD: boolean };
+type Variant = { sem: "v03" | "K43"; table: Table; k44: boolean; k45: boolean; hasD: boolean; stored?: boolean };
 type Cfg = Variant & { scenario: Scenario; reactS: number; phaseS: number };
 
 /** K-track state (the attacker uses only the K-track: the recovery track requires a bond and shares the common budget, K56). */
@@ -72,6 +72,7 @@ class KTrack {
   k = 0; // v03: consecutive counter; K43: stored score
   kEpoch = 0; // K43: the calendar slice the score is normalized to
   lastAt = -Infinity;
+  waitUntil = -Infinity; // F0.15 stored wait: the back-off end saved on submission
   nextV03 = 0;
   constructor(private readonly c: Cfg) {
     this.kEpoch = this.epoch(0); // the slice at t = 0 (−1 when φ > 0); starting from 0 added a phantom +1 point
@@ -86,6 +87,7 @@ class KTrack {
   nextAllowed(now: number): number {
     if (this.c.sem === "v03") return Math.max(now, this.nextV03);
     if (this.lastAt === -Infinity) return now;
+    if (this.c.stored) return Math.max(now, this.waitUntil); // F0.15: decay never shortens a running back-off
     let t = Math.max(now, this.lastAt);
     for (let i = 0; i < 10_000; i++) {
       const need = this.lastAt + this.c.table.backoff(this.eff(t));
@@ -104,6 +106,7 @@ class KTrack {
     } else {
       this.k = this.eff(t) + 1;
       this.kEpoch = this.epoch(t);
+      if (this.c.stored) this.waitUntil = t + this.c.table.backoff(this.k);
     }
     this.lastAt = t;
   }
@@ -115,6 +118,7 @@ class KTrack {
     } else {
       this.k = Math.max(0, this.eff(t) - 1);
       this.kEpoch = this.epoch(t);
+      if (this.c.stored) this.waitUntil = this.lastAt + this.c.table.backoff(this.k); // recomputed with the refunded score
     }
   }
 }
@@ -220,13 +224,16 @@ function main() {
     { sem: "K43", table: T1, k44: true, k45: false, hasD: false },
     { sem: "K43", table: T2, k44: true, k45: false, hasD: false },
     { sem: "K43", table: T2, k44: true, k45: true, hasD: true },
+    { sem: "K43", table: T2, k44: true, k45: false, hasD: false, stored: true },
+    { sem: "K43", table: T2, k44: true, k45: true, hasD: true, stored: true },
   ];
-  const label = (v: Variant) => `${v.sem}/${v.table.name}${v.k44 ? "+K44" : ""}${v.k45 ? "+K45" : ""}${v.hasD ? " (with D)" : v.sem === "K43" && v.table === T2 ? " (no D)" : ""}`;
+  const label = (v: Variant) =>
+    `${v.sem}/${v.table.name}${v.k44 ? "+K44" : ""}${v.k45 ? "+K45" : ""}${v.stored ? "+SW" : ""}${v.hasD ? " (with D)" : v.sem === "K43" && v.table === T2 ? " (no D)" : ""}`;
   const rows: any[] = [];
   for (const v of variants) {
     for (const scenario of ["none", "rotate", "escape", "unrestrict"] as const) {
       for (const reactS of scenario === "none" ? [0] : reacts) {
-        const r: any = { variant: label(v), final: v.sem === "K43" && v.table === T2 && v.k44, scenario, react: scenario === "none" ? "-" : fmt(reactS) };
+        const r: any = { variant: label(v), final: v.sem === "K43" && v.table === T2 && v.k44 && !!v.stored, scenario, react: scenario === "none" ? "-" : fmt(reactS) };
         for (const w of windows) {
           const runs = (v.sem === "v03" ? [DECAY] : phases).map((phaseS) => simulate({ ...v, scenario, reactS, phaseS }, w.s));
           const g = runs.map((x) => x.guesses);
@@ -250,7 +257,7 @@ function main() {
     note: s >= 3 ? "on the K-track every PIN entry updates the last-attempt time; remedies: lane (D), rotation (score is reset), escape or decay" : "",
   }));
   const out = {
-    evidence: "[I] model (event-driven simulation; an exact model of the F0.10 contract semantics); success curve interpolated from v0.3 §13.8",
+    evidence: "[I] model (event-driven simulation; an exact model of the contract semantics: F0.10 derived back-off, and F0.15 stored back-off in the +SW variants); success curve interpolated from v0.3 §13.8",
     generatedAtUtc: new Date().toISOString(),
     tables: [T0, T1, T2].map((t) => ({ name: t.name, desc: t.desc })),
     assumptions: [
@@ -261,6 +268,7 @@ function main() {
       "unrestrict: r after each restriction the owner lifts it with the PIN (in v03 the counter is reset every time; in K43 the score is kept and the owner's PIN updates the last-attempt time).",
       "Decay (K43): fixed calendar, −1 every 7 days; the phase φ of the first boundary is scanned on an hourly grid and the worst phase is reported (guessesMinMedianMax: over the phases).",
       "Below 10 guesses the success probability is linear from 0 (the real curve is concave; higher for the first guesses).",
+      "+SW (F0.15, stored wait): the back-off end is saved when a guess is submitted and recomputed from the last attempt with the refunded score on a correct result; a decay boundary never shortens a running back-off. Rows without +SW model the F0.10 derived back-off.",
     ],
     rows,
     ownerTypos: typos,

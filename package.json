@@ -10,6 +10,7 @@
   "scripts": {
     "compile": "hardhat compile",
     "test": "node scripts/run-tests.mjs",
+    "test:record": "node scripts/run-tests.mjs --record",
     "test:sdk": "mocha -r ts-node/register sdk/test/**/*.test.ts --timeout 120000",
     "test:all": "npm run test:sdk && npm test",
     "size": "hardhat run scripts/contract-sizes.ts",

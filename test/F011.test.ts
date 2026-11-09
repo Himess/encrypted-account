@@ -32,6 +32,7 @@ import {
   guessAndFinalize,
   opIdFromReceipt,
   time,
+  RECORD,
 } from "./helpers";
 import { randomUint64 } from "../sdk/src";
 
@@ -439,8 +440,10 @@ describe("F0.11 · B variant: open list, open limit, synchronous K-only", functi
       rows,
     };
     const dir = path.join(__dirname, "..", "results");
-    fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(path.join(dir, "f011-mock.json"), JSON.stringify(out, null, 2));
+    if (RECORD) {
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(path.join(dir, "f011-mock.json"), JSON.stringify(out, null, 2)); // only `npm run test:record`
+    }
     console.log(JSON.stringify({ setup: out.setup, hotPath: out.hotPath }, null, 2));
 
     expect(rows.filter((r) => r.variant === "B" && /sync/.test(r.flow)).every((r) => r.hcu === 0)).to.eq(true);

@@ -68,7 +68,7 @@ library PinLib {
         S.Op storage op = l.ops[opId];
         // K53 / I23: a guess made against another challenge (e.g. one read from a lagging RPC backend) would be
         // wrong for sure — it is neither evaluated nor counted.
-        if (c != PolicyMath.challengeOf(opId, op.opHash)) revert Errors.StaleChallenge();
+        if (c != PolicyMath.challengeOf(opId, PolicyMath.opHashOf(opId, op))) revert Errors.StaleChallenge();
         if (PolicyMath.status(l, op) != S.Status.NeedsPin) revert Errors.BadStatus();
 
         // P alone (recovery track) may only freeze or start a delayed recovery (S4, Section 11.3).
@@ -89,16 +89,20 @@ library PinLib {
         uint64 next = PolicyMath.nextAllowed(l, track);
         if (nowTs < next) revert Errors.Backoff(next);
 
-        // Input hygiene: fresh proof (no handle injection) + one-time handle (replay, Section 13.3).
+        // Input hygiene: fresh proof (no handle injection) + no replay. The same input twice in a row on a track is
+        // rejected (I5); an input can never count for another op either, because the challenge is bound to the op's
+        // content (K53). F0.15: this replaces a one-time-handle mapping that opened a new slot on every guess.
         PolicyMath.requireProof(proof);
+        S.Guess storage gs = l.trackGuesses[track];
         bytes32 gh = externalEuint64.unwrap(guess);
-        if (l.usedInput[gh]) revert Errors.InputReplayed();
-        l.usedInput[gh] = true;
+        if (gs.inputH == gh) revert Errors.InputReplayed();
+        gs.inputH = gh;
 
         // ── Count BEFORE the result exists (I10): a provisional +1 that only a correct result refunds (K43).
         PolicyMath.normalize(t);
         t.score += 1;
         t.lastAt = nowTs; // also for the owner's correct PIN: nobody can guess right after it (K43)
+        t.waitUntil = nowTs + PolicyMath.backoff(PolicyMath.budgetScore(l, track)); // F0.15: stored wait (§5.2 b)
         bool setStrikes;
         if (track == S.TRACK_OWNER && t.score >= PolicyMath.STRIKE_SCORE && (l.restrictedReasons & S.R_STRIKES) == 0) {
             l.restrictedReasons |= S.R_STRIKES;
@@ -118,23 +122,26 @@ library PinLib {
         FHE.allowThis(isDuress);
         if (l.guardian != address(0)) FHE.allow(isDuress, l.guardian); // silent alarm (17.3), never public
 
-        S.Guess storage gs = l.guesses[opId];
         gs.okH = ebool.unwrap(okAny);
         gs.duressFlagH = ebool.unwrap(isDuress);
-        gs.bigH = op.kind == S.Kind.Outflow ? ebool.unwrap(_bigClass(l, op, okAny)) : bytes32(0);
+        bool hasBig = op.kind == S.Kind.Outflow;
+        if (hasBig) gs.bigH = ebool.unwrap(_bigClass(l, op, okAny)); // a stale bigH stays (no slot reset to zero)
+        gs.hasBig = hasBig;
         gs.bondPayer = bondPayer;
         gs.bond = uint96(bond);
+        gs.opId = uint64(opId);
         gs.track = track;
         gs.pending = true;
         gs.setStrikes = setStrikes;
 
-        t.pendingOp = opId;
+        t.pendingOp = uint64(opId);
         op.status = S.Status.Guessing;
+        op.guessTrack = track;
         if (op.kind == S.Kind.Admin && op.sub == S.A_CANCEL) {
             // "pause during cancellation" (Section 13.4): the target cannot run while its veto is in flight
             l.ops[abi.decode(op.data, (uint256))].paused = true;
         }
-        emit IAccountEvents.GuessSubmitted(opId, track, gs.okH, gs.bigH);
+        emit IAccountEvents.GuessSubmitted(opId, track, gs.okH, hasBig ? gs.bigH : bytes32(0));
     }
 
     /// @dev Delay class of a PIN-path outflow: big = okAny AND (pinSpent + pinCommitted + amount > L_big).
@@ -142,7 +149,8 @@ library PinLib {
     function _bigClass(S.Layout storage l, S.Op storage op, ebool okAny) private returns (ebool big) {
         S.AssetCfg storage cfg = l.assets[op.target];
         uint256 sc = type(uint256).max;
-        if (cfg.configured) {
+        // above MAX_AMOUNT (e.g. an unlimited approval): always the long delay; the counters below stay in range
+        if (cfg.configured && op.amount <= S.MAX_AMOUNT) {
             PolicyMath.sync(l, cfg);
             PolicyMath.rollEpoch(cfg);
             sc = PolicyMath.scaleUp(cfg.pinSpent + cfg.pinCommitted + op.amount, cfg.unit);
@@ -166,9 +174,10 @@ library PinLib {
         bytes calldata decryptionProof
     ) external returns (bool ok, bool big, uint8 track) {
         S.Layout storage l = S.layout();
-        S.Guess storage gs = l.guesses[opId];
-        if (!gs.pending) revert Errors.BadStatus();
-        bool hasBig = gs.bigH != bytes32(0);
+        track = l.ops[opId].guessTrack;
+        S.Guess storage gs = l.trackGuesses[track];
+        if (!gs.pending || gs.opId != opId) revert Errors.BadStatus();
+        bool hasBig = gs.hasBig;
         bytes32[] memory hs = new bytes32[](hasBig ? 2 : 1);
         hs[0] = gs.okH;
         if (hasBig) hs[1] = gs.bigH;
@@ -180,14 +189,14 @@ library PinLib {
         }
 
         gs.pending = false;
-        track = gs.track;
         S.Track storage t = l.tracks[track];
         t.pendingOp = 0;
         if (ok) {
             // K43 / I20: refund the provisional +1 only — a correct PIN never lowers the score it found. The attempt
-            // time stays, so the derived back-off still runs from this guess.
+            // time stays: the stored back-off is recomputed from it with the refunded score (§5.2 b).
             PolicyMath.normalize(t);
             if (t.score != 0) t.score -= 1;
+            t.waitUntil = t.lastAt + PolicyMath.backoff(PolicyMath.budgetScore(l, track));
             l.lastPinAt = uint64(block.timestamp);
             // R_STRIKES (score-caused) lifts itself if it was this guess's own provisional mark, or if the K-track
             // score is below 3 again. Guardian / owner / P restrictions are lifted only by UNRESTRICT.
@@ -212,5 +221,15 @@ library PinLib {
             emit IAccountEvents.RestrictionChanged(l.restrictedReasons);
         }
         // On failure the +1 stays and the bond stays in the account (each wrong guess pays the owner).
+    }
+
+    /// @notice The guess record of `opId` while it is the latest guess on its track (records are reused per track).
+    function guessOf(uint256 opId) external view returns (S.Guess memory g) {
+        S.Layout storage l = S.layout();
+        S.Guess storage gs = l.trackGuesses[l.ops[opId].guessTrack];
+        if (opId != 0 && gs.opId == opId) {
+            g = gs;
+            if (!g.hasBig) g.bigH = bytes32(0);
+        }
     }
 }

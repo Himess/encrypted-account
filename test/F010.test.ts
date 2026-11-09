@@ -370,7 +370,7 @@ describe("F0.10 — score, escape and rotation locks, challenge consistency, esc
   it("K53 / I23: a guess with a stale challenge reverts, the score and last-attempt time stay unchanged; the client takes c from the opening receipt", async () => {
     const acct = await fresh();
     const next = (await acct.opCount()) + 1n;
-    const stale = BigInt(await acct.challengeOf(next)); // lagging back end: the op is not visible yet (opHash = 0)
+    const stale = BigInt(await acct.challengeOf(next)); // lagging back end: the op is not visible yet (its fields are still empty)
     const rc = await (await acct.connect(owner).requestTransfer(ETH, bob.address, E.parseEther("0.05"), true)).wait();
     const { opId, c } = challengeFromReceipt(acct, rc);
     expect(opId).to.eq(next);

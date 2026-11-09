@@ -33,11 +33,11 @@ library PolicyLib {
     ///         path. No L_min, L or tripwire.
     function setupBig(address asset, uint256 unit, uint256 openLimit, externalEuint64 big, bytes calldata proof) external {
         PolicyMath.requireProof(proof);
-        if (unit == 0) revert Errors.InvalidParams();
+        if (unit == 0 || unit > type(uint128).max) revert Errors.InvalidParams();
         S.Layout storage l = S.layout();
         S.AssetCfg storage cfg = l.assets[asset];
         cfg.configured = true;
-        cfg.unit = unit;
+        cfg.unit = uint128(unit);
         cfg.openLimit = openLimit;
         euint64 b = FHE.fromExternal(big, proof);
         FHE.allowThis(b);
@@ -66,11 +66,11 @@ library PolicyLib {
     }
 
     function _applyLimits(address asset, uint256 unit, euint64 lmin, euint64 lmax, euint64 big) private {
-        if (unit == 0) revert Errors.InvalidParams();
+        if (unit == 0 || unit > type(uint128).max) revert Errors.InvalidParams();
         S.Layout storage l = S.layout();
         S.AssetCfg storage cfg = l.assets[asset];
         cfg.configured = true;
-        cfg.unit = unit;
+        cfg.unit = uint128(unit);
         S.AssetEnc storage e = l.assetEnc[asset];
         euint64 hi = FHE.max(lmax, lmin); // normalise: range is never empty
         FHE.allowThis(lmin);
@@ -150,8 +150,9 @@ library PolicyLib {
         S.AssetCfg storage cfg = l.assets[op.target];
         PolicyMath.sync(l, cfg);
         PolicyMath.rollEpoch(cfg);
-        uint256 sc = PolicyMath.scaleUp(cfg.spent + cfg.reserved + op.amount, cfg.unit);
-        if (sc > type(uint64).max) return false;
+        uint256 sc = PolicyMath.scaleUp(cfg.spent + cfg.reserved + op.amount, cfg.unit); // op.amount <= MAX_AMOUNT (openOutflow)
+        // out of the 64-bit FHE range, or the packed pending counter would overflow → PIN path, no evaluation
+        if (sc > type(uint64).max || uint256(cfg.reserved) + op.amount > type(uint112).max) return false;
 
         S.AssetEnc storage e = l.assetEnc[op.target];
         eaddress cp = FHE.asEaddress(op.counterparty); // counterparty is public in open mode anyway
@@ -162,7 +163,7 @@ library PolicyLib {
         FHE.makePubliclyDecryptable(ok);
 
         op.h0 = ebool.unwrap(ok);
-        cfg.reserved += op.amount; // N concurrent ops cannot use the threshold N times (S20)
+        cfg.reserved += uint112(op.amount); // N concurrent ops cannot use the threshold N times (S20)
         op.epochDay = cfg.epoch;
         op.status = S.Status.Evaluating;
         emit IAccountEvents.Evaluating(opId, op.h0);

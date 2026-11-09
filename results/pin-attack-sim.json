@@ -1,6 +1,6 @@
 {
-  "evidence": "[I] model (event-driven simulation; an exact model of the F0.10 contract semantics); success curve interpolated from v0.3 §13.8",
-  "generatedAtUtc": "2026-11-09T11:00:06.539Z",
+  "evidence": "[I] model (event-driven simulation; an exact model of the contract semantics: F0.10 derived back-off, and F0.15 stored back-off in the +SW variants); success curve interpolated from v0.3 §13.8",
+  "generatedAtUtc": "2026-11-09T22:39:59.041Z",
   "tables": [
     {
       "name": "T0",
@@ -22,7 +22,8 @@
     "escape: the owner starts an escape with K (no PIN). K44: anonymous guessing closes immediately. Without K44 the attacker keeps guessing for 30 days (if the PIN is found, the escape is cancelled with K+P).",
     "unrestrict: r after each restriction the owner lifts it with the PIN (in v03 the counter is reset every time; in K43 the score is kept and the owner's PIN updates the last-attempt time).",
     "Decay (K43): fixed calendar, −1 every 7 days; the phase φ of the first boundary is scanned on an hourly grid and the worst phase is reported (guessesMinMedianMax: over the phases).",
-    "Below 10 guesses the success probability is linear from 0 (the real curve is concave; higher for the first guesses)."
+    "Below 10 guesses the success probability is linear from 0 (the real curve is concave; higher for the first guesses).",
+    "+SW (F0.15, stored wait): the back-off end is saved when a guess is submitted and recomputed from the last attempt with the refunded score on a correct result; a decay boundary never shortens a running back-off. Rows without +SW model the F0.10 derived back-off."
   ],
   "rows": [
     {
@@ -1587,7 +1588,7 @@
     },
     {
       "variant": "K43/T2+K44 (no D)",
-      "final": true,
+      "final": false,
       "scenario": "none",
       "react": "-",
       "24h": {
@@ -1626,7 +1627,7 @@
     },
     {
       "variant": "K43/T2+K44 (no D)",
-      "final": true,
+      "final": false,
       "scenario": "rotate",
       "react": "15 min",
       "24h": {
@@ -1665,7 +1666,7 @@
     },
     {
       "variant": "K43/T2+K44 (no D)",
-      "final": true,
+      "final": false,
       "scenario": "rotate",
       "react": "1.0 h",
       "24h": {
@@ -1704,7 +1705,7 @@
     },
     {
       "variant": "K43/T2+K44 (no D)",
-      "final": true,
+      "final": false,
       "scenario": "rotate",
       "react": "8.0 h",
       "24h": {
@@ -1743,7 +1744,7 @@
     },
     {
       "variant": "K43/T2+K44 (no D)",
-      "final": true,
+      "final": false,
       "scenario": "escape",
       "react": "15 min",
       "24h": {
@@ -1782,7 +1783,7 @@
     },
     {
       "variant": "K43/T2+K44 (no D)",
-      "final": true,
+      "final": false,
       "scenario": "escape",
       "react": "1.0 h",
       "24h": {
@@ -1821,7 +1822,7 @@
     },
     {
       "variant": "K43/T2+K44 (no D)",
-      "final": true,
+      "final": false,
       "scenario": "escape",
       "react": "8.0 h",
       "24h": {
@@ -1860,7 +1861,7 @@
     },
     {
       "variant": "K43/T2+K44 (no D)",
-      "final": true,
+      "final": false,
       "scenario": "unrestrict",
       "react": "15 min",
       "24h": {
@@ -1899,7 +1900,7 @@
     },
     {
       "variant": "K43/T2+K44 (no D)",
-      "final": true,
+      "final": false,
       "scenario": "unrestrict",
       "react": "1.0 h",
       "24h": {
@@ -1938,7 +1939,7 @@
     },
     {
       "variant": "K43/T2+K44 (no D)",
-      "final": true,
+      "final": false,
       "scenario": "unrestrict",
       "react": "8.0 h",
       "24h": {
@@ -1977,7 +1978,7 @@
     },
     {
       "variant": "K43/T2+K44+K45 (with D)",
-      "final": true,
+      "final": false,
       "scenario": "none",
       "react": "-",
       "24h": {
@@ -2016,7 +2017,7 @@
     },
     {
       "variant": "K43/T2+K44+K45 (with D)",
-      "final": true,
+      "final": false,
       "scenario": "rotate",
       "react": "15 min",
       "24h": {
@@ -2055,7 +2056,7 @@
     },
     {
       "variant": "K43/T2+K44+K45 (with D)",
-      "final": true,
+      "final": false,
       "scenario": "rotate",
       "react": "1.0 h",
       "24h": {
@@ -2094,7 +2095,7 @@
     },
     {
       "variant": "K43/T2+K44+K45 (with D)",
-      "final": true,
+      "final": false,
       "scenario": "rotate",
       "react": "8.0 h",
       "24h": {
@@ -2133,7 +2134,7 @@
     },
     {
       "variant": "K43/T2+K44+K45 (with D)",
-      "final": true,
+      "final": false,
       "scenario": "escape",
       "react": "15 min",
       "24h": {
@@ -2172,7 +2173,7 @@
     },
     {
       "variant": "K43/T2+K44+K45 (with D)",
-      "final": true,
+      "final": false,
       "scenario": "escape",
       "react": "1.0 h",
       "24h": {
@@ -2211,7 +2212,7 @@
     },
     {
       "variant": "K43/T2+K44+K45 (with D)",
-      "final": true,
+      "final": false,
       "scenario": "escape",
       "react": "8.0 h",
       "24h": {
@@ -2250,7 +2251,7 @@
     },
     {
       "variant": "K43/T2+K44+K45 (with D)",
-      "final": true,
+      "final": false,
       "scenario": "unrestrict",
       "react": "15 min",
       "24h": {
@@ -2289,7 +2290,7 @@
     },
     {
       "variant": "K43/T2+K44+K45 (with D)",
-      "final": true,
+      "final": false,
       "scenario": "unrestrict",
       "react": "1.0 h",
       "24h": {
@@ -2328,7 +2329,7 @@
     },
     {
       "variant": "K43/T2+K44+K45 (with D)",
-      "final": true,
+      "final": false,
       "scenario": "unrestrict",
       "react": "8.0 h",
       "24h": {
@@ -2362,6 +2363,786 @@
           13
         ],
         "ownerPinEntries": 7,
+        "stopReason": null
+      }
+    },
+    {
+      "variant": "K43/T2+K44+SW (no D)",
+      "final": true,
+      "scenario": "none",
+      "react": "-",
+      "24h": {
+        "guesses": 8,
+        "pSuccessPct": 5.2,
+        "guessesMinMedianMax": [
+          7,
+          7,
+          8
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": null
+      },
+      "7d": {
+        "guesses": 9,
+        "pSuccessPct": 5.9,
+        "guessesMinMedianMax": [
+          8,
+          9,
+          9
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": null
+      },
+      "30d": {
+        "guesses": 12,
+        "pSuccessPct": 6.9,
+        "guessesMinMedianMax": [
+          11,
+          12,
+          12
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": null
+      }
+    },
+    {
+      "variant": "K43/T2+K44+SW (no D)",
+      "final": true,
+      "scenario": "rotate",
+      "react": "15 min",
+      "24h": {
+        "guesses": 8,
+        "pSuccessPct": 5.2,
+        "guessesMinMedianMax": [
+          7,
+          7,
+          8
+        ],
+        "ownerPinEntries": 1,
+        "stopReason": "rotation executed after 24 h"
+      },
+      "7d": {
+        "guesses": 8,
+        "pSuccessPct": 5.2,
+        "guessesMinMedianMax": [
+          7,
+          7,
+          8
+        ],
+        "ownerPinEntries": 1,
+        "stopReason": "rotation executed after 24 h"
+      },
+      "30d": {
+        "guesses": 8,
+        "pSuccessPct": 5.2,
+        "guessesMinMedianMax": [
+          7,
+          7,
+          8
+        ],
+        "ownerPinEntries": 1,
+        "stopReason": "rotation executed after 24 h"
+      }
+    },
+    {
+      "variant": "K43/T2+K44+SW (no D)",
+      "final": true,
+      "scenario": "rotate",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 8,
+        "pSuccessPct": 5.2,
+        "guessesMinMedianMax": [
+          7,
+          7,
+          8
+        ],
+        "ownerPinEntries": 1,
+        "stopReason": "rotation executed after 24 h"
+      },
+      "7d": {
+        "guesses": 8,
+        "pSuccessPct": 5.2,
+        "guessesMinMedianMax": [
+          7,
+          7,
+          8
+        ],
+        "ownerPinEntries": 1,
+        "stopReason": "rotation executed after 24 h"
+      },
+      "30d": {
+        "guesses": 8,
+        "pSuccessPct": 5.2,
+        "guessesMinMedianMax": [
+          7,
+          7,
+          8
+        ],
+        "ownerPinEntries": 1,
+        "stopReason": "rotation executed after 24 h"
+      }
+    },
+    {
+      "variant": "K43/T2+K44+SW (no D)",
+      "final": true,
+      "scenario": "rotate",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 7,
+        "pSuccessPct": 4.6,
+        "guessesMinMedianMax": [
+          6,
+          6,
+          7
+        ],
+        "ownerPinEntries": 1,
+        "stopReason": "rotation executed after 24 h"
+      },
+      "7d": {
+        "guesses": 8,
+        "pSuccessPct": 5.2,
+        "guessesMinMedianMax": [
+          7,
+          7,
+          8
+        ],
+        "ownerPinEntries": 1,
+        "stopReason": "rotation executed after 24 h"
+      },
+      "30d": {
+        "guesses": 8,
+        "pSuccessPct": 5.2,
+        "guessesMinMedianMax": [
+          7,
+          7,
+          8
+        ],
+        "ownerPinEntries": 1,
+        "stopReason": "rotation executed after 24 h"
+      }
+    },
+    {
+      "variant": "K43/T2+K44+SW (no D)",
+      "final": true,
+      "scenario": "escape",
+      "react": "15 min",
+      "24h": {
+        "guesses": 4,
+        "pSuccessPct": 2.6,
+        "guessesMinMedianMax": [
+          4,
+          4,
+          4
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": "K44: anonymous guessing closed when the escape started"
+      },
+      "7d": {
+        "guesses": 4,
+        "pSuccessPct": 2.6,
+        "guessesMinMedianMax": [
+          4,
+          4,
+          4
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": "K44: anonymous guessing closed when the escape started"
+      },
+      "30d": {
+        "guesses": 4,
+        "pSuccessPct": 2.6,
+        "guessesMinMedianMax": [
+          4,
+          4,
+          4
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": "K44: anonymous guessing closed when the escape started"
+      }
+    },
+    {
+      "variant": "K43/T2+K44+SW (no D)",
+      "final": true,
+      "scenario": "escape",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 4,
+        "pSuccessPct": 2.6,
+        "guessesMinMedianMax": [
+          4,
+          4,
+          4
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": "K44: anonymous guessing closed when the escape started"
+      },
+      "7d": {
+        "guesses": 4,
+        "pSuccessPct": 2.6,
+        "guessesMinMedianMax": [
+          4,
+          4,
+          4
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": "K44: anonymous guessing closed when the escape started"
+      },
+      "30d": {
+        "guesses": 4,
+        "pSuccessPct": 2.6,
+        "guessesMinMedianMax": [
+          4,
+          4,
+          4
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": "K44: anonymous guessing closed when the escape started"
+      }
+    },
+    {
+      "variant": "K43/T2+K44+SW (no D)",
+      "final": true,
+      "scenario": "escape",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 7,
+        "pSuccessPct": 4.6,
+        "guessesMinMedianMax": [
+          6,
+          6,
+          7
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": "K44: anonymous guessing closed when the escape started"
+      },
+      "7d": {
+        "guesses": 7,
+        "pSuccessPct": 4.6,
+        "guessesMinMedianMax": [
+          6,
+          6,
+          7
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": "K44: anonymous guessing closed when the escape started"
+      },
+      "30d": {
+        "guesses": 7,
+        "pSuccessPct": 4.6,
+        "guessesMinMedianMax": [
+          6,
+          6,
+          7
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": "K44: anonymous guessing closed when the escape started"
+      }
+    },
+    {
+      "variant": "K43/T2+K44+SW (no D)",
+      "final": true,
+      "scenario": "unrestrict",
+      "react": "15 min",
+      "24h": {
+        "guesses": 7,
+        "pSuccessPct": 4.6,
+        "guessesMinMedianMax": [
+          6,
+          6,
+          7
+        ],
+        "ownerPinEntries": 4,
+        "stopReason": null
+      },
+      "7d": {
+        "guesses": 8,
+        "pSuccessPct": 5.2,
+        "guessesMinMedianMax": [
+          7,
+          8,
+          8
+        ],
+        "ownerPinEntries": 6,
+        "stopReason": null
+      },
+      "30d": {
+        "guesses": 12,
+        "pSuccessPct": 6.9,
+        "guessesMinMedianMax": [
+          11,
+          11,
+          12
+        ],
+        "ownerPinEntries": 9,
+        "stopReason": null
+      }
+    },
+    {
+      "variant": "K43/T2+K44+SW (no D)",
+      "final": true,
+      "scenario": "unrestrict",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 7,
+        "pSuccessPct": 4.6,
+        "guessesMinMedianMax": [
+          6,
+          6,
+          7
+        ],
+        "ownerPinEntries": 3,
+        "stopReason": null
+      },
+      "7d": {
+        "guesses": 8,
+        "pSuccessPct": 5.2,
+        "guessesMinMedianMax": [
+          7,
+          8,
+          8
+        ],
+        "ownerPinEntries": 5,
+        "stopReason": null
+      },
+      "30d": {
+        "guesses": 12,
+        "pSuccessPct": 6.9,
+        "guessesMinMedianMax": [
+          11,
+          11,
+          12
+        ],
+        "ownerPinEntries": 8,
+        "stopReason": null
+      }
+    },
+    {
+      "variant": "K43/T2+K44+SW (no D)",
+      "final": true,
+      "scenario": "unrestrict",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 7,
+        "pSuccessPct": 4.6,
+        "guessesMinMedianMax": [
+          6,
+          6,
+          7
+        ],
+        "ownerPinEntries": 1,
+        "stopReason": null
+      },
+      "7d": {
+        "guesses": 9,
+        "pSuccessPct": 5.9,
+        "guessesMinMedianMax": [
+          8,
+          8,
+          9
+        ],
+        "ownerPinEntries": 2,
+        "stopReason": null
+      },
+      "30d": {
+        "guesses": 12,
+        "pSuccessPct": 6.9,
+        "guessesMinMedianMax": [
+          11,
+          11,
+          12
+        ],
+        "ownerPinEntries": 5,
+        "stopReason": null
+      }
+    },
+    {
+      "variant": "K43/T2+K44+K45+SW (with D)",
+      "final": true,
+      "scenario": "none",
+      "react": "-",
+      "24h": {
+        "guesses": 8,
+        "pSuccessPct": 5.2,
+        "guessesMinMedianMax": [
+          7,
+          7,
+          8
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": null
+      },
+      "7d": {
+        "guesses": 9,
+        "pSuccessPct": 5.9,
+        "guessesMinMedianMax": [
+          8,
+          9,
+          9
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": null
+      },
+      "30d": {
+        "guesses": 12,
+        "pSuccessPct": 6.9,
+        "guessesMinMedianMax": [
+          11,
+          12,
+          12
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": null
+      }
+    },
+    {
+      "variant": "K43/T2+K44+K45+SW (with D)",
+      "final": true,
+      "scenario": "rotate",
+      "react": "15 min",
+      "24h": {
+        "guesses": 4,
+        "pSuccessPct": 2.6,
+        "guessesMinMedianMax": [
+          4,
+          4,
+          4
+        ],
+        "ownerPinEntries": 1,
+        "stopReason": "K45: verified rotation closed the K-track"
+      },
+      "7d": {
+        "guesses": 4,
+        "pSuccessPct": 2.6,
+        "guessesMinMedianMax": [
+          4,
+          4,
+          4
+        ],
+        "ownerPinEntries": 1,
+        "stopReason": "K45: verified rotation closed the K-track"
+      },
+      "30d": {
+        "guesses": 4,
+        "pSuccessPct": 2.6,
+        "guessesMinMedianMax": [
+          4,
+          4,
+          4
+        ],
+        "ownerPinEntries": 1,
+        "stopReason": "K45: verified rotation closed the K-track"
+      }
+    },
+    {
+      "variant": "K43/T2+K44+K45+SW (with D)",
+      "final": true,
+      "scenario": "rotate",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 4,
+        "pSuccessPct": 2.6,
+        "guessesMinMedianMax": [
+          4,
+          4,
+          4
+        ],
+        "ownerPinEntries": 1,
+        "stopReason": "K45: verified rotation closed the K-track"
+      },
+      "7d": {
+        "guesses": 4,
+        "pSuccessPct": 2.6,
+        "guessesMinMedianMax": [
+          4,
+          4,
+          4
+        ],
+        "ownerPinEntries": 1,
+        "stopReason": "K45: verified rotation closed the K-track"
+      },
+      "30d": {
+        "guesses": 4,
+        "pSuccessPct": 2.6,
+        "guessesMinMedianMax": [
+          4,
+          4,
+          4
+        ],
+        "ownerPinEntries": 1,
+        "stopReason": "K45: verified rotation closed the K-track"
+      }
+    },
+    {
+      "variant": "K43/T2+K44+K45+SW (with D)",
+      "final": true,
+      "scenario": "rotate",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 7,
+        "pSuccessPct": 4.6,
+        "guessesMinMedianMax": [
+          6,
+          6,
+          7
+        ],
+        "ownerPinEntries": 1,
+        "stopReason": "K45: verified rotation closed the K-track"
+      },
+      "7d": {
+        "guesses": 7,
+        "pSuccessPct": 4.6,
+        "guessesMinMedianMax": [
+          6,
+          6,
+          7
+        ],
+        "ownerPinEntries": 1,
+        "stopReason": "K45: verified rotation closed the K-track"
+      },
+      "30d": {
+        "guesses": 7,
+        "pSuccessPct": 4.6,
+        "guessesMinMedianMax": [
+          6,
+          6,
+          7
+        ],
+        "ownerPinEntries": 1,
+        "stopReason": "K45: verified rotation closed the K-track"
+      }
+    },
+    {
+      "variant": "K43/T2+K44+K45+SW (with D)",
+      "final": true,
+      "scenario": "escape",
+      "react": "15 min",
+      "24h": {
+        "guesses": 4,
+        "pSuccessPct": 2.6,
+        "guessesMinMedianMax": [
+          4,
+          4,
+          4
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": "K44: anonymous guessing closed when the escape started"
+      },
+      "7d": {
+        "guesses": 4,
+        "pSuccessPct": 2.6,
+        "guessesMinMedianMax": [
+          4,
+          4,
+          4
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": "K44: anonymous guessing closed when the escape started"
+      },
+      "30d": {
+        "guesses": 4,
+        "pSuccessPct": 2.6,
+        "guessesMinMedianMax": [
+          4,
+          4,
+          4
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": "K44: anonymous guessing closed when the escape started"
+      }
+    },
+    {
+      "variant": "K43/T2+K44+K45+SW (with D)",
+      "final": true,
+      "scenario": "escape",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 4,
+        "pSuccessPct": 2.6,
+        "guessesMinMedianMax": [
+          4,
+          4,
+          4
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": "K44: anonymous guessing closed when the escape started"
+      },
+      "7d": {
+        "guesses": 4,
+        "pSuccessPct": 2.6,
+        "guessesMinMedianMax": [
+          4,
+          4,
+          4
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": "K44: anonymous guessing closed when the escape started"
+      },
+      "30d": {
+        "guesses": 4,
+        "pSuccessPct": 2.6,
+        "guessesMinMedianMax": [
+          4,
+          4,
+          4
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": "K44: anonymous guessing closed when the escape started"
+      }
+    },
+    {
+      "variant": "K43/T2+K44+K45+SW (with D)",
+      "final": true,
+      "scenario": "escape",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 7,
+        "pSuccessPct": 4.6,
+        "guessesMinMedianMax": [
+          6,
+          6,
+          7
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": "K44: anonymous guessing closed when the escape started"
+      },
+      "7d": {
+        "guesses": 7,
+        "pSuccessPct": 4.6,
+        "guessesMinMedianMax": [
+          6,
+          6,
+          7
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": "K44: anonymous guessing closed when the escape started"
+      },
+      "30d": {
+        "guesses": 7,
+        "pSuccessPct": 4.6,
+        "guessesMinMedianMax": [
+          6,
+          6,
+          7
+        ],
+        "ownerPinEntries": 0,
+        "stopReason": "K44: anonymous guessing closed when the escape started"
+      }
+    },
+    {
+      "variant": "K43/T2+K44+K45+SW (with D)",
+      "final": true,
+      "scenario": "unrestrict",
+      "react": "15 min",
+      "24h": {
+        "guesses": 8,
+        "pSuccessPct": 5.2,
+        "guessesMinMedianMax": [
+          7,
+          7,
+          8
+        ],
+        "ownerPinEntries": 6,
+        "stopReason": null
+      },
+      "7d": {
+        "guesses": 9,
+        "pSuccessPct": 5.9,
+        "guessesMinMedianMax": [
+          8,
+          9,
+          9
+        ],
+        "ownerPinEntries": 7,
+        "stopReason": null
+      },
+      "30d": {
+        "guesses": 12,
+        "pSuccessPct": 6.9,
+        "guessesMinMedianMax": [
+          11,
+          12,
+          12
+        ],
+        "ownerPinEntries": 10,
+        "stopReason": null
+      }
+    },
+    {
+      "variant": "K43/T2+K44+K45+SW (with D)",
+      "final": true,
+      "scenario": "unrestrict",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 8,
+        "pSuccessPct": 5.2,
+        "guessesMinMedianMax": [
+          7,
+          7,
+          8
+        ],
+        "ownerPinEntries": 5,
+        "stopReason": null
+      },
+      "7d": {
+        "guesses": 9,
+        "pSuccessPct": 5.9,
+        "guessesMinMedianMax": [
+          8,
+          9,
+          9
+        ],
+        "ownerPinEntries": 6,
+        "stopReason": null
+      },
+      "30d": {
+        "guesses": 12,
+        "pSuccessPct": 6.9,
+        "guessesMinMedianMax": [
+          11,
+          12,
+          12
+        ],
+        "ownerPinEntries": 9,
+        "stopReason": null
+      }
+    },
+    {
+      "variant": "K43/T2+K44+K45+SW (with D)",
+      "final": true,
+      "scenario": "unrestrict",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 8,
+        "pSuccessPct": 5.2,
+        "guessesMinMedianMax": [
+          7,
+          7,
+          8
+        ],
+        "ownerPinEntries": 1,
+        "stopReason": null
+      },
+      "7d": {
+        "guesses": 9,
+        "pSuccessPct": 5.9,
+        "guessesMinMedianMax": [
+          8,
+          9,
+          9
+        ],
+        "ownerPinEntries": 3,
+        "stopReason": null
+      },
+      "30d": {
+        "guesses": 12,
+        "pSuccessPct": 6.9,
+        "guessesMinMedianMax": [
+          11,
+          12,
+          12
+        ],
+        "ownerPinEntries": 6,
         "stopReason": null
       }
     }

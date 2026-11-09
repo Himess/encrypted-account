@@ -2,7 +2,7 @@ import { expect } from "chai";
 import * as fs from "fs";
 import * as hre from "hardhat";
 import * as path from "path";
-import { debugU64, ethers } from "./helpers";
+import { RECORD, debugU64, ethers } from "./helpers";
 
 /**
  * E7-v2 (F0.10, K47) — the v1 and v2 formulas of the tripwire threshold τ.
@@ -103,7 +103,7 @@ describe("E7-v2 — τ formula (K47): exact distribution, mock draws, HCU", func
   };
 
   after(() => {
-    fs.writeFileSync(path.join(__dirname, "..", "results", "e7-v2.json"), JSON.stringify(out, null, 2));
+    if (RECORD) fs.writeFileSync(path.join(__dirname, "..", "results", "e7-v2.json"), JSON.stringify(out, null, 2)); // only `npm run test:record`
   });
 
   it("exact distribution: v2 stays in range; coverage ≥ 99% for 2^16 ≤ D < 2^48; uniform on narrow ranges too; v1's gaps are visible", () => {

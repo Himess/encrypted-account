@@ -124,7 +124,7 @@ contract EncryptedAccountB is EncryptedAccount {
         uint64 at = sub == S.OUT_APPROVE ? l.openKnownS[cp] : l.openKnownR[cp];
         if (at == 0 || at > block.timestamp) return false;
         PolicyMath.rollEpoch(cfg);
-        return cfg.spent + amount <= cfg.openLimit;
+        return cfg.spent <= cfg.openLimit && amount <= cfg.openLimit - cfg.spent; // no overflow for huge amounts
     }
 
     // ─────────────────────────────── restrictive actions (K alone, immediate) ───────────────────────────────
