@@ -351,8 +351,8 @@ contract EncryptedAccount is IAccount, IERC1271, ReentrancyGuardTransient, IAcco
         if (to == address(0) || to == address(this)) revert Errors.InvalidParams();
         S.AssetCfg storage cfg = l.assets[asset];
         PolicyMath.rollEpoch(cfg);
-        if (cfg.instantSpent + amount > cfg.instantBudget) revert Errors.InvalidParams();
-        cfg.instantSpent += amount;
+        if (PolicyMath.counterOf(cfg.instantSpent) + amount > cfg.instantBudget) revert Errors.InvalidParams();
+        cfg.instantSpent = PolicyMath.counterAdd(cfg.instantSpent, amount);
         OpsLib.performOutflow(asset == address(0) ? S.OUT_ETH : S.OUT_ERC20, asset, to, amount);
     }
 
@@ -491,6 +491,9 @@ contract EncryptedAccount is IAccount, IERC1271, ReentrancyGuardTransient, IAcco
             c.reserved = 0;
             c.pinCommitted = 0;
         }
+        c.spent = PolicyMath.counterOf(c.spent);
+        c.pinSpent = PolicyMath.counterOf(c.pinSpent);
+        c.instantSpent = PolicyMath.counterOf(c.instantSpent);
     }
 
     function delays() external view returns (S.Delays memory) {

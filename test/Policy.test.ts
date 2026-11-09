@@ -66,6 +66,30 @@ describe("F0.4 — Anomaly policy: hidden limit, random tripwire, encrypted know
     expect((await acct.assetState(ETH)).spent).to.eq(E.parseEther("0.05"));
   });
 
+  it("F0.15: the epoch roll restarts a used counter at 1, not at 0, so the day's first spend opens no new slot", async () => {
+    const acct = await fresh();
+    const addr = await acct.getAddress();
+    const amount = E.parseEther("0.05");
+    let opId = await requestTransfer(acct, owner, ETH, alice.address, amount);
+    await finalizeEvaluation(acct, opId);
+    // `assets[ETH].spent` in the ERC-7201 layout: keccak(asset, base + k) + 2, stored as value + 1
+    const BASE = BigInt("0x69b0cc5be722a1fbc0f4af700b954df411486df55095995ce386a11f614d6600");
+    let slot = -1n;
+    for (let k = 0n; k < 200n && slot < 0n; k++) {
+      const s = BigInt(E.keccak256(coder.encode(["address", "uint256"], [ETH, BASE + k]))) + 2n;
+      if (BigInt(await ethers.provider.getStorage(addr, s)) === amount + 1n) slot = s;
+    }
+    expect(slot).to.be.gte(0n);
+    const now = await time.latest();
+    await time.increaseTo((Math.floor(now / DAY) + 1) * DAY + 60); // next epoch
+    opId = await requestTransfer(acct, owner, ETH, alice.address, amount); // the evaluation rolls the epoch
+    expect(BigInt(await ethers.provider.getStorage(addr, slot))).to.eq(1n); // value 0, but the slot never returns to zero
+    expect((await acct.assetState(ETH)).spent).to.eq(0n);
+    await finalizeEvaluation(acct, opId);
+    expect((await acct.assetState(ETH)).spent).to.eq(amount);
+    expect(BigInt(await ethers.provider.getStorage(addr, slot))).to.eq(amount + 1n);
+  });
+
   it("unknown recipient (below the limit) → ok=0 → 'PIN required'; the tripwire does NOT fire (14.1)", async () => {
     const acct = await fresh();
     const opId = await requestTransfer(acct, owner, ETH, bob.address, E.parseEther("0.05"));

@@ -180,6 +180,23 @@ describe("F0.1 / F0.6 — PIN: two-phase verification, counters, restricted mode
     expect((await acct.getOp(op2)).status).to.eq(Status.NeedsPin);
   });
 
+  it("F0.15 · I5 per track: an older input replayed after another guess is evaluated, is wrong (it carries another op's c) and counts", async () => {
+    const acct = await fresh();
+    const op1 = await requestTransfer(acct, owner, ETH, bob.address, E.parseEther("0.05"), true);
+    const enc1 = await encGuess(acct, owner.address, stack.chainId, op1, PIN);
+    await (await acct.connect(owner).submitGuess(op1, enc1.c, enc1.handles[0], enc1.inputProof)).wait();
+    await finalizeGuess(acct, op1);
+    const op2 = await requestTransfer(acct, owner, ETH, bob.address, E.parseEther("0.05"), true);
+    await guessAndFinalize(acct, owner, stack.chainId, op2, PIN); // another input in between
+    const op3 = await requestTransfer(acct, owner, ETH, stranger.address, E.parseEther("1"), true);
+    const c3 = BigInt(await acct.challengeOf(op3));
+    const before = (await acct.trackState(TRACK.OWNER)).score;
+    await (await acct.connect(owner).submitGuess(op3, c3, enc1.handles[0], enc1.inputProof)).wait();
+    await finalizeGuess(acct, op3);
+    expect((await acct.getOp(op3)).status).to.eq(Status.NeedsPin); // it encrypts h + c1, not h + c3
+    expect((await acct.trackState(TRACK.OWNER)).score).to.eq(before + 1n); // a wrong guess against the submitter
+  });
+
   it("an empty input proof is rejected everywhere (no handle injection)", async () => {
     const acct = await fresh();
     const opId = await requestTransfer(acct, owner, ETH, bob.address, E.parseEther("0.05"), true);

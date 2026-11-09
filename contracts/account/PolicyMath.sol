@@ -28,16 +28,27 @@ library PolicyMath {
         return uint64(block.timestamp / EPOCH_LENGTH);
     }
 
-    /// @dev Calendar epochs (day buckets). Spent counters reset; reservations and committed PIN
-    ///      outflows are not epoch-bound and survive the roll.
+    /// @dev Calendar epochs (day buckets). Spent counters restart; reservations and committed PIN
+    ///      outflows are not epoch-bound and survive the roll. F0.15: a used counter restarts at 1 (its value 0, see
+    ///      counterOf) instead of at 0, so the day's first spend does not open a new slot again.
     function rollEpoch(S.AssetCfg storage cfg) internal {
         uint64 e = currentEpoch();
         if (cfg.epoch != e) {
             cfg.epoch = e;
-            cfg.spent = 0;
-            cfg.pinSpent = 0;
-            cfg.instantSpent = 0;
+            if (cfg.spent > 1) cfg.spent = 1;
+            if (cfg.pinSpent > 1) cfg.pinSpent = 1;
+            if (cfg.instantSpent > 1) cfg.instantSpent = 1;
         }
+    }
+
+    /// @notice Value of an epoch counter (`spent`, `pinSpent`, `instantSpent`): stored as value + 1 once used; 0 = never used.
+    function counterOf(uint256 raw) internal pure returns (uint256) {
+        return raw == 0 ? 0 : raw - 1;
+    }
+
+    /// @notice Stored form of an epoch counter after adding `v`.
+    function counterAdd(uint256 raw, uint256 v) internal pure returns (uint256) {
+        return (raw == 0 ? 1 : raw) + v;
     }
 
     // ─────────────────────────────── K43 / K46 / K56: score, decay, back-off ───────────────────────────────

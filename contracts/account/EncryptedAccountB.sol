@@ -100,9 +100,8 @@ contract EncryptedAccountB is EncryptedAccount {
         if (cp == address(0) || cp == address(this) || amount == 0) revert Errors.InvalidParams();
         S.AssetCfg storage cfg = l.assets[asset];
         if (!viaPin && _openOk(l, cfg, sub, cp, amount)) {
-            uint256 spent = cfg.spent + amount;
-            cfg.spent = spent; // I12: nothing but the epoch roll lowers it
-            emit OpenOutflow(sub, asset, cp, amount, spent);
+            cfg.spent = PolicyMath.counterAdd(cfg.spent, amount); // I12: nothing but the epoch roll lowers it
+            emit OpenOutflow(sub, asset, cp, amount, PolicyMath.counterOf(cfg.spent));
             if (sub == S.OUT_ETH) {
                 (bool s, ) = payable(cp).call{value: amount}("");
                 if (!s) revert Errors.TransferFailed();
@@ -124,7 +123,8 @@ contract EncryptedAccountB is EncryptedAccount {
         uint64 at = sub == S.OUT_APPROVE ? l.openKnownS[cp] : l.openKnownR[cp];
         if (at == 0 || at > block.timestamp) return false;
         PolicyMath.rollEpoch(cfg);
-        return cfg.spent <= cfg.openLimit && amount <= cfg.openLimit - cfg.spent; // no overflow for huge amounts
+        uint256 s = PolicyMath.counterOf(cfg.spent);
+        return s <= cfg.openLimit && amount <= cfg.openLimit - s; // no overflow for huge amounts
     }
 
     // ─────────────────────────────── restrictive actions (K alone, immediate) ───────────────────────────────

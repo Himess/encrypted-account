@@ -1,0 +1,141 @@
+{
+  "evidence": "[Mock] Hardhat EDR (prague schedule), test/CostModel.test.ts started 10 min into a UTC epoch; before = contracts at commit 78badaa, after = F0.15 incl. step 2",
+  "rows": [
+    {
+      "flow": "factory.createAccount (clone + initialize + E_addr EIP-712 consent)",
+      "gasBefore": 295365,
+      "gasAfter": 295399,
+      "delta": 34,
+      "hcu": 0,
+      "hcuSame": true
+    },
+    {
+      "flow": "setupPin (fingerprint + duress slot select/rand)",
+      "gasBefore": 813475,
+      "gasAfter": 813533,
+      "delta": 58,
+      "hcu": 79000,
+      "hcuSame": true
+    },
+    {
+      "flow": "setupAsset (L_min, L, L_big + \u03c4 draw)",
+      "gasBefore": 1477331,
+      "gasAfter": 1477473,
+      "delta": 142,
+      "hcu": 1345064,
+      "hcuSame": true
+    },
+    {
+      "flow": "setupKnown (12 eaddress / proof)",
+      "gasBefore": 2062906,
+      "gasAfter": 2062894,
+      "delta": -12,
+      "hcu": 0,
+      "hcuSame": true
+    },
+    {
+      "flow": "arm",
+      "gasBefore": 65693,
+      "gasAfter": 65693,
+      "delta": 0,
+      "hcu": 0,
+      "hcuSame": true
+    },
+    {
+      "flow": "requestTransfer K-only (isIn N=30 + threshold + sticky tripwire)",
+      "gasBefore": 1228302,
+      "gasAfter": 1185220,
+      "delta": -43082,
+      "hcu": 774036,
+      "hcuSame": true
+    },
+    {
+      "flow": "finalizeEvaluation (KMS proof + transfer)",
+      "gasBefore": 304309,
+      "gasAfter": 307391,
+      "delta": 3082,
+      "hcu": 0,
+      "hcuSame": true
+    },
+    {
+      "flow": "requestTransfer PIN path (opens op)",
+      "gasBefore": 139505,
+      "gasAfter": 117764,
+      "delta": -21741,
+      "hcu": 0,
+      "hcuSame": true
+    },
+    {
+      "flow": "submitGuess (transfer; okAny + isDuress + big)",
+      "gasBefore": 1205703,
+      "gasAfter": 1192186,
+      "delta": -13517,
+      "hcu": 698002,
+      "hcuSame": true
+    },
+    {
+      "flow": "finalizeGuess (2-handle KMS proof)",
+      "gasBefore": 311631,
+      "gasAfter": 303271,
+      "delta": -8360,
+      "hcu": 0,
+      "hcuSame": true
+    },
+    {
+      "flow": "executeOp transfer (+ auto-add to known list: isIn + select)",
+      "gasBefore": 734290,
+      "gasAfter": 737236,
+      "delta": 2946,
+      "hcu": 667032,
+      "hcuSame": true
+    },
+    {
+      "flow": "submitGuess (admin; okAny + isDuress)",
+      "gasBefore": 1025545,
+      "gasAfter": 949573,
+      "delta": -75972,
+      "hcu": 555002,
+      "hcuSame": true
+    },
+    {
+      "flow": "finalizeGuess + resetTrip (\u03c4 redrawn)",
+      "gasBefore": 953677,
+      "gasAfter": 959984,
+      "delta": 6307,
+      "hcu": 1127064,
+      "hcuSame": true
+    },
+    {
+      "flow": "tightenLimits (K-only; 4\u00d7 min)",
+      "gasBefore": 907386,
+      "gasAfter": 907387,
+      "delta": 1,
+      "hcu": 876000,
+      "hcuSame": true
+    },
+    {
+      "flow": "removeKnown (K-only; select)",
+      "gasBefore": 510093,
+      "gasAfter": 510105,
+      "delta": 12,
+      "hcu": 83032,
+      "hcuSame": true
+    },
+    {
+      "flow": "startEscape (no FHE)",
+      "gasBefore": 60094,
+      "gasAfter": 60040,
+      "delta": -54,
+      "hcu": 0,
+      "hcuSame": true
+    },
+    {
+      "flow": "executeEscape (no FHE; ETH + 1 token)",
+      "gasBefore": 50224,
+      "gasAfter": 50224,
+      "delta": 0,
+      "hcu": 0,
+      "hcuSame": true
+    }
+  ]
+}

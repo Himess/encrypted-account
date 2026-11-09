@@ -54,6 +54,7 @@ against whoever holds the account key (K). The PIN is asked only for unusual ope
 | Local input proof on a phone (Galaxy A73, no COOP/COEP, single thread) | p95 13.65 s | `results/mobile-proof.json` |
 | K-only transfer, interleaved A/B, N = 30 each | A: p50 20.1 s / p95 26.3 s, 1,949,477 gas · B: p50 7.2 s / p95 14.6 s, 59,820 gas, 0 HCU | `results/sepolia/f011-ab.json` |
 | Account setup gas | A: 17,048,629 · B: 3,259,034 | `results/sepolia/setup-f011.json` |
+| New storage slots per PIN-verified transfer (block access list), before → after F0.15 | 16 → 8; gas −22.6% on Sepolia, ≈ −3.5% on today's mainnet schedule | `results/sepolia/f015-slots.json` |
 | Attack simulation: key stolen, human-chosen 6-digit PIN, 30 days | ≈ 7% with no reaction · ≈ 3% if the owner escapes within an hour · negligible for a random PIN | `results/pin-attack-sim.json` |
 
 Sepolia runs a newer gas schedule than mainnet (a new storage slot costs ≈ 111k gas), so the gas figures are pessimistic
@@ -114,6 +115,10 @@ npx hardhat run scripts/sepolia/snapshot-f011.ts     # A + B build snapshot
 SEP_RUN=f011 npx hardhat run scripts/sepolia/f011-prepare.ts   # deploy, A and B accounts, warm-up
 SEP_RUN=f011 npx hardhat run scripts/sepolia/f011-run.ts       # interleaved A/B K-only hot path, N = 30
 node scripts/f011-results.mjs                        # A/B table → results/f011-summary.json
+npx hardhat run scripts/sepolia/snapshot-f015.ts     # F0.15 build snapshot (SEP_RUN=f015b: step 2)
+SEP_RUN=f015 npx hardhat run scripts/sepolia/f015-prepare.ts   # deploy, e1 and hot accounts
+SEP_RUN=f015 F09_N=5 npx hardhat run scripts/sepolia/f09-run.ts
+npx hardhat run scripts/sepolia/f015-slots.ts        # new slots per transaction (block access list), F0.10 vs F0.15
 ```
 
 Other tools:

@@ -64,6 +64,8 @@ describe("E9/E19/E7 — cost model [Mock]", function () {
   });
 
   it("gas and HCU per flow (setup, K-only transfer, PIN, execution, settings)", async () => {
+    // start 10 min into a UTC epoch: the measured flows then never straddle an epoch roll, whatever the wall clock says
+    await time.increaseTo((Math.floor((await time.latest()) / DAY) + 1) * DAY + 600);
     const d = { ...(await stack.factory.defaultDelays()).toObject() };
     const salt = E.id("cost");
     const addr = await stack.factory.predictAddress(owner.address, escape.address, guardian.address, d, salt);

@@ -150,7 +150,7 @@ library PolicyLib {
         S.AssetCfg storage cfg = l.assets[op.target];
         PolicyMath.sync(l, cfg);
         PolicyMath.rollEpoch(cfg);
-        uint256 sc = PolicyMath.scaleUp(cfg.spent + cfg.reserved + op.amount, cfg.unit); // op.amount <= MAX_AMOUNT (openOutflow)
+        uint256 sc = PolicyMath.scaleUp(PolicyMath.counterOf(cfg.spent) + cfg.reserved + op.amount, cfg.unit); // op.amount <= MAX_AMOUNT (openOutflow)
         // out of the 64-bit FHE range, or the packed pending counter would overflow → PIN path, no evaluation
         if (sc > type(uint64).max || uint256(cfg.reserved) + op.amount > type(uint112).max) return false;
 

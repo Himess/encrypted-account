@@ -42,7 +42,7 @@ library OpsLib {
         // A restriction or an expired pulse that happened meanwhile also stops K-only execution.
         if (ok && l.restrictedReasons == 0 && PolicyMath.pulseOk(l)) {
             PolicyMath.rollEpoch(cfg);
-            if (cfg.epoch == op.epochDay) cfg.spent += op.amount;
+            if (cfg.epoch == op.epochDay) cfg.spent = PolicyMath.counterAdd(cfg.spent, op.amount);
             op.status = S.Status.Executed;
             _performOutflow(op.sub, op.target, op.counterparty, op.amount);
             emit IAccountEvents.OpExecuted(opId);
@@ -116,7 +116,7 @@ library OpsLib {
             uint256 c = PolicyMath.capped(op.amount);
             cfg.pinCommitted -= uint128(c);
             PolicyMath.rollEpoch(cfg);
-            cfg.pinSpent += c;
+            cfg.pinSpent = PolicyMath.counterAdd(cfg.pinSpent, c);
             _performOutflow(op.sub, op.target, op.counterparty, op.amount);
             if (l.autoKnown) {
                 if (l.openMode) {

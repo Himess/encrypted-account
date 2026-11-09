@@ -1,0 +1,306 @@
+{
+  "evidence": "[M] Sepolia",
+  "generatedAtUtc": "2026-11-09T23:00:10.834Z",
+  "run": "f015",
+  "contracts": {
+    "PinLib": "0xC31a7959570A8015EcEEdE804e51cbc31dEbe855",
+    "PolicyLib": "0x7de632d5c990d7b9472D17288b0bE7967E7e6100",
+    "OpenLib": "0x64C708Ae4B7A5C23fe270039129B228f3DDbb0b0",
+    "OpsLib": "0x99395241f9386D8bAd8a5E37Edb1c2e02Aa0f5cf",
+    "EncryptedAccount": "0xa289F7374Fd7746cCd4696Ac893d5B2d7aAe2958",
+    "EncryptedAccountFactory": "0xD9eb634Cd5C08eCa88A4567e48D9BAB100C4115C"
+  },
+  "runtimeBytes": {
+    "PinLib": 9300,
+    "PolicyLib": 9195,
+    "OpenLib": 12756,
+    "OpsLib": 10974,
+    "EncryptedAccount": 22351,
+    "EncryptedAccountFactory": 1868
+  },
+  "deploys": {
+    "PinLib": {
+      "label": "deploy PinLib",
+      "hash": "0x6930322397df72d54f3f21f44b2350f7e590f6b797399444bd2ee30489279b31",
+      "nonce": 287,
+      "blockNumber": 12100622,
+      "blockTimestamp": 1794264900,
+      "sentAtUtc": "2026-11-09T22:54:48.274Z",
+      "minedSeenAtUtc": "2026-11-09T22:54:59.141Z",
+      "inclusionMs": 10754,
+      "gasUsed": "14589364",
+      "effectiveGasPriceWei": "50000016",
+      "costWei": "729468433429824",
+      "replacements": 0
+    },
+    "PolicyLib": {
+      "label": "deploy PolicyLib",
+      "hash": "0x412475d92b322fac6f09830186f2a383459fd969849a8e1880a708cd1070d3eb",
+      "nonce": 288,
+      "blockNumber": 12100623,
+      "blockTimestamp": 1794264912,
+      "sentAtUtc": "2026-11-09T22:54:59.145Z",
+      "minedSeenAtUtc": "2026-11-09T22:55:09.916Z",
+      "inclusionMs": 10668,
+      "gasUsed": "14426737",
+      "effectiveGasPriceWei": "50000016",
+      "costWei": "721337080827792",
+      "replacements": 0
+    },
+    "OpenLib": {
+      "label": "deploy OpenLib",
+      "hash": "0xe16c62007c749d3f5dc9d626685a36c96c44507dba3d1f8c29563bcb37fe72a8",
+      "nonce": 289,
+      "blockNumber": 12100624,
+      "blockTimestamp": 1794264924,
+      "sentAtUtc": "2026-11-09T22:55:09.920Z",
+      "minedSeenAtUtc": "2026-11-09T22:55:22.984Z",
+      "inclusionMs": 12963,
+      "gasUsed": "19933856",
+      "effectiveGasPriceWei": "50000016",
+      "costWei": "996693118941696",
+      "replacements": 0
+    },
+    "OpsLib": {
+      "label": "deploy OpsLib",
+      "hash": "0x74c0c699b97c8893c91326ed1a8d756e71d9d630256f0a7e7780a7b83d163360",
+      "nonce": 290,
+      "blockNumber": 12100625,
+      "blockTimestamp": 1794264936,
+      "sentAtUtc": "2026-11-09T22:55:22.986Z",
+      "minedSeenAtUtc": "2026-11-09T22:55:33.779Z",
+      "inclusionMs": 10685,
+      "gasUsed": "17177610",
+      "effectiveGasPriceWei": "50000016",
+      "costWei": "858880774841760",
+      "replacements": 0
+    },
+    "EncryptedAccount": {
+      "label": "deploy EncryptedAccount",
+      "hash": "0x648043c90163fdfa1cce5a980f167eed1fb99d194a4a1cb2a519a9e01925e142",
+      "nonce": 291,
+      "blockNumber": 12100626,
+      "blockTimestamp": 1794264948,
+      "sentAtUtc": "2026-11-09T22:55:33.790Z",
+      "minedSeenAtUtc": "2026-11-09T22:55:47.049Z",
+      "inclusionMs": 13158,
+      "gasUsed": "34882307",
+      "effectiveGasPriceWei": "50000016",
+      "costWei": "1744115908116912",
+      "replacements": 0
+    },
+    "EncryptedAccountFactory": {
+      "label": "deploy EncryptedAccountFactory",
+      "hash": "0x6d5b4754169b9d1a6536563440aaa7b439c139dda38f8070433c252a53134257",
+      "nonce": 292,
+      "blockNumber": 12100627,
+      "blockTimestamp": 1794264960,
+      "sentAtUtc": "2026-11-09T22:55:47.052Z",
+      "minedSeenAtUtc": "2026-11-09T22:55:59.187Z",
+      "inclusionMs": 12002,
+      "gasUsed": "3097426",
+      "effectiveGasPriceWei": "50000016",
+      "costWei": "154871349558816",
+      "replacements": 0
+    }
+  },
+  "implConfig": {
+    "aclAddress": "0xf0Ffdc93b7E186bC2f8CB3dAA75D86d1930A433D",
+    "executorAddress": "0x92C920834Ec8941d2C77D188936E1f7A6f49c127",
+    "entryPoint": "0x4337084D9E255Ff0702461CF8895CE9E3b5Ff108"
+  },
+  "testDelays": {
+    "pinTransfer": 0,
+    "bigTransfer": 60,
+    "genericCall": 60,
+    "settings": 60,
+    "loosen": 60,
+    "knownAdd": 60,
+    "recovery": 120,
+    "recoveryNoDevice": 300,
+    "pinReset": 300,
+    "escape": 300,
+    "escapeChange": 300
+  },
+  "knownRecipient": "0xe31d26D71BCB2330cEe5D814b762ef602b453950",
+  "accounts": {
+    "e1": {
+      "address": "0x08c3acC24883E0aC7405Df0c2e86bBA71103C4Fe",
+      "escape": "0xeE0e48f63738Bb0bA3AbE56d6c9c32e1f51a5Bab",
+      "guardian": "0x8e98d5e45822b81Ac7dB853480c405E8Ea769B7A",
+      "rows": [
+        {
+          "step": "createAccount",
+          "gas": 1306858,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0x5d36317ac7d6640f5268ca2260d20246dda5326a810acb90f0161618f5add12a",
+          "block": 12100628
+        },
+        {
+          "step": "setupPin",
+          "gas": 842261,
+          "hcu": 79000,
+          "meterCheck": "equal",
+          "tx": "0x6bf35cc4d178c4ff9226b342ef3b7f5ad1c2a5bd7178561125dfbf227829a687",
+          "block": 12100629
+        },
+        {
+          "step": "setupAsset",
+          "gas": 1959471,
+          "hcu": 1345064,
+          "meterCheck": "equal",
+          "tx": "0xe88e82e6245eaaa7bb6edcf93ada3525e608b966608e9cfb144268b9489d174e",
+          "block": 12100630
+        },
+        {
+          "step": "setupKnownR0",
+          "gas": 3787437,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0xf64aa51ab645087af852c43b044325c30d62529faec7e8f2d2fdb7fbcd70f9d5",
+          "block": 12100631
+        },
+        {
+          "step": "setupKnownR12",
+          "gas": 3787425,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0x551f7a3690994b7cbf653e1fa0de8cb7e7cd1a1bf505f59b1e7783f0d7d7c303",
+          "block": 12100632
+        },
+        {
+          "step": "setupKnownR24",
+          "gas": 2033525,
+          "hcu": 0,
+          "meterCheck": "unreadable",
+          "tx": "0xc1c138e3c82b472fa371918295beac86f42d915dfc5412df08535fe093fa020a",
+          "block": 12100633
+        },
+        {
+          "step": "setupKnownS0",
+          "gas": 3235129,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0x775a5d5f8cca40f604f26c612a8610668a741242d2df8eb599306dd83e353bce",
+          "block": 12100634
+        },
+        {
+          "step": "setupRoles",
+          "gas": 29576,
+          "hcu": 0,
+          "meterCheck": "unreadable",
+          "tx": "0x811eeb627b5832677c99db7919e565e2c441227dce22151e556f30d1b41225df",
+          "block": 12100635
+        },
+        {
+          "step": "arm",
+          "gas": 67293,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0xfe48fca46a0bc58e087110a2e4fd5ce7116b0ff37317bba8ad3c54d02ca30d92",
+          "block": 12100636
+        },
+        {
+          "step": "fund",
+          "gas": 24119,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0x9a64379d0c7eaf5a74fd28ef91c625a65d10b308993885f7f6d5377e3371c8dd",
+          "block": 12100637
+        }
+      ],
+      "totalGas": 17048975,
+      "totalHcu": 1424064
+    },
+    "hot": {
+      "address": "0xE85064dcdb8eeeA769466b0a2c05BC9FdFB3042B",
+      "escape": "0x3F148242E835A2C86c0ABB635633bae8c25dfbed",
+      "guardian": "0x8e98d5e45822b81Ac7dB853480c405E8Ea769B7A",
+      "rows": [
+        {
+          "step": "createAccount",
+          "gas": 1306846,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0x106b223def44e132ed6854213578b8f19f4b484472b3ef41a19fdde33b5f2e5d",
+          "block": 12100638
+        },
+        {
+          "step": "setupPin",
+          "gas": 842273,
+          "hcu": 79000,
+          "meterCheck": "equal",
+          "tx": "0xefca6b0c4f9dfd1a1318cf0932d7e1a8d50584f00b9ebcfa2151e3ccf59e0ba3",
+          "block": 12100639
+        },
+        {
+          "step": "setupAsset",
+          "gas": 1959471,
+          "hcu": 1345064,
+          "meterCheck": "equal",
+          "tx": "0x2062a0d3185aef0ac93560217ba2776ddde30b567abbfb0d15201ab0e9897df0",
+          "block": 12100640
+        },
+        {
+          "step": "setupKnownR0",
+          "gas": 3787389,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0xb5da5484d5bc28b4d5b6edfc5f550b3dacb38b5baa5c381f1133ecbda8bed82a",
+          "block": 12100641
+        },
+        {
+          "step": "setupKnownR12",
+          "gas": 3787437,
+          "hcu": 0,
+          "meterCheck": "unreadable",
+          "tx": "0xad2095b5eab8a5685b6a11baa8d8fada632073a4a9fe71f53ac21f7ffd6d5b76",
+          "block": 12100642
+        },
+        {
+          "step": "setupKnownR24",
+          "gas": 2033525,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0x029fb151ab207c1262b65ef85c33b5ed70f429037cdf8de01544e4b3c8eced0d",
+          "block": 12100643
+        },
+        {
+          "step": "setupKnownS0",
+          "gas": 3235105,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0x550260559022c6abdc9dedca41d7e2daf152e8a5fcd982a58dbdf192bb1aaa7e",
+          "block": 12100644
+        },
+        {
+          "step": "setupRoles",
+          "gas": 29576,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0x93452b3f9dfb7e368c829d50f9759b7596e875bd5efc7d9fcb362c6ac82fcd4d",
+          "block": 12100645
+        },
+        {
+          "step": "arm",
+          "gas": 67293,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0xab36fc735ff3f6636dad81ef204f05fcf302a046342bcc6f758ef3c19b847d10",
+          "block": 12100646
+        },
+        {
+          "step": "fund",
+          "gas": 24119,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0x7588a9d8d04234404fbcb5e438774b7da7eb25acfef299f8eafb21501ea3490e",
+          "block": 12100647
+        }
+      ],
+      "totalGas": 17048915,
+      "totalHcu": 1424064
+    }
+  }
+}

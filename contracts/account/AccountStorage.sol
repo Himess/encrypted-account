@@ -126,6 +126,7 @@ library AccountStorage {
         uint112 reserved; // K-only outflows waiting for their `ok` bit (F0.15: shares the slot with `configured`)
         uint128 unit; // token base units per encrypted unit (64-bit range, see PolicyLib.scaleUp)
         uint128 pinCommitted; // PIN-path outflows verified but not yet executed (F0.15: shares the slot with `unit`)
+        // Epoch counters (spent, pinSpent, instantSpent) are stored as value + 1 once used (PolicyMath.counterOf / counterAdd).
         uint256 spent; // K-only outflows (incl. approvals) in this epoch — invariant: scaled(spent) <= tau
         uint256 pinSpent; // PIN-path outflows executed in this epoch
         uint256 instantBudget; // optional public "instant bucket" per epoch (default 0 = off)

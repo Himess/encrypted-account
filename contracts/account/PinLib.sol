@@ -153,7 +153,7 @@ library PinLib {
         if (cfg.configured && op.amount <= S.MAX_AMOUNT) {
             PolicyMath.sync(l, cfg);
             PolicyMath.rollEpoch(cfg);
-            sc = PolicyMath.scaleUp(cfg.pinSpent + cfg.pinCommitted + op.amount, cfg.unit);
+            sc = PolicyMath.scaleUp(PolicyMath.counterOf(cfg.pinSpent) + cfg.pinCommitted + op.amount, cfg.unit);
         }
         if (sc > type(uint64).max) {
             // no threshold configured / out of 64-bit range → always the long delay
