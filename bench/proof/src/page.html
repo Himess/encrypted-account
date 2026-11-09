@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Input proof measurement</title>
+<style>
+  :root { --bg:#f7f7f5; --fg:#1d1d1b; --muted:#6b6b66; --card:#fff; --line:#e3e2dc; --accent:#2f5bd3; --ok:#1d7a3e; --bad:#b3261e; --warn:#9a6700; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#151514; --fg:#ecebe6; --muted:#a3a29b; --card:#1f1f1d; --line:#33332f; --accent:#7ea2ff; --ok:#57c27f; --bad:#ff8a80; --warn:#e0b44c; } }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:16px; background:var(--bg); color:var(--fg); font:15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 4px 0 2px; }
+  .sub { color: var(--muted); margin: 0 0 14px; font-size: 13px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; }
+  table { width: 100%; border-collapse: collapse; }
+  td { padding: 4px 0; vertical-align: top; }
+  td:first-child { color: var(--muted); width: 48%; padding-right: 8px; }
+  input { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); font: inherit; }
+  button { font: inherit; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
+  button.secondary { background: transparent; color: var(--accent); }
+  button:disabled { opacity: .5; cursor: default; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  pre { margin: 0; white-space: pre-wrap; word-break: break-word; font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; max-height: 260px; overflow: auto; }
+  textarea { width: 100%; height: 160px; font: 11px/1.35 ui-monospace, Menlo, Consolas, monospace; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); }
+  .pass { color: var(--ok); font-weight: 600; } .fail { color: var(--bad); font-weight: 600; } .warn { color: var(--warn); font-weight: 600; }
+  .note { font-size: 12.5px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Input proof measurement (F0.12b)</h1>
+  <p class="sub">Encrypted Account · local proof time of the PIN guess input (a single <code>euint64</code>) on a phone. Needs internet; no transaction is sent to the chain.</p>
+
+  <div class="card">
+    <table>
+      <tr><td>Page</td><td id="variant">—</td></tr>
+      <tr><td>crossOriginIsolated</td><td id="coi">—</td></tr>
+      <tr><td>Cores (hardwareConcurrency)</td><td id="cores">—</td></tr>
+      <tr><td>TFHE threads</td><td id="threads">shown after start</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <label class="note" for="label">Device name (optional)</label>
+    <input id="label" placeholder="e.g. Galaxy A73 · Chrome">
+    <div class="row" style="margin-top:10px">
+      <button id="start">Start measurement</button>
+      <span id="progress" class="note">ready</span>
+    </div>
+    <p class="note">Takes about 2–4 minutes (first load + 10 PIN inputs, 5 s apart, + 2 reference runs). Keep the screen on and do not
+      switch to another app; runs that drop to the background are not counted.</p>
+  </div>
+
+  <div class="card"><pre id="log"></pre></div>
+
+  <div class="card" id="result" hidden>
+    <table>
+      <tr><td>Local proof p50 / p95 / max</td><td id="r-local">—</td></tr>
+      <tr><td>Relayer p50 / p95 / max</td><td id="r-relayer">—</td></tr>
+      <tr><td>Total p50 / p95 / max</td><td id="r-total">—</td></tr>
+      <tr><td>12 eaddress (local)</td><td id="r-ref">—</td></tr>
+      <tr><td>First load</td><td id="r-first">—</td></tr>
+      <tr><td>Mobile E1 p95 estimate</td><td id="r-e1">—</td></tr>
+      <tr><td>Gate (K58: local p95 ≤ 16 s)</td><td id="r-gate">—</td></tr>
+    </table>
+    <div class="row" style="margin:10px 0">
+      <button id="copy">Copy JSON</button>
+      <button id="download" class="secondary">Download JSON</button>
+      <span id="copied" class="note"></span>
+    </div>
+    <textarea id="json" readonly></textarea>
+  </div>
+</main>
+<script type="module" src="../assets/bench.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "evidence": "[M] desktop",
+  "node": "v22.13.0",
+  "cpu": "AMD Ryzen 5 5600 6-Core Processor              ",
+  "runs": 20,
+  "p50ms": 180,
+  "p95ms": 186,
+  "minms": 173,
+  "maxms": 191
+}

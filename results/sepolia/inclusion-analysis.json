@@ -1,0 +1,1650 @@
+{
+  "evidence": "[M] Sepolia block headers (slotNumber, timestamp)",
+  "generatedAtUtc": "2026-11-08T22:52:26.338Z",
+  "summary": {
+    "n": 150,
+    "inclusionMs": {
+      "n": 150,
+      "min": 1515,
+      "p50": 6458,
+      "p95": 17900,
+      "max": 31791,
+      "mean": 7726
+    },
+    "slotStartToSeenMs": {
+      "n": 150,
+      "min": -137,
+      "p50": 934,
+      "p95": 2546,
+      "max": 3768,
+      "mean": 1016
+    },
+    "missedSlotShare": 0.1,
+    "blockIntervalGt12Share": 0.1,
+    "notInFirstBlockShare": 0.08,
+    "slowOver15s": [
+      {
+        "flow": "e1",
+        "kind": "submitGuess",
+        "inclusionMs": 19659,
+        "slotGap": 2,
+        "blockAfterSent": 1,
+        "blockIntervalS": 24
+      },
+      {
+        "flow": "e1",
+        "kind": "finalizeGuess",
+        "inclusionMs": 18352,
+        "slotGap": 2,
+        "blockAfterSent": 1,
+        "blockIntervalS": 24
+      },
+      {
+        "flow": "e1",
+        "kind": "submitGuess",
+        "inclusionMs": 17481,
+        "slotGap": 2,
+        "blockAfterSent": 1,
+        "blockIntervalS": 24
+      },
+      {
+        "flow": "e1",
+        "kind": "finalizeGuess",
+        "inclusionMs": 19482,
+        "slotGap": 2,
+        "blockAfterSent": 1,
+        "blockIntervalS": 24
+      },
+      {
+        "flow": "e1",
+        "kind": "finalizeGuess",
+        "inclusionMs": 18596,
+        "slotGap": 2,
+        "blockAfterSent": 1,
+        "blockIntervalS": 24
+      },
+      {
+        "flow": "e1",
+        "kind": "submitGuess",
+        "inclusionMs": 16793,
+        "slotGap": 1,
+        "blockAfterSent": 2,
+        "blockIntervalS": 12
+      },
+      {
+        "flow": "e1",
+        "kind": "open",
+        "inclusionMs": 15174,
+        "slotGap": 1,
+        "blockAfterSent": 2,
+        "blockIntervalS": 12
+      },
+      {
+        "flow": "e1",
+        "kind": "submitGuess",
+        "inclusionMs": 15862,
+        "slotGap": 1,
+        "blockAfterSent": 2,
+        "blockIntervalS": 12
+      },
+      {
+        "flow": "e1",
+        "kind": "finalizeGuess",
+        "inclusionMs": 31791,
+        "slotGap": 3,
+        "blockAfterSent": 1,
+        "blockIntervalS": 36
+      },
+      {
+        "flow": "hot",
+        "kind": "finalizeEvaluation",
+        "inclusionMs": 15099,
+        "slotGap": 1,
+        "blockAfterSent": 2,
+        "blockIntervalS": 12
+      },
+      {
+        "flow": "hot",
+        "kind": "finalizeEvaluation",
+        "inclusionMs": 17900,
+        "slotGap": 2,
+        "blockAfterSent": 1,
+        "blockIntervalS": 24
+      },
+      {
+        "flow": "hot",
+        "kind": "finalizeEvaluation",
+        "inclusionMs": 16127,
+        "slotGap": 2,
+        "blockAfterSent": 1,
+        "blockIntervalS": 24
+      },
+      {
+        "flow": "hot",
+        "kind": "finalizeEvaluation",
+        "inclusionMs": 30927,
+        "slotGap": 2,
+        "blockAfterSent": 2,
+        "blockIntervalS": 24
+      },
+      {
+        "flow": "hot",
+        "kind": "finalizeEvaluation",
+        "inclusionMs": 16307,
+        "slotGap": 2,
+        "blockAfterSent": 1,
+        "blockIntervalS": 24
+      },
+      {
+        "flow": "hot",
+        "kind": "request",
+        "inclusionMs": 21120,
+        "slotGap": 2,
+        "blockAfterSent": 1,
+        "blockIntervalS": 24
+      }
+    ]
+  },
+  "rows": [
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 5803,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3604,
+      "slotStartToSeenMs": 2286,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 19659,
+      "slotGap": 2,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 16187,
+      "slotStartToSeenMs": 3573,
+      "blockIntervalS": 24
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 7139,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5508,
+      "slotStartToSeenMs": 1748,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 13573,
+      "slotGap": 1,
+      "blockAfterSent": 2,
+      "sentToSlotStartMs": 12735,
+      "slotStartToSeenMs": 950,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 6529,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5728,
+      "slotStartToSeenMs": 912,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 18352,
+      "slotGap": 2,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 17615,
+      "slotStartToSeenMs": 1050,
+      "blockIntervalS": 24
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 8153,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6811,
+      "slotStartToSeenMs": 1464,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 17481,
+      "slotGap": 2,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 17243,
+      "slotStartToSeenMs": 384,
+      "blockIntervalS": 24
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 19482,
+      "slotGap": 2,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 18493,
+      "slotStartToSeenMs": 1188,
+      "blockIntervalS": 24
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 3263,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 2843,
+      "slotStartToSeenMs": 609,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 6567,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6210,
+      "slotStartToSeenMs": 496,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 7420,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6672,
+      "slotStartToSeenMs": 978,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 12870,
+      "slotGap": 1,
+      "blockAfterSent": 2,
+      "sentToSlotStartMs": 11979,
+      "slotStartToSeenMs": 1013,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 6663,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5639,
+      "slotStartToSeenMs": 1162,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 6205,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6116,
+      "slotStartToSeenMs": 227,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 6179,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5533,
+      "slotStartToSeenMs": 784,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 7348,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5931,
+      "slotStartToSeenMs": 1526,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 6311,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5779,
+      "slotStartToSeenMs": 721,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 1668,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 1323,
+      "slotStartToSeenMs": 460,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 7319,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6431,
+      "slotStartToSeenMs": 1015,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 6203,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5994,
+      "slotStartToSeenMs": 346,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 4321,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 4027,
+      "slotStartToSeenMs": 427,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 6308,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5982,
+      "slotStartToSeenMs": 502,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 7769,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6600,
+      "slotStartToSeenMs": 1305,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 3450,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3428,
+      "slotStartToSeenMs": 139,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 6607,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6174,
+      "slotStartToSeenMs": 546,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 18596,
+      "slotGap": 2,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 18156,
+      "slotStartToSeenMs": 586,
+      "blockIntervalS": 24
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 9044,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 7864,
+      "slotStartToSeenMs": 1338,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 16793,
+      "slotGap": 1,
+      "blockAfterSent": 2,
+      "sentToSlotStartMs": 16307,
+      "slotStartToSeenMs": 641,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 6721,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5908,
+      "slotStartToSeenMs": 934,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 2323,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 1706,
+      "slotStartToSeenMs": 732,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 14358,
+      "slotGap": 1,
+      "blockAfterSent": 2,
+      "sentToSlotStartMs": 13034,
+      "slotStartToSeenMs": 1431,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 5049,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3657,
+      "slotStartToSeenMs": 1547,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 7259,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6376,
+      "slotStartToSeenMs": 1063,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 6911,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3941,
+      "slotStartToSeenMs": 3084,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 6235,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5932,
+      "slotStartToSeenMs": 429,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 5459,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 4629,
+      "slotStartToSeenMs": 944,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 5527,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 4635,
+      "slotStartToSeenMs": 1004,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 7425,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5988,
+      "slotStartToSeenMs": 1541,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 11681,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 10555,
+      "slotStartToSeenMs": 1221,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 6066,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5605,
+      "slotStartToSeenMs": 578,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 7296,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6292,
+      "slotStartToSeenMs": 1118,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 3528,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3252,
+      "slotStartToSeenMs": 408,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 6765,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6481,
+      "slotStartToSeenMs": 480,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 6810,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6097,
+      "slotStartToSeenMs": 1246,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 11849,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 10845,
+      "slotStartToSeenMs": 1166,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 5274,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 4679,
+      "slotStartToSeenMs": 980,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 7223,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6253,
+      "slotStartToSeenMs": 1098,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 6267,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5431,
+      "slotStartToSeenMs": 1011,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 6725,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5722,
+      "slotStartToSeenMs": 1118,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 7270,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6225,
+      "slotStartToSeenMs": 1414,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 6028,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5922,
+      "slotStartToSeenMs": 260,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 7377,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6564,
+      "slotStartToSeenMs": 920,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 5983,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5858,
+      "slotStartToSeenMs": 243,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 15174,
+      "slotGap": 1,
+      "blockAfterSent": 2,
+      "sentToSlotStartMs": 14974,
+      "slotStartToSeenMs": 422,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 6450,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 4959,
+      "slotStartToSeenMs": 1844,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 6075,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3840,
+      "slotStartToSeenMs": 2512,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 7843,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5692,
+      "slotStartToSeenMs": 2658,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 15862,
+      "slotGap": 1,
+      "blockAfterSent": 2,
+      "sentToSlotStartMs": 15391,
+      "slotStartToSeenMs": 884,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 6808,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6305,
+      "slotStartToSeenMs": 621,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 4366,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3683,
+      "slotStartToSeenMs": 939,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 6091,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5622,
+      "slotStartToSeenMs": 643,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 6321,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5972,
+      "slotStartToSeenMs": 524,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 4281,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 4051,
+      "slotStartToSeenMs": 358,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 6458,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5949,
+      "slotStartToSeenMs": 620,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 5632,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5875,
+      "slotStartToSeenMs": -137,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 10087,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 9587,
+      "slotStartToSeenMs": 609,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 6233,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5688,
+      "slotStartToSeenMs": 670,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 6676,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6139,
+      "slotStartToSeenMs": 659,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 4729,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 4675,
+      "slotStartToSeenMs": 168,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 6664,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6370,
+      "slotStartToSeenMs": 458,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 6597,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5383,
+      "slotStartToSeenMs": 1401,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 4850,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 4401,
+      "slotStartToSeenMs": 630,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 7655,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6126,
+      "slotStartToSeenMs": 1679,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 7656,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 7264,
+      "slotStartToSeenMs": 513,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 11149,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 11267,
+      "slotStartToSeenMs": 102,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 6052,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5772,
+      "slotStartToSeenMs": 724,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 6989,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6298,
+      "slotStartToSeenMs": 812,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 5844,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5493,
+      "slotStartToSeenMs": 456,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 4867,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 4572,
+      "slotStartToSeenMs": 427,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 31791,
+      "slotGap": 3,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 30998,
+      "slotStartToSeenMs": 1112,
+      "blockIntervalS": 36
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 10971,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 10752,
+      "slotStartToSeenMs": 308,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 5463,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 4644,
+      "slotStartToSeenMs": 956,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 6993,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5354,
+      "slotStartToSeenMs": 1746,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 4232,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3842,
+      "slotStartToSeenMs": 659,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 6532,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5955,
+      "slotStartToSeenMs": 755,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 6161,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6161,
+      "slotStartToSeenMs": 406,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "open",
+      "inclusionMs": 1515,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 714,
+      "slotStartToSeenMs": 893,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "submitGuess",
+      "inclusionMs": 6207,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5988,
+      "slotStartToSeenMs": 315,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "e1",
+      "kind": "finalizeGuess",
+      "inclusionMs": 6625,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6616,
+      "slotStartToSeenMs": 110,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 8613,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 8284,
+      "slotStartToSeenMs": 453,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 6997,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3985,
+      "slotStartToSeenMs": 3118,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 1740,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 1073,
+      "slotStartToSeenMs": 804,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 5687,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 4546,
+      "slotStartToSeenMs": 1256,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 2593,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 1279,
+      "slotStartToSeenMs": 1482,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 3234,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3044,
+      "slotStartToSeenMs": 308,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 6701,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6117,
+      "slotStartToSeenMs": 908,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 1944,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 1631,
+      "slotStartToSeenMs": 467,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 3733,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3083,
+      "slotStartToSeenMs": 852,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 4502,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3658,
+      "slotStartToSeenMs": 1000,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 7113,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6259,
+      "slotStartToSeenMs": 972,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 4276,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3417,
+      "slotStartToSeenMs": 976,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 11751,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 11222,
+      "slotStartToSeenMs": 646,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 4771,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3705,
+      "slotStartToSeenMs": 1317,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 5486,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 4657,
+      "slotStartToSeenMs": 934,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 5007,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 4459,
+      "slotStartToSeenMs": 961,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 3549,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 2881,
+      "slotStartToSeenMs": 775,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 14978,
+      "slotGap": 1,
+      "blockAfterSent": 2,
+      "sentToSlotStartMs": 14786,
+      "slotStartToSeenMs": 312,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 6016,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 4732,
+      "slotStartToSeenMs": 1476,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 3903,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3088,
+      "slotStartToSeenMs": 947,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 5301,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 4533,
+      "slotStartToSeenMs": 901,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 4638,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3812,
+      "slotStartToSeenMs": 988,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 10188,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 7767,
+      "slotStartToSeenMs": 2546,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 15099,
+      "slotGap": 1,
+      "blockAfterSent": 2,
+      "sentToSlotStartMs": 14174,
+      "slotStartToSeenMs": 1033,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 6610,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5736,
+      "slotStartToSeenMs": 993,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 4516,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3661,
+      "slotStartToSeenMs": 969,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 4018,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3768,
+      "slotStartToSeenMs": 363,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 2959,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 2682,
+      "slotStartToSeenMs": 398,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 13570,
+      "slotGap": 1,
+      "blockAfterSent": 2,
+      "sentToSlotStartMs": 12256,
+      "slotStartToSeenMs": 1699,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 12897,
+      "slotGap": 1,
+      "blockAfterSent": 2,
+      "sentToSlotStartMs": 10970,
+      "slotStartToSeenMs": 3768,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 8480,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6193,
+      "slotStartToSeenMs": 2398,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 17900,
+      "slotGap": 2,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 16618,
+      "slotStartToSeenMs": 1407,
+      "blockIntervalS": 24
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 11063,
+      "slotGap": 2,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 9220,
+      "slotStartToSeenMs": 2008,
+      "blockIntervalS": 24
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 4328,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3117,
+      "slotStartToSeenMs": 1327,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 6314,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5312,
+      "slotStartToSeenMs": 1181,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 16127,
+      "slotGap": 2,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 15379,
+      "slotStartToSeenMs": 861,
+      "blockIntervalS": 24
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 7294,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6918,
+      "slotStartToSeenMs": 484,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 30927,
+      "slotGap": 2,
+      "blockAfterSent": 2,
+      "sentToSlotStartMs": 27817,
+      "slotStartToSeenMs": 3270,
+      "blockIntervalS": 24
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 8359,
+      "slotGap": 2,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 7367,
+      "slotStartToSeenMs": 1200,
+      "blockIntervalS": 24
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 3823,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3239,
+      "slotStartToSeenMs": 707,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 4002,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3250,
+      "slotStartToSeenMs": 872,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 7346,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 4659,
+      "slotStartToSeenMs": 2794,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 7455,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6223,
+      "slotStartToSeenMs": 1357,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 3723,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3156,
+      "slotStartToSeenMs": 1411,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 6113,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5087,
+      "slotStartToSeenMs": 1129,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 4934,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3424,
+      "slotStartToSeenMs": 1837,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 6734,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 6816,
+      "slotStartToSeenMs": 241,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 4938,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 4213,
+      "slotStartToSeenMs": 940,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 6098,
+      "slotGap": 2,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 5033,
+      "slotStartToSeenMs": 1183,
+      "blockIntervalS": 24
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 16307,
+      "slotGap": 2,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 15347,
+      "slotStartToSeenMs": 1055,
+      "blockIntervalS": 24
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 21120,
+      "slotGap": 2,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 20581,
+      "slotStartToSeenMs": 653,
+      "blockIntervalS": 24
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 3140,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 1976,
+      "slotStartToSeenMs": 1285,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 10035,
+      "slotGap": 2,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 9007,
+      "slotStartToSeenMs": 1136,
+      "blockIntervalS": 24
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 4534,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3327,
+      "slotStartToSeenMs": 1339,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 2894,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 1829,
+      "slotStartToSeenMs": 1171,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 3631,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3474,
+      "slotStartToSeenMs": 261,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 12961,
+      "slotGap": 1,
+      "blockAfterSent": 2,
+      "sentToSlotStartMs": 12433,
+      "slotStartToSeenMs": 687,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 3715,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 3656,
+      "slotStartToSeenMs": 341,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "request",
+      "inclusionMs": 2189,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 1765,
+      "slotStartToSeenMs": 563,
+      "blockIntervalS": 12
+    },
+    {
+      "flow": "hot",
+      "kind": "finalizeEvaluation",
+      "inclusionMs": 5612,
+      "slotGap": 1,
+      "blockAfterSent": 1,
+      "sentToSlotStartMs": 4802,
+      "slotStartToSeenMs": 926,
+      "blockIntervalS": 12
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "evidence": "[M] Sepolia",
+  "startedAtUtc": "2026-11-09T11:21:57.811Z",
+  "run": "f010",
+  "tauBench": "0xE076A906569EF60422b31df27531CD0eA79E7146",
+  "tau": [
+    {
+      "D": "1000",
+      "setBoundsTx": "0xee1048a697a02531dffc58103ca530f2a7ba2592d1e604ff77553264cbbc24c6",
+      "v2": {
+        "tx": "0x0167010ff8eb2dbfe2ab9398c0346b2fdb167ec59a3abfc0a9b24721be0482e8",
+        "gas": "2013307",
+        "hcu": {
+          "total": 4508128,
+          "depth": 1104000,
+          "fheOps": 28,
+          "blockMeter": 4508128,
+          "blockFheTxs": 1,
+          "blockComputed": 4508128,
+          "meterCheck": "equal"
+        },
+        "offsets": [
+          "382",
+          "494",
+          "793",
+          "572"
+        ],
+        "inRange": true,
+        "decryptWaitedMs": 10856
+      },
+      "v1": {
+        "tx": "0x4f218d697e0f88c5d84273462d0aed3b275bcda2e2be3d640b19aea620d391c6",
+        "offsets": [
+          "0",
+          "0"
+        ],
+        "allLmin": true,
+        "hcu": {
+          "total": 1954064,
+          "depth": 954000,
+          "fheOps": 12,
+          "blockMeter": 1954064,
+          "blockFheTxs": 1,
+          "blockComputed": 1954064,
+          "meterCheck": "equal"
+        }
+      }
+    },
+    {
+      "D": "131071",
+      "setBoundsTx": "0x1887771fa3d1ae4d0caf013adc3ab612df9ab30f61c7b3d41c7b8b65a7eae55a",
+      "v2": {
+        "tx": "0x415217f0d8803b2f3ddc02e9a1100d05a76595c4a9de748b1806bfa0b734a80b",
+        "gas": "1915387",
+        "hcu": {
+          "total": 4508128,
+          "depth": 1104000,
+          "fheOps": 28,
+          "blockMeter": 4508128,
+          "blockFheTxs": 1,
+          "blockComputed": 4508128,
+          "meterCheck": "equal"
+        },
+        "offsets": [
+          "5291",
+          "110527",
+          "28665",
+          "56541"
+        ],
+        "inRange": true,
+        "decryptWaitedMs": 9856
+      }
+    }
+  ],
+  "k53": {
+    "opId": "6",
+    "openTx": "0xafd28265d3bf6923187cbb0794b1c0b72339141cc578fc112ec6e1f0cc43128c",
+    "cReceipt": "15697223422501256585",
+    "cRpcAtBlock": "15697223422501256585",
+    "receiptMatchesChain": true,
+    "cStaleFromPreviousBlock": "2511492037238289501",
+    "staleGuessRevert": "StaleChallenge"
+  },
+  "k55": {
+    "accounts": {
+      "e1": {
+        "address": "0x7F8c5399705560b125D62C02860d7A09987Cc9a0",
+        "escape": "0x8e98d5e45822b81Ac7dB853480c405E8Ea769B7A",
+        "verifiedAt": 1794222468,
+        "nonce": 1,
+        "createTx": "0xd1660f63ce73159b54d03ba5fb472a1f7d6c99d5b5828eaee0f6af29aafef240"
+      },
+      "hot": {
+        "address": "0x34318C950d350cb236409AC934398cD4EAbE2FcB",
+        "escape": "0x8e98d5e45822b81Ac7dB853480c405E8Ea769B7A",
+        "verifiedAt": 1794222588,
+        "nonce": 1,
+        "createTx": "0xc73864a12fab3e64d3b79578db663390ff9ad7ddd56cc1fb00d6e2d661e80080"
+      }
+    },
+    "forgedConsentRevert": "BadSignature"
+  },
+  "finishedAtUtc": "2026-11-09T11:23:36.815Z",
+  "balances": {
+    "user": "0.063317248544387764",
+    "watchtower": "0.009094273392396742"
+  }
+}

@@ -1,0 +1,738 @@
+{
+  "evidence": "[M] Sepolia gas; [Mock] Round 1; state growth [M] BAL; old-schedule equivalent [I]",
+  "generatedAtUtc": "2026-11-08T22:52:26.338Z",
+  "schedule": {
+    "sepolia": {
+      "block": 12093255,
+      "gasLimit": 200000000,
+      "newSlot": 110983,
+      "codeByte": 1542,
+      "newAccountSurcharge": 186391,
+      "newHeaderFields": [
+        "blockAccessListHash",
+        "slotNumber"
+      ]
+    },
+    "mainnet": {
+      "block": 26372926,
+      "gasLimit": 60000000,
+      "newSlot": 22445,
+      "codeByte": 202,
+      "baseFeeGwei": 0.053575494
+    },
+    "deltas": {
+      "newSlot": 88538,
+      "newAccount": 161391,
+      "codeByte": 1340
+    }
+  },
+  "rows": [
+    {
+      "flow": "factory.createAccount (clone + initialize)",
+      "source": "setup ×3",
+      "mockGas": 281728,
+      "liveGas": {
+        "n": 3,
+        "median": 1292216,
+        "min": 1292204,
+        "max": 1292216
+      },
+      "diffPct": 358.7,
+      "mockHcu": 0,
+      "liveHcu": 0,
+      "liveHcuDepth": 0,
+      "hcuMeter": "equal",
+      "sampleTx": "0x4fe5bca78407210b532709fe65c427be266298c1575ac4cf5c016963c103cd83",
+      "state": {
+        "newSlots": 9,
+        "changedSlots": 0,
+        "clearedSlots": 0,
+        "newAccounts": 1,
+        "codeBytes": 45,
+        "fheOps": 0,
+        "balIndex": 29,
+        "block": 12093199
+      },
+      "oldScheduleEstimate": 273683,
+      "mockOverheadEstimate": 8045
+    },
+    {
+      "flow": "setupPin",
+      "source": "setup ×3",
+      "mockGas": 818196,
+      "liveGas": {
+        "n": 3,
+        "median": 854124,
+        "min": 854124,
+        "max": 854148
+      },
+      "diffPct": 4.4,
+      "mockHcu": 79000,
+      "liveHcu": 79000,
+      "liveHcuDepth": 79000,
+      "hcuMeter": "equal",
+      "sampleTx": "0x9624b4362bc396df0ce82aaa89543e4ec8de108be247c5d4aa426e92f388181c",
+      "state": {
+        "newSlots": 4,
+        "changedSlots": 4,
+        "clearedSlots": 0,
+        "newAccounts": 0,
+        "codeBytes": 0,
+        "fheOps": 5,
+        "balIndex": 55,
+        "block": 12093200
+      },
+      "oldScheduleEstimate": 499972,
+      "mockOverheadEstimate": 318224
+    },
+    {
+      "flow": "setupAsset (ETH; incl. τ draw)",
+      "source": "setup ×3",
+      "mockGas": 1411179,
+      "liveGas": {
+        "n": 3,
+        "median": 1943552,
+        "min": 1943540,
+        "max": 1943552
+      },
+      "diffPct": 37.7,
+      "mockHcu": 1195064,
+      "liveHcu": 1195064,
+      "liveHcuDepth": 1172000,
+      "hcuMeter": "unreadable",
+      "sampleTx": "0x3017a060b8add1a8c0d796f566e330c4bf744f6e930007485402618c13af0ae2",
+      "state": {
+        "newSlots": 13,
+        "changedSlots": 2,
+        "clearedSlots": 0,
+        "newAccounts": 0,
+        "codeBytes": 0,
+        "fheOps": 11,
+        "balIndex": 57,
+        "block": 12093201
+      },
+      "oldScheduleEstimate": 792558,
+      "mockOverheadEstimate": 618621
+    },
+    {
+      "flow": "setupKnown (12 eaddress / proof)",
+      "source": "setup ×6",
+      "mockGas": 2062794,
+      "liveGas": {
+        "n": 6,
+        "median": 3787337,
+        "min": 3787313,
+        "max": 3787373
+      },
+      "diffPct": 83.6,
+      "mockHcu": 0,
+      "liveHcu": 0,
+      "liveHcuDepth": 0,
+      "hcuMeter": "equal",
+      "sampleTx": "0x750789e53f4ec4276c91f9a7ac6d8ba919fae18cbc3027cc863126e2e8b52683",
+      "state": {
+        "newSlots": 27,
+        "changedSlots": 0,
+        "clearedSlots": 0,
+        "newAccounts": 0,
+        "codeBytes": 0,
+        "fheOps": 12,
+        "balIndex": 85,
+        "block": 12093203
+      },
+      "oldScheduleEstimate": 1396811,
+      "mockOverheadEstimate": 665983
+    },
+    {
+      "flow": "setupKnown (6 eaddress)",
+      "source": "setup ×3",
+      "mockGas": null,
+      "liveGas": {
+        "n": 3,
+        "median": 2033425,
+        "min": 2033413,
+        "max": 2033437
+      },
+      "diffPct": null,
+      "mockHcu": null,
+      "liveHcu": 0,
+      "liveHcuDepth": 0,
+      "hcuMeter": "unreadable",
+      "sampleTx": "0xb4c0394d4e510027935e91b50a4f5e552b74398e7713671e3a30a820fb60f6d6",
+      "state": {
+        "newSlots": 14,
+        "changedSlots": 0,
+        "clearedSlots": 0,
+        "newAccounts": 0,
+        "codeBytes": 0,
+        "fheOps": 6,
+        "balIndex": 41,
+        "block": 12093204
+      },
+      "oldScheduleEstimate": 793893
+    },
+    {
+      "flow": "setupKnown spenders (10 eaddress)",
+      "source": "setup ×3",
+      "mockGas": null,
+      "liveGas": {
+        "n": 3,
+        "median": 3235029,
+        "min": 3235017,
+        "max": 3235053
+      },
+      "diffPct": null,
+      "mockHcu": null,
+      "liveHcu": 0,
+      "liveHcuDepth": 0,
+      "hcuMeter": "equal",
+      "sampleTx": "0x8fbde8abe78413530e39eda3d1787196e4065c180ec2d6b7fa247fa0a73d5a2b",
+      "state": {
+        "newSlots": 23,
+        "changedSlots": 0,
+        "clearedSlots": 0,
+        "newAccounts": 0,
+        "codeBytes": 0,
+        "fheOps": 10,
+        "balIndex": 26,
+        "block": 12093205
+      },
+      "oldScheduleEstimate": 1198655
+    },
+    {
+      "flow": "setupRoles",
+      "source": "setup ×3",
+      "mockGas": null,
+      "liveGas": {
+        "n": 3,
+        "median": 31500,
+        "min": 31500,
+        "max": 31500
+      },
+      "diffPct": null,
+      "mockHcu": null,
+      "liveHcu": 0,
+      "liveHcuDepth": 0,
+      "hcuMeter": "equal",
+      "sampleTx": "0x8701b47345424b98480fbc33ecc2f2e0cf493b34da52b8b0df13003790abad94",
+      "state": {
+        "newSlots": 0,
+        "changedSlots": 0,
+        "clearedSlots": 0,
+        "newAccounts": 0,
+        "codeBytes": 0,
+        "fheOps": 0,
+        "balIndex": 63,
+        "block": 12093206
+      },
+      "oldScheduleEstimate": 31500
+    },
+    {
+      "flow": "arm",
+      "source": "setup ×3",
+      "mockGas": 65633,
+      "liveGas": {
+        "n": 3,
+        "median": 67233,
+        "min": 67233,
+        "max": 67233
+      },
+      "diffPct": 2.4,
+      "mockHcu": 0,
+      "liveHcu": 0,
+      "liveHcuDepth": 0,
+      "hcuMeter": "equal",
+      "sampleTx": "0xde325f078b1e4e6249e9fc20f8a2d1444ea83099855b1bc00a319878ba6c7153",
+      "state": {
+        "newSlots": 0,
+        "changedSlots": 1,
+        "clearedSlots": 0,
+        "newAccounts": 0,
+        "codeBytes": 0,
+        "fheOps": 0,
+        "balIndex": 11,
+        "block": 12093207
+      },
+      "oldScheduleEstimate": 67233,
+      "mockOverheadEstimate": -1600
+    },
+    {
+      "flow": "requestTransfer K-only (isIn N=30 + threshold + tripwire)",
+      "source": "hot ×30",
+      "mockGas": 1226772,
+      "liveGas": {
+        "n": 30,
+        "median": 1524305,
+        "min": 1524301,
+        "max": 1636733
+      },
+      "diffPct": 24.3,
+      "mockHcu": 774036,
+      "liveHcu": 774036,
+      "liveHcuDepth": 634032,
+      "hcuMeter": "equal",
+      "sampleTx": "0xfd2304a485acb0c5b2a234af9edac0dc23c05faeddc776415186b4fa1dc42017",
+      "state": {
+        "newSlots": 9,
+        "changedSlots": 3,
+        "clearedSlots": 0,
+        "newAccounts": 0,
+        "codeBytes": 0,
+        "fheOps": 8,
+        "balIndex": 124,
+        "block": 12093260
+      },
+      "oldScheduleEstimate": 727463,
+      "mockOverheadEstimate": 499309
+    },
+    {
+      "flow": "finalizeEvaluation (KMS proof + transfer)",
+      "source": "hot ×30",
+      "mockGas": 303454,
+      "liveGas": {
+        "n": 30,
+        "median": 422803,
+        "min": 422767,
+        "max": 704335
+      },
+      "diffPct": 39.3,
+      "mockHcu": 0,
+      "liveHcu": 0,
+      "liveHcuDepth": 0,
+      "hcuMeter": "equal",
+      "sampleTx": "0xe5acbdcfb34f37fb19c6e37d2cc90b7dee5caa0226d5c03e7c6bdd6878918fdc",
+      "state": {
+        "newSlots": 0,
+        "changedSlots": 2,
+        "clearedSlots": 1,
+        "newAccounts": 0,
+        "codeBytes": 0,
+        "fheOps": 0,
+        "balIndex": 88,
+        "block": 12093316
+      },
+      "oldScheduleEstimate": 422803,
+      "mockOverheadEstimate": -119349
+    },
+    {
+      "flow": "requestTransfer PIN path (opens op)",
+      "source": "e1 ×30",
+      "mockGas": 136397,
+      "liveGas": {
+        "n": 30,
+        "median": 490253,
+        "min": 490253,
+        "max": 588173
+      },
+      "diffPct": 259.4,
+      "mockHcu": 0,
+      "liveHcu": 0,
+      "liveHcuDepth": 0,
+      "hcuMeter": "equal",
+      "sampleTx": "0x7ee612397884ca2576d3835b842f1d4f16f6f88e27ce99e85385d5569a89b28b",
+      "state": {
+        "newSlots": 4,
+        "changedSlots": 1,
+        "clearedSlots": 0,
+        "newAccounts": 0,
+        "codeBytes": 0,
+        "fheOps": 0,
+        "balIndex": 63,
+        "block": 12093256
+      },
+      "oldScheduleEstimate": 136101,
+      "mockOverheadEstimate": 296
+    },
+    {
+      "flow": "submitGuess (transfer; okAny + isDuress + big)",
+      "source": "e1 ×30",
+      "mockGas": 1206087,
+      "liveGas": {
+        "n": 30,
+        "median": 1711020,
+        "min": 1710984,
+        "max": 1725536
+      },
+      "diffPct": 41.9,
+      "mockHcu": 698002,
+      "liveHcu": 698002,
+      "liveHcuDepth": 302000,
+      "hcuMeter": "equal",
+      "sampleTx": "0xea83d005da96abdf5e2871e95570187db6b9b8d2f904ffb536cc254f902ba974",
+      "state": {
+        "newSlots": 11,
+        "changedSlots": 3,
+        "clearedSlots": 0,
+        "newAccounts": 0,
+        "codeBytes": 0,
+        "fheOps": 10,
+        "balIndex": 75,
+        "block": 12093281
+      },
+      "oldScheduleEstimate": 737102,
+      "mockOverheadEstimate": 468985
+    },
+    {
+      "flow": "finalizeGuess (2-handle KMS proof)",
+      "source": "e1 ×30",
+      "mockGas": 303015,
+      "liveGas": {
+        "n": 30,
+        "median": 526028,
+        "min": 525980,
+        "max": 526052
+      },
+      "diffPct": 73.6,
+      "mockHcu": 0,
+      "liveHcu": 0,
+      "liveHcuDepth": 0,
+      "hcuMeter": "equal",
+      "sampleTx": "0xe490830a6052e7b4b963db69f50fbdb156453ee019de09bdc0cee0cfd6fea21c",
+      "state": {
+        "newSlots": 1,
+        "changedSlots": 2,
+        "clearedSlots": 3,
+        "newAccounts": 0,
+        "codeBytes": 0,
+        "fheOps": 0,
+        "balIndex": 81,
+        "block": 12093258
+      },
+      "oldScheduleEstimate": 437490,
+      "mockOverheadEstimate": -134475
+    },
+    {
+      "flow": "executeOp transfer (+ auto-add to known list)",
+      "source": "e1 ×30",
+      "mockGas": 729222,
+      "liveGas": {
+        "n": 30,
+        "median": 765223,
+        "min": 765219,
+        "max": 863112
+      },
+      "diffPct": 4.9,
+      "mockHcu": 667032,
+      "liveHcu": 667032,
+      "liveHcuDepth": 667032,
+      "hcuMeter": "equal",
+      "sampleTx": "0x147933ffa66fb9a80df38e8f72f332ef0da6a60c9d8ab9b436e00e4b7f87875f",
+      "note": "recipient is a new address in every sample (new-account surcharge)",
+      "state": {
+        "newSlots": 1,
+        "changedSlots": 5,
+        "clearedSlots": 1,
+        "newAccounts": 1,
+        "codeBytes": 0,
+        "fheOps": 3,
+        "balIndex": 49,
+        "block": 12093259
+      },
+      "oldScheduleEstimate": 515294,
+      "mockOverheadEstimate": 213928
+    },
+    {
+      "flow": "submitGuess (admin; okAny + isDuress)",
+      "source": "live ×1",
+      "mockGas": 1043475,
+      "liveGas": {
+        "n": 1,
+        "median": 1435266,
+        "min": 1435266,
+        "max": 1435266
+      },
+      "diffPct": 37.5,
+      "mockHcu": 555002,
+      "liveHcu": 555002,
+      "liveHcuDepth": 278002,
+      "hcuMeter": "equal",
+      "sampleTx": "0xc750fe9de13d9bf92027dd6d205c2758b17f9665bfaa2265c546a68e7ce57d40",
+      "state": {
+        "newSlots": 9,
+        "changedSlots": 3,
+        "clearedSlots": 0,
+        "newAccounts": 0,
+        "codeBytes": 0,
+        "fheOps": 8,
+        "balIndex": 47,
+        "block": 12093499
+      },
+      "oldScheduleEstimate": 638424,
+      "mockOverheadEstimate": 405051
+    },
+    {
+      "flow": "finalizeGuess + resetTrip (τ redrawn)",
+      "source": "live ×1",
+      "mockGas": 881249,
+      "liveGas": {
+        "n": 1,
+        "median": 967852,
+        "min": 967852,
+        "max": 967852
+      },
+      "diffPct": 9.8,
+      "mockHcu": 977064,
+      "liveHcu": 977064,
+      "liveHcuDepth": 954000,
+      "hcuMeter": "equal",
+      "sampleTx": "0xad5a2f78dd9966e7342fc54c96661bdafc7826e97fdccefe0df29a669fa673b2",
+      "state": {
+        "newSlots": 3,
+        "changedSlots": 6,
+        "clearedSlots": 3,
+        "newAccounts": 0,
+        "codeBytes": 0,
+        "fheOps": 7,
+        "balIndex": 66,
+        "block": 12093500
+      },
+      "oldScheduleEstimate": 702238,
+      "mockOverheadEstimate": 179011
+    },
+    {
+      "flow": "tightenLimits (K-only; 4× encrypted min)",
+      "source": "live ×1",
+      "mockGas": 907276,
+      "liveGas": {
+        "n": 1,
+        "median": 895113,
+        "min": 895113,
+        "max": 895113
+      },
+      "diffPct": -1.3,
+      "mockHcu": 876000,
+      "liveHcu": 876000,
+      "liveHcuDepth": 438000,
+      "hcuMeter": "equal",
+      "sampleTx": "0xbfa01fed72e12365e9e656690d05ec834d003e4288a3461647c5f3fc0eab1116",
+      "state": {
+        "newSlots": 4,
+        "changedSlots": 5,
+        "clearedSlots": 0,
+        "newAccounts": 0,
+        "codeBytes": 0,
+        "fheOps": 6,
+        "balIndex": 43,
+        "block": 12093501
+      },
+      "oldScheduleEstimate": 540961,
+      "mockOverheadEstimate": 366315
+    },
+    {
+      "flow": "removeKnown (K-only; select)",
+      "source": "live ×1",
+      "mockGas": 509993,
+      "liveGas": {
+        "n": 1,
+        "median": 427404,
+        "min": 427404,
+        "max": 427404
+      },
+      "diffPct": -16.2,
+      "mockHcu": 83032,
+      "liveHcu": 83032,
+      "liveHcuDepth": 83032,
+      "hcuMeter": "equal",
+      "sampleTx": "0xb2f6e6f4c1d21994be44bd41b3ae0ca44dbd4c343eb8870d32b3c7f9c651bb3d",
+      "state": {
+        "newSlots": 1,
+        "changedSlots": 2,
+        "clearedSlots": 0,
+        "newAccounts": 0,
+        "codeBytes": 0,
+        "fheOps": 3,
+        "balIndex": 45,
+        "block": 12093502
+      },
+      "oldScheduleEstimate": 338866,
+      "mockOverheadEstimate": 171127
+    },
+    {
+      "flow": "startEscape (no FHE)",
+      "source": "live ×1",
+      "mockGas": 34534,
+      "liveGas": {
+        "n": 1,
+        "median": 36134,
+        "min": 36134,
+        "max": 36134
+      },
+      "diffPct": 4.6,
+      "mockHcu": 0,
+      "liveHcu": 0,
+      "liveHcuDepth": 0,
+      "hcuMeter": "equal",
+      "sampleTx": "0xaa74ba4c6e12307c99962e13713b221a7a76a7bdb94b19801cf958194f8bd157",
+      "state": {
+        "newSlots": 0,
+        "changedSlots": 1,
+        "clearedSlots": 0,
+        "newAccounts": 0,
+        "codeBytes": 0,
+        "fheOps": 0,
+        "balIndex": 44,
+        "block": 12093503
+      },
+      "oldScheduleEstimate": 36134,
+      "mockOverheadEstimate": -1600
+    },
+    {
+      "flow": "executeEscape (no FHE; ETH only)",
+      "source": "live ×1",
+      "mockGas": 50158,
+      "liveGas": {
+        "n": 1,
+        "median": 38457,
+        "min": 38457,
+        "max": 38457
+      },
+      "diffPct": -23.3,
+      "mockHcu": 0,
+      "liveHcu": 0,
+      "liveHcuDepth": 0,
+      "hcuMeter": "equal",
+      "sampleTx": "0x4e41a26ed053fd4637f0fed77b19d6960dd7fe6bcfcac7080084c842df65c4e2",
+      "note": "mock: ETH + 1 token; live: ETH only",
+      "state": {
+        "newSlots": 0,
+        "changedSlots": 0,
+        "clearedSlots": 0,
+        "newAccounts": 0,
+        "codeBytes": 0,
+        "fheOps": 0,
+        "balIndex": 92,
+        "block": 12093514
+      },
+      "oldScheduleEstimate": 38457,
+      "mockOverheadEstimate": 11701
+    },
+    {
+      "flow": "Bench isIn N=30",
+      "source": "live ×1",
+      "mockGas": 555239,
+      "liveGas": {
+        "n": 1,
+        "median": 447929,
+        "min": 447929,
+        "max": 447929
+      },
+      "diffPct": -19.3,
+      "mockHcu": 584032,
+      "liveHcu": 584032,
+      "liveHcuDepth": 584032,
+      "hcuMeter": "equal",
+      "sampleTx": "0xd9e9532b6954167eabdec59020339ad8c48f0282ebb9b5c68bc697fd5ea97edc",
+      "state": {
+        "newSlots": 1,
+        "changedSlots": 2,
+        "clearedSlots": 0,
+        "newAccounts": 0,
+        "codeBytes": 0,
+        "fheOps": 2,
+        "balIndex": 28,
+        "block": 12093480
+      },
+      "oldScheduleEstimate": 359391,
+      "mockOverheadEstimate": 195848
+    },
+    {
+      "flow": "Bench isIn N=60",
+      "source": "live ×1",
+      "mockGas": 899365,
+      "liveGas": {
+        "n": 1,
+        "median": 776458,
+        "min": 776458,
+        "max": 776458
+      },
+      "diffPct": -13.7,
+      "mockHcu": 885032,
+      "liveHcu": 885032,
+      "liveHcuDepth": 885032,
+      "hcuMeter": "equal",
+      "sampleTx": "0xa3ab0fbfc0c00ad4dd28acf06f8f66e1ff952f7f2786a3ac9cd9e7cc57529d5d",
+      "state": {
+        "newSlots": 2,
+        "changedSlots": 1,
+        "clearedSlots": 0,
+        "newAccounts": 0,
+        "codeBytes": 0,
+        "fheOps": 2,
+        "balIndex": 59,
+        "block": 12093479
+      },
+      "oldScheduleEstimate": 599382,
+      "mockOverheadEstimate": 299983
+    },
+    {
+      "flow": "AA handleOps: requestTransfer (PIN path)",
+      "source": "live ×1",
+      "mockGas": null,
+      "liveGas": {
+        "n": 1,
+        "median": 687601,
+        "min": 687601,
+        "max": 687601
+      },
+      "diffPct": null,
+      "mockHcu": null,
+      "liveHcu": 0,
+      "liveHcuDepth": 0,
+      "hcuMeter": "equal",
+      "sampleTx": "0x2771c9827d90af61c3c75714e0979559883af63473b263c76d99cd50a6aaefb1",
+      "state": {
+        "newSlots": 5,
+        "changedSlots": 2,
+        "clearedSlots": 0,
+        "newAccounts": 0,
+        "codeBytes": 0,
+        "fheOps": 0,
+        "balIndex": 59,
+        "block": 12093492
+      },
+      "oldScheduleEstimate": 244911
+    },
+    {
+      "flow": "AA handleOps: submitGuess",
+      "source": "live ×1",
+      "mockGas": null,
+      "liveGas": {
+        "n": 1,
+        "median": 1802139,
+        "min": 1802139,
+        "max": 1802139
+      },
+      "diffPct": null,
+      "mockHcu": null,
+      "liveHcu": 698002,
+      "liveHcuDepth": 302000,
+      "hcuMeter": "equal",
+      "sampleTx": "0x494d1381934b48925d826d015e386c46171cf3f536995ba3e719eaaa90fc990c",
+      "state": {
+        "newSlots": 11,
+        "changedSlots": 6,
+        "clearedSlots": 0,
+        "newAccounts": 0,
+        "codeBytes": 0,
+        "fheOps": 10,
+        "balIndex": 36,
+        "block": 12093493
+      },
+      "oldScheduleEstimate": 828221
+    }
+  ],
+  "totals": {
+    "kOnlyTransfer": {
+      "live": 1947108,
+      "mock": 1530226,
+      "oldScheduleEstimate": 1150266
+    },
+    "pinTransfer": {
+      "live": 3492524,
+      "mock": 2374721,
+      "oldScheduleEstimate": 1825987
+    },
+    "setupOneAssetLive": 17031729,
+    "deployLiveGas": 109351992
+  }
+}

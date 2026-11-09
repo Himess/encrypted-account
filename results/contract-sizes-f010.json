@@ -1,0 +1,54 @@
+{
+  "evidence": "[Mock] build (solc 0.8.28, viaIR, runs 1)",
+  "limit": 24576,
+  "rows": [
+    {
+      "contract": "EncryptedAccount",
+      "bytes": 22344,
+      "limit": 24576,
+      "ok": true,
+      "round1": 20442,
+      "delta": 1902
+    },
+    {
+      "contract": "PinLib",
+      "bytes": 8029,
+      "limit": 24576,
+      "ok": true,
+      "round1": 7217,
+      "delta": 812
+    },
+    {
+      "contract": "PolicyLib",
+      "bytes": 8684,
+      "limit": 24576,
+      "ok": true,
+      "round1": 8389,
+      "delta": 295
+    },
+    {
+      "contract": "OpsLib",
+      "bytes": 9807,
+      "limit": 24576,
+      "ok": true,
+      "round1": 8190,
+      "delta": 1617
+    },
+    {
+      "contract": "OpenLib",
+      "bytes": 12547,
+      "limit": 24576,
+      "ok": true,
+      "round1": 9487,
+      "delta": 3060
+    },
+    {
+      "contract": "EncryptedAccountFactory",
+      "bytes": 1868,
+      "limit": 24576,
+      "ok": true,
+      "round1": 1666,
+      "delta": 202
+    }
+  ]
+}

@@ -1,0 +1,219 @@
+{
+  "evidence": "[Mock]",
+  "generatedAt": "2026-11-09T22:27:12.060Z",
+  "rows": [
+    {
+      "flow": "factory.createAccount (clone + initialize + E_addr EIP-712 consent)",
+      "gas": 295365,
+      "hcuTotal": 0,
+      "hcuDepth": 0
+    },
+    {
+      "flow": "setupPin (fingerprint + duress slot select/rand)",
+      "gas": 813511,
+      "hcuTotal": 79000,
+      "hcuDepth": 79000
+    },
+    {
+      "flow": "setupAsset (L_min, L, L_big + τ draw)",
+      "gas": 1477295,
+      "hcuTotal": 1345064,
+      "hcuDepth": 1322000
+    },
+    {
+      "flow": "setupKnown (12 eaddress / proof)",
+      "gas": 2062894,
+      "hcuTotal": 0,
+      "hcuDepth": 0,
+      "note": "2048-bit CRS limit: at most 12 eaddress"
+    },
+    {
+      "flow": "arm",
+      "gas": 65693,
+      "hcuTotal": 0,
+      "hcuDepth": 0
+    },
+    {
+      "flow": "requestTransfer K-only (isIn N=30 + threshold + sticky tripwire)",
+      "gas": 1228302,
+      "hcuTotal": 774036,
+      "hcuDepth": 634032
+    },
+    {
+      "flow": "finalizeEvaluation (KMS proof + transfer)",
+      "gas": 304309,
+      "hcuTotal": 0,
+      "hcuDepth": 0
+    },
+    {
+      "flow": "requestTransfer PIN path (opens op)",
+      "gas": 139505,
+      "hcuTotal": 0,
+      "hcuDepth": 0
+    },
+    {
+      "flow": "submitGuess (transfer; okAny + isDuress + big)",
+      "gas": 1205703,
+      "hcuTotal": 698002,
+      "hcuDepth": 302000
+    },
+    {
+      "flow": "finalizeGuess (2-handle KMS proof)",
+      "gas": 311607,
+      "hcuTotal": 0,
+      "hcuDepth": 0
+    },
+    {
+      "flow": "executeOp transfer (+ auto-add to known list: isIn + select)",
+      "gas": 734290,
+      "hcuTotal": 667032,
+      "hcuDepth": 667032
+    },
+    {
+      "flow": "submitGuess (admin; okAny + isDuress)",
+      "gas": 1025545,
+      "hcuTotal": 555002,
+      "hcuDepth": 278002
+    },
+    {
+      "flow": "finalizeGuess + resetTrip (τ redrawn)",
+      "gas": 953689,
+      "hcuTotal": 1127064,
+      "hcuDepth": 1104000
+    },
+    {
+      "flow": "tightenLimits (K-only; 4× min)",
+      "gas": 907386,
+      "hcuTotal": 876000,
+      "hcuDepth": 438000
+    },
+    {
+      "flow": "removeKnown (K-only; select)",
+      "gas": 510093,
+      "hcuTotal": 83032,
+      "hcuDepth": 83032
+    },
+    {
+      "flow": "startEscape (no FHE)",
+      "gas": 60094,
+      "hcuTotal": 0,
+      "hcuDepth": 0
+    },
+    {
+      "flow": "executeEscape (no FHE; ETH + 1 token)",
+      "gas": 50224,
+      "hcuTotal": 0,
+      "hcuDepth": 0
+    },
+    {
+      "flow": "isIn N=8",
+      "gas": 320025,
+      "hcuTotal": 286032,
+      "hcuDepth": 286032
+    },
+    {
+      "flow": "eq+or linear N=8",
+      "gas": 945492,
+      "hcuTotal": 1264032,
+      "hcuDepth": 305032
+    },
+    {
+      "flow": "eq+or tree N=8",
+      "gas": 949812,
+      "hcuTotal": 1264032,
+      "hcuDepth": 209032
+    },
+    {
+      "flow": "isIn N=10",
+      "gas": 325858,
+      "hcuTotal": 286032,
+      "hcuDepth": 286032
+    },
+    {
+      "flow": "eq+or linear N=10",
+      "gas": 1152280,
+      "hcuTotal": 1586032,
+      "hcuDepth": 353032
+    },
+    {
+      "flow": "eq+or tree N=10",
+      "gas": 1158175,
+      "hcuTotal": 1586032,
+      "hcuDepth": 233032
+    },
+    {
+      "flow": "isIn N=16",
+      "gas": 394684,
+      "hcuTotal": 584032,
+      "hcuDepth": 584032
+    },
+    {
+      "flow": "eq+or linear N=16",
+      "gas": 1772645,
+      "hcuTotal": 2552032,
+      "hcuDepth": 497032
+    },
+    {
+      "flow": "eq+or tree N=16",
+      "gas": 1780891,
+      "hcuTotal": 2552032,
+      "hcuDepth": 233032
+    },
+    {
+      "flow": "isIn N=30",
+      "gas": 555239,
+      "hcuTotal": 584032,
+      "hcuDepth": 584032
+    },
+    {
+      "flow": "eq+or linear N=30",
+      "gas": 3220167,
+      "hcuTotal": 4806032,
+      "hcuDepth": 833032
+    },
+    {
+      "flow": "eq+or tree N=30",
+      "gas": 3235425,
+      "hcuTotal": 4806032,
+      "hcuDepth": 257032
+    },
+    {
+      "flow": "isIn N=32",
+      "gas": 578176,
+      "hcuTotal": 885032,
+      "hcuDepth": 885032
+    },
+    {
+      "flow": "eq+or linear N=32",
+      "gas": 3426956,
+      "hcuTotal": 5128032,
+      "hcuDepth": 881032
+    },
+    {
+      "flow": "eq+or tree N=32",
+      "gas": 3442917,
+      "hcuTotal": 5128032,
+      "hcuDepth": 257032
+    },
+    {
+      "flow": "isIn N=60",
+      "gas": 899365,
+      "hcuTotal": 885032,
+      "hcuDepth": 885032
+    },
+    {
+      "flow": "τ draw ×16 (one tx)",
+      "gas": 5878501,
+      "hcuTotal": 15632512,
+      "hcuDepth": 954000,
+      "note": "per draw ≈ HCU/16"
+    },
+    {
+      "flow": "τ distribution: buckets 28/31/31/35/33/40/28/30",
+      "gas": 0,
+      "hcuTotal": 0,
+      "hcuDepth": 0,
+      "note": "χ²=3.50 (df=7, p=0.001 threshold 24.32)"
+    }
+  ]
+}

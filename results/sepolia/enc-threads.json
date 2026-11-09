@@ -1,0 +1,173 @@
+{
+  "evidence": "[M] desktop (relayer.testnet.zama.org input proof)",
+  "note": "1 × euint64 (PIN guess format); first run is a warm-up, excluded",
+  "runs": {
+    "singleThread": {
+      "atUtc": "2026-11-08T22:55:40.739Z",
+      "tfhe": {
+        "numberOfThreads": 0,
+        "threadsAvailable": null
+      },
+      "totalMs": {
+        "n": 8,
+        "min": 12120,
+        "p50": 12497,
+        "p95": 13427,
+        "max": 13427,
+        "mean": 12588
+      },
+      "localMs": {
+        "n": 8,
+        "min": 11869,
+        "p50": 11982,
+        "p95": 12711,
+        "max": 12711,
+        "mean": 12133
+      },
+      "relayerMs": {
+        "n": 8,
+        "min": 251,
+        "p50": 304,
+        "p95": 1445,
+        "max": 1445,
+        "mean": 455
+      },
+      "samples": [
+        {
+          "totalMs": 13427,
+          "relayerHttpMs": 1445,
+          "localMs": 11982,
+          "httpCalls": 2
+        },
+        {
+          "totalMs": 12497,
+          "relayerHttpMs": 521,
+          "localMs": 11976,
+          "httpCalls": 2
+        },
+        {
+          "totalMs": 12558,
+          "relayerHttpMs": 312,
+          "localMs": 12246,
+          "httpCalls": 2
+        },
+        {
+          "totalMs": 12270,
+          "relayerHttpMs": 305,
+          "localMs": 11965,
+          "httpCalls": 2
+        },
+        {
+          "totalMs": 12120,
+          "relayerHttpMs": 251,
+          "localMs": 11869,
+          "httpCalls": 2
+        },
+        {
+          "totalMs": 12546,
+          "relayerHttpMs": 254,
+          "localMs": 12292,
+          "httpCalls": 2
+        },
+        {
+          "totalMs": 13015,
+          "relayerHttpMs": 304,
+          "localMs": 12711,
+          "httpCalls": 2
+        },
+        {
+          "totalMs": 12271,
+          "relayerHttpMs": 251,
+          "localMs": 12020,
+          "httpCalls": 2
+        }
+      ]
+    },
+    "multiThread": {
+      "atUtc": "2026-11-08T22:56:51.828Z",
+      "tfhe": {
+        "numberOfThreads": 12,
+        "threadsAvailable": true
+      },
+      "totalMs": {
+        "n": 8,
+        "min": 4556,
+        "p50": 5018,
+        "p95": 5626,
+        "max": 5626,
+        "mean": 5112
+      },
+      "localMs": {
+        "n": 8,
+        "min": 4274,
+        "p50": 4518,
+        "p95": 4929,
+        "max": 4929,
+        "mean": 4558
+      },
+      "relayerMs": {
+        "n": 8,
+        "min": 282,
+        "p50": 470,
+        "p95": 929,
+        "max": 929,
+        "mean": 554
+      },
+      "samples": [
+        {
+          "totalMs": 4904,
+          "relayerHttpMs": 470,
+          "localMs": 4434,
+          "httpCalls": 2
+        },
+        {
+          "totalMs": 4556,
+          "relayerHttpMs": 282,
+          "localMs": 4274,
+          "httpCalls": 2
+        },
+        {
+          "totalMs": 4934,
+          "relayerHttpMs": 416,
+          "localMs": 4518,
+          "httpCalls": 2
+        },
+        {
+          "totalMs": 5259,
+          "relayerHttpMs": 723,
+          "localMs": 4536,
+          "httpCalls": 2
+        },
+        {
+          "totalMs": 5018,
+          "relayerHttpMs": 551,
+          "localMs": 4467,
+          "httpCalls": 2
+        },
+        {
+          "totalMs": 5575,
+          "relayerHttpMs": 929,
+          "localMs": 4646,
+          "httpCalls": 2
+        },
+        {
+          "totalMs": 5626,
+          "relayerHttpMs": 697,
+          "localMs": 4929,
+          "httpCalls": 2
+        },
+        {
+          "totalMs": 5027,
+          "relayerHttpMs": 367,
+          "localMs": 4660,
+          "httpCalls": 2
+        }
+      ]
+    }
+  },
+  "client": {
+    "node": "v22.13.0",
+    "cpu": "AMD Ryzen 5 5600 6-Core Processor              ",
+    "cores": 12
+  }
+}

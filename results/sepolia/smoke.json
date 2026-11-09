@@ -1,0 +1,129 @@
+{
+  "evidence": "[M] Sepolia",
+  "startedAtUtc": "2026-11-08T21:00:14.475Z",
+  "rpc": "https://sepolia.gateway.tenderly.co",
+  "tipGwei": 0.05,
+  "clientReadyMs": 17994,
+  "entryPointV08": {
+    "address": "0x4337084D9E255Ff0702461CF8895CE9E3b5Ff108",
+    "hasCode": true,
+    "codeBytes": 21738
+  },
+  "steps": {
+    "setSecret": {
+      "encrypt": {
+        "totalMs": 5185,
+        "relayerHttpMs": 654,
+        "localMs": 4531,
+        "httpCalls": 2
+      },
+      "tx": {
+        "label": "setSecret",
+        "hash": "0xb3a57655072c89e47473126eeb3655c5e04ca3f8fd8f8d89fe9838eb113570cd",
+        "nonce": 1,
+        "blockNumber": 12093001,
+        "blockTimestamp": 1794171636,
+        "sentAtUtc": "2026-11-08T21:00:30.886Z",
+        "minedSeenAtUtc": "2026-11-08T21:00:37.123Z",
+        "inclusionMs": 6132,
+        "gasUsed": "453464",
+        "effectiveGasPriceWei": "50000016",
+        "costWei": "22673207255424",
+        "replacements": 0,
+        "sentBlock": 12093000,
+        "blocksToInclusion": 1
+      }
+    },
+    "guess": {
+      "encrypt": {
+        "totalMs": 4788,
+        "relayerHttpMs": 550,
+        "localMs": 4238,
+        "httpCalls": 2
+      },
+      "tx": {
+        "label": "guessWithChallenge",
+        "hash": "0x686c3fa3615702397006549683c3d1e8fab28335ed6f515e6177a89eabc5bcf4",
+        "nonce": 2,
+        "blockNumber": 12093002,
+        "blockTimestamp": 1794171648,
+        "sentAtUtc": "2026-11-08T21:00:42.115Z",
+        "minedSeenAtUtc": "2026-11-08T21:00:50.610Z",
+        "inclusionMs": 8352,
+        "gasUsed": "630503",
+        "effectiveGasPriceWei": "50000016",
+        "costWei": "31525160088048",
+        "replacements": 0,
+        "sentBlock": 12093001,
+        "blocksToInclusion": 1
+      }
+    },
+    "publicDecrypt": {
+      "handle": "0x29a8000a272c42926d082f0f52b04dfc21fb603392ff0000000000aa36a70000",
+      "ok": true,
+      "waitedMs": 2927,
+      "attempts": 1,
+      "readyBlock": 12093002,
+      "blocksAfterInclusion": 0,
+      "progress": [
+        {
+          "type": "queued",
+          "step": 0,
+          "totalSteps": 1,
+          "retryCount": 0,
+          "t": 666
+        },
+        {
+          "type": "succeeded",
+          "step": 1,
+          "totalSteps": 1,
+          "retryCount": 1,
+          "t": 2812
+        }
+      ],
+      "lastError": null
+    },
+    "verify": {
+      "tx": {
+        "label": "verify",
+        "hash": "0x81809aef11f1c4bc8ddf005714a5307929b45b967cce42df0e388a4b36a77d31",
+        "nonce": 3,
+        "blockNumber": 12093003,
+        "blockTimestamp": 1794171660,
+        "sentAtUtc": "2026-11-08T21:00:53.771Z",
+        "minedSeenAtUtc": "2026-11-08T21:01:00.761Z",
+        "inclusionMs": 6867,
+        "gasUsed": "469425",
+        "effectiveGasPriceWei": "50000016",
+        "costWei": "23471257510800",
+        "replacements": 0,
+        "sentBlock": 12093002,
+        "blocksToInclusion": 1
+      },
+      "verifiedValue": true
+    }
+  },
+  "spike": "0x1d6b515d50e4a47f3B67e405073bd16B70F9c74B",
+  "pass": true,
+  "finishedAtUtc": "2026-11-08T21:01:00.864Z",
+  "balanceAfterEth": "0.099533589150748576",
+  "rpcStats": {
+    "calls": 74,
+    "retries": 0,
+    "rotations": 0,
+    "perUrl": {
+      "https://ethereum-sepolia-rpc.publicnode.com": {
+        "ok": 0,
+        "fail": 0
+      },
+      "https://sepolia.gateway.tenderly.co": {
+        "ok": 74,
+        "fail": 0
+      },
+      "https://1rpc.io/sepolia": {
+        "ok": 0,
+        "fail": 0
+      }
+    }
+  }
+}

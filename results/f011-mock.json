@@ -1,0 +1,128 @@
+{
+  "evidence": "[Mock]",
+  "generatedAt": "2026-11-09T22:28:15.806Z",
+  "note": "hardhat (cancun gas schedule, new slot 20k); on Sepolia's newer schedule a new slot ≈ 111k (F0.10 live lesson)",
+  "setup": {
+    "A": {
+      "create": 295365,
+      "pin": 796471,
+      "assets": 2954854,
+      "known": 7087167,
+      "roles": 35176,
+      "arm": 65693,
+      "total": 11234726
+    },
+    "B": {
+      "create": 317555,
+      "pin": 796559,
+      "assets": 973828,
+      "known": 159014,
+      "roles": 35286,
+      "arm": 32337,
+      "total": 2314579
+    },
+    "listR": 3,
+    "listS": 1,
+    "perEntryB": 25235
+  },
+  "hotPath": {
+    "A_requestPlusFinalize_warm": 1516768,
+    "B_sync_warm": 61662,
+    "ratio": 24.6
+  },
+  "rows": [
+    {
+      "variant": "A",
+      "flow": "K-only ERC-20 request #1",
+      "gas": 1248312,
+      "hcu": 774036,
+      "note": "first (cold)"
+    },
+    {
+      "variant": "A",
+      "flow": "K-only ERC-20 finalize #1",
+      "gas": 310276,
+      "hcu": 0,
+      "note": "first (cold)"
+    },
+    {
+      "variant": "A",
+      "flow": "K-only ERC-20 request #2",
+      "gas": 1223604,
+      "hcu": 774036,
+      "note": "warm"
+    },
+    {
+      "variant": "A",
+      "flow": "K-only ERC-20 finalize #2",
+      "gas": 293164,
+      "hcu": 0,
+      "note": "warm"
+    },
+    {
+      "variant": "A",
+      "flow": "K-only ERC-20 request #3",
+      "gas": 1223604,
+      "hcu": 774036,
+      "note": "warm"
+    },
+    {
+      "variant": "A",
+      "flow": "K-only ERC-20 finalize #3",
+      "gas": 293164,
+      "hcu": 0,
+      "note": "warm"
+    },
+    {
+      "variant": "B",
+      "flow": "K-only ERC-20 sync #1",
+      "gas": 86370,
+      "hcu": 0,
+      "note": "first (cold)"
+    },
+    {
+      "variant": "B",
+      "flow": "K-only ERC-20 sync #2",
+      "gas": 61662,
+      "hcu": 0,
+      "note": "warm"
+    },
+    {
+      "variant": "B",
+      "flow": "K-only ERC-20 sync #3",
+      "gas": 61662,
+      "hcu": 0,
+      "note": "warm"
+    },
+    {
+      "variant": "B",
+      "flow": "K-only ETH sync",
+      "gas": 80240,
+      "hcu": 0
+    },
+    {
+      "variant": "B",
+      "flow": "K-only approval sync",
+      "gas": 74006,
+      "hcu": 0
+    },
+    {
+      "variant": "B",
+      "flow": "above limit → PIN op opening",
+      "gas": 186804,
+      "hcu": 0
+    },
+    {
+      "variant": "A",
+      "flow": "PIN op opening (viaPin)",
+      "gas": 159621,
+      "hcu": 0
+    },
+    {
+      "variant": "B",
+      "flow": "reference: plain ERC-20 transfer (EOA)",
+      "gas": 51255,
+      "hcu": 0
+    }
+  ]
+}

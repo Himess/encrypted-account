@@ -1,0 +1,70 @@
+{
+  "description": "Encrypted Account PIN fingerprint test vectors, KDF v1 (Argon2id m=64MiB t=3 p=1, dkLen=32; fp = first 8 bytes BE)",
+  "kdf": {
+    "version": 1,
+    "memoryKiB": 65536,
+    "iterations": 3,
+    "parallelism": 1,
+    "hashLength": 32,
+    "saltFormat": "SHA-256(\"encrypted-account/pin/v1\" || chainId u256be || account 20B)",
+    "normalization": "NFKC, UTF-8"
+  },
+  "crossCheckedWith": [
+    "hash-wasm@4.13.0 (WASM)",
+    "@noble/hashes@2.0.1 (pure JS)"
+  ],
+  "referenceKAT": {
+    "params": "argon2id v=19 m=65536 t=2 p=1 password/somesalt",
+    "hash": "0x09316115d5cf24ed5a15a31a3ba326e5cf32edc24702987c02b6566f61913cf7"
+  },
+  "vectors": [
+    {
+      "pin": "482915",
+      "chainId": "31337",
+      "account": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "salt": "0x2c60bd949c1a033ba0b830dbc6e581b8c7c20a196768a3cfc6a7bd3e08fe056d",
+      "argon2id": "0x7a3afa7192218bc6bf17db8c896cb0666cf2c97c6b1c82a5abdf43d964c23460",
+      "fingerprint": "0x7a3afa7192218bc6"
+    },
+    {
+      "pin": "482915",
+      "chainId": "11155111",
+      "account": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "salt": "0xe0de8f30522a6ddb0bcdd4306b4124d894d07b4462e38cea2ef87a471d2985fa",
+      "argon2id": "0x2f761a61a716ca3a66d37df05794ff2de3d0496204418ab63e9bcaaf6f847c1f",
+      "fingerprint": "0x2f761a61a716ca3a"
+    },
+    {
+      "pin": "482915",
+      "chainId": "1",
+      "account": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "salt": "0xe24c9f7dada7b1b2c8a6dad6c0079aaf457e5f27519434d1906103955a944612",
+      "argon2id": "0x67c8bc6ad45f3342275ba6d85609c7aeb662128f75251277502db15adc94f5b5",
+      "fingerprint": "0x67c8bc6ad45f3342"
+    },
+    {
+      "pin": "007731",
+      "chainId": "11155111",
+      "account": "0x000000000000000000000000000000000000dEaD",
+      "salt": "0xc89a2e3520e94468387cc139bd8848d69e3136651ed37bb6a38e20615f455fc8",
+      "argon2id": "0x3073f0dd172bf7330621f1ee6a58b39e70353b71a3e7112cfd0db02c8d878054",
+      "fingerprint": "0x3073f0dd172bf733"
+    },
+    {
+      "pin": "correct horse battery",
+      "chainId": "11155111",
+      "account": "0x1111111111111111111111111111111111111111",
+      "salt": "0xbd97c9e78821f34cbb30e1efeb10a7238e2eede7dc898d0c20cf1caad05e5338",
+      "argon2id": "0xd6c3e38b5a9774b1ba7805236f2546464cffc049f92965557c4604321e1441e2",
+      "fingerprint": "0xd6c3e38b5a9774b1"
+    },
+    {
+      "pin": "Café-ÅŁŽ-1453",
+      "chainId": "11155111",
+      "account": "0x2222222222222222222222222222222222222222",
+      "salt": "0xd9ea4adb1ba5874e161c66f69e032744a45bc23258745859978d25d3a24455c0",
+      "argon2id": "0x05f98b39ff011cc25f5911a1cf17cef1ea8176b1944ae3ba6f9590898fc20e63",
+      "fingerprint": "0x05f98b39ff011cc2"
+    }
+  ]
+}

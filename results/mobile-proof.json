@@ -1,0 +1,62 @@
+{
+  "evidence": "[M] browser measurement (bench/proof; @fhevm/sdk 0.13.7, TFHE 1.6.2, relayer.testnet.zama.org)",
+  "package": "F0.12b · input proof on a phone (mobile gate, K58)",
+  "gate": { "rule": "K58: local proof p95 on a phone ≤ 16 s", "thresholdMs": 16000 },
+  "e1Formula": "E1(phone) p95 ≈ 47,724 − 4,454 + local proof p95 + (321.6 − 207) ms (interim report §2.6)",
+  "pages": {
+    "coi": "/coi/ — Cross-Origin-Opener-Policy: same-origin, Cross-Origin-Embedder-Policy: require-corp (crossOriginIsolated → multi-threaded TFHE)",
+    "plain": "/plain/ — no headers (the SDK falls back to a single thread)"
+  },
+  "desktopReference": {
+    "device": "Ryzen 5 5600 (12 threads), Chromium 152 pane of the Claude app, local server (localhost, secure context)",
+    "coi": {
+      "file": "results/proof-bench/coi-2026-11-08T23-49-39-182Z.json",
+      "tfheThreads": 12,
+      "localMs": { "n": 10, "p50": 4064.2, "p95": 4104.8, "max": 4104.8 },
+      "relayerMs": { "p50": 632, "p95": 711 },
+      "ref12eaddressLocalMs": [4214.2, 4220],
+      "earlierRun": { "atUtc": "2026-11-08T23:40:35Z", "localMs": { "p50": 4083.7, "p95": 4109.9 }, "note": "details were read off the page before saving was set up in this session" }
+    },
+    "plain": {
+      "file": "results/proof-bench/plain-2026-11-08T23-51-59-214Z.json",
+      "tfheThreads": 0,
+      "localMs": { "n": 10, "p50": 9212.6, "p95": 9411.5, "max": 9411.5 },
+      "relayerMs": { "p50": 646, "p95": 719 },
+      "ref12eaddressLocalMs": [9933.9, 9829.1],
+      "earlierRun": { "atUtc": "2026-11-08T23:44:40Z", "localMs": { "p50": 9310.7, "p95": 9531.8 } }
+    },
+    "firstLoad": {
+      "cold": { "atUtc": "2026-11-08T23:40:35Z", "clientReadyMs": 38756, "crsBytes": 4571368, "crsDownloadMs": 37585, "publicKeyBytes": 33018 },
+      "warm": { "clientReadyMs": [688, 1108], "crsDownloadMs": 6, "note": "CRS came from the browser's HTTP cache" }
+    },
+    "nodeComparison": { "multiThreadLocalP50Ms": 4518, "singleThreadLocalP50Ms": 11982, "source": "results/sepolia/enc-threads.json" }
+  },
+  "phone": [
+    {
+      "device": "Samsung Galaxy A73 5G (SM-A736B), Android 15, Chrome 156, 8 cores, 8 GB",
+      "variant": "plain-file (single file opened as a file on the phone; crossOriginIsolated = false, single-threaded TFHE)",
+      "file": "results/proof-bench/phone-galaxy-a73-plain-file-2026-11-09T05-10-07-337Z.json",
+      "atUtc": "2026-11-09T05:10:07Z",
+      "localMs": { "n": 10, "min": 13315.2, "p50": 13477.3, "p95": 13647, "max": 13647 },
+      "relayerMs": { "p50": 865, "p95": 986 },
+      "totalMs": { "p50": 14388.5, "p95": 14559 },
+      "ref12eaddressLocalMs": [14614, 14652.1],
+      "firstLoad": { "clientReadyMs": 10781, "crsDownloadMs": 8713, "publicKeyDownloadMs": 713, "firstEncryptMs": 15447.5, "totalMs": 26375 },
+      "ratioToDesktopSingleThreadP50": 1.46,
+      "e1EstimateMs": { "p50": 33869, "p95": 57032 },
+      "gate": { "localP95Ms": 13647, "thresholdMs": 16000, "pass": true }
+    }
+  ],
+  "decision": {
+    "atUtc": "2026-11-09",
+    "rule": "§7.4: mobile web is GO if local proof p95 on a phone ≤ 16 s",
+    "result": "GO — on Android without COOP/COEP (single thread, worst case) local proof p95 is 13.65 s",
+    "margin": "mobile E1 p95 estimate ≈ 57.0 s; margin to the 60 s criterion ≈ 3 s (narrow)",
+    "recommendations": [
+      "Serve the production page with COOP/COEP (not required; multi-threading widens the margin — it gave a 2.3× speed-up on desktop)",
+      "Download and cache the CRS (4.57 MB) at app start, before the PIN is requested: first load on the phone is 26.4 s (CRS 8.7 s + first encryption 15.4 s)",
+      "Optional: a /coi/ measurement on the phone (needs a server) would show the multi-threading gain on the phone; not needed for the decision"
+    ]
+  },
+  "pending": ["iOS Safari: once a device is available", "optional: /coi/ on the Galaxy A73 (needs a server with COOP/COEP)"]
+}

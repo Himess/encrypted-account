@@ -1,0 +1,3707 @@
+{
+  "evidence": "[M] Sepolia",
+  "flow": "K-only hot path (request → ok decryption → finalizeEvaluation → transfer)",
+  "account": "0x456336adB1869D678D7222b809CDA7c9Ad765E8E",
+  "startedAtUtc": "2026-11-08T21:54:02.891Z",
+  "config": {
+    "n": 30,
+    "gapS": [
+      3,
+      20
+    ],
+    "rpc": "https://sepolia.gateway.tenderly.co",
+    "tipGwei": 0.05,
+    "relayer": "https://relayer.testnet.zama.org",
+    "sdk": "@fhevm/sdk 0.13.7",
+    "tfhe": {
+      "tfheVersion": "1.6.2",
+      "numberOfThreads": 12,
+      "threadsAvailable": true,
+      "wasmMemoryBytes": 27394048
+    },
+    "clientReadyMs": 22224,
+    "client": {
+      "node": "v22.13.0",
+      "cpu": "AMD Ryzen 5 5600 6-Core Processor              ",
+      "cores": 12,
+      "platform": "win32 10.0.19045"
+    },
+    "argon2id": {
+      "version": 1,
+      "memoryKiB": 65536,
+      "iterations": 3,
+      "parallelism": 1,
+      "hashLength": 32,
+      "impl": "hash-wasm 4.13.0 (WASM, Node)"
+    },
+    "amountWei": "1000000000000",
+    "limits": {
+      "unitWei": "1e12",
+      "lmin": "100000",
+      "lmax": "300000",
+      "big": "3000000"
+    },
+    "watchtower": "0x8e98d5e45822b81Ac7dB853480c405E8Ea769B7A",
+    "pollMs": 500
+  },
+  "samples": [
+    {
+      "i": 0,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T21:54:03.519Z",
+      "opId": "1",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 8934,
+        "decryptMs": 7304,
+        "finalizeMs": 7361
+      },
+      "totalMs": 23600,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 7302,
+        "httpCalls": 4,
+        "readyBlock": 12093249,
+        "lastError": null,
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 621
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 2763
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 4907
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 3,
+            "t": 7035
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093249,
+        "decryptReadySeenAt": 12093249,
+        "finalize": 12093250,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#0 requestTransfer (K-only)",
+          "hash": "0xce6845af20e07791a4a05eac9fa496bc0b828fb744615f8e3a3f316aa613b415",
+          "nonce": 44,
+          "blockNumber": 12093249,
+          "blockTimestamp": 1794174852,
+          "sentAtUtc": "2026-11-08T21:54:03.716Z",
+          "minedSeenAtUtc": "2026-11-08T21:54:12.453Z",
+          "inclusionMs": 8613,
+          "gasUsed": "1636733",
+          "effectiveGasPriceWei": "50000017",
+          "costWei": "81836677824461",
+          "replacements": 0,
+          "sentBlock": 12093248,
+          "blocksToInclusion": 1,
+          "wallMs": 8934,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#0 finalizeEvaluation (watchtower)",
+          "hash": "0x02dccd1246c3a9cc07a33aebda4ef223293619afc5a10ec59e1c5482592644b3",
+          "nonce": 0,
+          "blockNumber": 12093250,
+          "blockTimestamp": 1794174864,
+          "sentAtUtc": "2026-11-08T21:54:20.015Z",
+          "minedSeenAtUtc": "2026-11-08T21:54:27.118Z",
+          "inclusionMs": 6997,
+          "gasUsed": "704335",
+          "effectiveGasPriceWei": "50000017",
+          "costWei": "35216761973695",
+          "replacements": 0,
+          "sentBlock": 12093249,
+          "blocksToInclusion": 1,
+          "wallMs": 7361,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": 0,
+            "blockComputed": 0,
+            "meterCheck": "equal"
+          }
+        }
+      }
+    },
+    {
+      "i": 1,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T21:56:46.660Z",
+      "opId": "2",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 2144,
+        "decryptMs": 6544,
+        "finalizeMs": 5908
+      },
+      "totalMs": 14596,
+      "decrypt": {
+        "attempts": 2,
+        "waitedMs": 6544,
+        "httpCalls": 3,
+        "readyBlock": 12093260,
+        "lastError": "Handle 0x8d8e53abfb0d4a4ad016ed35e262b024ad4fdd634bff0000000000aa36a70000 is not allowed for public decryption\nVersion: @fhevm/sdk@0.13.7",
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 2133
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 4256
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 6378
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093260,
+        "decryptReadySeenAt": 12093260,
+        "finalize": 12093261,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#1 requestTransfer (K-only)",
+          "hash": "0xfd2304a485acb0c5b2a234af9edac0dc23c05faeddc776415186b4fa1dc42017",
+          "nonce": 49,
+          "blockNumber": 12093260,
+          "blockTimestamp": 1794175008,
+          "sentAtUtc": "2026-11-08T21:56:46.927Z",
+          "minedSeenAtUtc": "2026-11-08T21:56:48.804Z",
+          "inclusionMs": 1740,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000017",
+          "costWei": "76215275913185",
+          "replacements": 0,
+          "sentBlock": 12093259,
+          "blocksToInclusion": 1,
+          "wallMs": 2144,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#1 finalizeEvaluation (watchtower)",
+          "hash": "0xfd0aad689188143685c6aa8d72981c0d6bcb9a219bf469f5908f9b2dcc010610",
+          "nonce": 5,
+          "blockNumber": 12093261,
+          "blockTimestamp": 1794175020,
+          "sentAtUtc": "2026-11-08T21:56:55.454Z",
+          "minedSeenAtUtc": "2026-11-08T21:57:01.256Z",
+          "inclusionMs": 5687,
+          "gasUsed": "422779",
+          "effectiveGasPriceWei": "50000017",
+          "costWei": "21138957187243",
+          "replacements": 0,
+          "sentBlock": 12093260,
+          "blocksToInclusion": 1,
+          "wallMs": 5908,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 162032,
+            "blockFheTxs": null,
+            "blockComputed": null,
+            "meterCheck": "unreadable"
+          }
+        }
+      }
+    },
+    {
+      "i": 2,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T21:57:22.476Z",
+      "opId": "3",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 3006,
+        "decryptMs": 7249,
+        "finalizeMs": 3576
+      },
+      "totalMs": 13832,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 7248,
+        "httpCalls": 4,
+        "readyBlock": 12093263,
+        "lastError": null,
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 418
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 2535
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 4663
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 3,
+            "t": 6794
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093263,
+        "decryptReadySeenAt": 12093263,
+        "finalize": 12093264,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#2 requestTransfer (K-only)",
+          "hash": "0xf1f35bf19b350d5250876a436f1a44d1d0d2e55af918ca8432acab07ee0fca83",
+          "nonce": 50,
+          "blockNumber": 12093263,
+          "blockTimestamp": 1794175044,
+          "sentAtUtc": "2026-11-08T21:57:22.721Z",
+          "minedSeenAtUtc": "2026-11-08T21:57:25.482Z",
+          "inclusionMs": 2593,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000017",
+          "costWei": "76215275913185",
+          "replacements": 0,
+          "sentBlock": 12093262,
+          "blocksToInclusion": 1,
+          "wallMs": 3006,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#2 finalizeEvaluation (watchtower)",
+          "hash": "0xa22a4c52ba66cd0bcba77b17c6d86bc8192e641dd53dc68e8883270a89b0afc3",
+          "nonce": 6,
+          "blockNumber": 12093264,
+          "blockTimestamp": 1794175056,
+          "sentAtUtc": "2026-11-08T21:57:32.956Z",
+          "minedSeenAtUtc": "2026-11-08T21:57:36.308Z",
+          "inclusionMs": 3234,
+          "gasUsed": "422815",
+          "effectiveGasPriceWei": "50000017",
+          "costWei": "21140757187855",
+          "replacements": 0,
+          "sentBlock": 12093263,
+          "blocksToInclusion": 1,
+          "wallMs": 3576,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": null,
+            "blockComputed": null,
+            "meterCheck": "unreadable"
+          }
+        }
+      }
+    },
+    {
+      "i": 3,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T21:59:29.660Z",
+      "opId": "4",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 7248,
+        "decryptMs": 9354,
+        "finalizeMs": 2205
+      },
+      "totalMs": 18808,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 9354,
+        "httpCalls": 5,
+        "readyBlock": 12093271,
+        "lastError": null,
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 485
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 2634
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 4794
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 3,
+            "t": 6912
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 4,
+            "t": 9073
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093271,
+        "decryptReadySeenAt": 12093271,
+        "finalize": 12093272,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#3 requestTransfer (K-only)",
+          "hash": "0x5dd5780962fa91d12fb6c2f2e68b5f8c705b69e9bd4c9e3d46c0179deb0ae458",
+          "nonce": 53,
+          "blockNumber": 12093271,
+          "blockTimestamp": 1794175176,
+          "sentAtUtc": "2026-11-08T21:59:29.883Z",
+          "minedSeenAtUtc": "2026-11-08T21:59:36.908Z",
+          "inclusionMs": 6701,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "76215274388880",
+          "replacements": 0,
+          "sentBlock": 12093270,
+          "blocksToInclusion": 1,
+          "wallMs": 7248,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#3 finalizeEvaluation (watchtower)",
+          "hash": "0x81a89ce0e18ec8b3ed790d83a345d9ef326973ddb06d896c5c3a86f0116538c0",
+          "nonce": 9,
+          "blockNumber": 12093272,
+          "blockTimestamp": 0,
+          "sentAtUtc": "2026-11-08T21:59:46.369Z",
+          "minedSeenAtUtc": "2026-11-08T21:59:48.467Z",
+          "inclusionMs": 1944,
+          "gasUsed": "422791",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "21139556764656",
+          "replacements": 0,
+          "sentBlock": 12093271,
+          "blocksToInclusion": 1,
+          "wallMs": 2205,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": null,
+            "blockComputed": null,
+            "meterCheck": "unreadable"
+          }
+        }
+      }
+    },
+    {
+      "i": 4,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:00:44.662Z",
+      "opId": "5",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 4190,
+        "decryptMs": 7185,
+        "finalizeMs": 4963
+      },
+      "totalMs": 16338,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 7184,
+        "httpCalls": 4,
+        "readyBlock": 12093277,
+        "lastError": null,
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 476
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 2623
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 4757
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 3,
+            "t": 6870
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093277,
+        "decryptReadySeenAt": 12093277,
+        "finalize": 12093278,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#4 requestTransfer (K-only)",
+          "hash": "0x45857b1e5f51ffdc77afa5c5630488486db12a7fc6706918507bcb7451219b53",
+          "nonce": 56,
+          "blockNumber": 12093277,
+          "blockTimestamp": 1794175248,
+          "sentAtUtc": "2026-11-08T22:00:44.917Z",
+          "minedSeenAtUtc": "2026-11-08T22:00:48.852Z",
+          "inclusionMs": 3733,
+          "gasUsed": "1524301",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "76215074388816",
+          "replacements": 0,
+          "sentBlock": 12093276,
+          "blocksToInclusion": 1,
+          "wallMs": 4190,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 936068,
+            "blockFheTxs": 2,
+            "blockComputed": 936068,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#4 finalizeEvaluation (watchtower)",
+          "hash": "0xb89d395b3da88b2006ec29691a5061fd565abfef6e11b6da59676d39775931af",
+          "nonce": 12,
+          "blockNumber": 12093278,
+          "blockTimestamp": 1794175260,
+          "sentAtUtc": "2026-11-08T22:00:56.342Z",
+          "minedSeenAtUtc": "2026-11-08T22:01:01.000Z",
+          "inclusionMs": 4502,
+          "gasUsed": "422815",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "21140756765040",
+          "replacements": 0,
+          "sentBlock": 12093277,
+          "blocksToInclusion": 1,
+          "wallMs": 4963,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": null,
+            "blockComputed": null,
+            "meterCheck": "unreadable"
+          }
+        }
+      }
+    },
+    {
+      "i": 5,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:02:17.487Z",
+      "opId": "6",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 7485,
+        "decryptMs": 7376,
+        "finalizeMs": 4627
+      },
+      "totalMs": 19489,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 7376,
+        "httpCalls": 4,
+        "readyBlock": 12093285,
+        "lastError": null,
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 613
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 2739
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 4853
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 3,
+            "t": 6989
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093285,
+        "decryptReadySeenAt": 12093285,
+        "finalize": 12093286,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#5 requestTransfer (K-only)",
+          "hash": "0x13796d28e76a998287c61db601c11eb3977319a567a19ebb90a568a626b001cc",
+          "nonce": 59,
+          "blockNumber": 12093285,
+          "blockTimestamp": 1794175344,
+          "sentAtUtc": "2026-11-08T22:02:17.741Z",
+          "minedSeenAtUtc": "2026-11-08T22:02:24.972Z",
+          "inclusionMs": 7113,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "76215274388880",
+          "replacements": 0,
+          "sentBlock": 12093284,
+          "blocksToInclusion": 1,
+          "wallMs": 7485,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#5 finalizeEvaluation (watchtower)",
+          "hash": "0x3d1529066bf5dcba525a4eb2f3ed4ce0d5ab4f68501e786c5fd24a75c1e24e92",
+          "nonce": 15,
+          "blockNumber": 12093286,
+          "blockTimestamp": 1794175356,
+          "sentAtUtc": "2026-11-08T22:02:32.583Z",
+          "minedSeenAtUtc": "2026-11-08T22:02:36.976Z",
+          "inclusionMs": 4276,
+          "gasUsed": "422779",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "21138956764464",
+          "replacements": 0,
+          "sentBlock": 12093285,
+          "blocksToInclusion": 1,
+          "wallMs": 4627,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": 0,
+            "blockComputed": 0,
+            "meterCheck": "equal"
+          }
+        }
+      }
+    },
+    {
+      "i": 6,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:04:36.509Z",
+      "opId": "7",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 12137,
+        "decryptMs": 7415,
+        "finalizeMs": 5255
+      },
+      "totalMs": 24808,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 7415,
+        "httpCalls": 4,
+        "readyBlock": 12093297,
+        "lastError": null,
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 487
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 2619
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 4990
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 3,
+            "t": 7124
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093297,
+        "decryptReadySeenAt": 12093297,
+        "finalize": 12093298,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#6 requestTransfer (K-only)",
+          "hash": "0x1929d3735f4429710e4713a7e5138e6c6da17ee060492c0f4c20af6ea700a219",
+          "nonce": 64,
+          "blockNumber": 12093297,
+          "blockTimestamp": 1794175488,
+          "sentAtUtc": "2026-11-08T22:04:36.778Z",
+          "minedSeenAtUtc": "2026-11-08T22:04:48.646Z",
+          "inclusionMs": 11751,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "76215274388880",
+          "replacements": 0,
+          "sentBlock": 12093296,
+          "blocksToInclusion": 1,
+          "wallMs": 12137,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 6126196,
+            "blockFheTxs": 2,
+            "blockComputed": 6126196,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#6 finalizeEvaluation (watchtower)",
+          "hash": "0xf134e26327ae417258cf0039c05f57852a7113c0b79618d7584d211ac7e3973c",
+          "nonce": 20,
+          "blockNumber": 12093298,
+          "blockTimestamp": 1794175500,
+          "sentAtUtc": "2026-11-08T22:04:56.295Z",
+          "minedSeenAtUtc": "2026-11-08T22:05:01.317Z",
+          "inclusionMs": 4771,
+          "gasUsed": "422815",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "21140756765040",
+          "replacements": 0,
+          "sentBlock": 12093297,
+          "blocksToInclusion": 1,
+          "wallMs": 5255,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": null,
+            "blockComputed": null,
+            "meterCheck": "unreadable"
+          }
+        }
+      }
+    },
+    {
+      "i": 7,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:06:19.120Z",
+      "opId": "8",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 5814,
+        "decryptMs": 6494,
+        "finalizeMs": 5533
+      },
+      "totalMs": 17842,
+      "decrypt": {
+        "attempts": 2,
+        "waitedMs": 6493,
+        "httpCalls": 3,
+        "readyBlock": 12093304,
+        "lastError": "Handle 0x3a19ba95493304312312fbbcbbb15c83b7d4e29838ff0000000000aa36a70000 is not allowed for public decryption\nVersion: @fhevm/sdk@0.13.7",
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 2108
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 4260
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 6371
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093304,
+        "decryptReadySeenAt": 12093304,
+        "finalize": 12093305,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#7 requestTransfer (K-only)",
+          "hash": "0x1305072c99ab3a87d4c3835f8e477edadda4bfc0d0cc7e9474d05b5666321453",
+          "nonce": 67,
+          "blockNumber": 12093304,
+          "blockTimestamp": 1794175584,
+          "sentAtUtc": "2026-11-08T22:06:19.343Z",
+          "minedSeenAtUtc": "2026-11-08T22:06:24.934Z",
+          "inclusionMs": 5486,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "76215274388880",
+          "replacements": 0,
+          "sentBlock": 12093303,
+          "blocksToInclusion": 1,
+          "wallMs": 5814,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#7 finalizeEvaluation (watchtower)",
+          "hash": "0x4b3ff92162b97f3e3f3daac2c415f5dec6e83703e17e83d6b6d0f27579241ce4",
+          "nonce": 23,
+          "blockNumber": 12093305,
+          "blockTimestamp": 1794175596,
+          "sentAtUtc": "2026-11-08T22:06:31.541Z",
+          "minedSeenAtUtc": "2026-11-08T22:06:36.961Z",
+          "inclusionMs": 5007,
+          "gasUsed": "422815",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "21140756765040",
+          "replacements": 0,
+          "sentBlock": 12093304,
+          "blocksToInclusion": 1,
+          "wallMs": 5533,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 162032,
+            "blockFheTxs": 1,
+            "blockComputed": 162032,
+            "meterCheck": "equal"
+          }
+        }
+      }
+    },
+    {
+      "i": 8,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:07:56.894Z",
+      "opId": "9",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 3881,
+        "decryptMs": 8205,
+        "finalizeMs": 15332
+      },
+      "totalMs": 27418,
+      "decrypt": {
+        "attempts": 2,
+        "waitedMs": 8204,
+        "httpCalls": 3,
+        "readyBlock": 12093311,
+        "lastError": "Handle 0xa66fc7542cf62e1705a29e6be971b0e8591d04d620ff0000000000aa36a70000 is not allowed for public decryption\nVersion: @fhevm/sdk@0.13.7",
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 2237
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 4395
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 7735
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093311,
+        "decryptReadySeenAt": 12093311,
+        "finalize": 12093313,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 2
+      },
+      "tx": {
+        "request": {
+          "label": "hot#8 requestTransfer (K-only)",
+          "hash": "0xc5d3f5c7facc9c45da97d8d800e815cdd6fcd765784d63d3eb734931df3e2588",
+          "nonce": 70,
+          "blockNumber": 12093311,
+          "blockTimestamp": 1794175680,
+          "sentAtUtc": "2026-11-08T22:07:57.119Z",
+          "minedSeenAtUtc": "2026-11-08T22:08:00.775Z",
+          "inclusionMs": 3549,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "76215274388880",
+          "replacements": 0,
+          "sentBlock": 12093310,
+          "blocksToInclusion": 1,
+          "wallMs": 3881,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#8 finalizeEvaluation (watchtower)",
+          "hash": "0x69594dc3e25709e808d45522e2cb540f2f80a4e36b9187609cbf742099274d10",
+          "nonce": 26,
+          "blockNumber": 12093313,
+          "blockTimestamp": 1794175704,
+          "sentAtUtc": "2026-11-08T22:08:09.214Z",
+          "minedSeenAtUtc": "2026-11-08T22:08:24.312Z",
+          "inclusionMs": 14978,
+          "gasUsed": "422827",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "21141356765232",
+          "replacements": 0,
+          "sentBlock": 12093311,
+          "blocksToInclusion": 2,
+          "wallMs": 15332,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": 0,
+            "blockComputed": 0,
+            "meterCheck": "equal"
+          }
+        }
+      }
+    },
+    {
+      "i": 9,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:08:43.025Z",
+      "opId": "10",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 6451,
+        "decryptMs": 7235,
+        "finalizeMs": 4236
+      },
+      "totalMs": 17922,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 7234,
+        "httpCalls": 4,
+        "readyBlock": 12093315,
+        "lastError": null,
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 455
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 2579
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 4707
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 3,
+            "t": 6840
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093315,
+        "decryptReadySeenAt": 12093315,
+        "finalize": 12093316,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#9 requestTransfer (K-only)",
+          "hash": "0x1010f9972f1270314746dd94133dc06804177fa33e0c3cedc4c1152a8fb8fdab",
+          "nonce": 71,
+          "blockNumber": 12093315,
+          "blockTimestamp": 1794175728,
+          "sentAtUtc": "2026-11-08T22:08:43.268Z",
+          "minedSeenAtUtc": "2026-11-08T22:08:49.476Z",
+          "inclusionMs": 6016,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "76215274388880",
+          "replacements": 0,
+          "sentBlock": 12093314,
+          "blocksToInclusion": 1,
+          "wallMs": 6451,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#9 finalizeEvaluation (watchtower)",
+          "hash": "0xe5acbdcfb34f37fb19c6e37d2cc90b7dee5caa0226d5c03e7c6bdd6878918fdc",
+          "nonce": 27,
+          "blockNumber": 12093316,
+          "blockTimestamp": 1794175740,
+          "sentAtUtc": "2026-11-08T22:08:56.912Z",
+          "minedSeenAtUtc": "2026-11-08T22:09:00.947Z",
+          "inclusionMs": 3903,
+          "gasUsed": "422803",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "21140156764848",
+          "replacements": 0,
+          "sentBlock": 12093315,
+          "blocksToInclusion": 1,
+          "wallMs": 4236,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": 0,
+            "blockComputed": 0,
+            "meterCheck": "equal"
+          }
+        }
+      }
+    },
+    {
+      "i": 10,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:11:31.264Z",
+      "opId": "11",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 5637,
+        "decryptMs": 7061,
+        "finalizeMs": 5027
+      },
+      "totalMs": 17725,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 7060,
+        "httpCalls": 4,
+        "readyBlock": 12093329,
+        "lastError": null,
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 425
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 2536
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 4653
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 3,
+            "t": 6769
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093329,
+        "decryptReadySeenAt": 12093329,
+        "finalize": 12093330,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#10 requestTransfer (K-only)",
+          "hash": "0xd4f9fe25791ed587df3c5b8e8853d8d0ae93630b6990a0ae210654baf368dc06",
+          "nonce": 76,
+          "blockNumber": 12093329,
+          "blockTimestamp": 1794175896,
+          "sentAtUtc": "2026-11-08T22:11:31.467Z",
+          "minedSeenAtUtc": "2026-11-08T22:11:36.901Z",
+          "inclusionMs": 5301,
+          "gasUsed": "1524301",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "76215072864515",
+          "replacements": 0,
+          "sentBlock": 12093328,
+          "blocksToInclusion": 1,
+          "wallMs": 5637,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 936068,
+            "blockFheTxs": 2,
+            "blockComputed": 936068,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#10 finalizeEvaluation (watchtower)",
+          "hash": "0xf526e83d409ef55dc0299bbc82dc21648a728a1bbe5c91423353944a304598d8",
+          "nonce": 32,
+          "blockNumber": 12093330,
+          "blockTimestamp": 0,
+          "sentAtUtc": "2026-11-08T22:11:44.188Z",
+          "minedSeenAtUtc": "2026-11-08T22:11:48.988Z",
+          "inclusionMs": 4638,
+          "gasUsed": "422803",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "21140156342045",
+          "replacements": 0,
+          "sentBlock": 12093329,
+          "blocksToInclusion": 1,
+          "wallMs": 5027,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": 0,
+            "blockComputed": 0,
+            "meterCheck": "equal"
+          }
+        }
+      }
+    },
+    {
+      "i": 11,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:13:04.030Z",
+      "opId": "12",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 10517,
+        "decryptMs": 7170,
+        "finalizeMs": 15317
+      },
+      "totalMs": 33004,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 7169,
+        "httpCalls": 4,
+        "readyBlock": 12093337,
+        "lastError": null,
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 540
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 3645
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 5764
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 3,
+            "t": 6901
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093337,
+        "decryptReadySeenAt": 12093337,
+        "finalize": 12093339,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 2
+      },
+      "tx": {
+        "request": {
+          "label": "hot#11 requestTransfer (K-only)",
+          "hash": "0xdb273384585a3801a22688d9c22b4f39659c40fc75f3a58350467101593dcd81",
+          "nonce": 79,
+          "blockNumber": 12093337,
+          "blockTimestamp": 1794175992,
+          "sentAtUtc": "2026-11-08T22:13:04.233Z",
+          "minedSeenAtUtc": "2026-11-08T22:13:14.546Z",
+          "inclusionMs": 10188,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "76215272864575",
+          "replacements": 0,
+          "sentBlock": 12093336,
+          "blocksToInclusion": 1,
+          "wallMs": 10517,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#11 finalizeEvaluation (watchtower)",
+          "hash": "0xd83693700e95ccffb7510da4e24fe207ccff32375f37a5e17f400149b99c2bdf",
+          "nonce": 35,
+          "blockNumber": 12093339,
+          "blockTimestamp": 1794176016,
+          "sentAtUtc": "2026-11-08T22:13:21.826Z",
+          "minedSeenAtUtc": "2026-11-08T22:13:37.033Z",
+          "inclusionMs": 15099,
+          "gasUsed": "422827",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "21141356342405",
+          "replacements": 0,
+          "sentBlock": 12093337,
+          "blocksToInclusion": 2,
+          "wallMs": 15317,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": null,
+            "blockComputed": null,
+            "meterCheck": "unreadable"
+          }
+        }
+      }
+    },
+    {
+      "i": 12,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:13:54.034Z",
+      "opId": "13",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 6959,
+        "decryptMs": 7115,
+        "finalizeMs": 4860
+      },
+      "totalMs": 18934,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 7114,
+        "httpCalls": 4,
+        "readyBlock": 12093341,
+        "lastError": null,
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 483
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 2610
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 4713
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 3,
+            "t": 6832
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093341,
+        "decryptReadySeenAt": 12093341,
+        "finalize": 12093342,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#12 requestTransfer (K-only)",
+          "hash": "0x351155e9e17880f00acdfa2b699313798886e1cfbcea007c5ce650306474ea79",
+          "nonce": 80,
+          "blockNumber": 12093341,
+          "blockTimestamp": 1794176040,
+          "sentAtUtc": "2026-11-08T22:13:54.264Z",
+          "minedSeenAtUtc": "2026-11-08T22:14:00.993Z",
+          "inclusionMs": 6610,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "76215272864575",
+          "replacements": 0,
+          "sentBlock": 12093340,
+          "blocksToInclusion": 1,
+          "wallMs": 6959,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#12 finalizeEvaluation (watchtower)",
+          "hash": "0x66e62fc6eeedd843bfe8b185dd05cbe34e1295b054e60fb523497a4b4b10cf22",
+          "nonce": 36,
+          "blockNumber": 12093342,
+          "blockTimestamp": 1794176052,
+          "sentAtUtc": "2026-11-08T22:14:08.339Z",
+          "minedSeenAtUtc": "2026-11-08T22:14:12.969Z",
+          "inclusionMs": 4516,
+          "gasUsed": "422815",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "21140756342225",
+          "replacements": 0,
+          "sentBlock": 12093341,
+          "blocksToInclusion": 1,
+          "wallMs": 4860,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": 0,
+            "blockComputed": 0,
+            "meterCheck": "equal"
+          }
+        }
+      }
+    },
+    {
+      "i": 13,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:16:08.027Z",
+      "opId": "14",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 4336,
+        "decryptMs": 8709,
+        "finalizeMs": 3326
+      },
+      "totalMs": 16371,
+      "decrypt": {
+        "attempts": 2,
+        "waitedMs": 8709,
+        "httpCalls": 4,
+        "readyBlock": 12093352,
+        "lastError": "Handle 0x31382764f1aafa4ac2e190b058cede3913e2a33d71ff0000000000aa36a70000 is not allowed for public decryption\nVersion: @fhevm/sdk@0.13.7",
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 2053
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 4192
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 6301
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 3,
+            "t": 8424
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093352,
+        "decryptReadySeenAt": 12093352,
+        "finalize": 12093353,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#13 requestTransfer (K-only)",
+          "hash": "0xa13c489e76cf38a0daa90eaa80a5a6b18482a9e042ea69ee72fe2952dccce56b",
+          "nonce": 85,
+          "blockNumber": 12093352,
+          "blockTimestamp": 1794176172,
+          "sentAtUtc": "2026-11-08T22:16:08.232Z",
+          "minedSeenAtUtc": "2026-11-08T22:16:12.363Z",
+          "inclusionMs": 4018,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "76215272864575",
+          "replacements": 0,
+          "sentBlock": 12093351,
+          "blocksToInclusion": 1,
+          "wallMs": 4336,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#13 finalizeEvaluation (watchtower)",
+          "hash": "0xf64ff3df1b05622ddd17355ed57937e0517c45bc20b326c223bb4c36bf8844e9",
+          "nonce": 41,
+          "blockNumber": 12093353,
+          "blockTimestamp": 1794176184,
+          "sentAtUtc": "2026-11-08T22:16:21.318Z",
+          "minedSeenAtUtc": "2026-11-08T22:16:24.398Z",
+          "inclusionMs": 2959,
+          "gasUsed": "422827",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "21141356342405",
+          "replacements": 0,
+          "sentBlock": 12093352,
+          "blocksToInclusion": 1,
+          "wallMs": 3326,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 162032,
+            "blockFheTxs": 1,
+            "blockComputed": 162032,
+            "meterCheck": "equal"
+          }
+        }
+      }
+    },
+    {
+      "i": 14,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:17:46.913Z",
+      "opId": "15",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 14786,
+        "decryptMs": 9081,
+        "finalizeMs": 16988
+      },
+      "totalMs": 40855,
+      "decrypt": {
+        "attempts": 2,
+        "waitedMs": 9080,
+        "httpCalls": 2,
+        "readyBlock": 12093361,
+        "lastError": "Handle 0x2973bf5f7e456ad38c1d4234908386f01ff9679c3cff0000000000aa36a70000 is not allowed for public decryption\nVersion: @fhevm/sdk@0.13.7",
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 4532
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 6778
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093361,
+        "decryptReadySeenAt": 12093361,
+        "finalize": 12093363,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 2
+      },
+      "tx": {
+        "request": {
+          "label": "hot#14 requestTransfer (K-only)",
+          "hash": "0xe090b1c3f2152529a206e31d9d3822a20ddea092a8e8c21f9d23afede515515b",
+          "nonce": 88,
+          "blockNumber": 12093361,
+          "blockTimestamp": 1794176280,
+          "sentAtUtc": "2026-11-08T22:17:47.744Z",
+          "minedSeenAtUtc": "2026-11-08T22:18:01.699Z",
+          "inclusionMs": 13570,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "76215272864575",
+          "replacements": 0,
+          "sentBlock": 12093359,
+          "blocksToInclusion": 2,
+          "wallMs": 14786,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#14 finalizeEvaluation (watchtower)",
+          "hash": "0x16cb231a3a5b91e9a4bf5faa927a1b2b14ae18661d73fff9b11634f4244d414d",
+          "nonce": 44,
+          "blockNumber": 12093363,
+          "blockTimestamp": 1794176304,
+          "sentAtUtc": "2026-11-08T22:18:13.030Z",
+          "minedSeenAtUtc": "2026-11-08T22:18:27.768Z",
+          "inclusionMs": 12897,
+          "gasUsed": "422791",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "21139556341865",
+          "replacements": 0,
+          "sentBlock": 12093361,
+          "blocksToInclusion": 2,
+          "wallMs": 16988,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": 0,
+            "blockComputed": 0,
+            "meterCheck": "equal"
+          }
+        }
+      }
+    },
+    {
+      "i": 15,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:19:41.586Z",
+      "opId": "16",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 8812,
+        "decryptMs": 4854,
+        "finalizeMs": 18155
+      },
+      "totalMs": 31821,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 4854,
+        "httpCalls": 3,
+        "readyBlock": 12093370,
+        "lastError": null,
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 468
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 2583
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 4706
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093370,
+        "decryptReadySeenAt": 12093370,
+        "finalize": 12093371,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#15 requestTransfer (K-only)",
+          "hash": "0x6745cb61b3696a86a412e6bbf0b585fe9436b25b135e0600c82600ebc45a59d5",
+          "nonce": 91,
+          "blockNumber": 12093370,
+          "blockTimestamp": 1794176388,
+          "sentAtUtc": "2026-11-08T22:19:41.807Z",
+          "minedSeenAtUtc": "2026-11-08T22:19:50.398Z",
+          "inclusionMs": 8480,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "76215272864575",
+          "replacements": 0,
+          "sentBlock": 12093369,
+          "blocksToInclusion": 1,
+          "wallMs": 8812,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#15 finalizeEvaluation (watchtower)",
+          "hash": "0xe5a91e18ba55d58ee945ba9d7b47c623e0f6995a8181baa3eee5528f0bb84c4c",
+          "nonce": 47,
+          "blockNumber": 12093371,
+          "blockTimestamp": 1794176412,
+          "sentAtUtc": "2026-11-08T22:19:55.382Z",
+          "minedSeenAtUtc": "2026-11-08T22:20:13.407Z",
+          "inclusionMs": 17900,
+          "gasUsed": "422815",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "21140756342225",
+          "replacements": 0,
+          "sentBlock": 12093370,
+          "blocksToInclusion": 1,
+          "wallMs": 18155,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": 0,
+            "blockComputed": 0,
+            "meterCheck": "equal"
+          }
+        }
+      }
+    },
+    {
+      "i": 16,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:20:26.579Z",
+      "opId": "17",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 11429,
+        "decryptMs": 6751,
+        "finalizeMs": 4568
+      },
+      "totalMs": 22748,
+      "decrypt": {
+        "attempts": 2,
+        "waitedMs": 6750,
+        "httpCalls": 3,
+        "readyBlock": 12093372,
+        "lastError": "Handle 0xdb16e97d2a0ee7b7e70351fce2b2a1e46ccb733ecfff0000000000aa36a70000 is not allowed for public decryption\nVersion: @fhevm/sdk@0.13.7",
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 2290
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 4481
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 6626
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093372,
+        "decryptReadySeenAt": 12093372,
+        "finalize": 12093373,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#16 requestTransfer (K-only)",
+          "hash": "0xa23b7f06b9a62784be0cc405308e7a6bd807e3102d26879ec1bca616368c79cd",
+          "nonce": 92,
+          "blockNumber": 12093372,
+          "blockTimestamp": 1794176436,
+          "sentAtUtc": "2026-11-08T22:20:26.780Z",
+          "minedSeenAtUtc": "2026-11-08T22:20:38.008Z",
+          "inclusionMs": 11063,
+          "gasUsed": "1524301",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "76215072864515",
+          "replacements": 0,
+          "sentBlock": 12093371,
+          "blocksToInclusion": 1,
+          "wallMs": 11429,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 936068,
+            "blockFheTxs": 2,
+            "blockComputed": 936068,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#16 finalizeEvaluation (watchtower)",
+          "hash": "0xa405d8d1b936a637263101b99400479fa0d0e68fd19ce55ae567b58bc6ffa197",
+          "nonce": 48,
+          "blockNumber": 12093373,
+          "blockTimestamp": 1794176448,
+          "sentAtUtc": "2026-11-08T22:20:44.883Z",
+          "minedSeenAtUtc": "2026-11-08T22:20:49.327Z",
+          "inclusionMs": 4328,
+          "gasUsed": "422767",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "21138356341505",
+          "replacements": 0,
+          "sentBlock": 12093372,
+          "blocksToInclusion": 1,
+          "wallMs": 4568,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 162032,
+            "blockFheTxs": 1,
+            "blockComputed": 162032,
+            "meterCheck": "equal"
+          }
+        }
+      }
+    },
+    {
+      "i": 17,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:22:54.418Z",
+      "opId": "18",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 6764,
+        "decryptMs": 7219,
+        "finalizeMs": 16460
+      },
+      "totalMs": 30442,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 7219,
+        "httpCalls": 4,
+        "readyBlock": 12093384,
+        "lastError": null,
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 540
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 2657
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 4786
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 3,
+            "t": 6914
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093384,
+        "decryptReadySeenAt": 12093384,
+        "finalize": 12093385,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#17 requestTransfer (K-only)",
+          "hash": "0x671531791c7ebe59439aeaaa5166f930a6e5d0f44ef1d6a00e9e2c77eb719790",
+          "nonce": 97,
+          "blockNumber": 12093384,
+          "blockTimestamp": 1794176580,
+          "sentAtUtc": "2026-11-08T22:22:54.688Z",
+          "minedSeenAtUtc": "2026-11-08T22:23:01.181Z",
+          "inclusionMs": 6314,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "76215272864575",
+          "replacements": 0,
+          "sentBlock": 12093383,
+          "blocksToInclusion": 1,
+          "wallMs": 6764,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#17 finalizeEvaluation (watchtower)",
+          "hash": "0xcc7aafcefa988a950451937f2d83f77aed23f2aeab414f46341c5047f284f967",
+          "nonce": 53,
+          "blockNumber": 12093385,
+          "blockTimestamp": 1794176604,
+          "sentAtUtc": "2026-11-08T22:23:08.621Z",
+          "minedSeenAtUtc": "2026-11-08T22:23:24.861Z",
+          "inclusionMs": 16127,
+          "gasUsed": "422803",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "21140156342045",
+          "replacements": 0,
+          "sentBlock": 12093384,
+          "blocksToInclusion": 1,
+          "wallMs": 16460,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": 0,
+            "blockComputed": 0,
+            "meterCheck": "equal"
+          }
+        }
+      }
+    },
+    {
+      "i": 18,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:23:28.892Z",
+      "opId": "19",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 7592,
+        "decryptMs": 7306,
+        "finalizeMs": 31479
+      },
+      "totalMs": 46378,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 7305,
+        "httpCalls": 3,
+        "readyBlock": 12093386,
+        "lastError": null,
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 2007
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 4930
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 6996
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093386,
+        "decryptReadySeenAt": 12093386,
+        "finalize": 12093388,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 2
+      },
+      "tx": {
+        "request": {
+          "label": "hot#18 requestTransfer (K-only)",
+          "hash": "0x0bb6a525bfe40b55fd1857c52d284a433c51dee5bb47c14ad4c02ba6d4a27ef2",
+          "nonce": 98,
+          "blockNumber": 12093386,
+          "blockTimestamp": 1794176616,
+          "sentAtUtc": "2026-11-08T22:23:29.082Z",
+          "minedSeenAtUtc": "2026-11-08T22:23:36.484Z",
+          "inclusionMs": 7294,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "76215272864575",
+          "replacements": 0,
+          "sentBlock": 12093385,
+          "blocksToInclusion": 1,
+          "wallMs": 7592,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#18 finalizeEvaluation (watchtower)",
+          "hash": "0x070f9807380d8069b8c0f5113b36c6c334b1cc0a473e56529c1a3bf6bf9ce658",
+          "nonce": 54,
+          "blockNumber": 12093388,
+          "blockTimestamp": 1794176652,
+          "sentAtUtc": "2026-11-08T22:23:44.183Z",
+          "minedSeenAtUtc": "2026-11-08T22:24:15.270Z",
+          "inclusionMs": 30927,
+          "gasUsed": "422791",
+          "effectiveGasPriceWei": "50000014",
+          "costWei": "21139555919074",
+          "replacements": 0,
+          "sentBlock": 12093386,
+          "blocksToInclusion": 2,
+          "wallMs": 31479,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": 0,
+            "blockComputed": 0,
+            "meterCheck": "equal"
+          }
+        }
+      }
+    },
+    {
+      "i": 19,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:26:52.428Z",
+      "opId": "20",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 8773,
+        "decryptMs": 7450,
+        "finalizeMs": 4057
+      },
+      "totalMs": 20280,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 7449,
+        "httpCalls": 4,
+        "readyBlock": 12093401,
+        "lastError": null,
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 741
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 2857
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 4974
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 3,
+            "t": 7182
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093401,
+        "decryptReadySeenAt": 12093401,
+        "finalize": 12093402,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#19 requestTransfer (K-only)",
+          "hash": "0xaa6b098fef652f53e4f0c7c540a90f4481396694235ec06cbc8c35ade87b5b5c",
+          "nonce": 103,
+          "blockNumber": 12093401,
+          "blockTimestamp": 1794176820,
+          "sentAtUtc": "2026-11-08T22:26:52.633Z",
+          "minedSeenAtUtc": "2026-11-08T22:27:01.200Z",
+          "inclusionMs": 8359,
+          "gasUsed": "1524301",
+          "effectiveGasPriceWei": "50000019",
+          "costWei": "76215078961719",
+          "replacements": 0,
+          "sentBlock": 12093400,
+          "blocksToInclusion": 1,
+          "wallMs": 8773,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 936068,
+            "blockFheTxs": 2,
+            "blockComputed": 936068,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#19 finalizeEvaluation (watchtower)",
+          "hash": "0x85f72692c60d966bf7081024a280ebf549c1f2a5df247569d1edaf8141221b2e",
+          "nonce": 59,
+          "blockNumber": 12093402,
+          "blockTimestamp": 1794176832,
+          "sentAtUtc": "2026-11-08T22:27:08.761Z",
+          "minedSeenAtUtc": "2026-11-08T22:27:12.707Z",
+          "inclusionMs": 3823,
+          "gasUsed": "422803",
+          "effectiveGasPriceWei": "50000019",
+          "costWei": "21140158033257",
+          "replacements": 0,
+          "sentBlock": 12093401,
+          "blocksToInclusion": 1,
+          "wallMs": 4057,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": null,
+            "blockComputed": null,
+            "meterCheck": "unreadable"
+          }
+        }
+      }
+    },
+    {
+      "i": 20,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:27:20.209Z",
+      "opId": "21",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 4663,
+        "decryptMs": 6367,
+        "finalizeMs": 7554
+      },
+      "totalMs": 18585,
+      "decrypt": {
+        "attempts": 2,
+        "waitedMs": 6367,
+        "httpCalls": 3,
+        "readyBlock": 12093403,
+        "lastError": "Handle 0x0d2796f67760e08ddf68e164568e6638f8b67cff24ff0000000000aa36a70000 is not allowed for public decryption\nVersion: @fhevm/sdk@0.13.7",
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 2037
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 5125
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 6241
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093403,
+        "decryptReadySeenAt": 12093403,
+        "finalize": 12093404,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#20 requestTransfer (K-only)",
+          "hash": "0x6e1283af531314ae50c615a586991ff28408a9feb74aa9c88f835bf59f8c0c1e",
+          "nonce": 104,
+          "blockNumber": 12093403,
+          "blockTimestamp": 1794176844,
+          "sentAtUtc": "2026-11-08T22:27:20.750Z",
+          "minedSeenAtUtc": "2026-11-08T22:27:24.872Z",
+          "inclusionMs": 4002,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000019",
+          "costWei": "76215278961795",
+          "replacements": 0,
+          "sentBlock": 12093402,
+          "blocksToInclusion": 1,
+          "wallMs": 4663,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#20 finalizeEvaluation (watchtower)",
+          "hash": "0x888bafea0230f0d2d16950a7261c49a6808b50649b9de69b4b44d99a70c50855",
+          "nonce": 60,
+          "blockNumber": 12093404,
+          "blockTimestamp": 1794176856,
+          "sentAtUtc": "2026-11-08T22:27:31.341Z",
+          "minedSeenAtUtc": "2026-11-08T22:27:38.794Z",
+          "inclusionMs": 7346,
+          "gasUsed": "422815",
+          "effectiveGasPriceWei": "50000019",
+          "costWei": "21140758033485",
+          "replacements": 0,
+          "sentBlock": 12093403,
+          "blocksToInclusion": 1,
+          "wallMs": 7554,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": 0,
+            "blockComputed": 0,
+            "meterCheck": "equal"
+          }
+        }
+      }
+    },
+    {
+      "i": 21,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:29:41.549Z",
+      "opId": "22",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 7808,
+        "decryptMs": 7252,
+        "finalizeMs": 4801
+      },
+      "totalMs": 19862,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 7252,
+        "httpCalls": 4,
+        "readyBlock": 12093414,
+        "lastError": null,
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 593
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 2720
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 4836
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 3,
+            "t": 6954
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093414,
+        "decryptReadySeenAt": 12093414,
+        "finalize": 12093415,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#21 requestTransfer (K-only)",
+          "hash": "0x117e62d84f3ce1624819164211a1c50799a0253a98e5dc160a95c6a5a2aa0ee4",
+          "nonce": 109,
+          "blockNumber": 12093414,
+          "blockTimestamp": 1794176988,
+          "sentAtUtc": "2026-11-08T22:29:41.777Z",
+          "minedSeenAtUtc": "2026-11-08T22:29:49.357Z",
+          "inclusionMs": 7455,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000017",
+          "costWei": "76215275913185",
+          "replacements": 0,
+          "sentBlock": 12093413,
+          "blocksToInclusion": 1,
+          "wallMs": 7808,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#21 finalizeEvaluation (watchtower)",
+          "hash": "0x7237f61599f07f214f6a7c3b7b97060c704efde16062e933b14efff26053d338",
+          "nonce": 65,
+          "blockNumber": 12093415,
+          "blockTimestamp": 1794177000,
+          "sentAtUtc": "2026-11-08T22:29:56.844Z",
+          "minedSeenAtUtc": "2026-11-08T22:30:01.411Z",
+          "inclusionMs": 3723,
+          "gasUsed": "422803",
+          "effectiveGasPriceWei": "50000017",
+          "costWei": "21140157187651",
+          "replacements": 0,
+          "sentBlock": 12093414,
+          "blocksToInclusion": 1,
+          "wallMs": 4801,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": 0,
+            "blockComputed": 0,
+            "meterCheck": "equal"
+          }
+        }
+      }
+    },
+    {
+      "i": 22,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:31:18.735Z",
+      "opId": "23",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 6394,
+        "decryptMs": 6821,
+        "finalizeMs": 5887
+      },
+      "totalMs": 19102,
+      "decrypt": {
+        "attempts": 3,
+        "waitedMs": 6821,
+        "httpCalls": 2,
+        "readyBlock": 12093422,
+        "lastError": "Handle 0x7fde2f584e7c355d31aa3556a99207803220b72b3eff0000000000aa36a70000 is not allowed for public decryption\nVersion: @fhevm/sdk@0.13.7",
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 4217
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 6498
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093422,
+        "decryptReadySeenAt": 12093422,
+        "finalize": 12093423,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#22 requestTransfer (K-only)",
+          "hash": "0x60970cedae7ddef99bc29b0fb03b574ca04f14d5a1e39d8851cfe0fa23525de2",
+          "nonce": 112,
+          "blockNumber": 12093422,
+          "blockTimestamp": 1794177084,
+          "sentAtUtc": "2026-11-08T22:31:18.913Z",
+          "minedSeenAtUtc": "2026-11-08T22:31:25.129Z",
+          "inclusionMs": 6113,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "76215274388880",
+          "replacements": 0,
+          "sentBlock": 12093421,
+          "blocksToInclusion": 1,
+          "wallMs": 6394,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#22 finalizeEvaluation (watchtower)",
+          "hash": "0xd4f0bf835072b1ee131c0abdc5030ec472e931016a8e022f4afacba0717dab61",
+          "nonce": 68,
+          "blockNumber": 12093423,
+          "blockTimestamp": 1794177096,
+          "sentAtUtc": "2026-11-08T22:31:32.576Z",
+          "minedSeenAtUtc": "2026-11-08T22:31:37.837Z",
+          "inclusionMs": 4934,
+          "gasUsed": "422791",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "21139556764656",
+          "replacements": 0,
+          "sentBlock": 12093422,
+          "blocksToInclusion": 1,
+          "wallMs": 5887,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": 0,
+            "blockComputed": 0,
+            "meterCheck": "equal"
+          }
+        }
+      }
+    },
+    {
+      "i": 23,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:31:52.949Z",
+      "opId": "24",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 7292,
+        "decryptMs": 7141,
+        "finalizeMs": 5557
+      },
+      "totalMs": 19991,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 7141,
+        "httpCalls": 3,
+        "readyBlock": 12093425,
+        "lastError": null,
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 2014
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 4237
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 6666
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093425,
+        "decryptReadySeenAt": 12093425,
+        "finalize": 12093426,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#23 requestTransfer (K-only)",
+          "hash": "0xfd60a40b2293e5ff68d66c67c4d4df4e3cdb9ea3cec6ac807678c7473c54554d",
+          "nonce": 113,
+          "blockNumber": 12093425,
+          "blockTimestamp": 1794177120,
+          "sentAtUtc": "2026-11-08T22:31:53.184Z",
+          "minedSeenAtUtc": "2026-11-08T22:32:00.241Z",
+          "inclusionMs": 6734,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "76215274388880",
+          "replacements": 0,
+          "sentBlock": 12093424,
+          "blocksToInclusion": 1,
+          "wallMs": 7292,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#23 finalizeEvaluation (watchtower)",
+          "hash": "0x66ca57e0ad1b72272fdecbc5a3b02a9eb988f87f178478291a85f5583b393714",
+          "nonce": 69,
+          "blockNumber": 12093426,
+          "blockTimestamp": 1794177132,
+          "sentAtUtc": "2026-11-08T22:32:07.787Z",
+          "minedSeenAtUtc": "2026-11-08T22:32:12.940Z",
+          "inclusionMs": 4938,
+          "gasUsed": "422767",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "21138356764272",
+          "replacements": 0,
+          "sentBlock": 12093425,
+          "blocksToInclusion": 1,
+          "wallMs": 5557,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": 0,
+            "blockComputed": 0,
+            "meterCheck": "equal"
+          }
+        }
+      }
+    },
+    {
+      "i": 24,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:33:18.501Z",
+      "opId": "25",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 6682,
+        "decryptMs": 7311,
+        "finalizeMs": 16561
+      },
+      "totalMs": 30554,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 7310,
+        "httpCalls": 4,
+        "readyBlock": 12093431,
+        "lastError": null,
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 519
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 2775
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 4904
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 3,
+            "t": 7037
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093431,
+        "decryptReadySeenAt": 12093431,
+        "finalize": 12093432,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#24 requestTransfer (K-only)",
+          "hash": "0x90732ea0f571e2d3a9ee49252dd48f7100715a3666d88f71b71887a9b1e96d9d",
+          "nonce": 116,
+          "blockNumber": 12093431,
+          "blockTimestamp": 1794177204,
+          "sentAtUtc": "2026-11-08T22:33:18.967Z",
+          "minedSeenAtUtc": "2026-11-08T22:33:25.183Z",
+          "inclusionMs": 6098,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "76215274388880",
+          "replacements": 0,
+          "sentBlock": 12093430,
+          "blocksToInclusion": 1,
+          "wallMs": 6682,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#24 finalizeEvaluation (watchtower)",
+          "hash": "0xf53343dde648303bc1331c4c5e6184f5dbb4535427959ff07c1801f28bd093a7",
+          "nonce": 72,
+          "blockNumber": 12093432,
+          "blockTimestamp": 1794177228,
+          "sentAtUtc": "2026-11-08T22:33:32.653Z",
+          "minedSeenAtUtc": "2026-11-08T22:33:49.055Z",
+          "inclusionMs": 16307,
+          "gasUsed": "422791",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "21139556764656",
+          "replacements": 0,
+          "sentBlock": 12093431,
+          "blocksToInclusion": 1,
+          "wallMs": 16561,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": 0,
+            "blockComputed": 0,
+            "meterCheck": "equal"
+          }
+        }
+      }
+    },
+    {
+      "i": 25,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:34:51.196Z",
+      "opId": "26",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 21457,
+        "decryptMs": 9226,
+        "finalizeMs": 3406
+      },
+      "totalMs": 34089,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 9225,
+        "httpCalls": 5,
+        "readyBlock": 12093438,
+        "lastError": null,
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 443
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 2565
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 4709
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 3,
+            "t": 6832
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 4,
+            "t": 8961
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093438,
+        "decryptReadySeenAt": 12093438,
+        "finalize": 12093439,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#25 requestTransfer (K-only)",
+          "hash": "0xecdab999edfd8503147f24f55e3b93a1fefc328bb0385047a8f8a45fbcc7e7e9",
+          "nonce": 119,
+          "blockNumber": 12093438,
+          "blockTimestamp": 1794177312,
+          "sentAtUtc": "2026-11-08T22:34:51.419Z",
+          "minedSeenAtUtc": "2026-11-08T22:35:12.653Z",
+          "inclusionMs": 21120,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "76215274388880",
+          "replacements": 0,
+          "sentBlock": 12093437,
+          "blocksToInclusion": 1,
+          "wallMs": 21457,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 10151060,
+            "blockFheTxs": 3,
+            "blockComputed": 10151060,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#25 finalizeEvaluation (watchtower)",
+          "hash": "0x65a3e7da65485e51b7bbf50eccaf575a90176285d070752b27cc0db842e25a98",
+          "nonce": 75,
+          "blockNumber": 12093439,
+          "blockTimestamp": 1794177324,
+          "sentAtUtc": "2026-11-08T22:35:22.024Z",
+          "minedSeenAtUtc": "2026-11-08T22:35:25.285Z",
+          "inclusionMs": 3140,
+          "gasUsed": "422815",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "21140756765040",
+          "replacements": 0,
+          "sentBlock": 12093438,
+          "blocksToInclusion": 1,
+          "wallMs": 3406,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 162032,
+            "blockFheTxs": 2,
+            "blockComputed": 162032,
+            "meterCheck": "equal"
+          }
+        }
+      }
+    },
+    {
+      "i": 26,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:38:26.589Z",
+      "opId": "27",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 10547,
+        "decryptMs": 7323,
+        "finalizeMs": 4880
+      },
+      "totalMs": 22750,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 7323,
+        "httpCalls": 4,
+        "readyBlock": 12093451,
+        "lastError": null,
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 470
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 2595
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 4878
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 3,
+            "t": 7024
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093451,
+        "decryptReadySeenAt": 12093451,
+        "finalize": 12093452,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#26 requestTransfer (K-only)",
+          "hash": "0x3a9313f671d46205d7c30dbc37e41b8a93dcbd2027366205ba9e0bb6b22c374a",
+          "nonce": 124,
+          "blockNumber": 12093451,
+          "blockTimestamp": 1794177516,
+          "sentAtUtc": "2026-11-08T22:38:26.993Z",
+          "minedSeenAtUtc": "2026-11-08T22:38:37.136Z",
+          "inclusionMs": 10035,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "76215272864575",
+          "replacements": 0,
+          "sentBlock": 12093450,
+          "blocksToInclusion": 1,
+          "wallMs": 10547,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#26 finalizeEvaluation (watchtower)",
+          "hash": "0xc37c7cedaee7043159ad739383b1fb52ee267d69372ceae8c3da0016471a687a",
+          "nonce": 80,
+          "blockNumber": 12093452,
+          "blockTimestamp": 1794177528,
+          "sentAtUtc": "2026-11-08T22:38:44.673Z",
+          "minedSeenAtUtc": "2026-11-08T22:38:49.339Z",
+          "inclusionMs": 4534,
+          "gasUsed": "422779",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "21138956341685",
+          "replacements": 0,
+          "sentBlock": 12093451,
+          "blocksToInclusion": 1,
+          "wallMs": 4880,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": 1,
+            "blockComputed": 0,
+            "meterCheck": "equal"
+          }
+        }
+      }
+    },
+    {
+      "i": 27,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:39:57.938Z",
+      "opId": "28",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 3232,
+        "decryptMs": 7095,
+        "finalizeMs": 3995
+      },
+      "totalMs": 14323,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 7094,
+        "httpCalls": 4,
+        "readyBlock": 12093458,
+        "lastError": null,
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 456
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 2562
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 4677
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 3,
+            "t": 6790
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093458,
+        "decryptReadySeenAt": 12093458,
+        "finalize": 12093459,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#27 requestTransfer (K-only)",
+          "hash": "0xe4a25d4078500c1d52616b35896edfb5e88605b4b52b8de2618fed54f8d6ff13",
+          "nonce": 127,
+          "blockNumber": 12093458,
+          "blockTimestamp": 0,
+          "sentAtUtc": "2026-11-08T22:39:58.171Z",
+          "minedSeenAtUtc": "2026-11-08T22:40:01.171Z",
+          "inclusionMs": 2894,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "76215272864575",
+          "replacements": 0,
+          "sentBlock": 12093457,
+          "blocksToInclusion": 1,
+          "wallMs": 3232,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#27 finalizeEvaluation (watchtower)",
+          "hash": "0xcc4b5cb182a34ad98d368bfd42398c53ad1200e57c3dbb1688daec57f34e1d68",
+          "nonce": 83,
+          "blockNumber": 12093459,
+          "blockTimestamp": 1794177612,
+          "sentAtUtc": "2026-11-08T22:40:08.526Z",
+          "minedSeenAtUtc": "2026-11-08T22:40:12.261Z",
+          "inclusionMs": 3631,
+          "gasUsed": "422791",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "21139556341865",
+          "replacements": 0,
+          "sentBlock": 12093458,
+          "blocksToInclusion": 1,
+          "wallMs": 3995,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": 0,
+            "blockComputed": 0,
+            "meterCheck": "equal"
+          }
+        }
+      }
+    },
+    {
+      "i": 28,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:40:23.355Z",
+      "opId": "29",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 13332,
+        "decryptMs": 7423,
+        "finalizeMs": 4231
+      },
+      "totalMs": 24986,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 7423,
+        "httpCalls": 4,
+        "readyBlock": 12093461,
+        "lastError": null,
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 709
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 2844
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 4974
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 3,
+            "t": 7114
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093461,
+        "decryptReadySeenAt": 12093461,
+        "finalize": 12093462,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#28 requestTransfer (K-only)",
+          "hash": "0x77224ec16ccbda95b27cd7512cf398098dd98397bfc3062fb13a2c85a0acd2ab",
+          "nonce": 128,
+          "blockNumber": 12093461,
+          "blockTimestamp": 1794177636,
+          "sentAtUtc": "2026-11-08T22:40:23.567Z",
+          "minedSeenAtUtc": "2026-11-08T22:40:36.687Z",
+          "inclusionMs": 12961,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "76215272864575",
+          "replacements": 0,
+          "sentBlock": 12093459,
+          "blocksToInclusion": 2,
+          "wallMs": 13332,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#28 finalizeEvaluation (watchtower)",
+          "hash": "0x1f65065af665dff37ee3ed316180390d256f044b1b802f097f2d1dfdd7ebd650",
+          "nonce": 84,
+          "blockNumber": 12093462,
+          "blockTimestamp": 1794177648,
+          "sentAtUtc": "2026-11-08T22:40:44.344Z",
+          "minedSeenAtUtc": "2026-11-08T22:40:48.341Z",
+          "inclusionMs": 3715,
+          "gasUsed": "422803",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "21140156764848",
+          "replacements": 0,
+          "sentBlock": 12093461,
+          "blocksToInclusion": 1,
+          "wallMs": 4231,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": 0,
+            "blockComputed": 0,
+            "meterCheck": "equal"
+          }
+        }
+      }
+    },
+    {
+      "i": 29,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-08T22:41:58.026Z",
+      "opId": "30",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 2537,
+        "decryptMs": 6528,
+        "finalizeMs": 5835
+      },
+      "totalMs": 14900,
+      "decrypt": {
+        "attempts": 2,
+        "waitedMs": 6528,
+        "httpCalls": 3,
+        "readyBlock": 12093468,
+        "lastError": "Handle 0xa6b1760355cdbf00fc35eaafc7aa39ddeb0899de82ff0000000000aa36a70000 is not allowed for public decryption\nVersion: @fhevm/sdk@0.13.7",
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 2146
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 4271
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 6396
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12093468,
+        "decryptReadySeenAt": 12093468,
+        "finalize": 12093469,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#29 requestTransfer (K-only)",
+          "hash": "0x29f6e1a191f1e2ac80c74eff5461c0b4d71341d488b7b76916816f4bacdabf1e",
+          "nonce": 131,
+          "blockNumber": 12093468,
+          "blockTimestamp": 1794177720,
+          "sentAtUtc": "2026-11-08T22:41:58.235Z",
+          "minedSeenAtUtc": "2026-11-08T22:42:00.563Z",
+          "inclusionMs": 2189,
+          "gasUsed": "1524305",
+          "effectiveGasPriceWei": "50000022",
+          "costWei": "76215283534710",
+          "replacements": 0,
+          "sentBlock": 12093467,
+          "blocksToInclusion": 1,
+          "wallMs": 2537,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#29 finalizeEvaluation (watchtower)",
+          "hash": "0xe05570baa42642ba194a6f8dd3df55e4163516e8304608b222f4912e3226ec26",
+          "nonce": 87,
+          "blockNumber": 12093469,
+          "blockTimestamp": 1794177732,
+          "sentAtUtc": "2026-11-08T22:42:07.198Z",
+          "minedSeenAtUtc": "2026-11-08T22:42:12.926Z",
+          "inclusionMs": 5612,
+          "gasUsed": "422791",
+          "effectiveGasPriceWei": "50000022",
+          "costWei": "21139559301402",
+          "replacements": 0,
+          "sentBlock": 12093468,
+          "blocksToInclusion": 1,
+          "wallMs": 5835,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": null,
+            "blockComputed": null,
+            "meterCheck": "unreadable"
+          }
+        }
+      }
+    }
+  ],
+  "failures": [],
+  "delays": {
+    "pinTransfer": 0,
+    "bigTransfer": 60,
+    "genericCall": 60,
+    "settings": 60,
+    "loosen": 60,
+    "knownAdd": 60,
+    "recovery": 120,
+    "recoveryNoDevice": 300,
+    "pinReset": 300,
+    "escape": 300,
+    "escapeChange": 300
+  },
+  "knownRecipient": "0x0A86f9d7deE95C511B376EC1BA16b804f20F4A1b",
+  "updatedAtUtc": "2026-11-08T22:43:07.083Z",
+  "summary": {
+    "nOk": 30,
+    "nNotOk": 0,
+    "totalMs": {
+      "n": 30,
+      "min": 13832,
+      "p50": 19862,
+      "p95": 40855,
+      "max": 46378,
+      "mean": 23078
+    },
+    "phases": {
+      "requestMs": {
+        "n": 30,
+        "min": 2144,
+        "p50": 6959,
+        "p95": 14786,
+        "max": 21457,
+        "mean": 7695
+      },
+      "decryptMs": {
+        "n": 30,
+        "min": 4854,
+        "p50": 7235,
+        "p95": 9226,
+        "max": 9354,
+        "mean": 7319
+      },
+      "finalizeMs": {
+        "n": 30,
+        "min": 2205,
+        "p50": 5027,
+        "p95": 18155,
+        "max": 31479,
+        "mean": 8065
+      }
+    },
+    "blocks": {
+      "requestBlocksToInclusion": {
+        "n": 30,
+        "min": 1,
+        "p50": 1,
+        "p95": 2,
+        "max": 2,
+        "mean": 1
+      },
+      "decryptBlocksAfterRequest": {
+        "n": 30,
+        "min": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "finalizeBlocksAfterRequest": {
+        "n": 30,
+        "min": 1,
+        "p50": 1,
+        "p95": 2,
+        "max": 2,
+        "mean": 1
+      }
+    },
+    "gas": {
+      "request": {
+        "n": 30,
+        "min": 1524301,
+        "p50": 1524305,
+        "p95": 1524305,
+        "max": 1636733,
+        "mean": 1528052
+      },
+      "finalizeEvaluation": {
+        "n": 30,
+        "min": 422767,
+        "p50": 422803,
+        "p95": 422827,
+        "max": 704335,
+        "mean": 432185
+      }
+    },
+    "hcu": {
+      "request": {
+        "total": {
+          "n": 30,
+          "min": 774036,
+          "p50": 774036,
+          "p95": 774036,
+          "max": 774036,
+          "mean": 774036
+        },
+        "depth": {
+          "n": 30,
+          "min": 634032,
+          "p50": 634032,
+          "p95": 634032,
+          "max": 634032,
+          "mean": 634032
+        }
+      }
+    },
+    "meterChecks": {
+      "equal": 52,
+      "unreadable": 8
+    },
+    "histogramTotal": [
+      {
+        "fromS": 10,
+        "toS": 15,
+        "count": 4
+      },
+      {
+        "fromS": 15,
+        "toS": 20,
+        "count": 12
+      },
+      {
+        "fromS": 20,
+        "toS": 25,
+        "count": 6
+      },
+      {
+        "fromS": 25,
+        "toS": 30,
+        "count": 1
+      },
+      {
+        "fromS": 30,
+        "toS": 35,
+        "count": 5
+      },
+      {
+        "fromS": 35,
+        "toS": 40,
+        "count": 0
+      },
+      {
+        "fromS": 40,
+        "toS": 45,
+        "count": 1
+      },
+      {
+        "fromS": 45,
+        "toS": 50,
+        "count": 1
+      }
+    ],
+    "threshold60s": "p95 < 60 s"
+  }
+}

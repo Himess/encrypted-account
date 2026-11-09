@@ -1,0 +1,215 @@
+{
+  "evidence": "[Mock] Hardhat EDR (prague) gas; HCU host table (F0.9: same on the live chain)",
+  "generatedAtUtc": "2026-11-09T11:01:33.014Z",
+  "note": "On Sepolia (post-fork) a new storage slot costs ≈ 111k gas; F0.10 adds no new slots (the new fields fit into existing slots), the shared budget slot was removed; the escape snapshot takes 1 new slot at escape time.",
+  "changed": [
+    {
+      "flow": "factory.createAccount (clone + initialize + E_addr EIP-712 consent)",
+      "gasRound1": 281728,
+      "gasF010": 295280,
+      "gasDelta": 13552,
+      "hcuRound1": 0,
+      "hcuF010": 0,
+      "hcuDelta": 0
+    },
+    {
+      "flow": "setupPin (fingerprint + duress slot select/rand)",
+      "gasRound1": 818196,
+      "gasF010": 813499,
+      "gasDelta": -4697,
+      "hcuRound1": 79000,
+      "hcuF010": 79000,
+      "hcuDelta": 0
+    },
+    {
+      "flow": "setupAsset (L_min, L, L_big + τ draw)",
+      "gasRound1": 1411179,
+      "gasF010": 1477319,
+      "gasDelta": 66140,
+      "hcuRound1": 1195064,
+      "hcuF010": 1345064,
+      "hcuDelta": 150000
+    },
+    {
+      "flow": "setupKnown (12 eaddress / proof)",
+      "gasRound1": 2062794,
+      "gasF010": 2062860,
+      "gasDelta": 66,
+      "hcuRound1": 0,
+      "hcuF010": 0,
+      "hcuDelta": 0
+    },
+    {
+      "flow": "arm",
+      "gasRound1": 65633,
+      "gasF010": 65693,
+      "gasDelta": 60,
+      "hcuRound1": 0,
+      "hcuF010": 0,
+      "hcuDelta": 0
+    },
+    {
+      "flow": "requestTransfer K-only (isIn N=30 + threshold + sticky tripwire)",
+      "gasRound1": 1226772,
+      "gasF010": 1228302,
+      "gasDelta": 1530,
+      "hcuRound1": 774036,
+      "hcuF010": 774036,
+      "hcuDelta": 0
+    },
+    {
+      "flow": "finalizeEvaluation (KMS proof + transfer)",
+      "gasRound1": 303454,
+      "gasF010": 304321,
+      "gasDelta": 867,
+      "hcuRound1": 0,
+      "hcuF010": 0,
+      "hcuDelta": 0
+    },
+    {
+      "flow": "requestTransfer PIN path (opens op)",
+      "gasRound1": 136397,
+      "gasF010": 139505,
+      "gasDelta": 3108,
+      "hcuRound1": 0,
+      "hcuF010": 0,
+      "hcuDelta": 0
+    },
+    {
+      "flow": "submitGuess (transfer; okAny + isDuress + big)",
+      "gasRound1": 1206087,
+      "gasF010": 1205643,
+      "gasDelta": -444,
+      "hcuRound1": 698002,
+      "hcuF010": 698002,
+      "hcuDelta": 0
+    },
+    {
+      "flow": "finalizeGuess (2-handle KMS proof)",
+      "gasRound1": 303015,
+      "gasF010": 311627,
+      "gasDelta": 8612,
+      "hcuRound1": 0,
+      "hcuF010": 0,
+      "hcuDelta": 0
+    },
+    {
+      "flow": "executeOp transfer (+ auto-add to known list: isIn + select)",
+      "gasRound1": 729222,
+      "gasF010": 732148,
+      "gasDelta": 2926,
+      "hcuRound1": 667032,
+      "hcuF010": 667032,
+      "hcuDelta": 0
+    },
+    {
+      "flow": "submitGuess (admin; okAny + isDuress)",
+      "gasRound1": 1043475,
+      "gasF010": 1025545,
+      "gasDelta": -17930,
+      "hcuRound1": 555002,
+      "hcuF010": 555002,
+      "hcuDelta": 0
+    },
+    {
+      "flow": "finalizeGuess + resetTrip (τ redrawn)",
+      "gasRound1": 881249,
+      "gasF010": 953642,
+      "gasDelta": 72393,
+      "hcuRound1": 977064,
+      "hcuF010": 1127064,
+      "hcuDelta": 150000
+    },
+    {
+      "flow": "tightenLimits (K-only; 4× min)",
+      "gasRound1": 907276,
+      "gasF010": 907365,
+      "gasDelta": 89,
+      "hcuRound1": 876000,
+      "hcuF010": 876000,
+      "hcuDelta": 0
+    },
+    {
+      "flow": "removeKnown (K-only; select)",
+      "gasRound1": 509993,
+      "gasF010": 510093,
+      "gasDelta": 100,
+      "hcuRound1": 83032,
+      "hcuF010": 83032,
+      "hcuDelta": 0
+    },
+    {
+      "flow": "startEscape (no FHE)",
+      "gasRound1": 34534,
+      "gasF010": 60094,
+      "gasDelta": 25560,
+      "hcuRound1": 0,
+      "hcuF010": 0,
+      "hcuDelta": 0
+    },
+    {
+      "flow": "executeEscape (no FHE; ETH + 1 token)",
+      "gasRound1": 50158,
+      "gasF010": 50224,
+      "gasDelta": 66,
+      "hcuRound1": 0,
+      "hcuF010": 0,
+      "hcuDelta": 0
+    }
+  ],
+  "unchangedRows": 17,
+  "sizes": {
+    "evidence": "[Mock] build (solc 0.8.28, viaIR, runs 1)",
+    "limit": 24576,
+    "rows": [
+      {
+        "contract": "EncryptedAccount",
+        "bytes": 22344,
+        "limit": 24576,
+        "ok": true,
+        "round1": 20442,
+        "delta": 1902
+      },
+      {
+        "contract": "PinLib",
+        "bytes": 8029,
+        "limit": 24576,
+        "ok": true,
+        "round1": 7217,
+        "delta": 812
+      },
+      {
+        "contract": "PolicyLib",
+        "bytes": 8684,
+        "limit": 24576,
+        "ok": true,
+        "round1": 8389,
+        "delta": 295
+      },
+      {
+        "contract": "OpsLib",
+        "bytes": 9807,
+        "limit": 24576,
+        "ok": true,
+        "round1": 8190,
+        "delta": 1617
+      },
+      {
+        "contract": "OpenLib",
+        "bytes": 12547,
+        "limit": 24576,
+        "ok": true,
+        "round1": 9487,
+        "delta": 3060
+      },
+      {
+        "contract": "EncryptedAccountFactory",
+        "bytes": 1868,
+        "limit": 24576,
+        "ok": true,
+        "round1": 1666,
+        "delta": 202
+      }
+    ]
+  }
+}

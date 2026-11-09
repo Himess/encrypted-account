@@ -1,0 +1,78 @@
+{
+  "evidence": "[M] live chain read",
+  "date": "2026-11-08T17:10:47.281Z",
+  "networks": {
+    "sepolia": {
+      "block": 12091918,
+      "contracts": {
+        "ACL": {
+          "proxy": "0xf0Ffdc93b7E186bC2f8CB3dAA75D86d1930A433D",
+          "implementation": "0xc6f5aB2EBbc51827D932c6dc32638bd7566Dc739",
+          "version": "ACL v0.5.0",
+          "owner": "0x08e8a84c3c8c7cba165B1adcf67Ae4639eF84f52"
+        },
+        "FHEVMExecutor": {
+          "proxy": "0x92C920834Ec8941d2C77D188936E1f7A6f49c127",
+          "implementation": "0xdCFA1A3Ab1d2a894f65825a17cf9369e85232A03",
+          "version": "FHEVMExecutor v0.6.0",
+          "selectors": {
+            "fheIsIn(bytes32,bytes32[],uint8)": true,
+            "fheSum(bytes32[],uint8)": true,
+            "checkHandleType(bytes32,uint8)": true,
+            "fheRandBounded(uint256,uint8)": true
+          }
+        },
+        "KMSVerifier": {
+          "proxy": "0xbE0E383937d564D7FF0BC3b46c51f0bF8d5C311A",
+          "implementation": "0xa618B22709381aE18cc15ca87b14BbA32E6d63AF",
+          "version": "KMSVerifier v0.4.0",
+          "kmsSignatureThreshold": "7",
+          "kmsSigners": 13
+        }
+      },
+      "hcuLimit": {
+        "address": "0xa10998783c8CF88D886Bc30307e631D6686F0A22",
+        "version": "HCULimit v0.4.0",
+        "capPerBlock": "281474976710655",
+        "maxHCUDepthPerTx": "5000000",
+        "maxHCUPerTx": "20000000"
+      }
+    },
+    "mainnet": {
+      "block": 26371565,
+      "contracts": {
+        "ACL": {
+          "proxy": "0xcA2E8f1F656CD25C01F05d0b243Ab1ecd4a8ffb6",
+          "implementation": "0x9A017e0ba4c19A325D5a89f5dd2112e605E85418",
+          "version": "ACL v0.4.0",
+          "owner": "0xB6D69D5F334d8B97B194617B53c6aB62f8681Ef3"
+        },
+        "FHEVMExecutor": {
+          "proxy": "0xD82385dADa1ae3E969447f20A3164F6213100e75",
+          "implementation": "0x0675c7BFA34aF170C49e6590A2cBf845c3029d7B",
+          "version": "FHEVMExecutor v0.5.0",
+          "selectors": {
+            "fheIsIn(bytes32,bytes32[],uint8)": true,
+            "fheSum(bytes32[],uint8)": true,
+            "checkHandleType(bytes32,uint8)": true,
+            "fheRandBounded(uint256,uint8)": true
+          }
+        },
+        "KMSVerifier": {
+          "proxy": "0x77627828a55156b04Ac0DC0eb30467f1a552BB03",
+          "implementation": "0x390683dEa46a61786f4F0807bf3559038Cf43Fa4",
+          "version": "KMSVerifier v0.3.0",
+          "kmsSignatureThreshold": "7",
+          "kmsSigners": 13
+        }
+      },
+      "hcuLimit": {
+        "address": "0x3b4da65e45Fda2CAa0285A735ab4361a44F171E2",
+        "version": "HCULimit v0.3.0",
+        "capPerBlock": "281474976710655",
+        "maxHCUDepthPerTx": "5000000",
+        "maxHCUPerTx": "20000000"
+      }
+    }
+  }
+}

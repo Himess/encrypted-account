@@ -1,0 +1,61 @@
+{
+  "evidence": "[M] Sepolia eth_estimateGas (no transaction sent)",
+  "chainId": 11155111,
+  "atUtc": "2026-11-08T21:55:40.479Z",
+  "block": 12093255,
+  "gasLimit": 200000000,
+  "baseFeeGwei": 1.7e-8,
+  "headerFields": [
+    "baseFeePerGas",
+    "blobGasUsed",
+    "blockAccessListHash",
+    "difficulty",
+    "excessBlobGas",
+    "extraData",
+    "gasLimit",
+    "gasUsed",
+    "hash",
+    "logsBloom",
+    "miner",
+    "mixHash",
+    "nonce",
+    "number",
+    "parentBeaconBlockRoot",
+    "parentHash",
+    "receiptsRoot",
+    "requestsHash",
+    "sha3Uncles",
+    "size",
+    "slotNumber",
+    "stateRoot",
+    "timestamp",
+    "transactions",
+    "transactionsRoot",
+    "uncles",
+    "withdrawals",
+    "withdrawalsRoot"
+  ],
+  "newHeaderFields": [
+    "blockAccessListHash",
+    "slotNumber"
+  ],
+  "createGasBySize": {
+    "0": 210483,
+    "1024": 1789942,
+    "4096": 6528306,
+    "16384": 25482125
+  },
+  "codeDepositPerByte": 1542,
+  "codeDepositPerByte1k": 1542,
+  "createGasBySstoreCount": {
+    "0": 210483,
+    "1": 321455,
+    "10": 1320314
+  },
+  "newSlotSstoreGas": 110983,
+  "ethTransferToFreshAddress": 207391,
+  "ethTransferToSelf": 12000,
+  "ethTransferToExisting": 21000,
+  "newAccountSurcharge": 186391,
+  "reference": "Pre-Prague/Osaka values: code deposit 200 gas/byte; SSTORE 0→1 ≈ 22 100 (cold); value transfer to a new account +25 000."
+}

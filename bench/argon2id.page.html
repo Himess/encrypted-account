@@ -1,0 +1,492 @@
+<title>Argon2id Phone Measurement</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  /* Layout: single-column measurement tool. KDF label on top, start + live progress in the middle, results table, strip chart and raw JSON at the bottom. */
+  :root {
+    --bg: #f3f5f8;
+    --panel: #ffffff;
+    --fg: #15202b;
+    --muted: #5a6b7c;
+    --line: #d5dce5;
+    --accent: #1d5fc4;
+    --accent-ink: #ffffff;
+    --good: #1c7a4b;
+    --warn: #9a6410;
+    --bad: #b23838;
+    --target: #b23838;
+    --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-data: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e151d; --panel: #152029; --fg: #e4ebf2; --muted: #92a3b4; --line: #27394a;
+      --accent: #6aa6ff; --accent-ink: #0a1a2e; --good: #4cc38a; --warn: #e1ae47; --bad: #f07a7a; --target: #f07a7a;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e151d; --panel: #152029; --fg: #e4ebf2; --muted: #92a3b4; --line: #27394a;
+    --accent: #6aa6ff; --accent-ink: #0a1a2e; --good: #4cc38a; --warn: #e1ae47; --bad: #f07a7a; --target: #f07a7a;
+    color-scheme: dark;
+  }
+  body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+  .wrap {
+    max-width: 760px; margin: 0 auto; display: grid; gap: 18px;
+    padding-block: 22px 56px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  header { display: grid; gap: 8px; }
+  .eyebrow { margin: 0; font-family: var(--font-data); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  h1 { margin: 0; font-size: 26px; line-height: 1.2; letter-spacing: -0.01em; text-wrap: balance; }
+  h2 { margin: 0; font-size: 17px; text-wrap: balance; }
+  h3 { margin: 0; font-size: 15px; }
+  p { margin: 0; max-width: 65ch; }
+  .lede { color: var(--muted); }
+  .params { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 4px 0 0; }
+  .params div { display: grid; gap: 0; }
+  .params dt { font-family: var(--font-data); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .params dd { margin: 0; font-family: var(--font-data); font-size: 14px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
+  .field { display: grid; gap: 4px; }
+  label { font-size: 13px; color: var(--muted); }
+  input[type="text"], input[type="number"] {
+    font: inherit; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; width: 100%; box-sizing: border-box;
+  }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .check { display: flex; gap: 8px; align-items: flex-start; color: var(--fg); font-size: 14px; }
+  .check input { margin-top: 3px; }
+  button {
+    font: inherit; font-weight: 600; border-radius: 8px; padding: 11px 16px; cursor: pointer;
+    border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink);
+  }
+  button.secondary { background: transparent; color: var(--accent); }
+  button:disabled { opacity: 0.5; cursor: default; }
+  button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  progress { width: 100%; height: 8px; accent-color: var(--accent); }
+  #status { font-family: var(--font-data); font-size: 13px; color: var(--muted); }
+  .table-wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; font-size: 14px; }
+  th, td { text-align: right; padding: 7px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  th { font-weight: 600; font-size: 12px; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
+  td.mono, .mono { font-family: var(--font-data); }
+  .pill { display: inline-block; font-family: var(--font-data); font-size: 12px; padding: 1px 8px; border-radius: 999px; border: 1px solid currentColor; }
+  .ok { color: var(--good); }
+  .warn { color: var(--warn); }
+  .bad { color: var(--bad); }
+  .example-note { font-size: 13px; color: var(--muted); }
+  .strip svg { display: block; width: 100%; height: auto; }
+  .strip .axis { stroke: var(--line); stroke-width: 1; }
+  .strip .tick { fill: var(--muted); font-family: var(--font-data); font-size: 10px; }
+  .strip .target { stroke: var(--target); stroke-width: 1.5; stroke-dasharray: 4 3; }
+  .strip .target-label { fill: var(--target); font-family: var(--font-data); font-size: 10px; }
+  .strip .dot { fill: var(--accent); fill-opacity: 0.75; }
+  .strip .rowlabel { fill: var(--fg); font-family: var(--font-data); font-size: 11px; }
+  dl.kv { display: grid; grid-template-columns: minmax(120px, max-content) 1fr; gap: 6px 14px; margin: 0; font-size: 14px; }
+  dl.kv dt { color: var(--muted); }
+  dl.kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; font-family: var(--font-data); font-size: 13px; }
+  textarea { width: 100%; box-sizing: border-box; min-height: 160px; font-family: var(--font-data); font-size: 12px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; resize: vertical; }
+  ul.saved { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 14px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Encrypted Account · E17 · PIN fingerprint KDF</p>
+    <h1>Argon2id phone measurement</h1>
+    <p class="lede">This page measures how many milliseconds the PIN fingerprint takes on this device. No network connection is needed; the computation runs inside the page. Keep the screen on during the measurement and do not switch to another app or tab.</p>
+    <dl class="params">
+      <div><dt>KDF v1</dt><dd>m = 64 MiB · t = 3 · p = 1 · 32 bytes</dd></div>
+      <div><dt>Target</dt><dd>p95 ≤ 1 s on a phone</dd></div>
+      <div><dt>Library</dt><dd>hash-wasm 4.13.0 (embedded)</dd></div>
+    </dl>
+  </header>
+
+  <section class="panel" aria-labelledby="h-run">
+    <h2 id="h-run">Measurement</h2>
+    <div class="field">
+      <label for="device">Device and browser</label>
+      <input id="device" type="text" placeholder="e.g. iPhone 13 · iOS 18.1 · Safari" autocomplete="off">
+    </div>
+    <div class="row">
+      <div class="field" style="width: 9rem">
+        <label for="runs">Runs per set</label>
+        <input id="runs" type="number" min="5" max="50" value="20">
+      </div>
+      <label class="check"><input type="checkbox" id="extras" checked> Also measure the extra sets: 32 MiB t=3, 64 MiB t=2, 128 MiB t=2</label>
+    </div>
+    <div class="row">
+      <button id="start" type="button">Start measurement</button>
+    </div>
+    <progress id="prog" max="1" value="0"></progress>
+    <p id="status" role="status">Ready. Total time is 1–3 minutes depending on the phone.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="h-res">
+    <h2 id="h-res">Results</h2>
+    <p class="example-note" id="example-note">The row below is an example: the v1 time measured on a desktop (Ryzen 5 5600, Node) in Round 1. When the measurement finishes, this device's results replace it.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Set</th><th>n</th><th>p50</th><th>p95</th><th>min</th><th>max</th><th>Target</th></tr></thead>
+        <tbody id="tbody">
+          <tr><td class="mono">v1 · example (desktop)</td><td>20</td><td>180</td><td>186</td><td>173</td><td>191</td><td><span class="pill ok">≤ 1 s</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="example-note">Times are in milliseconds. p95 uses the nearest-rank method; the first (warm-up) run is not counted, and runs measured while the page was in the background are excluded.</p>
+    <div class="strip" id="strip" aria-label="Strip chart of run times"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-env">
+    <h2 id="h-env">Correctness and device</h2>
+    <dl class="kv" id="kv">
+      <dt>Reference vector</dt><dd id="kv-kat">checked together with the measurement</dd>
+      <dt>v1 pipeline</dt><dd id="kv-pipe">salt + NFKC + Argon2id + fingerprint, against the Sepolia vector</dd>
+      <dt>User agent</dt><dd id="kv-ua">—</dd>
+      <dt>Cores / memory</dt><dd id="kv-hw">—</dd>
+    </dl>
+  </section>
+
+  <section class="panel" aria-labelledby="h-out">
+    <h2 id="h-out">Raw result</h2>
+    <p class="lede" id="out-help">The JSON appears here when the measurement finishes. If the "Save to Claude" button is visible, you can save the result with one tap; otherwise copy the JSON and paste it into the chat.</p>
+    <textarea id="json" readonly aria-label="Raw result JSON"></textarea>
+    <div class="row">
+      <button id="copy" type="button" class="secondary" disabled>Copy JSON</button>
+      <button id="save" type="button" hidden disabled>Save to Claude</button>
+    </div>
+    <p id="save-status" class="example-note" role="status"></p>
+    <div id="saved-box" hidden>
+      <h3>Saved measurements</h3>
+      <ul class="saved" id="saved-list"></ul>
+    </div>
+  </section>
+</div>
+
+<script>
+/*__HASHWASM_ARGON2__*/
+</script>
+<script>
+/*__HASHWASM_SHA256__*/
+</script>
+<script>
+(function () {
+  "use strict";
+  var VECTORS = /*__VECTORS__*/ null;
+  var SCHEMA = "encrypted-account/argon2id-bench/v1";
+  var TARGET_MS = 1000;
+  var $ = function (id) { return document.getElementById(id); };
+  var hw = window.hashwasm;
+  var SETS = [
+    { id: "v1", label: "v1 · 64 MiB, t=3", m: 65536, t: 3, p: 1, core: true },
+    { id: "m32t3", label: "32 MiB, t=3", m: 32768, t: 3, p: 1 },
+    { id: "m64t2", label: "64 MiB, t=2", m: 65536, t: 2, p: 1 },
+    { id: "m128t2", label: "128 MiB, t=2", m: 131072, t: 2, p: 1 }
+  ];
+  var MARK = "argon2bench.inflight";
+  var lastResult = null;
+  var hiddenSeen = false;
+  var dbRef = null;
+  var saving = false;
+
+  document.addEventListener("visibilitychange", function () { if (document.hidden) hiddenSeen = true; });
+
+  function utf8(s) { return new TextEncoder().encode(s); }
+  function hex(b) { var s = "0x"; for (var i = 0; i < b.length; i++) s += b[i].toString(16).padStart(2, "0"); return s; }
+  function hexToBytes(h) { h = h.replace(/^0x/, ""); var o = new Uint8Array(h.length / 2); for (var i = 0; i < o.length; i++) o[i] = parseInt(h.substr(2 * i, 2), 16); return o; }
+  function u256be(n) { var o = new Uint8Array(32); var x = BigInt(n); for (var i = 31; i >= 0; i--) { o[i] = Number(x & 255n); x >>= 8n; } return o; }
+  function concat(parts) { var len = 0; parts.forEach(function (p) { len += p.length; }); var o = new Uint8Array(len); var off = 0; parts.forEach(function (p) { o.set(p, off); off += p.length; }); return o; }
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  function round1(x) { return Math.round(x * 10) / 10; }
+  function setStatus(t) { $("status").textContent = t; }
+  function mark(v) { try { if (v) localStorage.setItem(MARK, JSON.stringify(v)); else localStorage.removeItem(MARK); } catch (e) { /* storage may be disabled */ } }
+  function readMark() { try { var s = localStorage.getItem(MARK); return s ? JSON.parse(s) : null; } catch (e) { return null; } }
+
+  async function sha256(bytes) {
+    if (window.crypto && crypto.subtle && crypto.subtle.digest) {
+      try { return new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)); } catch (e) { /* not a secure context */ }
+    }
+    return hexToBytes(await hw.sha256(bytes));
+  }
+  async function pinSalt(chainId, account) {
+    return sha256(concat([utf8("encrypted-account/pin/v1"), u256be(chainId), hexToBytes(account)]));
+  }
+  function argon(pw, salt, m, t, p) {
+    return hw.argon2id({ password: pw, salt: salt, parallelism: p, iterations: t, memorySize: m, hashLength: 32, outputType: "binary" });
+  }
+  function nearestRank(sorted, q) { return sorted[Math.min(sorted.length - 1, Math.ceil(q * sorted.length) - 1)]; }
+  function stats(arr) {
+    if (!arr.length) return null;
+    var s = arr.slice().sort(function (a, b) { return a - b; });
+    var mean = s.reduce(function (a, b) { return a + b; }, 0) / s.length;
+    return { n: s.length, p50: round1(nearestRank(s, 0.5)), p95: round1(nearestRank(s, 0.95)), min: round1(s[0]), max: round1(s[s.length - 1]), mean: round1(mean) };
+  }
+  function timerResolution() {
+    var best = Infinity;
+    for (var k = 0; k < 20; k++) { var a = performance.now(), b = a; while (b === a) b = performance.now(); if (b - a < best) best = b - a; }
+    return Math.round(best * 1000) / 1000;
+  }
+  async function collectDevice() {
+    var n = navigator;
+    var d = {
+      label: $("device").value.trim() || null,
+      userAgent: n.userAgent,
+      platform: n.platform || null,
+      language: n.language || null,
+      hardwareConcurrency: n.hardwareConcurrency || null,
+      deviceMemoryGB: n.deviceMemory || null,
+      screen: screen.width + "x" + screen.height + "@" + (window.devicePixelRatio || 1),
+      crossOriginIsolated: !!self.crossOriginIsolated,
+      timerResolutionMs: timerResolution(),
+      inClaudeViewer: !!(window.claude && window.claude.use)
+    };
+    if (n.userAgentData) {
+      d.uaData = { mobile: n.userAgentData.mobile, platform: n.userAgentData.platform, brands: n.userAgentData.brands };
+      try {
+        var hi = await n.userAgentData.getHighEntropyValues(["model", "platformVersion", "architecture"]);
+        d.uaData.model = hi.model || null; d.uaData.platformVersion = hi.platformVersion || null; d.uaData.architecture = hi.architecture || null;
+      } catch (e) { /* not permitted */ }
+    }
+    return d;
+  }
+
+  function pill(p95) {
+    if (p95 == null) return '<span class="pill bad">error</span>';
+    if (p95 <= TARGET_MS) return '<span class="pill ok">≤ 1 s</span>';
+    if (p95 <= 1.5 * TARGET_MS) return '<span class="pill warn">' + (p95 / 1000).toFixed(2) + ' s</span>';
+    return '<span class="pill bad">' + (p95 / 1000).toFixed(2) + ' s</span>';
+  }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+  function renderTable(result) {
+    var rows = result.sets.map(function (s) {
+      var st = s.stats;
+      var note = s.errors.length ? ' <span class="pill bad">' + esc(s.errors[0].kind) + '</span>' : "";
+      if (!st) return '<tr><td class="mono">' + esc(s.label) + note + '</td><td>0</td><td>—</td><td>—</td><td>—</td><td>—</td><td>' + pill(null) + '</td></tr>';
+      return '<tr><td class="mono">' + esc(s.label) + note + '</td><td>' + st.n + '</td><td>' + Math.round(st.p50) + '</td><td>' + Math.round(st.p95) + '</td><td>' + Math.round(st.min) + '</td><td>' + Math.round(st.max) + '</td><td>' + pill(st.p95) + '</td></tr>';
+    });
+    $("tbody").innerHTML = rows.join("");
+    $("example-note").hidden = true;
+  }
+
+  function renderStrip(result) {
+    var sets = result.sets.filter(function (s) { return s.runs.length; });
+    if (!sets.length) { $("strip").innerHTML = ""; return; }
+    var maxRun = 0;
+    sets.forEach(function (s) { s.runs.forEach(function (v) { if (v > maxRun) maxRun = v; }); });
+    var step = maxRun > 3000 ? 1000 : maxRun > 1500 ? 500 : 250;
+    var xMax = Math.max(TARGET_MS * 1.25, Math.ceil(maxRun / step) * step);
+    var W = 640, left = 118, right = 14, rowH = 26, top = 8, axisH = 24;
+    var H = top + sets.length * rowH + axisH;
+    var x = function (v) { return left + (v / xMax) * (W - left - right); };
+    var out = ['<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Run times for each set; the dashed line is the 1-second target">'];
+    sets.forEach(function (s, i) {
+      var cy = top + i * rowH + rowH / 2;
+      out.push('<text class="rowlabel" x="0" y="' + (cy + 4) + '">' + esc(s.label.replace(/^v1 · /, "v1 ")) + "</text>");
+      out.push('<line class="axis" x1="' + left + '" x2="' + (W - right) + '" y1="' + cy + '" y2="' + cy + '"></line>');
+      s.runs.forEach(function (v) { out.push('<circle class="dot" cx="' + x(v).toFixed(1) + '" cy="' + cy + '" r="3.5"></circle>'); });
+    });
+    var axisY = top + sets.length * rowH + 4;
+    for (var v = 0; v <= xMax + 0.001; v += step) {
+      out.push('<text class="tick" x="' + x(v).toFixed(1) + '" y="' + (axisY + 12) + '" text-anchor="middle">' + v + "</text>");
+    }
+    out.push('<line class="target" x1="' + x(TARGET_MS) + '" x2="' + x(TARGET_MS) + '" y1="' + (top - 4) + '" y2="' + (axisY - 2) + '"></line>');
+    out.push('<text class="target-label" x="' + (x(TARGET_MS) + 4) + '" y="' + (top + 6) + '">1 s</text>');
+    out.push("</svg>");
+    $("strip").innerHTML = out.join("");
+  }
+
+  function renderKv(result) {
+    var c = result.correctness;
+    $("kv-kat").innerHTML = c.kat ? (c.kat.ok ? '<span class="ok">correct</span> · ' : '<span class="bad">WRONG</span> · ') + Math.round(c.kat.ms) + " ms (m=64 MiB, t=2)" : "—";
+    $("kv-pipe").innerHTML = c.pipelineV1 ? (c.pipelineV1.ok ? '<span class="ok">correct</span> · ' : '<span class="bad">WRONG</span> · ') + esc(c.pipelineV1.fingerprint) : "—";
+    var d = result.device;
+    $("kv-ua").textContent = d.userAgent + (d.uaData && d.uaData.model ? " · model " + d.uaData.model : "");
+    $("kv-hw").textContent = (d.hardwareConcurrency || "?") + " cores · " + (d.deviceMemoryGB ? d.deviceMemoryGB + " GB (approx.)" : "no memory info") + " · timer resolution " + d.timerResolutionMs + " ms";
+  }
+
+  function showJson(result) {
+    $("json").value = JSON.stringify(result, null, 2);
+    $("copy").disabled = false;
+    if (dbRef) { $("save").disabled = false; }
+  }
+
+  function classifyError(e) {
+    var m = String((e && e.message) || e);
+    var kind = /memory|Memory|allocation|RangeError|out of bounds|grow/i.test(m) ? "memory" : "error";
+    return { kind: kind, message: m.slice(0, 300) };
+  }
+
+  async function run() {
+    $("start").disabled = true; $("copy").disabled = true; $("save").disabled = true; $("save-status").textContent = "";
+    var lock = null;
+    try { if (navigator.wakeLock) lock = await navigator.wakeLock.request("screen"); } catch (e) { lock = null; }
+    var N = Math.max(5, Math.min(50, parseInt($("runs").value, 10) || 20));
+    var sets = $("extras").checked ? SETS : SETS.filter(function (s) { return s.core; });
+    var result = {
+      schema: SCHEMA,
+      page: "bench/argon2id.html",
+      hashWasm: "4.13.0",
+      startedAtUtc: new Date().toISOString(),
+      device: await collectDevice(),
+      runsPerSet: N,
+      correctness: {},
+      sets: [],
+      notes: []
+    };
+    var prior = readMark();
+    if (prior) result.notes.push("The previous measurement was interrupted in set '" + prior.set + "' (the page reloaded; most likely memory). Time: " + prior.at);
+    var total = 2 + sets.length * (N + 1), done = 0;
+    var tick = function () { done++; $("prog").value = done / total; };
+    hiddenSeen = document.hidden;
+
+    try {
+      setStatus("Correctness check: reference vector…");
+      await sleep(30);
+      var t0 = performance.now();
+      var kat = hex(await argon(utf8("password"), utf8("somesalt"), 65536, 2, 1));
+      result.correctness.kat = { ok: kat === VECTORS.referenceKAT.hash, ms: round1(performance.now() - t0), expected: VECTORS.referenceKAT.hash, got: kat };
+      tick();
+      setStatus("Correctness check: v1 pipeline (Sepolia vector)…");
+      await sleep(30);
+      var vec = VECTORS.vectors.filter(function (v) { return v.chainId === "11155111" && v.pin === "482915"; })[0];
+      var salt = await pinSalt(vec.chainId, vec.account);
+      var raw = await argon(utf8(vec.pin.normalize("NFKC")), salt, VECTORS.kdf.memoryKiB, VECTORS.kdf.iterations, VECTORS.kdf.parallelism);
+      var fp = hex(raw.slice(0, 8));
+      result.correctness.pipelineV1 = { ok: hex(salt) === vec.salt && hex(raw) === vec.argon2id && fp === vec.fingerprint, fingerprint: fp, expected: vec.fingerprint };
+      tick();
+      renderKv(result);
+      if (!result.correctness.kat.ok || !result.correctness.pipelineV1.ok) throw new Error("Correctness check failed: Argon2id does not produce the expected output in this browser, so timing it would be meaningless.");
+
+      for (var si = 0; si < sets.length; si++) {
+        var set = sets[si];
+        var entry = { id: set.id, label: set.label, memoryKiB: set.m, iterations: set.t, parallelism: set.p, warmupMs: null, runs: [], excludedHidden: 0, errors: [], stats: null };
+        result.sets.push(entry);
+        mark({ set: set.id, at: new Date().toISOString() });
+        try {
+          setStatus(set.label + ": warm-up…");
+          await sleep(40);
+          var w0 = performance.now();
+          await argon(crypto.getRandomValues(new Uint8Array(6)), crypto.getRandomValues(new Uint8Array(32)), set.m, set.t, set.p);
+          entry.warmupMs = round1(performance.now() - w0);
+          tick();
+          for (var i = 0; i < N; i++) {
+            setStatus(set.label + ": " + (i + 1) + "/" + N);
+            await sleep(40);
+            hiddenSeen = document.hidden;
+            var pw = utf8(String(100000 + Math.floor(Math.random() * 900000)));
+            var sl = crypto.getRandomValues(new Uint8Array(32));
+            var s0 = performance.now();
+            await argon(pw, sl, set.m, set.t, set.p);
+            var ms = performance.now() - s0;
+            if (hiddenSeen || document.hidden) entry.excludedHidden++;
+            else entry.runs.push(round1(ms));
+            tick();
+            entry.stats = stats(entry.runs);
+            renderTable(result); renderStrip(result);
+          }
+        } catch (e) {
+          entry.errors.push(classifyError(e));
+        }
+        mark(null);
+        entry.stats = stats(entry.runs);
+        renderTable(result); renderStrip(result);
+      }
+      var v1 = result.sets.filter(function (s) { return s.id === "v1"; })[0];
+      result.verdict = { targetP95Ms: TARGET_MS, v1P95Ms: v1 && v1.stats ? v1.stats.p95 : null, v1MeetsTarget: !!(v1 && v1.stats && v1.stats.p95 <= TARGET_MS) };
+      result.finishedAtUtc = new Date().toISOString();
+      lastResult = result;
+      showJson(result);
+      var excluded = result.sets.reduce(function (a, s) { return a + s.excludedHidden; }, 0);
+      setStatus("Done. v1 p95 = " + (result.verdict.v1P95Ms != null ? Math.round(result.verdict.v1P95Ms) + " ms" : "not measured") + (excluded ? " · runs excluded because the page was in the background: " + excluded : ""));
+    } catch (e) {
+      result.fatal = String((e && e.message) || e);
+      result.finishedAtUtc = new Date().toISOString();
+      lastResult = result;
+      showJson(result);
+      setStatus("Stopped: " + result.fatal);
+    } finally {
+      mark(null);
+      try { if (lock) await lock.release(); } catch (e) { /* ignore */ }
+      $("start").disabled = false;
+    }
+  }
+
+  async function copyJson() {
+    var text = $("json").value;
+    try {
+      await navigator.clipboard.writeText(text);
+      $("save-status").textContent = "JSON copied to the clipboard.";
+    } catch (e) {
+      $("json").focus(); $("json").select();
+      $("save-status").textContent = "No clipboard access: the text is selected; long-press it and choose Copy.";
+    }
+  }
+
+  function shortDevice(d) {
+    if (!d) return "?";
+    if (d.label) return d.label;
+    var ua = d.userAgent || "";
+    var m = ua.match(/\(([^)]+)\)/);
+    return m ? m[1].slice(0, 60) : ua.slice(0, 60);
+  }
+
+  async function saveResult() {
+    if (!dbRef || !lastResult || saving) return;
+    saving = true; $("save").disabled = true;
+    $("save-status").textContent = "Saving…";
+    var attempt = 0;
+    for (;;) {
+      try {
+        await dbRef.collection("runs").add(JSON.parse(JSON.stringify(lastResult)));
+        $("save-status").textContent = "Saved. Claude can read this measurement directly; you can also open the same page on another device and measure there.";
+        break;
+      } catch (e) {
+        var code = e && e.code;
+        if (code === "unavailable" && attempt === 0) { attempt++; await sleep(800 + Math.random() * 800); continue; }
+        $("save-status").textContent = code === "invalid_argument" || code === "not_granted"
+          ? "Saving is not permitted in this view. Copy the JSON and paste it into the chat."
+          : "Could not save (" + (code || "error") + "). Copy the JSON and paste it into the chat.";
+        $("save").disabled = false;
+        break;
+      }
+    }
+    saving = false;
+  }
+
+  function watchSaved(db) {
+    var box = $("saved-box"), list = $("saved-list");
+    box.hidden = false;
+    list.innerHTML = "<li>Loading saved runs…</li>";
+    var timer = setTimeout(function () { list.innerHTML = "<li>Saved runs are not reachable yet.</li>"; }, 10000);
+    db.collection("runs").orderBy("startedAtUtc", "desc").limit(20).onSnapshot(function (snap) {
+      if (!snap.metadata.fromCache) clearTimeout(timer);
+      if (snap.empty) { list.innerHTML = "<li>No saved runs yet. Run the first measurement and save it.</li>"; return; }
+      list.innerHTML = snap.docs.map(function (doc) {
+        var r = doc.data() || {};
+        var v1 = r.verdict && r.verdict.v1P95Ms != null ? Math.round(r.verdict.v1P95Ms) + " ms" : "—";
+        return "<li><span class=\"mono\">" + esc((r.startedAtUtc || "").slice(0, 16).replace("T", " ")) + "</span> · " + esc(shortDevice(r.device)) + " · v1 p95 " + esc(v1) + "</li>";
+      }).join("");
+    }, function () { clearTimeout(timer); list.innerHTML = "<li>Could not read the list of saved runs.</li>"; });
+  }
+
+  $("start").addEventListener("click", run);
+  $("copy").addEventListener("click", copyJson);
+  $("save").addEventListener("click", saveResult);
+
+  var prior = readMark();
+  if (prior) setStatus("The previous measurement was interrupted in set '" + prior.set + "' (most likely the memory limit). You can start again; this note is added to the result.");
+  if (!hw || !hw.argon2id) { setStatus("hash-wasm failed to load: the page may have been copied incompletely."); $("start").disabled = true; }
+
+  if (window.claude && typeof window.claude.use === "function") {
+    window.claude.use("db").then(function (db) {
+      if (!db) return;
+      dbRef = db;
+      $("save").hidden = false;
+      if (lastResult) $("save").disabled = false;
+      watchSaved(db);
+    }).catch(function () { /* no db: copy only */ });
+  }
+})();
+</script>

@@ -1,0 +1,332 @@
+{
+  "evidence": {
+    "exact": "[I] exact computation over all 65 536 values of r",
+    "mock": "[Mock] TauBench, @fhevm/hardhat-plugin 0.13.0-1",
+    "hcu": "[Mock] host HCU table (F0.9: same on the live chain)"
+  },
+  "generatedAtUtc": "2026-11-09T22:27:15.894Z",
+  "criterion": "coverage ≥ 99% for 2^16 ≤ D < 2^48 (v2); for D ≥ 2^48 coverage is [L_min, L_min + 2^48) by design",
+  "exact": [
+    {
+      "version": "v1",
+      "D": "0",
+      "Dvalue": "0",
+      "tauAlwaysLmin": true,
+      "inRange": true,
+      "note": "empty range: τ = L_min (an input with L < L_min is normalized to this case by max)"
+    },
+    {
+      "version": "v2",
+      "D": "0",
+      "Dvalue": "0",
+      "tauAlwaysLmin": true,
+      "inRange": true,
+      "note": "empty range: τ = L_min (an input with L < L_min is normalized to this case by max)"
+    },
+    {
+      "version": "v1",
+      "D": "1",
+      "Dvalue": "1",
+      "inRange": true,
+      "minOffset": "0",
+      "maxOffset": "0",
+      "distinct": 1,
+      "coverageDesignPct": 100,
+      "coverageFullRangePct": 100,
+      "buckets": 1,
+      "exactChi2": 0,
+      "maxBucketDeviationPct": 0
+    },
+    {
+      "version": "v2",
+      "D": "1",
+      "Dvalue": "1",
+      "inRange": true,
+      "minOffset": "0",
+      "maxOffset": "0",
+      "distinct": 1,
+      "coverageDesignPct": 100,
+      "coverageFullRangePct": 100,
+      "buckets": 1,
+      "exactChi2": 0,
+      "maxBucketDeviationPct": 0
+    },
+    {
+      "version": "v1",
+      "D": "1 000",
+      "Dvalue": "1000",
+      "inRange": true,
+      "minOffset": "0",
+      "maxOffset": "0",
+      "distinct": 1,
+      "coverageDesignPct": 0.1,
+      "coverageFullRangePct": 0.1,
+      "buckets": 16,
+      "exactChi2": 991496.2581,
+      "maxBucketDeviationPct": 1500.8
+    },
+    {
+      "version": "v2",
+      "D": "1 000",
+      "Dvalue": "1000",
+      "inRange": true,
+      "minOffset": "0",
+      "maxOffset": "999",
+      "distinct": 1000,
+      "coverageDesignPct": 100,
+      "coverageFullRangePct": 100,
+      "buckets": 16,
+      "exactChi2": 0.0023,
+      "maxBucketDeviationPct": 0.019
+    },
+    {
+      "version": "v1",
+      "D": "65 535",
+      "Dvalue": "65535",
+      "inRange": true,
+      "minOffset": "0",
+      "maxOffset": "0",
+      "distinct": 1,
+      "coverageDesignPct": 0.002,
+      "coverageFullRangePct": 0.002,
+      "buckets": 16,
+      "exactChi2": 983280.0586,
+      "maxBucketDeviationPct": 1500.023
+    },
+    {
+      "version": "v2",
+      "D": "65 535",
+      "Dvalue": "65535",
+      "inRange": true,
+      "minOffset": "0",
+      "maxOffset": "65534",
+      "distinct": 65535,
+      "coverageDesignPct": 100,
+      "coverageFullRangePct": 100,
+      "buckets": 16,
+      "exactChi2": 0.0002,
+      "maxBucketDeviationPct": 0.023
+    },
+    {
+      "version": "v1",
+      "D": "65 536",
+      "Dvalue": "65536",
+      "inRange": true,
+      "minOffset": "0",
+      "maxOffset": "65535",
+      "distinct": 65536,
+      "coverageDesignPct": 100,
+      "coverageFullRangePct": 100,
+      "buckets": 16,
+      "exactChi2": 0,
+      "maxBucketDeviationPct": 0
+    },
+    {
+      "version": "v2",
+      "D": "65 536",
+      "Dvalue": "65536",
+      "inRange": true,
+      "minOffset": "0",
+      "maxOffset": "65535",
+      "distinct": 65536,
+      "coverageDesignPct": 100,
+      "coverageFullRangePct": 100,
+      "buckets": 16,
+      "exactChi2": 0,
+      "maxBucketDeviationPct": 0
+    },
+    {
+      "version": "v1",
+      "D": "131 071",
+      "Dvalue": "131071",
+      "inRange": true,
+      "minOffset": "0",
+      "maxOffset": "65535",
+      "distinct": 65536,
+      "coverageDesignPct": 50,
+      "coverageFullRangePct": 50,
+      "buckets": 16,
+      "exactChi2": 65533.0003,
+      "maxBucketDeviationPct": 100.001
+    },
+    {
+      "version": "v2",
+      "D": "131 071",
+      "Dvalue": "131071",
+      "inRange": true,
+      "minOffset": "0",
+      "maxOffset": "131069",
+      "distinct": 65536,
+      "coverageDesignPct": 99.999,
+      "coverageFullRangePct": 99.999,
+      "buckets": 16,
+      "exactChi2": 0.0001,
+      "maxBucketDeviationPct": 0.011
+    },
+    {
+      "version": "v1",
+      "D": "2^20",
+      "Dvalue": "1048576",
+      "inRange": true,
+      "minOffset": "0",
+      "maxOffset": "1048560",
+      "distinct": 65536,
+      "coverageDesignPct": 99.999,
+      "coverageFullRangePct": 99.999,
+      "buckets": 16,
+      "exactChi2": 0,
+      "maxBucketDeviationPct": 0
+    },
+    {
+      "version": "v2",
+      "D": "2^20",
+      "Dvalue": "1048576",
+      "inRange": true,
+      "minOffset": "0",
+      "maxOffset": "1048560",
+      "distinct": 65536,
+      "coverageDesignPct": 99.999,
+      "coverageFullRangePct": 99.999,
+      "buckets": 16,
+      "exactChi2": 0,
+      "maxBucketDeviationPct": 0
+    },
+    {
+      "version": "v1",
+      "D": "2^40",
+      "Dvalue": "1099511627776",
+      "inRange": true,
+      "minOffset": "0",
+      "maxOffset": "1099494850560",
+      "distinct": 65536,
+      "coverageDesignPct": 99.998,
+      "coverageFullRangePct": 99.998,
+      "buckets": 16,
+      "exactChi2": 0,
+      "maxBucketDeviationPct": 0
+    },
+    {
+      "version": "v2",
+      "D": "2^40",
+      "Dvalue": "1099511627776",
+      "inRange": true,
+      "minOffset": "0",
+      "maxOffset": "1099494850560",
+      "distinct": 65536,
+      "coverageDesignPct": 99.998,
+      "coverageFullRangePct": 99.998,
+      "buckets": 16,
+      "exactChi2": 0,
+      "maxBucketDeviationPct": 0
+    },
+    {
+      "version": "v1",
+      "D": "2^50",
+      "Dvalue": "1125899906842624",
+      "inRange": true,
+      "minOffset": "0",
+      "maxOffset": "1125882726973440",
+      "distinct": 65536,
+      "coverageDesignPct": 99.998,
+      "coverageFullRangePct": 99.998,
+      "buckets": 16,
+      "exactChi2": 0,
+      "maxBucketDeviationPct": 0
+    },
+    {
+      "version": "v2",
+      "D": "2^50",
+      "Dvalue": "1125899906842624",
+      "inRange": true,
+      "minOffset": "0",
+      "maxOffset": "281470681743359",
+      "distinct": 65536,
+      "coverageDesignPct": 99.998,
+      "coverageFullRangePct": 25,
+      "buckets": 16,
+      "exactChi2": 0,
+      "maxBucketDeviationPct": 0
+    }
+  ],
+  "mock": [
+    {
+      "D": "1000",
+      "draws": 1024,
+      "buckets": [
+        58,
+        78,
+        55,
+        61,
+        59,
+        77,
+        59,
+        51,
+        64,
+        77,
+        74,
+        56,
+        59,
+        57,
+        69,
+        70
+      ],
+      "chi2": 17.92,
+      "chi2CriticalDf15P001": 37.697,
+      "min": "0",
+      "max": "999",
+      "v1Sample": {
+        "draws": 16,
+        "distinctOffsets": 1,
+        "maxOffset": "0"
+      }
+    },
+    {
+      "D": "131071",
+      "draws": 1024,
+      "buckets": [
+        65,
+        66,
+        60,
+        73,
+        59,
+        66,
+        70,
+        62,
+        73,
+        60,
+        58,
+        62,
+        60,
+        62,
+        73,
+        55
+      ],
+      "chi2": 7.66,
+      "chi2CriticalDf15P001": 37.697,
+      "min": "169",
+      "max": "130845",
+      "v1Sample": {
+        "draws": 16,
+        "distinctOffsets": 16,
+        "maxOffset": "62875"
+      }
+    },
+    {
+      "D": "L < L_min (normalize → 0)",
+      "draws": 8,
+      "allEqualLmin": true
+    }
+  ],
+  "hcu": {
+    "v1PerDraw": {
+      "total": 977032,
+      "depth": 954000
+    },
+    "v2PerDraw": {
+      "total": 1127032,
+      "depth": 1104000
+    },
+    "deltaTotal": 150000,
+    "note": "v2 = v1 + one scalar min (euint64); mul is euint64 × euint64 in both versions"
+  }
+}

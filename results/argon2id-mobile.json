@@ -1,0 +1,129 @@
+{
+  "evidence": "[M] phone browser (bench/argon2id.html; raw output below, unmodified)",
+  "target": { "set": "v1 (64 MiB, t=3, p=1)", "p95MsMax": 1000 },
+  "desktopReference": {
+    "chromiumPaneV1": { "n": 5, "p50": 172, "p95": 174, "source": "RESULTS.md Round 2 / F0.12 desktop smoke test" },
+    "nodeV1": { "n": 20, "p50": 180, "p95": 186, "source": "results/argon2id-desktop.json" }
+  },
+  "summary": [
+    {
+      "device": "Samsung Galaxy A73 5G (SM-A736B)",
+      "os": "Android 15",
+      "browser": "Chrome 156",
+      "atUtc": "2026-11-08T22:13:37.787Z",
+      "correctness": { "kat": true, "pipelineV1": true },
+      "v1": { "p50": 308.6, "p95": 321.6, "max": 323.7, "meetsTarget": true, "ratioToDesktopChromiumP95": 1.85 },
+      "m32t3": { "p50": 159.3, "p95": 164.4 },
+      "m64t2": { "p50": 219.5, "p95": 230.6 },
+      "m128t2": { "p50": 440.5, "p95": 454.9 },
+      "excludedHidden": 0,
+      "memoryErrors": 0
+    }
+  ],
+  "pending": ["at least one iOS Safari measurement (work package F0.12 acceptance) — no device available as of 2026-11-08; open item"],
+  "measurements": [
+    {
+      "receivedAtUtc": "2026-11-08T22:15:00Z",
+      "annotations": {
+        "deviceLabelGiven": "Samsung galaxy A7",
+        "modelCode": "SM-A736B",
+        "modelName": "Samsung Galaxy A73 5G [I: from the model code]",
+        "androidVersion": "15 (uaData.platformVersion; the 'Android 10; K' in the UA string is Chrome's UA reduction)",
+        "openedAs": "local file (inClaudeViewer = false, crossOriginIsolated = false)"
+      },
+      "raw": {
+        "schema": "encrypted-account/argon2id-bench/v1",
+        "page": "bench/argon2id.html",
+        "hashWasm": "4.13.0",
+        "startedAtUtc": "2026-11-08T22:13:37.787Z",
+        "device": {
+          "label": "Samsung galaxy A7",
+          "userAgent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Mobile Safari/537.36",
+          "platform": "Linux armv81",
+          "language": "en",
+          "hardwareConcurrency": 8,
+          "deviceMemoryGB": 8,
+          "screen": "384x854@2.8125",
+          "crossOriginIsolated": false,
+          "timerResolutionMs": 0.1,
+          "inClaudeViewer": false,
+          "uaData": {
+            "mobile": true,
+            "platform": "Android",
+            "brands": [
+              { "brand": "Not:A-Brand", "version": "8" },
+              { "brand": "Chromium", "version": "156" },
+              { "brand": "Google Chrome", "version": "156" }
+            ],
+            "model": "SM-A736B",
+            "platformVersion": "15.0.0",
+            "architecture": null
+          }
+        },
+        "runsPerSet": 20,
+        "correctness": {
+          "kat": {
+            "ok": true,
+            "ms": 241.4,
+            "expected": "0x09316115d5cf24ed5a15a31a3ba326e5cf32edc24702987c02b6566f61913cf7",
+            "got": "0x09316115d5cf24ed5a15a31a3ba326e5cf32edc24702987c02b6566f61913cf7"
+          },
+          "pipelineV1": { "ok": true, "fingerprint": "0xfd60401df3f239b8", "expected": "0xfd60401df3f239b8" }
+        },
+        "sets": [
+          {
+            "id": "v1",
+            "label": "v1 · 64 MiB, t=3",
+            "memoryKiB": 65536,
+            "iterations": 3,
+            "parallelism": 1,
+            "warmupMs": 321.5,
+            "runs": [308.1, 316.9, 305.1, 308.6, 323.7, 307.5, 316.5, 305.3, 320.9, 308.2, 308.9, 313, 304.8, 306.8, 301.5, 306.2, 315.7, 310.7, 310.1, 321.6],
+            "excludedHidden": 0,
+            "errors": [],
+            "stats": { "n": 20, "p50": 308.6, "p95": 321.6, "min": 301.5, "max": 323.7, "mean": 311 }
+          },
+          {
+            "id": "m32t3",
+            "label": "32 MiB, t=3",
+            "memoryKiB": 32768,
+            "iterations": 3,
+            "parallelism": 1,
+            "warmupMs": 153.6,
+            "runs": [163.7, 164.4, 165.9, 159.4, 154.8, 160.6, 162.6, 159.5, 160.9, 160.1, 160.7, 151, 149.1, 159.3, 157.2, 151.5, 150.8, 155.4, 158.1, 148.5],
+            "excludedHidden": 0,
+            "errors": [],
+            "stats": { "n": 20, "p50": 159.3, "p95": 164.4, "min": 148.5, "max": 165.9, "mean": 157.7 }
+          },
+          {
+            "id": "m64t2",
+            "label": "64 MiB, t=2",
+            "memoryKiB": 65536,
+            "iterations": 2,
+            "parallelism": 1,
+            "warmupMs": 229.8,
+            "runs": [230.9, 225.5, 230.6, 210.9, 213.7, 222.1, 222.8, 216.4, 212.5, 218.4, 226.6, 228.7, 216.2, 219.5, 220.7, 222.6, 214.9, 215.3, 228, 209.7],
+            "excludedHidden": 0,
+            "errors": [],
+            "stats": { "n": 20, "p50": 219.5, "p95": 230.6, "min": 209.7, "max": 230.9, "mean": 220.3 }
+          },
+          {
+            "id": "m128t2",
+            "label": "128 MiB, t=2",
+            "memoryKiB": 131072,
+            "iterations": 2,
+            "parallelism": 1,
+            "warmupMs": 451.2,
+            "runs": [436, 446.7, 433.8, 445.4, 442.7, 447.4, 424.7, 440.5, 454.9, 452.8, 442.2, 444.9, 458.7, 444.3, 433.5, 438.6, 432.5, 436.8, 438.7, 436.8],
+            "excludedHidden": 0,
+            "errors": [],
+            "stats": { "n": 20, "p50": 440.5, "p95": 454.9, "min": 424.7, "max": 458.7, "mean": 441.6 }
+          }
+        ],
+        "notes": [],
+        "verdict": { "targetP95Ms": 1000, "v1P95Ms": 321.6, "v1MeetsTarget": true },
+        "finishedAtUtc": "2026-11-08T22:14:05.852Z"
+      }
+    }
+  ]
+}

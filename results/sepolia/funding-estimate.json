@@ -1,0 +1,210 @@
+{
+  "evidence": "[M] Sepolia read; plan [I] (Round 2 §3)",
+  "generatedAtUtc": "2026-11-08T19:19:56.810Z",
+  "address": "0xcBdaED7D91644c771Aa84C5AbE5afFBB42a4d502",
+  "balanceWei": "0",
+  "rpc": {
+    "rows": [
+      {
+        "url": "https://ethereum-sepolia-rpc.publicnode.com",
+        "ok": true,
+        "chainId": 11155111,
+        "block": 12092528,
+        "ms": 326
+      },
+      {
+        "url": "https://sepolia.gateway.tenderly.co",
+        "ok": true,
+        "chainId": 11155111,
+        "block": 12092528,
+        "ms": 331
+      },
+      {
+        "url": "https://1rpc.io/sepolia",
+        "ok": true,
+        "chainId": 11155111,
+        "block": 12092528,
+        "ms": 450
+      }
+    ],
+    "best": "https://ethereum-sepolia-rpc.publicnode.com"
+  },
+  "gas": {
+    "block": 12092528,
+    "baseFeeGwei": 1.5e-8,
+    "baseFee100": {
+      "medianGwei": 1.6e-8,
+      "maxGwei": 2.1e-8
+    },
+    "ethGasPriceGwei": 1.7e-8,
+    "nodePriorityGwei": 2e-9,
+    "blockP50RewardGwei": 0.999999984,
+    "tipUsedGwei": 0.05,
+    "unitPriceNowGwei": 0.050000015,
+    "unitPriceSafeGwei": 0.050000021
+  },
+  "planS3": [
+    {
+      "item": "Deployment ×2 (baseline + after fixes)",
+      "gas": 30000000,
+      "basis": "20 KiB account + 4 libraries + factory + test contracts [I]"
+    },
+    {
+      "item": "Account setups (A ×3, B ×1)",
+      "gas": 36000000,
+      "basis": "A setup ≈ 10.7M [I, from mock parts]; B has no encrypted slots"
+    },
+    {
+      "item": "E1 PIN flow ×30",
+      "gas": 71000000,
+      "basis": "≈ 2.37M / flow [Mock total]"
+    },
+    {
+      "item": "K-only hot path (A) ×30",
+      "gas": 46000000,
+      "basis": "≈ 1.53M / flow [Mock total]"
+    },
+    {
+      "item": "Variant B ×30",
+      "gas": 3000000,
+      "basis": "Plain-transfer level [I]"
+    },
+    {
+      "item": "Live checks",
+      "gas": 13000000,
+      "basis": "isIn 60/61, τ draws, escape, AA [I]"
+    }
+  ],
+  "planTotalGas": 200000000,
+  "margin": 1.3,
+  "extraWei": "5000000000000000",
+  "scenarios": [
+    {
+      "label": "current price",
+      "priceGwei": 0.050000015,
+      "recommendedEth": "0.0180000039"
+    },
+    {
+      "label": "max base fee of last 100 blocks",
+      "priceGwei": 0.050000021,
+      "recommendedEth": "0.01800000546"
+    },
+    {
+      "label": "1 gwei",
+      "priceGwei": 1,
+      "recommendedEth": "0.265"
+    },
+    {
+      "label": "5 gwei",
+      "priceGwei": 5,
+      "recommendedEth": "1.305"
+    },
+    {
+      "label": "10 gwei",
+      "priceGwei": 10,
+      "recommendedEth": "2.605"
+    }
+  ],
+  "formulaEth": "0.01800000546",
+  "recommendedEth": "0.06",
+  "recommendationRule": "max(3 × formula, 0.05 ETH), rounded up to 0.01 ETH",
+  "minStartEth": "0.001907908642641913",
+  "deployCrossCheck": {
+    "contracts": [
+      {
+        "name": "PinLib",
+        "runtimeBytes": 7217,
+        "initBytes": 7249,
+        "gas": 1672166
+      },
+      {
+        "name": "PolicyLib",
+        "runtimeBytes": 8389,
+        "initBytes": 8421,
+        "gas": 1924960
+      },
+      {
+        "name": "OpsLib",
+        "runtimeBytes": 8190,
+        "initBytes": 8222,
+        "gas": 1881758
+      },
+      {
+        "name": "OpenLib",
+        "runtimeBytes": 9487,
+        "initBytes": 9519,
+        "gas": 2162016
+      },
+      {
+        "name": "EncryptedAccount",
+        "runtimeBytes": 20442,
+        "initBytes": 21341,
+        "gas": 4527582
+      },
+      {
+        "name": "EncryptedAccountFactory",
+        "runtimeBytes": 1666,
+        "initBytes": 1806,
+        "gas": 473446
+      },
+      {
+        "name": "Bench",
+        "runtimeBytes": 4251,
+        "initBytes": 4859,
+        "gas": 1040900
+      },
+      {
+        "name": "NaivePinVerifier",
+        "runtimeBytes": 3586,
+        "initBytes": 4194,
+        "gas": 897172
+      },
+      {
+        "name": "TestPaymaster",
+        "runtimeBytes": 736,
+        "initBytes": 886,
+        "gas": 272524
+      },
+      {
+        "name": "MockERC20",
+        "runtimeBytes": 1725,
+        "initBytes": 2664,
+        "gas": 499892
+      }
+    ],
+    "oneFullDeployGas": 15352416
+  },
+  "preflight": {
+    "entryPointV08": {
+      "address": "0x4337084D9E255Ff0702461CF8895CE9E3b5Ff108",
+      "hasCode": true
+    },
+    "acl": {
+      "address": "0xf0Ffdc93b7E186bC2f8CB3dAA75D86d1930A433D",
+      "hasCode": true
+    },
+    "fhevmExecutor": {
+      "address": "0x92C920834Ec8941d2C77D188936E1f7A6f49c127",
+      "hasCode": true
+    },
+    "kmsVerifier": {
+      "address": "0xbE0E383937d564D7FF0BC3b46c51f0bF8d5C311A",
+      "hasCode": true
+    },
+    "inputVerifier": {
+      "address": "0xBBC1fFCdc7C316aAAd72E807D9b0272BE8F84DA0",
+      "hasCode": true
+    },
+    "protocolConfig": {
+      "address": "0x51f9AFBc89Ea792e1a21a12AB802ab58D4dbee83",
+      "hasCode": true
+    },
+    "relayerUrl": "https://relayer.testnet.zama.org",
+    "relayer": {
+      "ok": true,
+      "clientReadyMs": 6003,
+      "inputProofMs": 4887,
+      "proofBytes": 230
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "evidence": "[Mock] Round 1 code (before F0.10)",
+  "generatedAtUtc": "2026-11-08T22:57:00.395Z",
+  "afterThreeWrong": {
+    "track": {
+      "consecutive": "3",
+      "nextAllowedAt": "1794179569",
+      "pendingOp": "0"
+    },
+    "shared": {
+      "consecutive": "3",
+      "nextAllowedAt": "1794179569"
+    },
+    "restricted": 1
+  },
+  "afterOwnerCorrectPin": {
+    "track": {
+      "consecutive": "0",
+      "nextAllowedAt": "0",
+      "pendingOp": "0"
+    },
+    "shared": {
+      "consecutive": "0",
+      "nextAllowedAt": "0"
+    },
+    "restricted": 0,
+    "rotationReadyAt": "1794265972"
+  },
+  "sharedBudgetResetOnSuccess": true,
+  "trackResetOnSuccess": true,
+  "restrictionLiftedByOwnerPin": true,
+  "thiefCanGuessImmediatelyAfterOwnerPin": true,
+  "thiefRevert": ""
+}

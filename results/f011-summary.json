@@ -1,0 +1,319 @@
+{
+  "evidence": {
+    "mock": "[Mock]",
+    "sepolia": "[M] Sepolia"
+  },
+  "generatedAtUtc": "2026-11-09T22:30:29.808Z",
+  "mock": {
+    "setup": {
+      "A": {
+        "create": 295365,
+        "pin": 796471,
+        "assets": 2954854,
+        "known": 7087167,
+        "roles": 35176,
+        "arm": 65693,
+        "total": 11234726
+      },
+      "B": {
+        "create": 317555,
+        "pin": 796559,
+        "assets": 973828,
+        "known": 159014,
+        "roles": 35286,
+        "arm": 32337,
+        "total": 2314579
+      },
+      "listR": 3,
+      "listS": 1,
+      "perEntryB": 25235
+    },
+    "hotPath": {
+      "A_requestPlusFinalize_warm": 1516768,
+      "B_sync_warm": 61662,
+      "ratio": 24.6
+    }
+  },
+  "sepolia": {
+    "deploy": {
+      "contracts": {
+        "PinLib": "0x8C3D2Bd1418ebaEb0211413F838dCdb16FF306D8",
+        "PolicyLib": "0x176B297A9aFB88BB69D5A32489f22e937EA30f96",
+        "OpenLib": "0x0b76c95216825796f84496D5757C790829C2CDE5",
+        "OpsLib": "0x63FD874809Dca0dc0bD386Ef52A1B32afBFCd0af",
+        "EncryptedAccount": "0x97181fF14005aEA66f38175d791d10980300De70",
+        "EncryptedAccountB": "0x00C6b3Ffe57752BD9c42821A05ce52D23DE3CCe0",
+        "EncryptedAccountFactory": "0xd1A9660B0365D86096E4982e992b7258d0A57EdA",
+        "EncryptedAccountFactoryB": "0xe1738E23DCD165BC138FdD4714aC5839d6C09129"
+      },
+      "runtimeBytes": {
+        "PinLib": 8198,
+        "PolicyLib": 8922,
+        "OpenLib": 13009,
+        "OpsLib": 10667,
+        "EncryptedAccount": 22315,
+        "EncryptedAccountB": 23481,
+        "EncryptedAccountFactory": 1868,
+        "EncryptedAccountFactoryB": 1868
+      },
+      "totalGas": 141570189
+    },
+    "setup": {
+      "A": 17048629,
+      "B": 3259034,
+      "diff": {
+        "gasA": 17048629,
+        "gasB": 3259034,
+        "saved": 13789595,
+        "ratio": 5.23
+      },
+      "knownOpenOneEntry": 136692
+    },
+    "hot": {
+      "A": {
+        "nOk": 30,
+        "nNotOk": 0,
+        "totalMs": {
+          "n": 30,
+          "min": 15697,
+          "p50": 20090,
+          "p95": 26333,
+          "max": 31543,
+          "mean": 20774
+        },
+        "gasTotal": {
+          "n": 30,
+          "min": 1949433,
+          "p50": 1949477,
+          "p95": 1949493,
+          "max": 1949493,
+          "mean": 1949471
+        },
+        "histogramTotal": [
+          {
+            "fromS": 15,
+            "toS": 20,
+            "count": 14
+          },
+          {
+            "fromS": 20,
+            "toS": 25,
+            "count": 12
+          },
+          {
+            "fromS": 25,
+            "toS": 30,
+            "count": 3
+          },
+          {
+            "fromS": 30,
+            "toS": 35,
+            "count": 1
+          }
+        ],
+        "threshold60s": "p95 < 60 s",
+        "phases": {
+          "requestMs": {
+            "n": 30,
+            "min": 3785,
+            "p50": 7876,
+            "p95": 12628,
+            "max": 13804,
+            "mean": 8295
+          },
+          "decryptMs": {
+            "n": 30,
+            "min": 6405,
+            "p50": 7232,
+            "p95": 8815,
+            "max": 8901,
+            "mean": 7429
+          },
+          "finalizeMs": {
+            "n": 30,
+            "min": 2158,
+            "p50": 4692,
+            "p95": 8931,
+            "max": 15181,
+            "mean": 5051
+          }
+        },
+        "gas": {
+          "request": {
+            "n": 30,
+            "min": 1525831,
+            "p50": 1525835,
+            "p95": 1525835,
+            "max": 1525835,
+            "mean": 1525835
+          },
+          "finalizeEvaluation": {
+            "n": 30,
+            "min": 423598,
+            "p50": 423646,
+            "p95": 423658,
+            "max": 423658,
+            "mean": 423636
+          }
+        },
+        "hcu": {
+          "request": {
+            "n": 30,
+            "min": 774036,
+            "p50": 774036,
+            "p95": 774036,
+            "max": 774036,
+            "mean": 774036
+          }
+        },
+        "blocks": {
+          "requestBlocksToInclusion": {
+            "n": 30,
+            "min": 1,
+            "p50": 1,
+            "p95": 2,
+            "max": 2,
+            "mean": 1
+          },
+          "finalizeBlocksAfterRequest": {
+            "n": 30,
+            "min": 1,
+            "p50": 1,
+            "p95": 1,
+            "max": 2,
+            "mean": 1
+          }
+        },
+        "meterChecks": {
+          "equal": 56,
+          "unreadable": 4
+        }
+      },
+      "B": {
+        "nOk": 30,
+        "nNotOk": 0,
+        "totalMs": {
+          "n": 30,
+          "min": 1932,
+          "p50": 7220,
+          "p95": 14620,
+          "max": 24382,
+          "mean": 7981
+        },
+        "gasTotal": {
+          "n": 30,
+          "min": 59820,
+          "p50": 59820,
+          "p95": 59820,
+          "max": 59820,
+          "mean": 59820
+        },
+        "histogramTotal": [
+          {
+            "fromS": 0,
+            "toS": 5,
+            "count": 7
+          },
+          {
+            "fromS": 5,
+            "toS": 10,
+            "count": 15
+          },
+          {
+            "fromS": 10,
+            "toS": 15,
+            "count": 7
+          },
+          {
+            "fromS": 15,
+            "toS": 20,
+            "count": 0
+          },
+          {
+            "fromS": 20,
+            "toS": 25,
+            "count": 1
+          }
+        ],
+        "threshold60s": "p95 < 60 s",
+        "gas": {
+          "request": {
+            "n": 30,
+            "min": 59820,
+            "p50": 59820,
+            "p95": 59820,
+            "max": 59820,
+            "mean": 59820
+          }
+        },
+        "hcu": {
+          "request": {
+            "n": 30,
+            "min": 0,
+            "p50": 0,
+            "p95": 0,
+            "max": 0,
+            "mean": 0
+          },
+          "fheEvents": {
+            "n": 30,
+            "min": 0,
+            "p50": 0,
+            "p95": 0,
+            "max": 0,
+            "mean": 0
+          }
+        },
+        "blocks": {
+          "requestBlocksToInclusion": {
+            "n": 30,
+            "min": 1,
+            "p50": 1,
+            "p95": 2,
+            "max": 2,
+            "mean": 1
+          }
+        },
+        "meterChecks": {
+          "equal": 26,
+          "unreadable": 4
+        }
+      },
+      "failures": [],
+      "n": 30
+    },
+    "warmup": {
+      "A": 2159841,
+      "B": 172248
+    }
+  },
+  "baselineF09Hot": {
+    "totalMs": {
+      "n": 30,
+      "min": 13832,
+      "p50": 19862,
+      "p95": 40855,
+      "max": 46378,
+      "mean": 23078
+    },
+    "gas": {
+      "request": {
+        "n": 30,
+        "min": 1524301,
+        "p50": 1524305,
+        "p95": 1524305,
+        "max": 1636733,
+        "mean": 1528052
+      },
+      "finalizeEvaluation": {
+        "n": 30,
+        "min": 422767,
+        "p50": 422803,
+        "p95": 422827,
+        "max": 704335,
+        "mean": 432185
+      }
+    }
+  },
+  "spentEthSamples": 0.003013937220201637
+}

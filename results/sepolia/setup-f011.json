@@ -1,0 +1,474 @@
+{
+  "evidence": "[M] Sepolia",
+  "generatedAtUtc": "2026-11-09T18:04:23.433Z",
+  "run": "f011",
+  "contracts": {
+    "PinLib": "0x8C3D2Bd1418ebaEb0211413F838dCdb16FF306D8",
+    "PolicyLib": "0x176B297A9aFB88BB69D5A32489f22e937EA30f96",
+    "OpenLib": "0x0b76c95216825796f84496D5757C790829C2CDE5",
+    "OpsLib": "0x63FD874809Dca0dc0bD386Ef52A1B32afBFCd0af",
+    "EncryptedAccount": "0x97181fF14005aEA66f38175d791d10980300De70",
+    "EncryptedAccountB": "0x00C6b3Ffe57752BD9c42821A05ce52D23DE3CCe0",
+    "EncryptedAccountFactory": "0xd1A9660B0365D86096E4982e992b7258d0A57EdA",
+    "EncryptedAccountFactoryB": "0xe1738E23DCD165BC138FdD4714aC5839d6C09129"
+  },
+  "runtimeBytes": {
+    "PinLib": 8198,
+    "PolicyLib": 8922,
+    "OpenLib": 13009,
+    "OpsLib": 10667,
+    "EncryptedAccount": 22315,
+    "EncryptedAccountB": 23481,
+    "EncryptedAccountFactory": 1868,
+    "EncryptedAccountFactoryB": 1868
+  },
+  "deploys": {
+    "PinLib": {
+      "label": "deploy PinLib",
+      "hash": "0x097e384535dc60ee4ae874cdcac4c3f7151b59b8804eb22348af83c159b3890f",
+      "nonce": 199,
+      "blockNumber": 12099154,
+      "blockTimestamp": 1794247128,
+      "sentAtUtc": "2026-11-09T17:58:35.566Z",
+      "minedSeenAtUtc": "2026-11-09T17:58:47.630Z",
+      "inclusionMs": 11969,
+      "gasUsed": "12885004",
+      "effectiveGasPriceWei": "50000019",
+      "costWei": "644250444815076",
+      "replacements": 0
+    },
+    "PolicyLib": {
+      "label": "deploy PolicyLib",
+      "hash": "0x792fc47a8a1740f26aead8e3bc3db9b48af365bea8d31500ce04825dbddf2c7f",
+      "nonce": 200,
+      "blockNumber": 12099155,
+      "blockTimestamp": 1794247140,
+      "sentAtUtc": "2026-11-09T17:58:47.634Z",
+      "minedSeenAtUtc": "2026-11-09T17:58:59.658Z",
+      "inclusionMs": 11920,
+      "gasUsed": "14004543",
+      "effectiveGasPriceWei": "50000019",
+      "costWei": "700227416086317",
+      "replacements": 0
+    },
+    "OpenLib": {
+      "label": "deploy OpenLib",
+      "hash": "0xe32a427bcca1591abb5289f6d3b2127f4f3138f5ee6ff3027a6f252f587813fd",
+      "nonce": 201,
+      "blockNumber": 12099156,
+      "blockTimestamp": 1794247152,
+      "sentAtUtc": "2026-11-09T17:58:59.661Z",
+      "minedSeenAtUtc": "2026-11-09T17:59:10.622Z",
+      "inclusionMs": 10857,
+      "gasUsed": "20325022",
+      "effectiveGasPriceWei": "50000019",
+      "costWei": "1016251486175418",
+      "replacements": 0
+    },
+    "OpsLib": {
+      "label": "deploy OpsLib",
+      "hash": "0xe361d14b2bc079df72b6ce269efec2135e5317fc97f991eb791810c57d93c9d3",
+      "nonce": 202,
+      "blockNumber": 12099157,
+      "blockTimestamp": 1794247164,
+      "sentAtUtc": "2026-11-09T17:59:10.625Z",
+      "minedSeenAtUtc": "2026-11-09T17:59:22.715Z",
+      "inclusionMs": 11980,
+      "gasUsed": "16702922",
+      "effectiveGasPriceWei": "50000020",
+      "costWei": "835146434058440",
+      "replacements": 0
+    },
+    "EncryptedAccount": {
+      "label": "deploy EncryptedAccount",
+      "hash": "0xd210ecfef3bf088a02fe1be2c3f38cb7c47d4ac6a4dcd4496bd626c7391af194",
+      "nonce": 203,
+      "blockNumber": 12099158,
+      "blockTimestamp": 1794247176,
+      "sentAtUtc": "2026-11-09T17:59:22.726Z",
+      "minedSeenAtUtc": "2026-11-09T17:59:36.070Z",
+      "inclusionMs": 13224,
+      "gasUsed": "34826922",
+      "effectiveGasPriceWei": "50000020",
+      "costWei": "1741346796538440",
+      "replacements": 0
+    },
+    "EncryptedAccountB": {
+      "label": "deploy EncryptedAccountB",
+      "hash": "0x9a99f42dd69b971901c3409ff215b31856e1761ec3c81662d94626cc2df06185",
+      "nonce": 204,
+      "blockNumber": 12099159,
+      "blockTimestamp": 1794247188,
+      "sentAtUtc": "2026-11-09T17:59:36.077Z",
+      "minedSeenAtUtc": "2026-11-09T17:59:48.142Z",
+      "inclusionMs": 11941,
+      "gasUsed": "36630948",
+      "effectiveGasPriceWei": "50000020",
+      "costWei": "1831548132618960",
+      "replacements": 0
+    },
+    "EncryptedAccountFactory": {
+      "label": "deploy EncryptedAccountFactory",
+      "hash": "0x386d363cd4bed6b77e53656b2902ba58abfabbd51a17f3a7643a8d7a89b4edeb",
+      "nonce": 205,
+      "blockNumber": 12099160,
+      "blockTimestamp": 1794247200,
+      "sentAtUtc": "2026-11-09T17:59:48.144Z",
+      "minedSeenAtUtc": "2026-11-09T17:59:59.163Z",
+      "inclusionMs": 10891,
+      "gasUsed": "3097414",
+      "effectiveGasPriceWei": "50000020",
+      "costWei": "154870761948280",
+      "replacements": 0
+    },
+    "EncryptedAccountFactoryB": {
+      "label": "deploy EncryptedAccountFactory",
+      "hash": "0x35ca86e5344675941d1869d2bafda6592104ad23d8b0d349d6a5b503b876d5d9",
+      "nonce": 206,
+      "blockNumber": 12099161,
+      "blockTimestamp": 1794247212,
+      "sentAtUtc": "2026-11-09T17:59:59.165Z",
+      "minedSeenAtUtc": "2026-11-09T18:00:11.450Z",
+      "inclusionMs": 12161,
+      "gasUsed": "3097414",
+      "effectiveGasPriceWei": "50000020",
+      "costWei": "154870761948280",
+      "replacements": 0
+    }
+  },
+  "testDelays": {
+    "pinTransfer": 0,
+    "bigTransfer": 60,
+    "genericCall": 60,
+    "settings": 60,
+    "loosen": 60,
+    "knownAdd": 60,
+    "recovery": 120,
+    "recoveryNoDevice": 300,
+    "pinReset": 300,
+    "escape": 300,
+    "escapeChange": 300
+  },
+  "knownRecipient": "0xcaC004eC1B4ca48EB568c4E903F05ADaA19eF083",
+  "amountWei": "1000000000000",
+  "openLimitWei": "100000000000000000",
+  "accounts": {
+    "a": {
+      "variant": "A",
+      "address": "0xF681AE76D3c1c5A9137f9b3DF1bC0fcBEC3aECB3",
+      "escape": "0xaD55E9A05DD8aD8Bdd671D1361eDB1d6aC92aD13",
+      "guardian": "0x8e98d5e45822b81Ac7dB853480c405E8Ea769B7A",
+      "rows": [
+        {
+          "step": "createAccount",
+          "gas": 1306836,
+          "hcu": 0,
+          "meterCheck": "unreadable",
+          "tx": "0x6a37ac1346226693878ec049f35609a24bd293294ac20e8d711210aa962779a5",
+          "block": 12099162
+        },
+        {
+          "step": "setupPin",
+          "gas": 842263,
+          "hcu": 79000,
+          "meterCheck": "equal",
+          "tx": "0x94a89e6594bf25cadaeb0b86d29c95d12b600f3ac2635cd3ff248b43b083ac97",
+          "block": 12099163
+        },
+        {
+          "step": "setupAsset",
+          "gas": 1959205,
+          "hcu": 1345064,
+          "meterCheck": "equal",
+          "tx": "0x307b704641a9d0d1b29d0d7e755f4db5608430059c4e56415101e4e3ed772cc4",
+          "block": 12099164
+        },
+        {
+          "step": "setupKnownR0",
+          "gas": 3787401,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0x81833ce15d5fb6bdefdbc686a82817da4f32bf31f5129e4e3d6f81fa0c5fc849",
+          "block": 12099165
+        },
+        {
+          "step": "setupKnownR12",
+          "gas": 3787437,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0x9da69197a0589a4a5c66b7a3ab39157f1650e777ef5bb62080d8673460386a90",
+          "block": 12099166
+        },
+        {
+          "step": "setupKnownR24",
+          "gas": 2033513,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0x1c599a1939b0d407df7794dcac241343fde10563335387e5cf4555d62f60569a",
+          "block": 12099167
+        },
+        {
+          "step": "setupKnownS0",
+          "gas": 3235105,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0x47cbf9ea93b5f66d92aa5d554a778640d097d4be3963b3fe5f8d3cf703ecbee4",
+          "block": 12099168
+        },
+        {
+          "step": "setupRoles",
+          "gas": 29576,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0xeef3ef78aed963a6de6a8ab553742daa9360f02f2340efb102548963e92a037f",
+          "block": 12099169
+        },
+        {
+          "step": "arm",
+          "gas": 67293,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0xe536923b27d8e4e9882f74bf824c7ea0f6c62755020c608210c6d76cf550f964",
+          "block": 12099170
+        },
+        {
+          "step": "fund",
+          "gas": 24119,
+          "hcu": 0,
+          "meterCheck": "unreadable",
+          "tx": "0xbcd88d94a7a5e5299d5fa0b4125301eb316df311800fce467ed9c9005f5cce7a",
+          "block": 12099171
+        }
+      ],
+      "totalGas": 17048629,
+      "totalHcu": 1424064
+    },
+    "b": {
+      "variant": "B",
+      "address": "0x21f09Ba39694Dd7A1c242631234F689127381b89",
+      "escape": "0xc97822b806B81BEEc566938127E9Cae75bF421d4",
+      "guardian": "0x8e98d5e45822b81Ac7dB853480c405E8Ea769B7A",
+      "rows": [
+        {
+          "step": "createAccount",
+          "gas": 1417034,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0xa54554bd420c64f22782f9c6f06804b0fb7be4877c1195023dd992cccfcfb5da",
+          "block": 12099172
+        },
+        {
+          "step": "setupPin",
+          "gas": 842315,
+          "hcu": 79000,
+          "meterCheck": "equal",
+          "tx": "0xa20108957f4eb9cce115c5bb3a353e99ea0a4f90942fc5ed5cded1fe71e7bd9d",
+          "block": 12099173
+        },
+        {
+          "step": "setupAssetOpen",
+          "gas": 799370,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0x146495983aff7a4bc606cff1ff34ac0c4b9c2ffebb338d2c9d03518d802a697f",
+          "block": 12099174
+        },
+        {
+          "step": "setupKnownOpen",
+          "gas": 136692,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0xb7addfa65f0e0951d4db8e3f08d496e6c94e4b8a25519e6f8b75d7d271d64afe",
+          "block": 12099175
+        },
+        {
+          "step": "setupRoles",
+          "gas": 29686,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0x49d8e33557c410b2aa28b8b4e7a4553c102716842b01c3d59d8c1eb647891136",
+          "block": 12099176
+        },
+        {
+          "step": "arm",
+          "gas": 33937,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0x73c5cb71898d878f4ca98dd8ebe22069e768ff2ffc8808470eaed84310ec8dbe",
+          "block": 12099177
+        },
+        {
+          "step": "fund",
+          "gas": 24119,
+          "hcu": 0,
+          "meterCheck": "equal",
+          "tx": "0xf557365ff607cf0779091d9203ff2f1e79bc31be2c02af129f2aebe192bd2302",
+          "block": 12099178
+        }
+      ],
+      "totalGas": 3259034,
+      "totalHcu": 79000
+    }
+  },
+  "setupDiff": {
+    "gasA": 17048629,
+    "gasB": 3259034,
+    "saved": 13789595,
+    "ratio": 5.23
+  },
+  "warmup": {
+    "recipient": {
+      "label": "create the known recipient (1 wei)",
+      "hash": "0x8f8e40953e54c5791c74521e1bd5fc82a18360aa082a72738c8168f25d5a25dc",
+      "nonce": 224,
+      "blockNumber": 12099179,
+      "blockTimestamp": 1794247428,
+      "sentAtUtc": "2026-11-09T18:03:35.017Z",
+      "minedSeenAtUtc": "2026-11-09T18:03:46.262Z",
+      "inclusionMs": 11126,
+      "gasUsed": "204600",
+      "effectiveGasPriceWei": "50000020",
+      "costWei": "10230004092000",
+      "replacements": 0,
+      "sentBlock": 12099178,
+      "blocksToInclusion": 1,
+      "wallMs": 11486,
+      "status": 1,
+      "estimateRetries": 0
+    },
+    "b": {
+      "i": -1,
+      "variant": "B",
+      "startedAtUtc": "2026-11-09T18:03:46.263Z",
+      "totalMs": 12525,
+      "ok": true,
+      "executed": true,
+      "spentAfter": "1000000000000",
+      "fheEvents": 0,
+      "tx": {
+        "request": {
+          "label": "B#-1 requestTransfer (open path)",
+          "hash": "0xfc0cc2e26b0f09fd5e6de9c70cb37827d6bf0a69d11b0aadf6858dd50706b518",
+          "nonce": 225,
+          "blockNumber": 12099180,
+          "blockTimestamp": 1794247440,
+          "sentAtUtc": "2026-11-09T18:03:46.470Z",
+          "minedSeenAtUtc": "2026-11-09T18:03:58.787Z",
+          "inclusionMs": 12200,
+          "gasUsed": "172248",
+          "effectiveGasPriceWei": "50000020",
+          "costWei": "8612403444960",
+          "replacements": 0,
+          "sentBlock": 12099179,
+          "blocksToInclusion": 1,
+          "wallMs": 12525,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": null,
+            "blockComputed": null,
+            "meterCheck": "unreadable"
+          }
+        }
+      },
+      "hcu": 0,
+      "blocks": {
+        "request": 12099180,
+        "blocksToInclusion": 1
+      },
+      "gasTotal": 172248
+    },
+    "a": {
+      "i": -1,
+      "variant": "A",
+      "startedAtUtc": "2026-11-09T18:03:59.006Z",
+      "opId": "1",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 12021,
+        "decryptMs": 7550,
+        "finalizeMs": 4290
+      },
+      "totalMs": 23861,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 7549,
+        "httpCalls": 4,
+        "readyBlock": 12099181
+      },
+      "blocks": {
+        "request": 12099181,
+        "finalize": 12099182,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "A#-1 requestTransfer (K-only)",
+          "hash": "0xece20a1290da874950fde789f268d0fe6d75c1682b9d7ccb3308d604e5df2c88",
+          "nonce": 226,
+          "blockNumber": 12099181,
+          "blockTimestamp": 1794247452,
+          "sentAtUtc": "2026-11-09T18:03:59.201Z",
+          "minedSeenAtUtc": "2026-11-09T18:04:11.026Z",
+          "inclusionMs": 11718,
+          "gasUsed": "1638263",
+          "effectiveGasPriceWei": "50000020",
+          "costWei": "81913182765260",
+          "replacements": 0,
+          "sentBlock": 12099180,
+          "blocksToInclusion": 1,
+          "wallMs": 12021,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "A#-1 finalizeEvaluation (watchtower)",
+          "hash": "0x3b2b0bf97b2e547bde25bd7e22137741f3a0a9682dafdebfbe96155b12caeed6",
+          "nonce": 115,
+          "blockNumber": 12099182,
+          "blockTimestamp": 1794247464,
+          "sentAtUtc": "2026-11-09T18:04:18.698Z",
+          "minedSeenAtUtc": "2026-11-09T18:04:22.866Z",
+          "inclusionMs": 4015,
+          "gasUsed": "521578",
+          "effectiveGasPriceWei": "50000020",
+          "costWei": "26078910431560",
+          "replacements": 0,
+          "sentBlock": 12099181,
+          "blocksToInclusion": 1,
+          "wallMs": 4290,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": null,
+            "blockComputed": null,
+            "meterCheck": "unreadable"
+          }
+        }
+      },
+      "gasTotal": 2159841
+    }
+  }
+}

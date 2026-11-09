@@ -1,0 +1,1794 @@
+{
+  "evidence": "[I] model (event-driven simulation); success curve interpolated from v0.3 §13.8",
+  "generatedAtUtc": "2026-11-08T22:02:44.990Z",
+  "tables": [
+    {
+      "name": "T0",
+      "desc": "v0.3 table: 1–2 → 0; 3 → 15 min; 4–5 → 1 h; 6–9 → 6 h; 10+ → 24 h"
+    },
+    {
+      "name": "T1",
+      "desc": "strict: 1–2 → 0; 3 → 1 h; 4 → 6 h; 5+ → 24 h"
+    },
+    {
+      "name": "T2",
+      "desc": "exponential: 1–2 → 0; n ≥ 3 → 15 min · 4^(n−3), cap 7 days"
+    }
+  ],
+  "assumptions": [
+    "The attacker guesses at every allowed moment; all guesses are wrong (the success probability comes separately from the curve).",
+    "The owner and the attacker share the same K-track and back-off (Round 1 code); the owner's correct PIN can only be entered once the back-off has expired.",
+    "rotate: the key change executes after 24 h; window = until 24 h after the owner's PIN (if the attacker finds the PIN, it cancels with K+P).",
+    "escape (no K44): the escape executes after 30 days; if the attacker finds the PIN within that time, it can cancel the escape with K+P.",
+    "unrestrict: r after each restriction the owner lifts it with the PIN.",
+    "K43 score decay: −1 every 7 days. Below 10 guesses the success probability is linear from 0 (the real curve is concave; higher for the first guesses)."
+  ],
+  "rows": [
+    {
+      "variant": "v03/T0",
+      "semantics": "v03",
+      "table": "T0",
+      "k44": false,
+      "k45": false,
+      "scenario": "none",
+      "react": "-",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 15,
+        "pSuccess": 7.4,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 38,
+        "pSuccess": 9.8,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "v03/T0",
+      "semantics": "v03",
+      "table": "T0",
+      "k44": false,
+      "k45": false,
+      "scenario": "rotate",
+      "react": "15 min",
+      "24h": {
+        "guesses": 12,
+        "pSuccess": 6.9,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "7d": {
+        "guesses": 12,
+        "pSuccess": 6.9,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "30d": {
+        "guesses": 12,
+        "pSuccess": 6.9,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      }
+    },
+    {
+      "variant": "v03/T0",
+      "semantics": "v03",
+      "table": "T0",
+      "k44": false,
+      "k45": false,
+      "scenario": "rotate",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 13,
+        "pSuccess": 7.1,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "7d": {
+        "guesses": 13,
+        "pSuccess": 7.1,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "30d": {
+        "guesses": 13,
+        "pSuccess": 7.1,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      }
+    },
+    {
+      "variant": "v03/T0",
+      "semantics": "v03",
+      "table": "T0",
+      "k44": false,
+      "k45": false,
+      "scenario": "rotate",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 14,
+        "pSuccess": 7.2,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "7d": {
+        "guesses": 15,
+        "pSuccess": 7.4,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "30d": {
+        "guesses": 15,
+        "pSuccess": 7.4,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      }
+    },
+    {
+      "variant": "v03/T0",
+      "semantics": "v03",
+      "table": "T0",
+      "k44": false,
+      "k45": false,
+      "scenario": "escape",
+      "react": "15 min",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 15,
+        "pSuccess": 7.4,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 38,
+        "pSuccess": 9.8,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "v03/T0",
+      "semantics": "v03",
+      "table": "T0",
+      "k44": false,
+      "k45": false,
+      "scenario": "escape",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 15,
+        "pSuccess": 7.4,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 38,
+        "pSuccess": 9.8,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "v03/T0",
+      "semantics": "v03",
+      "table": "T0",
+      "k44": false,
+      "k45": false,
+      "scenario": "escape",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 15,
+        "pSuccess": 7.4,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 38,
+        "pSuccess": 9.8,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "v03/T0",
+      "semantics": "v03",
+      "table": "T0",
+      "k44": false,
+      "k45": false,
+      "scenario": "unrestrict",
+      "react": "15 min",
+      "24h": {
+        "guesses": 291,
+        "pSuccess": 17.2,
+        "stopReason": null,
+        "ownerPinEntries": 96
+      },
+      "7d": {
+        "guesses": 2019,
+        "pSuccess": 24.3,
+        "stopReason": null,
+        "ownerPinEntries": 672
+      },
+      "30d": {
+        "guesses": 8643,
+        "pSuccess": 29.6,
+        "stopReason": null,
+        "ownerPinEntries": 2880
+      }
+    },
+    {
+      "variant": "v03/T0",
+      "semantics": "v03",
+      "table": "T0",
+      "k44": false,
+      "k45": false,
+      "scenario": "unrestrict",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 80,
+        "pSuccess": 12.5,
+        "stopReason": null,
+        "ownerPinEntries": 19
+      },
+      "7d": {
+        "guesses": 540,
+        "pSuccess": 19.5,
+        "stopReason": null,
+        "ownerPinEntries": 134
+      },
+      "30d": {
+        "guesses": 2307,
+        "pSuccess": 24.8,
+        "stopReason": null,
+        "ownerPinEntries": 576
+      }
+    },
+    {
+      "variant": "v03/T0",
+      "semantics": "v03",
+      "table": "T0",
+      "k44": false,
+      "k45": false,
+      "scenario": "unrestrict",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 18,
+        "pSuccess": 7.8,
+        "stopReason": null,
+        "ownerPinEntries": 2
+      },
+      "7d": {
+        "guesses": 126,
+        "pSuccess": 14.1,
+        "stopReason": null,
+        "ownerPinEntries": 20
+      },
+      "30d": {
+        "guesses": 528,
+        "pSuccess": 19.4,
+        "stopReason": null,
+        "ownerPinEntries": 87
+      }
+    },
+    {
+      "variant": "K43/T0",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": false,
+      "k45": false,
+      "scenario": "none",
+      "react": "-",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 15,
+        "pSuccess": 7.4,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 38,
+        "pSuccess": 9.8,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "K43/T0",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": false,
+      "k45": false,
+      "scenario": "rotate",
+      "react": "15 min",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "7d": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "30d": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      }
+    },
+    {
+      "variant": "K43/T0",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": false,
+      "k45": false,
+      "scenario": "rotate",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "7d": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "30d": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      }
+    },
+    {
+      "variant": "K43/T0",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": false,
+      "k45": false,
+      "scenario": "rotate",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "7d": {
+        "guesses": 10,
+        "pSuccess": 6.5,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "30d": {
+        "guesses": 10,
+        "pSuccess": 6.5,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      }
+    },
+    {
+      "variant": "K43/T0",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": false,
+      "k45": false,
+      "scenario": "escape",
+      "react": "15 min",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 15,
+        "pSuccess": 7.4,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 38,
+        "pSuccess": 9.8,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "K43/T0",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": false,
+      "k45": false,
+      "scenario": "escape",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 15,
+        "pSuccess": 7.4,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 38,
+        "pSuccess": 9.8,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "K43/T0",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": false,
+      "k45": false,
+      "scenario": "escape",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 15,
+        "pSuccess": 7.4,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 38,
+        "pSuccess": 9.8,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "K43/T0",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": false,
+      "k45": false,
+      "scenario": "unrestrict",
+      "react": "15 min",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 6
+      },
+      "7d": {
+        "guesses": 15,
+        "pSuccess": 7.4,
+        "stopReason": null,
+        "ownerPinEntries": 12
+      },
+      "30d": {
+        "guesses": 38,
+        "pSuccess": 9.8,
+        "stopReason": null,
+        "ownerPinEntries": 35
+      }
+    },
+    {
+      "variant": "K43/T0",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": false,
+      "k45": false,
+      "scenario": "unrestrict",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 5
+      },
+      "7d": {
+        "guesses": 15,
+        "pSuccess": 7.4,
+        "stopReason": null,
+        "ownerPinEntries": 11
+      },
+      "30d": {
+        "guesses": 38,
+        "pSuccess": 9.8,
+        "stopReason": null,
+        "ownerPinEntries": 34
+      }
+    },
+    {
+      "variant": "K43/T0",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": false,
+      "k45": false,
+      "scenario": "unrestrict",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 2
+      },
+      "7d": {
+        "guesses": 15,
+        "pSuccess": 7.4,
+        "stopReason": null,
+        "ownerPinEntries": 7
+      },
+      "30d": {
+        "guesses": 38,
+        "pSuccess": 9.8,
+        "stopReason": null,
+        "ownerPinEntries": 30
+      }
+    },
+    {
+      "variant": "K43/T0+K44",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": true,
+      "k45": false,
+      "scenario": "none",
+      "react": "-",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 15,
+        "pSuccess": 7.4,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 38,
+        "pSuccess": 9.8,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "K43/T0+K44",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": true,
+      "k45": false,
+      "scenario": "rotate",
+      "react": "15 min",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "7d": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "30d": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      }
+    },
+    {
+      "variant": "K43/T0+K44",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": true,
+      "k45": false,
+      "scenario": "rotate",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "7d": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "30d": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      }
+    },
+    {
+      "variant": "K43/T0+K44",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": true,
+      "k45": false,
+      "scenario": "rotate",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "7d": {
+        "guesses": 10,
+        "pSuccess": 6.5,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "30d": {
+        "guesses": 10,
+        "pSuccess": 6.5,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      }
+    },
+    {
+      "variant": "K43/T0+K44",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": true,
+      "k45": false,
+      "scenario": "escape",
+      "react": "15 min",
+      "24h": {
+        "guesses": 3,
+        "pSuccess": 2,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 3,
+        "pSuccess": 2,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 3,
+        "pSuccess": 2,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "K43/T0+K44",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": true,
+      "k45": false,
+      "scenario": "escape",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 4,
+        "pSuccess": 2.6,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 4,
+        "pSuccess": 2.6,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 4,
+        "pSuccess": 2.6,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "K43/T0+K44",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": true,
+      "k45": false,
+      "scenario": "escape",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 6,
+        "pSuccess": 3.9,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 6,
+        "pSuccess": 3.9,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 6,
+        "pSuccess": 3.9,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "K43/T0+K44",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": true,
+      "k45": false,
+      "scenario": "unrestrict",
+      "react": "15 min",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 6
+      },
+      "7d": {
+        "guesses": 15,
+        "pSuccess": 7.4,
+        "stopReason": null,
+        "ownerPinEntries": 12
+      },
+      "30d": {
+        "guesses": 38,
+        "pSuccess": 9.8,
+        "stopReason": null,
+        "ownerPinEntries": 35
+      }
+    },
+    {
+      "variant": "K43/T0+K44",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": true,
+      "k45": false,
+      "scenario": "unrestrict",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 5
+      },
+      "7d": {
+        "guesses": 15,
+        "pSuccess": 7.4,
+        "stopReason": null,
+        "ownerPinEntries": 11
+      },
+      "30d": {
+        "guesses": 38,
+        "pSuccess": 9.8,
+        "stopReason": null,
+        "ownerPinEntries": 34
+      }
+    },
+    {
+      "variant": "K43/T0+K44",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": true,
+      "k45": false,
+      "scenario": "unrestrict",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 2
+      },
+      "7d": {
+        "guesses": 15,
+        "pSuccess": 7.4,
+        "stopReason": null,
+        "ownerPinEntries": 7
+      },
+      "30d": {
+        "guesses": 38,
+        "pSuccess": 9.8,
+        "stopReason": null,
+        "ownerPinEntries": 30
+      }
+    },
+    {
+      "variant": "K43/T0+K44+K45",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": true,
+      "k45": true,
+      "scenario": "none",
+      "react": "-",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 15,
+        "pSuccess": 7.4,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 38,
+        "pSuccess": 9.8,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "K43/T0+K44+K45",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": true,
+      "k45": true,
+      "scenario": "rotate",
+      "react": "15 min",
+      "24h": {
+        "guesses": 3,
+        "pSuccess": 2,
+        "stopReason": "K45 rotation lock",
+        "ownerPinEntries": 1
+      },
+      "7d": {
+        "guesses": 3,
+        "pSuccess": 2,
+        "stopReason": "K45 rotation lock",
+        "ownerPinEntries": 1
+      },
+      "30d": {
+        "guesses": 3,
+        "pSuccess": 2,
+        "stopReason": "K45 rotation lock",
+        "ownerPinEntries": 1
+      }
+    },
+    {
+      "variant": "K43/T0+K44+K45",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": true,
+      "k45": true,
+      "scenario": "rotate",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 4,
+        "pSuccess": 2.6,
+        "stopReason": "K45 rotation lock",
+        "ownerPinEntries": 1
+      },
+      "7d": {
+        "guesses": 4,
+        "pSuccess": 2.6,
+        "stopReason": "K45 rotation lock",
+        "ownerPinEntries": 1
+      },
+      "30d": {
+        "guesses": 4,
+        "pSuccess": 2.6,
+        "stopReason": "K45 rotation lock",
+        "ownerPinEntries": 1
+      }
+    },
+    {
+      "variant": "K43/T0+K44+K45",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": true,
+      "k45": true,
+      "scenario": "rotate",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 6,
+        "pSuccess": 3.9,
+        "stopReason": "K45 rotation lock",
+        "ownerPinEntries": 1
+      },
+      "7d": {
+        "guesses": 6,
+        "pSuccess": 3.9,
+        "stopReason": "K45 rotation lock",
+        "ownerPinEntries": 1
+      },
+      "30d": {
+        "guesses": 6,
+        "pSuccess": 3.9,
+        "stopReason": "K45 rotation lock",
+        "ownerPinEntries": 1
+      }
+    },
+    {
+      "variant": "K43/T0+K44+K45",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": true,
+      "k45": true,
+      "scenario": "escape",
+      "react": "15 min",
+      "24h": {
+        "guesses": 3,
+        "pSuccess": 2,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 3,
+        "pSuccess": 2,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 3,
+        "pSuccess": 2,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "K43/T0+K44+K45",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": true,
+      "k45": true,
+      "scenario": "escape",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 4,
+        "pSuccess": 2.6,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 4,
+        "pSuccess": 2.6,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 4,
+        "pSuccess": 2.6,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "K43/T0+K44+K45",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": true,
+      "k45": true,
+      "scenario": "escape",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 6,
+        "pSuccess": 3.9,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 6,
+        "pSuccess": 3.9,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 6,
+        "pSuccess": 3.9,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "K43/T0+K44+K45",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": true,
+      "k45": true,
+      "scenario": "unrestrict",
+      "react": "15 min",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 6
+      },
+      "7d": {
+        "guesses": 15,
+        "pSuccess": 7.4,
+        "stopReason": null,
+        "ownerPinEntries": 12
+      },
+      "30d": {
+        "guesses": 38,
+        "pSuccess": 9.8,
+        "stopReason": null,
+        "ownerPinEntries": 35
+      }
+    },
+    {
+      "variant": "K43/T0+K44+K45",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": true,
+      "k45": true,
+      "scenario": "unrestrict",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 5
+      },
+      "7d": {
+        "guesses": 15,
+        "pSuccess": 7.4,
+        "stopReason": null,
+        "ownerPinEntries": 11
+      },
+      "30d": {
+        "guesses": 38,
+        "pSuccess": 9.8,
+        "stopReason": null,
+        "ownerPinEntries": 34
+      }
+    },
+    {
+      "variant": "K43/T0+K44+K45",
+      "semantics": "K43",
+      "table": "T0",
+      "k44": true,
+      "k45": true,
+      "scenario": "unrestrict",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 9,
+        "pSuccess": 5.9,
+        "stopReason": null,
+        "ownerPinEntries": 2
+      },
+      "7d": {
+        "guesses": 15,
+        "pSuccess": 7.4,
+        "stopReason": null,
+        "ownerPinEntries": 7
+      },
+      "30d": {
+        "guesses": 38,
+        "pSuccess": 9.8,
+        "stopReason": null,
+        "ownerPinEntries": 30
+      }
+    },
+    {
+      "variant": "K43/T1+K44",
+      "semantics": "K43",
+      "table": "T1",
+      "k44": true,
+      "k45": false,
+      "scenario": "none",
+      "react": "-",
+      "24h": {
+        "guesses": 5,
+        "pSuccess": 3.3,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 11,
+        "pSuccess": 6.7,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 34,
+        "pSuccess": 9.4,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "K43/T1+K44",
+      "semantics": "K43",
+      "table": "T1",
+      "k44": true,
+      "k45": false,
+      "scenario": "rotate",
+      "react": "15 min",
+      "24h": {
+        "guesses": 5,
+        "pSuccess": 3.3,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "7d": {
+        "guesses": 5,
+        "pSuccess": 3.3,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "30d": {
+        "guesses": 5,
+        "pSuccess": 3.3,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      }
+    },
+    {
+      "variant": "K43/T1+K44",
+      "semantics": "K43",
+      "table": "T1",
+      "k44": true,
+      "k45": false,
+      "scenario": "rotate",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 5,
+        "pSuccess": 3.3,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "7d": {
+        "guesses": 5,
+        "pSuccess": 3.3,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "30d": {
+        "guesses": 5,
+        "pSuccess": 3.3,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      }
+    },
+    {
+      "variant": "K43/T1+K44",
+      "semantics": "K43",
+      "table": "T1",
+      "k44": true,
+      "k45": false,
+      "scenario": "rotate",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 5,
+        "pSuccess": 3.3,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 7,
+        "pSuccess": 4.6,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "30d": {
+        "guesses": 7,
+        "pSuccess": 4.6,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      }
+    },
+    {
+      "variant": "K43/T1+K44",
+      "semantics": "K43",
+      "table": "T1",
+      "k44": true,
+      "k45": false,
+      "scenario": "escape",
+      "react": "15 min",
+      "24h": {
+        "guesses": 3,
+        "pSuccess": 2,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 3,
+        "pSuccess": 2,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 3,
+        "pSuccess": 2,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "K43/T1+K44",
+      "semantics": "K43",
+      "table": "T1",
+      "k44": true,
+      "k45": false,
+      "scenario": "escape",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 3,
+        "pSuccess": 2,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 3,
+        "pSuccess": 2,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 3,
+        "pSuccess": 2,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "K43/T1+K44",
+      "semantics": "K43",
+      "table": "T1",
+      "k44": true,
+      "k45": false,
+      "scenario": "escape",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 5,
+        "pSuccess": 3.3,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 5,
+        "pSuccess": 3.3,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 5,
+        "pSuccess": 3.3,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "K43/T1+K44",
+      "semantics": "K43",
+      "table": "T1",
+      "k44": true,
+      "k45": false,
+      "scenario": "unrestrict",
+      "react": "15 min",
+      "24h": {
+        "guesses": 5,
+        "pSuccess": 3.3,
+        "stopReason": null,
+        "ownerPinEntries": 2
+      },
+      "7d": {
+        "guesses": 11,
+        "pSuccess": 6.7,
+        "stopReason": null,
+        "ownerPinEntries": 8
+      },
+      "30d": {
+        "guesses": 34,
+        "pSuccess": 9.4,
+        "stopReason": null,
+        "ownerPinEntries": 31
+      }
+    },
+    {
+      "variant": "K43/T1+K44",
+      "semantics": "K43",
+      "table": "T1",
+      "k44": true,
+      "k45": false,
+      "scenario": "unrestrict",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 5,
+        "pSuccess": 3.3,
+        "stopReason": null,
+        "ownerPinEntries": 2
+      },
+      "7d": {
+        "guesses": 11,
+        "pSuccess": 6.7,
+        "stopReason": null,
+        "ownerPinEntries": 8
+      },
+      "30d": {
+        "guesses": 34,
+        "pSuccess": 9.4,
+        "stopReason": null,
+        "ownerPinEntries": 31
+      }
+    },
+    {
+      "variant": "K43/T1+K44",
+      "semantics": "K43",
+      "table": "T1",
+      "k44": true,
+      "k45": false,
+      "scenario": "unrestrict",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 5,
+        "pSuccess": 3.3,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 11,
+        "pSuccess": 6.7,
+        "stopReason": null,
+        "ownerPinEntries": 6
+      },
+      "30d": {
+        "guesses": 34,
+        "pSuccess": 9.4,
+        "stopReason": null,
+        "ownerPinEntries": 29
+      }
+    },
+    {
+      "variant": "K43/T2+K44",
+      "semantics": "K43",
+      "table": "T2",
+      "k44": true,
+      "k45": false,
+      "scenario": "none",
+      "react": "-",
+      "24h": {
+        "guesses": 7,
+        "pSuccess": 4.6,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 8,
+        "pSuccess": 5.2,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 11,
+        "pSuccess": 6.7,
+        "stopReason": null,
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "K43/T2+K44",
+      "semantics": "K43",
+      "table": "T2",
+      "k44": true,
+      "k45": false,
+      "scenario": "rotate",
+      "react": "15 min",
+      "24h": {
+        "guesses": 7,
+        "pSuccess": 4.6,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "7d": {
+        "guesses": 7,
+        "pSuccess": 4.6,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "30d": {
+        "guesses": 7,
+        "pSuccess": 4.6,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      }
+    },
+    {
+      "variant": "K43/T2+K44",
+      "semantics": "K43",
+      "table": "T2",
+      "k44": true,
+      "k45": false,
+      "scenario": "rotate",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 7,
+        "pSuccess": 4.6,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "7d": {
+        "guesses": 7,
+        "pSuccess": 4.6,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "30d": {
+        "guesses": 7,
+        "pSuccess": 4.6,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      }
+    },
+    {
+      "variant": "K43/T2+K44",
+      "semantics": "K43",
+      "table": "T2",
+      "k44": true,
+      "k45": false,
+      "scenario": "rotate",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 7,
+        "pSuccess": 4.6,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "7d": {
+        "guesses": 7,
+        "pSuccess": 4.6,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "30d": {
+        "guesses": 7,
+        "pSuccess": 4.6,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      }
+    },
+    {
+      "variant": "K43/T2+K44",
+      "semantics": "K43",
+      "table": "T2",
+      "k44": true,
+      "k45": false,
+      "scenario": "escape",
+      "react": "15 min",
+      "24h": {
+        "guesses": 3,
+        "pSuccess": 2,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 3,
+        "pSuccess": 2,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 3,
+        "pSuccess": 2,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "K43/T2+K44",
+      "semantics": "K43",
+      "table": "T2",
+      "k44": true,
+      "k45": false,
+      "scenario": "escape",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 4,
+        "pSuccess": 2.6,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 4,
+        "pSuccess": 2.6,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 4,
+        "pSuccess": 2.6,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "K43/T2+K44",
+      "semantics": "K43",
+      "table": "T2",
+      "k44": true,
+      "k45": false,
+      "scenario": "escape",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 6,
+        "pSuccess": 3.9,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      },
+      "7d": {
+        "guesses": 6,
+        "pSuccess": 3.9,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      },
+      "30d": {
+        "guesses": 6,
+        "pSuccess": 3.9,
+        "stopReason": "K44 escape lock",
+        "ownerPinEntries": 0
+      }
+    },
+    {
+      "variant": "K43/T2+K44",
+      "semantics": "K43",
+      "table": "T2",
+      "k44": true,
+      "k45": false,
+      "scenario": "unrestrict",
+      "react": "15 min",
+      "24h": {
+        "guesses": 7,
+        "pSuccess": 4.6,
+        "stopReason": null,
+        "ownerPinEntries": 4
+      },
+      "7d": {
+        "guesses": 8,
+        "pSuccess": 5.2,
+        "stopReason": null,
+        "ownerPinEntries": 5
+      },
+      "30d": {
+        "guesses": 11,
+        "pSuccess": 6.7,
+        "stopReason": null,
+        "ownerPinEntries": 8
+      }
+    },
+    {
+      "variant": "K43/T2+K44",
+      "semantics": "K43",
+      "table": "T2",
+      "k44": true,
+      "k45": false,
+      "scenario": "unrestrict",
+      "react": "1.0 h",
+      "24h": {
+        "guesses": 7,
+        "pSuccess": 4.6,
+        "stopReason": null,
+        "ownerPinEntries": 3
+      },
+      "7d": {
+        "guesses": 8,
+        "pSuccess": 5.2,
+        "stopReason": null,
+        "ownerPinEntries": 4
+      },
+      "30d": {
+        "guesses": 11,
+        "pSuccess": 6.7,
+        "stopReason": null,
+        "ownerPinEntries": 7
+      }
+    },
+    {
+      "variant": "K43/T2+K44",
+      "semantics": "K43",
+      "table": "T2",
+      "k44": true,
+      "k45": false,
+      "scenario": "unrestrict",
+      "react": "8.0 h",
+      "24h": {
+        "guesses": 7,
+        "pSuccess": 4.6,
+        "stopReason": null,
+        "ownerPinEntries": 1
+      },
+      "7d": {
+        "guesses": 8,
+        "pSuccess": 5.2,
+        "stopReason": null,
+        "ownerPinEntries": 2
+      },
+      "30d": {
+        "guesses": 11,
+        "pSuccess": 6.7,
+        "stopReason": null,
+        "ownerPinEntries": 5
+      }
+    }
+  ],
+  "ownerTypos": [
+    {
+      "table": "T0",
+      "semantics": "v03",
+      "typos": 1,
+      "waitBeforeCorrect": "0 s",
+      "restricted": false,
+      "scoreAfterCorrect": 0
+    },
+    {
+      "table": "T0",
+      "semantics": "v03",
+      "typos": 2,
+      "waitBeforeCorrect": "0 s",
+      "restricted": false,
+      "scoreAfterCorrect": 0
+    },
+    {
+      "table": "T0",
+      "semantics": "v03",
+      "typos": 3,
+      "waitBeforeCorrect": "15 min",
+      "restricted": true,
+      "scoreAfterCorrect": 0
+    },
+    {
+      "table": "T0",
+      "semantics": "K43",
+      "typos": 1,
+      "waitBeforeCorrect": "0 s",
+      "restricted": false,
+      "scoreAfterCorrect": 1
+    },
+    {
+      "table": "T0",
+      "semantics": "K43",
+      "typos": 2,
+      "waitBeforeCorrect": "0 s",
+      "restricted": false,
+      "scoreAfterCorrect": 2
+    },
+    {
+      "table": "T0",
+      "semantics": "K43",
+      "typos": 3,
+      "waitBeforeCorrect": "15 min",
+      "restricted": true,
+      "scoreAfterCorrect": 3
+    },
+    {
+      "table": "T1",
+      "semantics": "v03",
+      "typos": 1,
+      "waitBeforeCorrect": "0 s",
+      "restricted": false,
+      "scoreAfterCorrect": 0
+    },
+    {
+      "table": "T1",
+      "semantics": "v03",
+      "typos": 2,
+      "waitBeforeCorrect": "0 s",
+      "restricted": false,
+      "scoreAfterCorrect": 0
+    },
+    {
+      "table": "T1",
+      "semantics": "v03",
+      "typos": 3,
+      "waitBeforeCorrect": "1.0 h",
+      "restricted": true,
+      "scoreAfterCorrect": 0
+    },
+    {
+      "table": "T1",
+      "semantics": "K43",
+      "typos": 1,
+      "waitBeforeCorrect": "0 s",
+      "restricted": false,
+      "scoreAfterCorrect": 1
+    },
+    {
+      "table": "T1",
+      "semantics": "K43",
+      "typos": 2,
+      "waitBeforeCorrect": "0 s",
+      "restricted": false,
+      "scoreAfterCorrect": 2
+    },
+    {
+      "table": "T1",
+      "semantics": "K43",
+      "typos": 3,
+      "waitBeforeCorrect": "1.0 h",
+      "restricted": true,
+      "scoreAfterCorrect": 3
+    },
+    {
+      "table": "T2",
+      "semantics": "v03",
+      "typos": 1,
+      "waitBeforeCorrect": "0 s",
+      "restricted": false,
+      "scoreAfterCorrect": 0
+    },
+    {
+      "table": "T2",
+      "semantics": "v03",
+      "typos": 2,
+      "waitBeforeCorrect": "0 s",
+      "restricted": false,
+      "scoreAfterCorrect": 0
+    },
+    {
+      "table": "T2",
+      "semantics": "v03",
+      "typos": 3,
+      "waitBeforeCorrect": "15 min",
+      "restricted": true,
+      "scoreAfterCorrect": 0
+    },
+    {
+      "table": "T2",
+      "semantics": "K43",
+      "typos": 1,
+      "waitBeforeCorrect": "0 s",
+      "restricted": false,
+      "scoreAfterCorrect": 1
+    },
+    {
+      "table": "T2",
+      "semantics": "K43",
+      "typos": 2,
+      "waitBeforeCorrect": "0 s",
+      "restricted": false,
+      "scoreAfterCorrect": 2
+    },
+    {
+      "table": "T2",
+      "semantics": "K43",
+      "typos": 3,
+      "waitBeforeCorrect": "15 min",
+      "restricted": true,
+      "scoreAfterCorrect": 3
+    }
+  ]
+}

@@ -1,0 +1,671 @@
+{
+  "schema": "encrypted-account/proof-bench/v1",
+  "page": "bench/proof",
+  "variant": "plain",
+  "startedAtUtc": "2026-11-08T23:51:59.214Z",
+  "errors": [],
+  "wakeLock": false,
+  "device": {
+    "label": "Desktop · Ryzen 5 5600 · Claude browser pane (Chromium)",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Claude/4.23118.0 Chrome/152.0.7977.167 Safari/537.36 MSIX",
+    "platform": "Win32",
+    "hardwareConcurrency": 12,
+    "deviceMemoryGB": 16,
+    "crossOriginIsolated": false,
+    "isSecureContext": true,
+    "sharedArrayBuffer": false,
+    "screen": "1920x1080@1",
+    "uaData": {
+      "mobile": false,
+      "platform": "Windows",
+      "model": "",
+      "platformVersion": "10.0.0",
+      "brands": [
+        {
+          "brand": "Not?A_Brand",
+          "version": "24"
+        },
+        {
+          "brand": "Chromium",
+          "version": "152"
+        }
+      ]
+    }
+  },
+  "tfhe": {
+    "tfheVersion": "1.6.2",
+    "numberOfThreads": 0,
+    "threadsAvailable": false,
+    "wasmMemoryBytes": 1441792
+  },
+  "firstLoad": {
+    "initRuntimeMs": 66,
+    "clientReadyMs": 1108,
+    "crsDownloadMs": 6,
+    "crsBytes": 4571368,
+    "publicKeyDownloadMs": 1,
+    "publicKeyBytes": 33018,
+    "firstEncrypt": {
+      "totalMs": 10292.2,
+      "relayerMs": 891,
+      "localMs": 9401.2,
+      "httpCalls": 4,
+      "proofBytes": 230,
+      "hidden": false
+    },
+    "totalMs": 11468,
+    "note": "fetch 'ms' = time until the response headers; download time is in resources[].ms (PerformanceResourceTiming)",
+    "fetches": [
+      {
+        "label": "init",
+        "host": "",
+        "path": "text/plain;base64,YQ==",
+        "method": "GET",
+        "status": 200,
+        "ms": 1,
+        "bytes": null
+      },
+      {
+        "label": "init",
+        "host": "",
+        "path": "application/octet-stream;base64,H4sIAAAAAAAAE8S8d2AcxfUHPqu9U7tbnWy1K9Ld23Pvp+tH",
+        "method": "GET",
+        "status": 200,
+        "ms": 15,
+        "bytes": null
+      },
+      {
+        "label": "init",
+        "host": "ethereum-sepolia-rpc.publicnode.com",
+        "path": "/",
+        "method": "POST",
+        "status": 200,
+        "ms": 191,
+        "bytes": null
+      },
+      {
+        "label": "init",
+        "host": "ethereum-sepolia-rpc.publicnode.com",
+        "path": "/",
+        "method": "POST",
+        "status": 200,
+        "ms": 90,
+        "bytes": null
+      },
+      {
+        "label": "init",
+        "host": "ethereum-sepolia-rpc.publicnode.com",
+        "path": "/",
+        "method": "POST",
+        "status": 200,
+        "ms": 88,
+        "bytes": null
+      },
+      {
+        "label": "init",
+        "host": "relayer.testnet.zama.org",
+        "path": "/v2/keyurl",
+        "method": "GET",
+        "status": 200,
+        "ms": 678,
+        "bytes": null
+      },
+      {
+        "label": "init",
+        "host": "zama-mpc-testnet-public-efd88e2b.s3.eu-west-1.amazonaws.com",
+        "path": "/PUB-p1/PublicKey/04000000000000000000000000000000000000000000000000000000000000",
+        "method": "GET",
+        "status": 200,
+        "ms": 1,
+        "bytes": 33018
+      },
+      {
+        "label": "init",
+        "host": "zama-mpc-testnet-public-efd88e2b.s3.eu-west-1.amazonaws.com",
+        "path": "/PUB-p1/CRS/0500000000000000000000000000000000000000000000000000000000000004",
+        "method": "GET",
+        "status": 200,
+        "ms": 2,
+        "bytes": 4571368
+      }
+    ],
+    "resources": [
+      {
+        "url": "https://ethereum-sepolia-rpc.publicnode.com/",
+        "ms": 189,
+        "transferSize": 0,
+        "encodedBodySize": 0
+      },
+      {
+        "url": "https://ethereum-sepolia-rpc.publicnode.com/",
+        "ms": 89,
+        "transferSize": 0,
+        "encodedBodySize": 0
+      },
+      {
+        "url": "https://ethereum-sepolia-rpc.publicnode.com/",
+        "ms": 88,
+        "transferSize": 0,
+        "encodedBodySize": 0
+      },
+      {
+        "url": "https://relayer.testnet.zama.org/v2/keyurl",
+        "ms": 681,
+        "transferSize": 0,
+        "encodedBodySize": 0
+      },
+      {
+        "url": "https://zama-mpc-testnet-public-efd88e2b.s3.eu-west-1.amazonaws.com/PUB-p1/PublicKey/04000000000000000000000000000000000",
+        "ms": 1,
+        "transferSize": 0,
+        "encodedBodySize": 0
+      },
+      {
+        "url": "https://zama-mpc-testnet-public-efd88e2b.s3.eu-west-1.amazonaws.com/PUB-p1/CRS/05000000000000000000000000000000000000000",
+        "ms": 6,
+        "transferSize": 0,
+        "encodedBodySize": 0
+      },
+      {
+        "url": "https://relayer.testnet.zama.org/v2/input-proof",
+        "ms": 510,
+        "transferSize": 0,
+        "encodedBodySize": 0
+      },
+      {
+        "url": "https://relayer.testnet.zama.org/v2/input-proof/e39e06ef-0119-4539-be3f-3f9f1b028ee3",
+        "ms": 205,
+        "transferSize": 0,
+        "encodedBodySize": 0
+      },
+      {
+        "url": "https://ethereum-sepolia-rpc.publicnode.com/",
+        "ms": 90,
+        "transferSize": 0,
+        "encodedBodySize": 0
+      },
+      {
+        "url": "https://ethereum-sepolia-rpc.publicnode.com/",
+        "ms": 90,
+        "transferSize": 0,
+        "encodedBodySize": 0
+      }
+    ]
+  },
+  "runs": [
+    {
+      "i": 0,
+      "totalMs": 9831.8,
+      "relayerMs": 574,
+      "localMs": 9257.8,
+      "httpCalls": 2,
+      "proofBytes": 230,
+      "hidden": false
+    },
+    {
+      "i": 1,
+      "totalMs": 9988.2,
+      "relayerMs": 719,
+      "localMs": 9269.2,
+      "httpCalls": 2,
+      "proofBytes": 230,
+      "hidden": false
+    },
+    {
+      "i": 2,
+      "totalMs": 9842.6,
+      "relayerMs": 630,
+      "localMs": 9212.6,
+      "httpCalls": 2,
+      "proofBytes": 230,
+      "hidden": false
+    },
+    {
+      "i": 3,
+      "totalMs": 9892.8,
+      "relayerMs": 718,
+      "localMs": 9174.8,
+      "httpCalls": 2,
+      "proofBytes": 230,
+      "hidden": false
+    },
+    {
+      "i": 4,
+      "totalMs": 9757.2,
+      "relayerMs": 624,
+      "localMs": 9133.2,
+      "httpCalls": 2,
+      "proofBytes": 230,
+      "hidden": false
+    },
+    {
+      "i": 5,
+      "totalMs": 9847.6,
+      "relayerMs": 655,
+      "localMs": 9192.6,
+      "httpCalls": 2,
+      "proofBytes": 230,
+      "hidden": false
+    },
+    {
+      "i": 6,
+      "totalMs": 9851.2,
+      "relayerMs": 650,
+      "localMs": 9201.2,
+      "httpCalls": 2,
+      "proofBytes": 230,
+      "hidden": false
+    },
+    {
+      "i": 7,
+      "totalMs": 9881.6,
+      "relayerMs": 646,
+      "localMs": 9235.6,
+      "httpCalls": 2,
+      "proofBytes": 230,
+      "hidden": false
+    },
+    {
+      "i": 8,
+      "totalMs": 9996.5,
+      "relayerMs": 585,
+      "localMs": 9411.5,
+      "httpCalls": 2,
+      "proofBytes": 230,
+      "hidden": false
+    },
+    {
+      "i": 9,
+      "totalMs": 9954,
+      "relayerMs": 699,
+      "localMs": 9255,
+      "httpCalls": 2,
+      "proofBytes": 230,
+      "hidden": false
+    }
+  ],
+  "reference12": [
+    {
+      "i": 0,
+      "totalMs": 10595.9,
+      "relayerMs": 662,
+      "localMs": 9933.9,
+      "httpCalls": 2,
+      "proofBytes": 582,
+      "hidden": false
+    },
+    {
+      "i": 1,
+      "totalMs": 10497.1,
+      "relayerMs": 668,
+      "localMs": 9829.1,
+      "httpCalls": 2,
+      "proofBytes": 582,
+      "hidden": false
+    }
+  ],
+  "stats": {
+    "localMs": {
+      "n": 10,
+      "min": 9133.2,
+      "p50": 9212.6,
+      "p95": 9411.5,
+      "max": 9411.5,
+      "mean": 9234.4
+    },
+    "relayerMs": {
+      "n": 10,
+      "min": 574,
+      "p50": 646,
+      "p95": 719,
+      "max": 719,
+      "mean": 650
+    },
+    "totalMs": {
+      "n": 10,
+      "min": 9757.2,
+      "p50": 9851.2,
+      "p95": 9996.5,
+      "max": 9996.5,
+      "mean": 9884.3
+    },
+    "excludedHidden": 0
+  },
+  "estimate": {
+    "formula": "E1(phone) p95 ≈ 47,724 − 4,454 + local proof p95 + (321.6 − 207) ms (interim report §2.6)",
+    "e1P95PhoneMs": 52796,
+    "gate": {
+      "rule": "K58: local proof p95 on a phone ≤ 16 s",
+      "localP95Ms": 9411.5,
+      "thresholdMs": 16000,
+      "pass": true
+    }
+  },
+  "finishedAtUtc": "2026-11-08T23:55:06.450Z",
+  "allFetches": [
+    {
+      "label": "init",
+      "host": "",
+      "path": "text/plain;base64,YQ==",
+      "method": "GET",
+      "status": 200,
+      "ms": 1,
+      "bytes": null
+    },
+    {
+      "label": "init",
+      "host": "",
+      "path": "application/octet-stream;base64,H4sIAAAAAAAAE8S8d2AcxfUHPqu9U7tbnWy1K9Ld23Pvp+tH",
+      "method": "GET",
+      "status": 200,
+      "ms": 15,
+      "bytes": null
+    },
+    {
+      "label": "init",
+      "host": "ethereum-sepolia-rpc.publicnode.com",
+      "path": "/",
+      "method": "POST",
+      "status": 200,
+      "ms": 191,
+      "bytes": null
+    },
+    {
+      "label": "init",
+      "host": "ethereum-sepolia-rpc.publicnode.com",
+      "path": "/",
+      "method": "POST",
+      "status": 200,
+      "ms": 90,
+      "bytes": null
+    },
+    {
+      "label": "init",
+      "host": "ethereum-sepolia-rpc.publicnode.com",
+      "path": "/",
+      "method": "POST",
+      "status": 200,
+      "ms": 88,
+      "bytes": null
+    },
+    {
+      "label": "init",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/keyurl",
+      "method": "GET",
+      "status": 200,
+      "ms": 678,
+      "bytes": null
+    },
+    {
+      "label": "init",
+      "host": "zama-mpc-testnet-public-efd88e2b.s3.eu-west-1.amazonaws.com",
+      "path": "/PUB-p1/PublicKey/04000000000000000000000000000000000000000000000000000000000000",
+      "method": "GET",
+      "status": 200,
+      "ms": 1,
+      "bytes": 33018
+    },
+    {
+      "label": "init",
+      "host": "zama-mpc-testnet-public-efd88e2b.s3.eu-west-1.amazonaws.com",
+      "path": "/PUB-p1/CRS/0500000000000000000000000000000000000000000000000000000000000004",
+      "method": "GET",
+      "status": 200,
+      "ms": 2,
+      "bytes": 4571368
+    },
+    {
+      "label": "warmup",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof",
+      "method": "POST",
+      "status": 202,
+      "ms": 512,
+      "bytes": 128
+    },
+    {
+      "label": "warmup",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof/e39e06ef-0119-4539-be3f-3f9f1b028ee3",
+      "method": "GET",
+      "status": 200,
+      "ms": 198,
+      "bytes": null
+    },
+    {
+      "label": "warmup",
+      "host": "ethereum-sepolia-rpc.publicnode.com",
+      "path": "/",
+      "method": "POST",
+      "status": 200,
+      "ms": 90,
+      "bytes": null
+    },
+    {
+      "label": "warmup",
+      "host": "ethereum-sepolia-rpc.publicnode.com",
+      "path": "/",
+      "method": "POST",
+      "status": 200,
+      "ms": 91,
+      "bytes": null
+    },
+    {
+      "label": "pin",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof",
+      "method": "POST",
+      "status": 202,
+      "ms": 390,
+      "bytes": 128
+    },
+    {
+      "label": "pin",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof/ed39eb9f-ecc8-4136-a99e-fb50bca64c03",
+      "method": "GET",
+      "status": 200,
+      "ms": 184,
+      "bytes": null
+    },
+    {
+      "label": "pin",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof",
+      "method": "POST",
+      "status": 202,
+      "ms": 513,
+      "bytes": 128
+    },
+    {
+      "label": "pin",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof/357dd8a1-ca1e-4e9b-982d-65ecf86cefed",
+      "method": "GET",
+      "status": 200,
+      "ms": 206,
+      "bytes": null
+    },
+    {
+      "label": "pin",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof",
+      "method": "POST",
+      "status": 202,
+      "ms": 417,
+      "bytes": 128
+    },
+    {
+      "label": "pin",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof/a60b073d-fa65-4632-973c-a7ceb7a30b55",
+      "method": "GET",
+      "status": 200,
+      "ms": 213,
+      "bytes": null
+    },
+    {
+      "label": "pin",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof",
+      "method": "POST",
+      "status": 202,
+      "ms": 505,
+      "bytes": 128
+    },
+    {
+      "label": "pin",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof/1431fd52-0a10-4611-8767-2fbab4a32608",
+      "method": "GET",
+      "status": 200,
+      "ms": 213,
+      "bytes": null
+    },
+    {
+      "label": "pin",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof",
+      "method": "POST",
+      "status": 202,
+      "ms": 434,
+      "bytes": 128
+    },
+    {
+      "label": "pin",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof/afa37c1c-eef5-40ab-b956-deb348bba864",
+      "method": "GET",
+      "status": 200,
+      "ms": 190,
+      "bytes": null
+    },
+    {
+      "label": "pin",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof",
+      "method": "POST",
+      "status": 202,
+      "ms": 468,
+      "bytes": 128
+    },
+    {
+      "label": "pin",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof/5d30b13c-82c7-4874-b4c3-962da2439f6e",
+      "method": "GET",
+      "status": 200,
+      "ms": 187,
+      "bytes": null
+    },
+    {
+      "label": "pin",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof",
+      "method": "POST",
+      "status": 202,
+      "ms": 466,
+      "bytes": 128
+    },
+    {
+      "label": "pin",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof/4be57ea1-55e7-4a5b-97dd-3eac4f0d338b",
+      "method": "GET",
+      "status": 200,
+      "ms": 184,
+      "bytes": null
+    },
+    {
+      "label": "pin",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof",
+      "method": "POST",
+      "status": 202,
+      "ms": 459,
+      "bytes": 128
+    },
+    {
+      "label": "pin",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof/8cbfbce9-4f29-44ba-b216-52d35ebb7924",
+      "method": "GET",
+      "status": 200,
+      "ms": 187,
+      "bytes": null
+    },
+    {
+      "label": "pin",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof",
+      "method": "POST",
+      "status": 202,
+      "ms": 391,
+      "bytes": 128
+    },
+    {
+      "label": "pin",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof/6ab3abc0-3c2d-4e55-9ed3-7ba601285f1c",
+      "method": "GET",
+      "status": 200,
+      "ms": 194,
+      "bytes": null
+    },
+    {
+      "label": "pin",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof",
+      "method": "POST",
+      "status": 202,
+      "ms": 510,
+      "bytes": 128
+    },
+    {
+      "label": "pin",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof/c3433b6f-78d4-4066-a9ee-678136e32ae8",
+      "method": "GET",
+      "status": 200,
+      "ms": 189,
+      "bytes": null
+    },
+    {
+      "label": "ref12",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof",
+      "method": "POST",
+      "status": 202,
+      "ms": 476,
+      "bytes": 128
+    },
+    {
+      "label": "ref12",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof/61153156-b75b-4341-903c-ed2e426f4617",
+      "method": "GET",
+      "status": 200,
+      "ms": 186,
+      "bytes": null
+    },
+    {
+      "label": "ref12",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof",
+      "method": "POST",
+      "status": 202,
+      "ms": 469,
+      "bytes": 128
+    },
+    {
+      "label": "ref12",
+      "host": "relayer.testnet.zama.org",
+      "path": "/v2/input-proof/ba7fd20f-1ea1-4623-aa0b-6b6e84f066a9",
+      "method": "GET",
+      "status": 200,
+      "ms": 199,
+      "bytes": null
+    }
+  ]
+}

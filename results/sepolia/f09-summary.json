@@ -1,0 +1,581 @@
+{
+  "generatedAtUtc": "2026-11-08T22:52:26.338Z",
+  "e1": {
+    "account": "0x57508b3c82fEcfBF5e448058F36cC877Af097F7b",
+    "n": 30,
+    "failures": 0,
+    "summary": {
+      "nOk": 30,
+      "nFailedOk": 0,
+      "totalMs": {
+        "n": 30,
+        "min": 23213,
+        "p50": 24402,
+        "p95": 47724,
+        "max": 48655,
+        "mean": 28117
+      },
+      "clickToFinalizeMs": {
+        "n": 30,
+        "min": 25015,
+        "p50": 31068,
+        "p95": 54813,
+        "max": 56212,
+        "mean": 35509
+      },
+      "phases": {
+        "argonMs": {
+          "n": 30,
+          "min": 170,
+          "p50": 175,
+          "p95": 207,
+          "max": 219,
+          "mean": 179
+        },
+        "challengeMs": {
+          "n": 30,
+          "min": 80,
+          "p50": 103,
+          "p95": 341,
+          "max": 1320,
+          "mean": 168
+        },
+        "encryptMs": {
+          "n": 30,
+          "min": 4573,
+          "p50": 4794,
+          "p95": 5967,
+          "max": 9706,
+          "mean": 5061
+        },
+        "encryptLocalMs": {
+          "n": 30,
+          "min": 4052,
+          "p50": 4144,
+          "p95": 4454,
+          "max": 4639,
+          "mean": 4206
+        },
+        "encryptRelayerMs": {
+          "n": 30,
+          "min": 458,
+          "p50": 601,
+          "p95": 1802,
+          "max": 5067,
+          "mean": 855
+        },
+        "submitMs": {
+          "n": 30,
+          "min": 5891,
+          "p50": 7044,
+          "p95": 18179,
+          "max": 19967,
+          "mean": 8786
+        },
+        "decryptMs": {
+          "n": 30,
+          "min": 2820,
+          "p50": 4963,
+          "p95": 5965,
+          "max": 6673,
+          "mean": 4867
+        },
+        "finalizeMs": {
+          "n": 30,
+          "min": 5443,
+          "p50": 7066,
+          "p95": 19779,
+          "max": 32208,
+          "mean": 9056
+        },
+        "openMs": {
+          "n": 30,
+          "min": 1799,
+          "p50": 6158,
+          "p95": 14379,
+          "max": 15579,
+          "mean": 7392
+        }
+      },
+      "blocks": {
+        "submitBlocksToInclusion": {
+          "n": 30,
+          "min": 1,
+          "p50": 1,
+          "p95": 2,
+          "max": 2,
+          "mean": 1
+        },
+        "decryptBlocksAfterSubmit": {
+          "n": 30,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "mean": 0
+        },
+        "finalizeBlocksAfterSubmit": {
+          "n": 30,
+          "min": 1,
+          "p50": 1,
+          "p95": 1,
+          "max": 1,
+          "mean": 1
+        }
+      },
+      "gas": {
+        "open": {
+          "n": 30,
+          "min": 490253,
+          "p50": 490253,
+          "p95": 490253,
+          "max": 588173,
+          "mean": 493517
+        },
+        "submitGuess": {
+          "n": 30,
+          "min": 1710984,
+          "p50": 1711020,
+          "p95": 1711032,
+          "max": 1725536,
+          "mean": 1711505
+        },
+        "finalizeGuess": {
+          "n": 30,
+          "min": 525980,
+          "p50": 526028,
+          "p95": 526052,
+          "max": 526052,
+          "mean": 526027
+        },
+        "executeOp": {
+          "n": 30,
+          "min": 765219,
+          "p50": 765223,
+          "p95": 765223,
+          "max": 863112,
+          "mean": 768486
+        }
+      },
+      "hcu": {
+        "submitGuess": {
+          "total": {
+            "n": 30,
+            "min": 698002,
+            "p50": 698002,
+            "p95": 698002,
+            "max": 698002,
+            "mean": 698002
+          },
+          "depth": {
+            "n": 30,
+            "min": 302000,
+            "p50": 302000,
+            "p95": 302000,
+            "max": 302000,
+            "mean": 302000
+          }
+        },
+        "executeOp": {
+          "total": {
+            "n": 30,
+            "min": 667032,
+            "p50": 667032,
+            "p95": 667032,
+            "max": 667032,
+            "mean": 667032
+          },
+          "depth": {
+            "n": 30,
+            "min": 667032,
+            "p50": 667032,
+            "p95": 667032,
+            "max": 667032,
+            "mean": 667032
+          }
+        }
+      },
+      "meterChecks": {
+        "equal": 116,
+        "unreadable": 4
+      },
+      "histogramTotal": [
+        {
+          "fromS": 20,
+          "toS": 25,
+          "count": 19
+        },
+        {
+          "fromS": 25,
+          "toS": 30,
+          "count": 3
+        },
+        {
+          "fromS": 30,
+          "toS": 35,
+          "count": 1
+        },
+        {
+          "fromS": 35,
+          "toS": 40,
+          "count": 5
+        },
+        {
+          "fromS": 40,
+          "toS": 45,
+          "count": 0
+        },
+        {
+          "fromS": 45,
+          "toS": 50,
+          "count": 2
+        }
+      ],
+      "goNoGo": "GO (p95 < 60 s)"
+    }
+  },
+  "hot": {
+    "account": "0x456336adB1869D678D7222b809CDA7c9Ad765E8E",
+    "n": 30,
+    "failures": 0,
+    "summary": {
+      "nOk": 30,
+      "nNotOk": 0,
+      "totalMs": {
+        "n": 30,
+        "min": 13832,
+        "p50": 19862,
+        "p95": 40855,
+        "max": 46378,
+        "mean": 23078
+      },
+      "phases": {
+        "requestMs": {
+          "n": 30,
+          "min": 2144,
+          "p50": 6959,
+          "p95": 14786,
+          "max": 21457,
+          "mean": 7695
+        },
+        "decryptMs": {
+          "n": 30,
+          "min": 4854,
+          "p50": 7235,
+          "p95": 9226,
+          "max": 9354,
+          "mean": 7319
+        },
+        "finalizeMs": {
+          "n": 30,
+          "min": 2205,
+          "p50": 5027,
+          "p95": 18155,
+          "max": 31479,
+          "mean": 8065
+        }
+      },
+      "blocks": {
+        "requestBlocksToInclusion": {
+          "n": 30,
+          "min": 1,
+          "p50": 1,
+          "p95": 2,
+          "max": 2,
+          "mean": 1
+        },
+        "decryptBlocksAfterRequest": {
+          "n": 30,
+          "min": 0,
+          "p50": 0,
+          "p95": 0,
+          "max": 0,
+          "mean": 0
+        },
+        "finalizeBlocksAfterRequest": {
+          "n": 30,
+          "min": 1,
+          "p50": 1,
+          "p95": 2,
+          "max": 2,
+          "mean": 1
+        }
+      },
+      "gas": {
+        "request": {
+          "n": 30,
+          "min": 1524301,
+          "p50": 1524305,
+          "p95": 1524305,
+          "max": 1636733,
+          "mean": 1528052
+        },
+        "finalizeEvaluation": {
+          "n": 30,
+          "min": 422767,
+          "p50": 422803,
+          "p95": 422827,
+          "max": 704335,
+          "mean": 432185
+        }
+      },
+      "hcu": {
+        "request": {
+          "total": {
+            "n": 30,
+            "min": 774036,
+            "p50": 774036,
+            "p95": 774036,
+            "max": 774036,
+            "mean": 774036
+          },
+          "depth": {
+            "n": 30,
+            "min": 634032,
+            "p50": 634032,
+            "p95": 634032,
+            "max": 634032,
+            "mean": 634032
+          }
+        }
+      },
+      "meterChecks": {
+        "equal": 52,
+        "unreadable": 8
+      },
+      "histogramTotal": [
+        {
+          "fromS": 10,
+          "toS": 15,
+          "count": 4
+        },
+        {
+          "fromS": 15,
+          "toS": 20,
+          "count": 12
+        },
+        {
+          "fromS": 20,
+          "toS": 25,
+          "count": 6
+        },
+        {
+          "fromS": 25,
+          "toS": 30,
+          "count": 1
+        },
+        {
+          "fromS": 30,
+          "toS": 35,
+          "count": 5
+        },
+        {
+          "fromS": 35,
+          "toS": 40,
+          "count": 0
+        },
+        {
+          "fromS": 40,
+          "toS": 45,
+          "count": 1
+        },
+        {
+          "fromS": 45,
+          "toS": 50,
+          "count": 1
+        }
+      ],
+      "threshold60s": "p95 < 60 s"
+    }
+  },
+  "live": {
+    "isIn": true,
+    "emptyProof": true,
+    "aa": true,
+    "admin": true,
+    "escape": true
+  },
+  "totals": {
+    "kOnlyTransfer": {
+      "live": 1947108,
+      "mock": 1530226,
+      "oldScheduleEstimate": 1150266
+    },
+    "pinTransfer": {
+      "live": 3492524,
+      "mock": 2374721,
+      "oldScheduleEstimate": 1825987
+    },
+    "setupOneAssetLive": 17031729,
+    "deployLiveGas": 109351992
+  },
+  "schedule": {
+    "sepolia": {
+      "block": 12093255,
+      "gasLimit": 200000000,
+      "newSlot": 110983,
+      "codeByte": 1542,
+      "newAccountSurcharge": 186391,
+      "newHeaderFields": [
+        "blockAccessListHash",
+        "slotNumber"
+      ]
+    },
+    "mainnet": {
+      "block": 26372926,
+      "gasLimit": 60000000,
+      "newSlot": 22445,
+      "codeByte": 202,
+      "baseFeeGwei": 0.053575494
+    },
+    "deltas": {
+      "newSlot": 88538,
+      "newAccount": 161391,
+      "codeByte": 1340
+    }
+  },
+  "inclusion": {
+    "n": 150,
+    "inclusionMs": {
+      "n": 150,
+      "min": 1515,
+      "p50": 6458,
+      "p95": 17900,
+      "max": 31791,
+      "mean": 7726
+    },
+    "slotStartToSeenMs": {
+      "n": 150,
+      "min": -137,
+      "p50": 934,
+      "p95": 2546,
+      "max": 3768,
+      "mean": 1016
+    },
+    "missedSlotShare": 0.1,
+    "blockIntervalGt12Share": 0.1,
+    "notInFirstBlockShare": 0.08,
+    "slowOver15s": [
+      {
+        "flow": "e1",
+        "kind": "submitGuess",
+        "inclusionMs": 19659,
+        "slotGap": 2,
+        "blockAfterSent": 1,
+        "blockIntervalS": 24
+      },
+      {
+        "flow": "e1",
+        "kind": "finalizeGuess",
+        "inclusionMs": 18352,
+        "slotGap": 2,
+        "blockAfterSent": 1,
+        "blockIntervalS": 24
+      },
+      {
+        "flow": "e1",
+        "kind": "submitGuess",
+        "inclusionMs": 17481,
+        "slotGap": 2,
+        "blockAfterSent": 1,
+        "blockIntervalS": 24
+      },
+      {
+        "flow": "e1",
+        "kind": "finalizeGuess",
+        "inclusionMs": 19482,
+        "slotGap": 2,
+        "blockAfterSent": 1,
+        "blockIntervalS": 24
+      },
+      {
+        "flow": "e1",
+        "kind": "finalizeGuess",
+        "inclusionMs": 18596,
+        "slotGap": 2,
+        "blockAfterSent": 1,
+        "blockIntervalS": 24
+      },
+      {
+        "flow": "e1",
+        "kind": "submitGuess",
+        "inclusionMs": 16793,
+        "slotGap": 1,
+        "blockAfterSent": 2,
+        "blockIntervalS": 12
+      },
+      {
+        "flow": "e1",
+        "kind": "open",
+        "inclusionMs": 15174,
+        "slotGap": 1,
+        "blockAfterSent": 2,
+        "blockIntervalS": 12
+      },
+      {
+        "flow": "e1",
+        "kind": "submitGuess",
+        "inclusionMs": 15862,
+        "slotGap": 1,
+        "blockAfterSent": 2,
+        "blockIntervalS": 12
+      },
+      {
+        "flow": "e1",
+        "kind": "finalizeGuess",
+        "inclusionMs": 31791,
+        "slotGap": 3,
+        "blockAfterSent": 1,
+        "blockIntervalS": 36
+      },
+      {
+        "flow": "hot",
+        "kind": "finalizeEvaluation",
+        "inclusionMs": 15099,
+        "slotGap": 1,
+        "blockAfterSent": 2,
+        "blockIntervalS": 12
+      },
+      {
+        "flow": "hot",
+        "kind": "finalizeEvaluation",
+        "inclusionMs": 17900,
+        "slotGap": 2,
+        "blockAfterSent": 1,
+        "blockIntervalS": 24
+      },
+      {
+        "flow": "hot",
+        "kind": "finalizeEvaluation",
+        "inclusionMs": 16127,
+        "slotGap": 2,
+        "blockAfterSent": 1,
+        "blockIntervalS": 24
+      },
+      {
+        "flow": "hot",
+        "kind": "finalizeEvaluation",
+        "inclusionMs": 30927,
+        "slotGap": 2,
+        "blockAfterSent": 2,
+        "blockIntervalS": 24
+      },
+      {
+        "flow": "hot",
+        "kind": "finalizeEvaluation",
+        "inclusionMs": 16307,
+        "slotGap": 2,
+        "blockAfterSent": 1,
+        "blockIntervalS": 24
+      },
+      {
+        "flow": "hot",
+        "kind": "request",
+        "inclusionMs": 21120,
+        "slotGap": 2,
+        "blockAfterSent": 1,
+        "blockIntervalS": 24
+      }
+    ]
+  }
+}

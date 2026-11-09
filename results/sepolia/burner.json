@@ -1,0 +1,15 @@
+{
+  "evidence": "[M]",
+  "address": "0xcBdaED7D91644c771Aa84C5AbE5afFBB42a4d502",
+  "createdAt": "2026-11-08T19:19:32.595Z",
+  "lastCheckedAt": "2026-11-08T20:48:02.630Z",
+  "note": "Only the address is recorded; the private key is kept nowhere except .env.sepolia.",
+  "retired": [
+    {
+      "address": "0xf36a11028969b58E82CF5F7Ff83aC292D5a05468",
+      "retiredAtUtc": "2026-11-08T19:19:32.590Z",
+      "balanceWei": "0",
+      "reason": "the key ended up in a session log via grep output (before funding)"
+    }
+  ]
+}

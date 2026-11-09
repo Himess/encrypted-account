@@ -1,0 +1,23 @@
+node_modules/
+artifacts/
+cache/
+fhevmTemp/
+coverage/
+coverage.json
+dist/
+types/
+*.log
+
+# Secrets: the Sepolia burner key lives only in .env.sepolia
+.env
+.env.sepolia
+.env.*
+results/private/
+
+# Build outputs of the phone benches (node bench/build.mjs, node bench/proof/build.mjs)
+bench/argon2id.html
+bench/dist/
+bench/proof/dist/
+
+# Resumable run state of the Sepolia scripts
+results/sepolia/state-*.json

@@ -1,0 +1,38 @@
+{
+  "evidence": "[Mock] F0.10 code (K43 + K56 + T2)",
+  "generatedAtUtc": "2026-11-09T22:29:18.638Z",
+  "afterThreeWrong": {
+    "track": {
+      "score": "3",
+      "nextAllowedAt": "1794442507",
+      "pendingOp": "0",
+      "lastAt": "1794441607"
+    },
+    "shared": {
+      "score": "3",
+      "nextAllowedAt": "1794442507"
+    },
+    "restricted": 1
+  },
+  "afterOwnerCorrectPin": {
+    "track": {
+      "score": "3",
+      "nextAllowedAt": "1794443409",
+      "pendingOp": "0",
+      "lastAt": "1794442509"
+    },
+    "shared": {
+      "score": "3",
+      "nextAllowedAt": "1794443409"
+    },
+    "restricted": 1,
+    "rotationReadyAt": "1794528910"
+  },
+  "scoreKeptOnSuccess": true,
+  "restrictionLiftedByOwnerPin": false,
+  "thiefCanGuessImmediatelyAfterOwnerPin": false,
+  "thiefWaitS": 899,
+  "thiefRevert": "VM Exception while processing transaction: reverted with custom error 'Backoff(1794443409)'",
+  "thiefRevertName": "Backoff",
+  "baseline": "results/y1-baseline.json (Round 1: the score/shared budget was reset, the attacker guessed without back-off)"
+}
