@@ -34,10 +34,79 @@ function eventOf(receipt: ethers.TransactionReceipt, account: string, name: stri
 
 // ───────────────────────────── reading ─────────────────────────────
 
+/** eth_getLogs in windows: the public RPC refuses ranges of 50,000 blocks or more. */
+export async function getLogsChunked(read: ethers.JsonRpcProvider, filter: { address: string; topics?: (string | null)[] }, fromBlock: number, toBlock: number, step = 45_000): Promise<ethers.Log[]> {
+  const ranges: [number, number][] = [];
+  for (let a = fromBlock; a <= toBlock; a += step) ranges.push([a, Math.min(toBlock, a + step - 1)]);
+  const out: ethers.Log[] = [];
+  for (let i = 0; i < ranges.length; i += 4) {
+    const res = await Promise.all(ranges.slice(i, i + 4).map(([a, b]) => read.getLogs({ ...filter, fromBlock: a, toBlock: b })));
+    for (const r of res) out.push(...r);
+  }
+  return out;
+}
+
 export async function findAccounts(read: ethers.JsonRpcProvider, owner: string): Promise<string[]> {
-  const f = factory(read);
-  const logs = await f.queryFilter(f.filters.AccountCreated(null, owner), FACTORY_DEPLOY_BLOCK, "latest");
-  return logs.map((l) => String((l as ethers.EventLog).args.account));
+  const topics = (await factory(read).filters.AccountCreated(null, owner).getTopicFilter()) as (string | null)[];
+  const logs = await getLogsChunked(read, { address: FACTORY, topics }, FACTORY_DEPLOY_BLOCK, await read.getBlockNumber());
+  return logs.map((l) => String(FIFACE.parseLog(l)!.args.account));
+}
+
+export async function readEscape(read: ethers.JsonRpcProvider, address: string): Promise<string> {
+  return String((await acct(address, read).escapeState())[0]);
+}
+
+export type Activity = {
+  kind: "sent" | "wrong" | "pending" | "approved" | "cancelled" | "armed";
+  amount?: bigint;
+  to?: string;
+  block: number;
+  hash: string;
+  time?: number;
+};
+
+/** The account's history from its own events: PIN transfers (sent, wrong PIN, pending) and activation. */
+export async function loadActivity(read: ethers.JsonRpcProvider, address: string, limit = 12): Promise<Activity[]> {
+  const latest = await read.getBlockNumber();
+  const logs = await getLogsChunked(read, { address }, FACTORY_DEPLOY_BLOCK, latest);
+  type OpRec = { amount: bigint; to: string; block: number; hash: string; ok?: boolean; fin?: [number, string]; exec?: [number, string]; cancel?: [number, string] };
+  const ops = new Map<string, OpRec>();
+  const items: Activity[] = [];
+  for (const log of logs) {
+    let ev: ethers.LogDescription | null = null;
+    try {
+      ev = IFACE.parseLog(log);
+    } catch {
+      continue;
+    }
+    if (!ev) continue;
+    const id = ev.args.opId !== undefined ? String(ev.args.opId) : "";
+    const at: [number, string] = [log.blockNumber, log.transactionHash];
+    if (ev.name === "OpOpened") ops.set(id, { amount: BigInt(ev.args.amount), to: String(ev.args.counterparty), block: at[0], hash: at[1] });
+    else if (ev.name === "GuessFinalized" && ops.has(id)) Object.assign(ops.get(id)!, { ok: Boolean(ev.args.ok), fin: at });
+    else if (ev.name === "OpExecuted" && ops.has(id)) ops.get(id)!.exec = at;
+    else if (ev.name === "OpCancelled" && ops.has(id)) ops.get(id)!.cancel = at;
+    else if (ev.name === "Armed") items.push({ kind: "armed", block: at[0], hash: at[1] });
+  }
+  for (const o of ops.values()) {
+    const [kind, [block, hash]]: [Activity["kind"], [number, string]] = o.exec
+      ? ["sent", o.exec]
+      : o.cancel
+        ? ["cancelled", o.cancel]
+        : o.ok === false
+          ? ["wrong", o.fin!]
+          : o.ok === true
+            ? ["approved", o.fin!]
+            : ["pending", [o.block, o.hash]];
+    items.push({ kind, amount: o.amount, to: o.to, block, hash });
+  }
+  items.sort((a, b) => b.block - a.block);
+  const top = items.slice(0, limit);
+  const blocks = [...new Set(top.map((i) => i.block))];
+  const times = new Map<number, number>();
+  await Promise.all(blocks.map(async (n) => times.set(n, (await read.getBlock(n))?.timestamp ?? 0)));
+  for (const i of top) i.time = times.get(i.block);
+  return top;
 }
 
 export type AccountView = {

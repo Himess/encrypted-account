@@ -1,8 +1,8 @@
-// Bundles the Sepolia web demo.
-//   node web/build.mjs   → web/dist/{index.html, assets/app.js, assets/style.css, web/public/*, vercel.json, _headers}
-// A Vercel project link in web/dist/.vercel survives rebuilds.
-// Served with COOP/COEP headers (crossOriginIsolated → multi-threaded TFHE); without them the SDK falls back to a
-// single thread, which also works (measured in F0.12b).
+// Bundles the Sepolia site: a landing page (index.html, no wallet code) and the app (app.html, served at /app).
+//   node web/build.mjs   → web/dist/{index.html, app.html, assets/*, web/public/*, vercel.json, _headers}
+// Asset names carry a content hash, so they can be cached forever; a Vercel project link in web/dist/.vercel survives
+// rebuilds. Served with COOP/COEP headers (crossOriginIsolated → multi-threaded TFHE); without them the SDK falls back
+// to a single thread, which also works (measured in F0.12b).
 import * as esbuild from "esbuild";
 import fs from "fs";
 import path from "path";
@@ -28,41 +28,85 @@ const stubUnused = {
   },
 };
 
-const HEADERS = [
+const ISOLATION = [
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   { key: "Cross-Origin-Embedder-Policy", value: "require-corp" },
 ];
+const PAGES = ["index.html", "app.html"];
 
 export async function build({ minify = true } = {}) {
   fs.mkdirSync(DIST, { recursive: true });
   for (const name of fs.readdirSync(DIST)) {
     if (name !== ".vercel") fs.rmSync(path.join(DIST, name), { recursive: true, force: true });
   }
-  fs.mkdirSync(path.join(DIST, "assets"), { recursive: true });
-  await esbuild.build({
+  const result = await esbuild.build({
     plugins: [stubUnused],
-    entryPoints: [path.join(HERE, "src", "main.ts")],
+    entryPoints: {
+      landing: path.join(HERE, "src", "landing.ts"),
+      app: path.join(HERE, "src", "app.tsx"),
+      "landing-style": path.join(HERE, "src", "styles", "landing.css"),
+      "app-style": path.join(HERE, "src", "styles", "app.css"),
+    },
     bundle: true,
     format: "esm",
     platform: "browser",
-    target: ["es2022"],
+    target: ["es2022", "safari16"],
+    jsx: "automatic",
+    jsxImportSource: "preact",
+    loader: { ".woff2": "file" },
+    entryNames: "[name]-[hash]",
+    assetNames: "fonts/[name]-[hash]",
+    outdir: path.join(DIST, "assets"),
+    metafile: true,
     minify,
     sourcemap: !minify,
     legalComments: "none",
-    outfile: path.join(DIST, "assets", "app.js"),
     external: ["node:url"], // SDK code path that only runs under Node
     logLevel: "warning",
   });
-  fs.copyFileSync(path.join(HERE, "src", "style.css"), path.join(DIST, "assets", "style.css"));
-  fs.copyFileSync(path.join(HERE, "index.html"), path.join(DIST, "index.html"));
-  const PUBLIC = path.join(HERE, "public"); // static files served from the site root (og.png)
+
+  // entry name → hashed file, then point the pages at the hashed files
+  const out = {};
+  for (const [file, meta] of Object.entries(result.metafile.outputs)) {
+    if (!meta.entryPoint) continue;
+    const base = path.basename(file);
+    const name = base.replace(/-[A-Z0-9]{8}\.(js|css)$/, "");
+    out[`${name}.${path.extname(base).slice(1)}`] = `/assets/${base}`;
+  }
+  const refs = {
+    "/assets/landing.js": out["landing.js"],
+    "/assets/landing.css": out["landing-style.css"],
+    "/assets/app.js": out["app.js"],
+    "/assets/app.css": out["app-style.css"],
+  };
+  for (const page of PAGES) {
+    let html = fs.readFileSync(path.join(HERE, page), "utf8");
+    for (const [from, to] of Object.entries(refs)) {
+      if (!to) throw new Error(`build: no output for ${from}`);
+      html = html.split(`"${from}"`).join(`"${to}"`);
+    }
+    fs.writeFileSync(path.join(DIST, page), html);
+  }
+
+  const PUBLIC = path.join(HERE, "public"); // static files served from the site root (favicon, og.png)
   if (fs.existsSync(PUBLIC)) fs.cpSync(PUBLIC, DIST, { recursive: true });
-  fs.writeFileSync(path.join(DIST, "vercel.json"), JSON.stringify({ headers: [{ source: "/(.*)", headers: HEADERS }] }, null, 2) + "\n");
-  fs.writeFileSync(path.join(DIST, "_headers"), "/*\n" + HEADERS.map((h) => `  ${h.key}: ${h.value}`).join("\n") + "\n");
-  return fs.statSync(path.join(DIST, "assets", "app.js")).size;
+
+  const vercel = {
+    cleanUrls: true,
+    trailingSlash: false,
+    headers: [
+      { source: "/(.*)", headers: ISOLATION },
+      { source: "/assets/(.*)", headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }] },
+    ],
+  };
+  fs.writeFileSync(path.join(DIST, "vercel.json"), JSON.stringify(vercel, null, 2) + "\n");
+  fs.writeFileSync(path.join(DIST, "_headers"), "/*\n" + ISOLATION.map((h) => `  ${h.key}: ${h.value}`).join("\n") + "\n");
+
+  const size = (k) => fs.statSync(path.join(DIST, out[k].slice(1))).size;
+  return { app: size("app.js"), landing: size("landing.js"), files: out };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const bytes = await build();
-  console.log(`web/dist ready · app.js ${(bytes / 1e6).toFixed(2)} MB`);
+  const r = await build();
+  console.log(`web/dist ready · app.js ${(r.app / 1e6).toFixed(2)} MB · landing.js ${(r.landing / 1e3).toFixed(1)} kB`);
 }

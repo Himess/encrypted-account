@@ -23,12 +23,23 @@ if (!chrome) throw new Error("Chrome not found; set CHROME=/path/to/chrome");
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 const profile = fs.mkdtempSync(path.join(os.tmpdir(), "og-chrome-"));
 try {
-  execFileSync(chrome, [
-    "--headless=new", "--disable-gpu", "--hide-scrollbars", "--no-first-run",
-    "--force-device-scale-factor=1", "--window-size=1200,630",
-    `--user-data-dir=${profile}`, `--screenshot=${OUT}`,
-    pathToFileURL(path.join(HERE, "og.html")).href,
-  ], { stdio: "ignore" });
+  execFileSync(
+    chrome,
+    [
+      "--headless=new",
+      "--disable-gpu",
+      "--hide-scrollbars",
+      "--no-first-run",
+      "--allow-file-access-from-files",
+      "--force-device-scale-factor=1",
+      "--window-size=1200,630",
+      "--virtual-time-budget=3000",
+      `--user-data-dir=${profile}`,
+      `--screenshot=${OUT}`,
+      pathToFileURL(path.join(HERE, "og.html")).href,
+    ],
+    { stdio: "ignore" },
+  );
 } finally {
   fs.rmSync(profile, { recursive: true, force: true });
 }

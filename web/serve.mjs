@@ -106,7 +106,16 @@ async function devRpc(method, params) {
   }
 }
 
-const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".map": "application/json", ".json": "application/json", ".png": "image/png" };
+const TYPES = {
+  ".html": "text/html; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".map": "application/json",
+  ".json": "application/json",
+  ".png": "image/png",
+  ".svg": "image/svg+xml",
+  ".woff2": "font/woff2",
+};
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url ?? "/", `http://127.0.0.1:${PORT}`);
@@ -129,15 +138,17 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(200, { ...head, "Content-Type": "application/json" });
       return res.end(JSON.stringify(out, (_k, v) => (typeof v === "bigint" ? v.toString() : v)));
     }
+    // clean URLs like Vercel: / → index.html, /app → app.html
     let p = url.pathname === "/" ? "/index.html" : url.pathname;
+    if (!path.extname(p) && fs.existsSync(path.join(DIST, `${p.replace(/^\/+/, "")}.html`))) p = `${p}.html`;
     const file = path.join(DIST, path.normalize(p).replace(/^([/\\])+/, ""));
     if (!file.startsWith(DIST) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) {
       res.writeHead(404, head);
       return res.end("not found");
     }
     let data = fs.readFileSync(file);
-    if (wallet && p === "/index.html") {
-      data = Buffer.from(String(data).replace('<script type="module" src="./assets/app.js"></script>', '<script src="/__dev/shim.js"></script>\n<script type="module" src="./assets/app.js"></script>'));
+    if (wallet && p === "/app.html") {
+      data = Buffer.from(String(data).replace("</head>", '<script src="/__dev/shim.js"></script>\n</head>'));
     }
     res.writeHead(200, { ...head, "Content-Type": TYPES[path.extname(file)] ?? "application/octet-stream" });
     res.end(data);

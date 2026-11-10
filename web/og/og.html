@@ -1,70 +1,81 @@
 <!doctype html>
-<!-- Link-preview image (1200×630). Rendered to web/public/og.png by: node web/og/render.mjs -->
+<!-- Link-preview image (1200×630), same styles as the site. Rendered to web/public/og.png by: node web/og/render.mjs -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<link rel="stylesheet" href="../src/styles/landing.css">
 <style>
-  * { box-sizing: border-box; margin: 0; }
   html, body { width: 1200px; height: 630px; overflow: hidden; }
-  body {
-    position: relative;
+  body::after { opacity: 0.05; }
+  .og { position: relative; width: 1200px; height: 630px; overflow: hidden; }
+  .og-bg {
+    position: absolute; inset: 0;
     background:
-      radial-gradient(700px 420px at 1080px 40px, rgba(99, 91, 255, 0.30), transparent 70%),
-      radial-gradient(560px 360px at 80px 640px, rgba(34, 195, 166, 0.16), transparent 70%),
-      #0e1016;
-    color: #e9ebf3;
-    font-family: "Segoe UI", Inter, system-ui, sans-serif;
+      radial-gradient(620px 460px at 930px 300px, rgba(196, 242, 93, 0.17), transparent 65%),
+      radial-gradient(600px 400px at 0px 0px, rgba(120, 140, 255, 0.07), transparent 70%);
   }
-  #cipher {
-    position: absolute; inset: 0 0 110px 560px;
-    padding: 28px 40px 0 0;
-    font: 500 19px/1.55 Consolas, ui-monospace, monospace;
-    color: #8b85ff; opacity: 0.12;
-    white-space: pre; overflow: hidden; text-align: right;
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 45%), linear-gradient(180deg, #000 70%, transparent);
-    mask-image: linear-gradient(90deg, transparent, #000 45%), linear-gradient(180deg, #000 70%, transparent);
-    -webkit-mask-composite: source-in;
-    mask-composite: intersect;
+  .og-bg::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 56px 56px;
+    -webkit-mask-image: radial-gradient(ellipse 60% 70% at 70% 45%, #000 15%, transparent 75%);
   }
-  .wrap { position: relative; height: 100%; padding: 64px 72px 60px; display: flex; flex-direction: column; }
-  .top { display: flex; align-items: center; gap: 18px; }
-  .logo { width: 56px; height: 56px; border-radius: 16px; background: #4f46e5; display: grid; place-items: center; }
-  .logo i { width: 24px; height: 24px; border-radius: 6px; background: #22c3a6; }
-  .brand { font-size: 34px; font-weight: 600; letter-spacing: -0.01em; }
-  .chip { margin-left: auto; font-size: 22px; color: #c9cdf9; background: #14162a; border: 1.5px solid #3a3f63; border-radius: 999px; padding: 8px 20px; }
-  h1 { margin-top: 92px; font-size: 88px; line-height: 1.02; font-weight: 700; letter-spacing: -0.025em; color: #ffffff; }
-  .sub { margin-top: 26px; font-size: 33px; line-height: 1.35; color: #b8bdd0; max-width: 960px; }
-  .bottom { margin-top: auto; display: flex; align-items: center; gap: 14px; }
-  .pill { font-size: 23px; color: #e9ebf3; background: #1b1f2e; border: 1.5px solid #2b3045; border-radius: 12px; padding: 10px 18px; }
-  .pill b { color: #4cd394; font-weight: 600; margin-right: 8px; }
-  .by { margin-left: auto; font-size: 23px; color: #9aa0b4; }
+  .left { position: absolute; left: 72px; top: 64px; bottom: 60px; width: 640px; display: flex; flex-direction: column; }
+  .brand { font-size: 24px; gap: 14px; }
+  .brand .mark { --s: 40px; }
+  h1 { margin: 64px 0 0; font-size: 84px; line-height: 0.98; letter-spacing: -0.045em; font-weight: 640; }
+  h1 .accent { color: var(--accent); }
+  .sub { margin: 26px 0 0; font-size: 27px; line-height: 1.35; color: var(--text-2); letter-spacing: -0.012em; max-width: 610px; }
+  .pills { margin-top: auto; display: flex; gap: 10px; }
+  .pills .pill { height: 38px; padding: 0 16px; font-size: 17px; }
+  .right { position: absolute; right: 60px; top: 50%; transform: translateY(-50%) scale(0.93); transform-origin: center right; }
+  .device { margin: 0; }
 </style>
 </head>
 <body>
-<div id="cipher"></div>
-<div class="wrap">
-  <div class="top">
-    <div class="logo"><i></i></div>
-    <div class="brand">Encrypted Account</div>
-    <div class="chip">Sepolia testnet</div>
+<div class="og">
+  <div class="og-bg"></div>
+  <div class="left">
+    <span class="brand"><span class="mark"><i class="on"></i><i></i><i></i><i></i><i class="on"></i><i></i><i class="on"></i><i></i><i class="on"></i></span>Encrypted Account</span>
+    <h1>A stolen key<br><span class="accent">isn't enough.</span></h1>
+    <p class="sub">A smart account whose PIN lives in the contract, checked under FHE. Wrong guesses move nothing.</p>
+    <div class="pills">
+      <span class="pill"><span class="dot live"></span>Live on Sepolia</span>
+      <span class="pill">Open source</span>
+      <span class="pill">Built on Zama FHEVM</span>
+    </div>
   </div>
-  <h1>A stolen key isn't enough.</h1>
-  <p class="sub">A smart account whose PIN lives in the contract, checked under FHE. The spending rules stay encrypted.</p>
-  <div class="bottom">
-    <span class="pill"><b>✓</b>PIN counted on-chain</span>
-    <span class="pill"><b>✓</b>Hidden limits</span>
-    <span class="pill"><b>✓</b>Open source</span>
-    <span class="by">Built with Zama FHEVM</span>
+  <div class="right">
+    <div class="device">
+      <div class="device-screen">
+        <div class="d-status"><span>9:41</span><span class="d-bars"><i></i><i></i><i></i><i></i></span></div>
+        <div class="d-head">
+          <span class="mark" style="--s:22px"><i class="on"></i><i></i><i></i><i></i><i class="on"></i><i></i><i class="on"></i><i></i><i class="on"></i></span>
+          <span>My account</span>
+          <span class="d-net">Sepolia</span>
+        </div>
+        <div class="d-balance">
+          <div class="d-label">Balance</div>
+          <div class="d-amount">2.40 <small>ETH</small></div>
+          <div class="d-safe"><span class="dot live"></span>Nothing moved · funds safe</div>
+        </div>
+        <div class="d-tx">
+          <div class="d-tx-title"><span class="d-alert">!</span>Transfer requested with your key</div>
+          <div class="d-row"><span>To</span><span><span class="d-tag">New address</span> <span class="mono">0x7a3c…9f1e</span></span></div>
+          <div class="d-row"><span>Amount</span><span class="mono">2.40 ETH · all of it</span></div>
+        </div>
+        <div class="d-sheet">
+          <div class="d-grab"></div>
+          <div class="d-title">PIN required</div>
+          <div class="d-pindots"><i class="bad"></i><i class="bad"></i><i class="bad"></i><i class="bad"></i><i class="bad"></i><i class="bad"></i></div>
+          <div class="d-state bad">Wrong PIN · nothing moved</div>
+          <div class="d-keys">
+            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span class="blank"></span><span>0</span><span class="del">⌫</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-<script>
-  // Deterministic "ciphertext" texture, so the image renders the same every time.
-  let s = 0x5eed1234;
-  const rnd = () => ((s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 2 ** 32);
-  const hex = (n) => Array.from({ length: n }, () => "0123456789abcdef"[Math.floor(rnd() * 16)]).join("");
-  const lines = [];
-  for (let i = 0; i < 22; i++) lines.push(`0x${hex(16)} ${hex(16)} ${hex(8)}`);
-  document.getElementById("cipher").textContent = lines.join("\n");
-</script>
 </body>
 </html>

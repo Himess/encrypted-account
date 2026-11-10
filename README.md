@@ -118,14 +118,14 @@ and retries native crashes.
 
 Live at [encrypted-account.vercel.app](https://encrypted-account.vercel.app).
 
-`web/` is a small browser app on top of the deployed Sepolia contracts: connect a wallet, choose a PIN and a hidden
-limit, create the account (8 transactions), deposit, and send ETH with the PIN — or try a wrong one and watch it being
-counted. The PIN never leaves the page: the browser derives the Argon2id fingerprint and encrypts it with Zama's SDK.
+`web/` holds the site: a landing page (`index.html`, no wallet code) and the app at `/app` (Preact) on top of the
+deployed Sepolia contracts: connect a wallet, choose a PIN on a keypad and a hidden limit, create the account (8
+transactions), deposit, and send ETH with the PIN — or try a wrong one and watch it being counted. The PIN never leaves the page: the browser derives the Argon2id fingerprint and encrypts it with Zama's SDK.
 Accounts use short demo delays instead of the production examples.
 
 ```bash
 npm run web:test     # the browser PIN fingerprint matches the SDK's test vectors
-npm run web:serve    # builds web/dist and serves it on http://localhost:8790 (use a Sepolia wallet such as MetaMask)
+npm run web:serve    # builds web/dist and serves it on http://localhost:8790 (app at /app; use a Sepolia wallet)
 npm run web:build    # static build for hosting → web/dist (COOP/COEP headers in vercel.json and _headers)
 node web/og/render.mjs   # re-renders the link-preview image web/public/og.png (needs a local Chrome)
 ```
@@ -186,7 +186,7 @@ contracts/account/
   EncryptedAccountFactory.sol counterfactual ERC-1167 clone factory
 contracts/test/               test and benchmark contracts, including a deliberately vulnerable PIN verifier
 sdk/src/                      Argon2id fingerprint, PIN policy, watchtower v0
-web/                          browser demo on Sepolia (create an account, send with the PIN)
+web/                          the site: landing page and the Sepolia app (create an account, send with the PIN)
 test/                         mock-stack tests (PIN, policy, recovery, ERC-4337, exploits, cost, F0.10, F0.11)
 scripts/                      Sepolia measurement scripts, simulations and reports
 bench/                        phone benches (Argon2id, input proof)

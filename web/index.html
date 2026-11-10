@@ -2,119 +2,306 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Encrypted Account</title>
-<meta name="description" content="Create a smart account on Sepolia whose PIN lives in the contract. The PIN is checked under FHE and the spending rules are encrypted: a stolen key isn't enough.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Encrypted Account — a stolen key isn't enough</title>
+<meta name="description" content="A smart account whose second factor lives in the contract. Your PIN, limits and trusted addresses are encrypted on-chain with FHE, so a stolen key can't drain it. Open source, live on Sepolia.">
+<meta name="theme-color" content="#07080a">
 <link rel="canonical" href="https://encrypted-account.vercel.app/">
 <meta property="og:title" content="Encrypted Account — a stolen key isn't enough">
-<meta property="og:description" content="A smart account whose PIN lives in the contract, checked under FHE, with spending rules even the key holder can't see. Try it on Sepolia.">
+<meta property="og:description" content="A smart account whose PIN lives in the contract, checked under FHE. Limits and trusted addresses stay encrypted, even from whoever holds the key. Try it on Sepolia.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Encrypted Account">
 <meta property="og:url" content="https://encrypted-account.vercel.app/">
 <meta property="og:image" content="https://encrypted-account.vercel.app/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Encrypted Account: a stolen key isn't enough. A smart account whose PIN lives in the contract, checked under FHE.">
+<meta property="og:image:alt" content="Encrypted Account: a stolen key isn't enough. A phone shows a transfer to a new address blocked by a wrong PIN; nothing moved.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://encrypted-account.vercel.app/og.png">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='26' height='26' rx='8' fill='%234f46e5'/%3E%3Crect x='10' y='10' width='12' height='12' rx='3' fill='%2322c3a6'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="./assets/style.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/landing.css">
+<script>document.documentElement.classList.add("js")</script>
 </head>
 <body>
-<header class="top">
-  <div class="brand"><span class="logo" aria-hidden="true"></span>Encrypted Account</div>
-  <div class="chips"><span class="chip">Sepolia</span><span id="fhe" class="chip muted">FHE loading…</span></div>
+
+<header class="nav" id="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="/" aria-label="Encrypted Account, home">
+      <span class="mark" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i class="on"></i><i></i><i class="on"></i><i></i><i class="on"></i></span>
+      Encrypted Account
+    </a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#how">How it works</a>
+      <a href="#security">Security</a>
+      <a href="#next">Roadmap</a>
+    </nav>
+    <div class="nav-right">
+      <a class="icon-link" href="https://github.com/Himess/encrypted-account" target="_blank" rel="noopener" aria-label="Source code on GitHub">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.73.5.5 5.74.5 12.02c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56l-.02-1.96c-3.2.7-3.87-1.54-3.87-1.54-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.69 1.25 3.35.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.06.78 2.14l-.01 3.17c0 .31.21.67.8.56A11.53 11.53 0 0 0 23.5 12.02C23.5 5.74 18.27.5 12 .5Z"/></svg>
+      </a>
+      <a class="btn btn-primary btn-sm" href="/app">Launch app</a>
+    </div>
+  </div>
 </header>
 
 <main>
+  <!-- ───────────── hero ───────────── -->
   <section class="hero">
-    <h1>A stolen key isn't enough.</h1>
-    <p class="lead">Create a smart account whose PIN lives in the contract. The PIN is checked under fully homomorphic encryption, and your spending rules are encrypted too: even whoever holds your key can't see them.</p>
-    <ul class="facts">
-      <li><b>No 2FA server.</b> Every PIN attempt is counted on-chain before its result is decrypted.</li>
-      <li><b>Your PIN never leaves this page.</b> Only an encrypted fingerprint goes on-chain.</li>
-      <li><b>Hidden rules.</b> Your limit is encrypted, and the real cap is a random point inside it.</li>
-    </ul>
-    <p class="warn">Research prototype · unaudited · Sepolia testnet only · demo timings</p>
-  </section>
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <div class="hero-badges">
+          <span class="pill"><span class="dot live"></span>Live on Sepolia</span>
+          <span class="pill">Built on Zama FHEVM</span>
+        </div>
+        <h1>A stolen key<br><span class="accent" data-scramble>isn't enough.</span></h1>
+        <p class="lead">A smart account whose second factor lives in the contract. Your PIN, spending limit and trusted addresses are encrypted on-chain, so whoever steals your key can't drain the account&nbsp;— or even see the rules.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary btn-lg" href="/app">Create your account
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          </a>
+          <a class="btn btn-secondary btn-lg" href="#how">How it works</a>
+        </div>
+        <p class="hero-foot"><span>Open source · MIT</span><span>Research prototype, not audited</span></p>
+      </div>
 
-  <section id="connect-card" class="card">
-    <h2><span class="num">1</span>Connect</h2>
-    <p>Use a browser wallet on Sepolia. Your wallet address becomes the account's key.</p>
-    <button id="connect" class="btn primary" type="button">Connect wallet</button>
-    <p id="connect-msg" class="msg"></p>
-  </section>
+      <div class="hero-visual">
+        <div class="glow" aria-hidden="true"></div>
+        <div class="callout c1" aria-hidden="true"><b>Every guess is counted</b> on-chain before its result is decrypted.</div>
+        <div class="callout c2" aria-hidden="true"><b>Only yes or no</b> is decrypted, by Zama's threshold network.</div>
+        <div class="callout c3" aria-hidden="true"><b>Limits and trusted addresses</b> stay encrypted too.</div>
 
-  <section id="create-card" class="card" hidden>
-    <h2><span class="num">2</span>Create your Encrypted Account</h2>
-    <div class="grid2">
-      <label>PIN (6+ digits)<input id="pin1" type="password" inputmode="numeric" autocomplete="new-password" maxlength="32"></label>
-      <label>Repeat PIN<input id="pin2" type="password" inputmode="numeric" autocomplete="new-password" maxlength="32"></label>
+        <div class="device" id="device" role="img" aria-label="A phone: someone with the key tries to send 2.40 ETH to a new address. The account asks for the PIN, the guess is wrong, and nothing moves.">
+          <div class="device-screen">
+            <div class="d-status"><span>9:41</span><span class="d-bars"><i></i><i></i><i></i><i></i></span></div>
+            <div class="d-head">
+              <span class="mark" style="--s:22px"><i class="on"></i><i></i><i></i><i></i><i class="on"></i><i></i><i class="on"></i><i></i><i class="on"></i></span>
+              <span>My account</span>
+              <span class="d-net">Sepolia</span>
+            </div>
+            <div class="d-balance">
+              <div class="d-label">Balance</div>
+              <div class="d-amount"><span id="d-amount">2.40</span> <small>ETH</small></div>
+              <div class="d-safe" id="d-safe"><span class="dot live"></span>Protected by PIN</div>
+            </div>
+            <div class="d-tx">
+              <div class="d-tx-title"><span class="d-alert">!</span>Transfer requested with your key</div>
+              <div class="d-row"><span>To</span><span><span class="d-tag">New address</span> <span class="mono">0x7a3c…9f1e</span></span></div>
+              <div class="d-row"><span>Amount</span><span class="mono">2.40 ETH · all of it</span></div>
+            </div>
+            <div class="d-sheet">
+              <div class="d-grab"></div>
+              <div class="d-title">PIN required</div>
+              <div class="d-pindots" id="d-dots"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="d-state" id="d-state">Checked under FHE</div>
+              <div class="d-keys" id="d-keys">
+                <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span class="blank"></span><span>0</span><span class="del">⌫</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="row"><button id="suggest" class="btn ghost" type="button">Suggest a random PIN</button><span id="pin-msg" class="msg"></span></div>
-    <label>Hidden daily limit (ETH)<input id="limit" type="text" inputmode="decimal" value="0.01"></label>
-    <p class="hint">Stored encrypted. Sending to a new address always needs the PIN; transfers above 10× the limit also get a longer waiting period.</p>
-    <details class="escape">
-      <summary>Escape address</summary>
-      <p>If your key is ever stolen, you start an escape and the funds can only go to this address. For the demo, this page generates one for you:</p>
-      <p class="mono" id="escape-addr"></p>
-      <button id="escape-dl" class="btn ghost" type="button">Download its key</button>
-    </details>
-    <button id="create" class="btn primary" type="button">Create account</button>
-    <ol id="setup-steps" class="steps"></ol>
-    <p id="create-msg" class="msg"></p>
   </section>
 
-  <section id="account-card" class="card" hidden>
-    <h2><span class="num">3</span>Your Encrypted Account <button id="refresh" class="btn ghost small" type="button">Refresh</button></h2>
-    <dl class="kv">
-      <div><dt>Address</dt><dd id="acct-addr" class="mono"></dd></div>
-      <div><dt>Balance</dt><dd id="acct-bal"></dd></div>
-      <div><dt>Status</dt><dd id="acct-state"></dd></div>
-      <div><dt>Wrong-PIN score</dt><dd id="acct-score"></dd></div>
-      <div><dt>Next PIN attempt</dt><dd id="acct-next"></dd></div>
-    </dl>
-
-    <div class="split">
-      <form id="deposit-form" class="sub">
-        <h3>Deposit</h3>
-        <p class="hint">Send Sepolia ETH from your wallet into the account.</p>
-        <label>Amount (ETH)<input id="dep-amt" type="text" inputmode="decimal" value="0.001"></label>
-        <button class="btn" type="submit">Deposit</button>
-        <p id="dep-msg" class="msg"></p>
-      </form>
-      <form id="send-form" class="sub">
-        <h3>Send with your PIN</h3>
-        <p class="hint">Try a wrong PIN too: nothing moves, and the attempt is counted.</p>
-        <label>Recipient<input id="to" type="text" placeholder="0x…" autocomplete="off" spellcheck="false"></label>
-        <label>Amount (ETH)<input id="amt" type="text" inputmode="decimal" value="0.0001"></label>
-        <label>PIN<input id="pin" type="password" inputmode="numeric" autocomplete="off"></label>
-        <button id="send-btn" class="btn primary" type="submit">Send</button>
-      </form>
+  <!-- ───────────── problem ───────────── -->
+  <section class="problem">
+    <div class="container">
+      <p class="eyebrow">The problem</p>
+      <p class="statement reveal">Keys leak. A phishing page, malware, a seed phrase in a cloud backup. <em>Once someone has your key, a regular wallet gives them everything&nbsp;— in one transaction.</em></p>
+      <p class="statement small reveal">2FA, guardians and co-signers usually live on servers or with other people. Encrypted Account puts the second factor where the money is: <em>in the contract.</em></p>
     </div>
-    <ol id="send-steps" class="steps"></ol>
-    <p id="send-msg" class="msg"></p>
   </section>
 
-  <section class="card how">
-    <h2>What happens when you send</h2>
-    <ol class="plain">
-      <li>The transfer is opened on-chain with a fresh challenge.</li>
-      <li>Your browser derives a fingerprint from the PIN (Argon2id) and encrypts <i>fingerprint + challenge</i>.</li>
-      <li>The contract compares it with the stored encrypted fingerprint under FHE and counts the attempt.</li>
-      <li>Zama's threshold network decrypts only the yes/no result, nothing else.</li>
-      <li>On yes, the ETH moves; on no, nothing moves and the next attempt waits longer.</li>
-    </ol>
+  <!-- ───────────── comparison ───────────── -->
+  <section class="compare">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">Same key, different ending</p>
+        <h2>What a thief can do with your key</h2>
+      </div>
+      <div class="compare-grid">
+        <article class="cmp cmp-bad reveal">
+          <header><span class="cmp-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M16 12.5h2"/><path d="M3 9.5h18"/></svg></span>Regular wallet</header>
+          <ul>
+            <li><span class="x">✕</span>Everything leaves in one transaction</li>
+            <li><span class="x">✕</span>A signed permit drains your tokens later</li>
+            <li><span class="x">✕</span>No second factor and no way back</li>
+          </ul>
+          <div class="cmp-foot mono">balance: 2.40 ETH → <b class="bad">0.00 ETH</b></div>
+        </article>
+        <article class="cmp cmp-good reveal">
+          <header><span class="cmp-icon good"><span class="mark" style="--s:22px"><i class="on"></i><i></i><i></i><i></i><i class="on"></i><i></i><i class="on"></i><i></i><i class="on"></i></span></span>Encrypted Account</header>
+          <ul>
+            <li><span class="v">✓</span>New addresses need your PIN, which the thief doesn't have</li>
+            <li><span class="v">✓</span>About 12 guesses a month at most, each one counted on-chain</li>
+            <li><span class="v">✓</span>Limits and trusted addresses are hidden, even from the key holder</li>
+            <li><span class="v">✓</span>A permit signed with the key alone is void</li>
+            <li><span class="v">✓</span>An escape sends everything to your backup address</li>
+          </ul>
+          <div class="cmp-foot mono">balance: 2.40 ETH → <b class="good">2.40 ETH</b></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── how it works ───────────── -->
+  <section class="how" id="how">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">How it works</p>
+        <h2>A PIN the contract checks without ever seeing it</h2>
+        <p class="section-sub">Fully homomorphic encryption lets the contract compare encrypted values. The PIN is never decrypted; only the yes-or-no answer is.</p>
+      </div>
+      <ol class="steps">
+        <li class="step reveal">
+          <div class="step-art" aria-hidden="true">
+            <svg viewBox="0 0 120 80" fill="none"><rect x="34" y="8" width="52" height="64" rx="10" stroke="currentColor" stroke-opacity=".35"/><g fill="currentColor"><circle cx="48" cy="26" r="3.2"/><circle cx="60" cy="26" r="3.2" class="hi"/><circle cx="72" cy="26" r="3.2"/><circle cx="48" cy="38" r="3.2" class="hi"/><circle cx="60" cy="38" r="3.2"/><circle cx="72" cy="38" r="3.2" class="hi"/><circle cx="48" cy="50" r="3.2"/><circle cx="60" cy="50" r="3.2" class="hi"/><circle cx="72" cy="50" r="3.2"/><circle cx="60" cy="62" r="3.2"/></g></svg>
+          </div>
+          <span class="step-n mono">01</span>
+          <h3>Set a PIN</h3>
+          <p>Your browser stretches it with Argon2id and encrypts the fingerprint. The PIN itself never leaves the page.</p>
+        </li>
+        <li class="step reveal">
+          <div class="step-art" aria-hidden="true">
+            <svg viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M20 58h40" stroke-opacity=".35"/><path d="M20 46h28" stroke-opacity=".35"/><rect x="66" y="20" width="36" height="40" rx="9" stroke-opacity=".35"/><path d="M78 44l12-12M80 32h10v10" class="hi-s" stroke-width="2.2"/><path d="M20 34h18" stroke-opacity=".35"/></svg>
+          </div>
+          <span class="step-n mono">02</span>
+          <h3>Send as usual</h3>
+          <p>Everyday transfers to addresses you trust stay within your hidden limit. Anything unusual opens a PIN check with a fresh challenge.</p>
+        </li>
+        <li class="step reveal">
+          <div class="step-art" aria-hidden="true">
+            <svg viewBox="0 0 120 80" fill="none" stroke="currentColor"><rect x="10" y="24" width="38" height="32" rx="8" stroke-opacity=".35"/><rect x="72" y="24" width="38" height="32" rx="8" stroke-opacity=".35"/><text x="29" y="44" text-anchor="middle" font-family="Geist Mono, monospace" font-size="10" fill="currentColor" stroke="none" fill-opacity=".6">0x9f…</text><text x="91" y="44" text-anchor="middle" font-family="Geist Mono, monospace" font-size="10" fill="currentColor" stroke="none" fill-opacity=".6">0x3c…</text><path d="M52 40h16" class="hi-s" stroke-width="2.2" stroke-dasharray="3 4"/><circle cx="60" cy="40" r="7" class="hi-s" stroke-width="1.6"/></svg>
+          </div>
+          <span class="step-n mono">03</span>
+          <h3>Checked under FHE</h3>
+          <p>The contract compares encrypted values and records the attempt before anyone learns the result.</p>
+        </li>
+        <li class="step reveal">
+          <div class="step-art" aria-hidden="true">
+            <svg viewBox="0 0 120 80" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="18" y="22" width="36" height="36" rx="18" stroke="currentColor" stroke-opacity=".35"/><path d="M28 40l6 6 11-12" class="hi-s" stroke-width="2.4"/><rect x="66" y="22" width="36" height="36" rx="18" stroke="currentColor" stroke-opacity=".35"/><path d="M78 34l12 12M90 34L78 46" class="bad-s" stroke-width="2.4"/></svg>
+          </div>
+          <span class="step-n mono">04</span>
+          <h3>Only yes or no comes out</h3>
+          <p>Zama's threshold network decrypts a single bit. Correct: the transfer goes. Wrong: nothing moves, and the next try waits longer.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ───────────── under the hood ───────────── -->
+  <section class="bento-wrap" id="security">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">Under the hood</p>
+        <h2>Built for the day your key leaks</h2>
+      </div>
+      <div class="bento">
+        <article class="tile t-wide reveal">
+          <div class="tile-art meter" aria-hidden="true">
+            <div class="meter-cells"><i class="bad"></i><i class="bad"></i><i class="bad"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="meter-legend mono"><span>3 wrong guesses</span><span class="wait">next try in 15 min</span></div>
+          </div>
+          <h3>Every guess counts</h3>
+          <p>Attempts are written on-chain before the result is decrypted. From the third wrong guess, the wait grows from 15&nbsp;minutes up to 7&nbsp;days.</p>
+        </article>
+        <article class="tile reveal">
+          <div class="tile-art bar" aria-hidden="true">
+            <div class="bar-track"><span class="bar-fill"></span><span class="bar-hidden"></span></div>
+            <div class="bar-legend mono"><span>0</span><span class="q">tripwire: hidden</span><span>limit</span></div>
+          </div>
+          <h3>A tripwire nobody knows</h3>
+          <p>Your limit hides a random threshold somewhere inside it. Not even you know where.</p>
+        </article>
+        <article class="tile reveal">
+          <div class="tile-art book mono" aria-hidden="true">
+            <div><span class="lock">●</span><span data-cipher>0x8c2f1e…a9</span></div>
+            <div><span class="lock">●</span><span data-cipher>0x44d0b7…1f</span></div>
+            <div><span class="lock">●</span><span data-cipher>0xe91a03…6c</span></div>
+          </div>
+          <h3>An encrypted address book</h3>
+          <p>30 recipients and 10 spenders, stored as ciphertext. The key holder can't read them.</p>
+        </article>
+        <article class="tile reveal">
+          <div class="tile-art escape" aria-hidden="true">
+            <svg viewBox="0 0 220 64" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="14" width="56" height="36" rx="10" stroke="currentColor" stroke-opacity=".3"/><text x="34" y="36" text-anchor="middle" font-family="Geist, sans-serif" font-size="11" fill="currentColor" fill-opacity=".7">account</text><path d="M70 32h70" stroke="currentColor" stroke-opacity=".3" stroke-dasharray="3 5"/><path d="M132 26l8 6-8 6" class="hi-s" stroke-width="2"/><rect x="152" y="14" width="62" height="36" rx="10" class="hi-s" stroke-width="1.5"/><text x="183" y="36" text-anchor="middle" font-family="Geist, sans-serif" font-size="11" class="hi-f">backup</text><text x="105" y="22" text-anchor="middle" font-family="Geist Mono, monospace" font-size="9" fill="currentColor" fill-opacity=".5">after a delay</text></svg>
+          </div>
+          <h3>An escape without FHE</h3>
+          <p>If your key leaks, start an escape: after a delay, funds can only go to your backup address. Even if the thief starts it.</p>
+        </article>
+        <article class="tile reveal">
+          <div class="tile-art code mono" aria-hidden="true">
+            <div><span class="k">fp</span> = argon2id(<span class="s">pin</span>, 64 MiB)</div>
+            <div><span class="k">ok</span> = FHE.eq(<span class="s">enc(fp + c)</span>, <span class="s">stored + c</span>)</div>
+            <div class="dim">// only ok is ever decrypted</div>
+          </div>
+          <h3>No 2FA server</h3>
+          <p>The second factor is not a code from an app or a server. Its state and its rules live in the contract.</p>
+        </article>
+        <article class="tile t-full reveal">
+          <div class="tile-art stats" aria-hidden="true">
+            <div><b>MIT</b><span>license</span></div>
+            <div><b>101</b><span>tests passing</span></div>
+            <div><b>Sepolia</b><span>deployed &amp; measured</span></div>
+          </div>
+          <h3>Open and measured</h3>
+          <p>The contracts were deployed and measured on Sepolia end to end: latency, gas and FHE cost. Every number in the repository points to raw data.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── CTA ───────────── -->
+  <section class="cta">
+    <div class="container">
+      <div class="cta-card reveal">
+        <div class="cta-glow" aria-hidden="true"></div>
+        <p class="eyebrow">Try it on Sepolia</p>
+        <h2>See it for yourself</h2>
+        <p>Create an account in about two minutes, send with your PIN, then try a wrong one and watch it get counted.</p>
+        <div class="hero-cta center">
+          <a class="btn btn-primary btn-lg" href="/app">Launch app
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          </a>
+          <a class="btn btn-secondary btn-lg" href="https://github.com/Himess/encrypted-account" target="_blank" rel="noopener">Read the code</a>
+        </div>
+        <p class="cta-note">You need a browser wallet and a little Sepolia ETH. Testnet only.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── roadmap ───────────── -->
+  <section class="next" id="next">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">Roadmap</p>
+        <h2>What's next</h2>
+      </div>
+      <div class="next-grid">
+        <article class="nx reveal"><span class="nx-tag">Next</span><h3>Steal this wallet</h3><p>A Sepolia account whose seed phrase is public. Try to move the funds without the PIN.</p></article>
+        <article class="nx reveal"><h3>Private mode</h3><p>Encrypted balances and amounts with ERC-7984 tokens, and a duress PIN.</p></article>
+        <article class="nx reveal"><h3>Hidden inheritance</h3><p>After a long silence, funds go to heirs whose addresses stay encrypted until then.</p></article>
+        <article class="nx reveal"><h3>Agent accounts</h3><p>An AI agent holds the key; a human holds the PIN.</p></article>
+      </div>
+    </div>
   </section>
 </main>
 
-<footer>
-  <a id="repo-link" href="#" target="_blank" rel="noopener">Code on GitHub (MIT)</a>
-  <span>·</span>
-  <a id="factory-link" href="#" target="_blank" rel="noopener">Contracts on Sepolia</a>
-  <span>·</span>
-  <span>Built with Zama FHEVM</span>
+<footer class="footer">
+  <div class="container footer-inner">
+    <span class="brand"><span class="mark" style="--s:24px" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i class="on"></i><i></i><i class="on"></i><i></i><i class="on"></i></span>Encrypted Account</span>
+    <nav class="footer-links" aria-label="Links">
+      <a href="/app">App</a>
+      <a href="https://github.com/Himess/encrypted-account" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/Himess/encrypted-account/blob/main/RESULTS.md" target="_blank" rel="noopener">Measurements</a>
+      <a href="https://sepolia.etherscan.io/address/0xd03C6a944ccC168Fceb1253Efc741403FC67e541" target="_blank" rel="noopener">Contracts</a>
+      <a href="https://www.zama.ai/" target="_blank" rel="noopener">Zama FHEVM</a>
+    </nav>
+    <p class="footer-note">Research prototype · not audited · Sepolia testnet only. Do not use it with real funds.</p>
+  </div>
 </footer>
-<script type="module" src="./assets/app.js"></script>
+
+<script type="module" src="/assets/landing.js"></script>
 </body>
 </html>
