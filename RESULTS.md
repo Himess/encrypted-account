@@ -17,7 +17,8 @@ Zama's mock · **[V]** verified by reading code or documentation · **[D]** Zama
   K-only p50 7.2 / p95 14.6 s and 59,820 gas, on A 20.1 / 26.3 s and 1,949,477 gas (N = 30, interleaved); setup 5.2×
   cheaper; lists and limit public, no tripwire; `npm test` 98/98. **F0.15 ✔** — new storage slots on a PIN-verified
   transfer 16 → 8 (Sepolia, block access list); gas −22.6% on Sepolia (≈ −3.5% on today's mainnet schedule); stored
-  back-off: the 30-day worst case is 12 guesses without a reaction and 4 with an escape; `npm test` 101/101. Next: F0.14.
+  back-off: the 30-day worst case is 12 guesses without a reaction and 4 with an escape; `npm test` 101/101. **F0.14 ✔**
+  (write-up). Round 2 is complete.
 
 ## F0.8 · Burner wallet and Sepolia preparation
 
