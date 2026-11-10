@@ -9,7 +9,18 @@ import { execFileSync } from "child_process";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
-import { ENV_SEPOLIA, ROOT, gitignoreHas, hasSepoliaKey, hasWatchtowerKey, readEnvSepolia, sepoliaPrivateKey, sepoliaWatchtowerKey } from "./lib/env";
+import {
+  ENV_SEPOLIA,
+  ROOT,
+  gitignoreHas,
+  hasSepoliaKey,
+  hasUiTestKey,
+  hasWatchtowerKey,
+  readEnvSepolia,
+  sepoliaPrivateKey,
+  sepoliaUiTestKey,
+  sepoliaWatchtowerKey,
+} from "./lib/env";
 
 const SKIP_DIRS = new Set(["node_modules", "artifacts", "cache", "fhevmTemp", ".git"]);
 
@@ -31,9 +42,10 @@ function* walk(dir: string): Generator<string> {
 function main() {
   const env = readEnvSepolia();
   if (!hasSepoliaKey(env)) throw new Error("no key in .env.sepolia.");
-  // Case-insensitive search: the content is lower-cased. Burner + (if present) watchtower key.
+  // Case-insensitive search: the content is lower-cased. Burner + (if present) watchtower and web-demo test keys.
   const needles = [sepoliaPrivateKey(env)];
   if (hasWatchtowerKey(env)) needles.push(sepoliaWatchtowerKey(env));
+  if (hasUiTestKey(env)) needles.push(sepoliaUiTestKey(env));
   const hexes = needles.map((k) => k.toLowerCase().slice(2));
 
   const roots = [ROOT];

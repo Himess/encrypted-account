@@ -68,6 +68,17 @@ export function sepoliaWatchtowerKey(env = readEnvSepolia()): string {
   return k;
 }
 
+/** Web demo test wallet (web/serve.mjs --devwallet): a third random Sepolia burner. Same rules: .env.sepolia only. */
+export function hasUiTestKey(env = readEnvSepolia()): boolean {
+  return /^0x[0-9a-fA-F]{64}$/.test(env.SEPOLIA_UITEST_KEY ?? "");
+}
+
+export function sepoliaUiTestKey(env = readEnvSepolia()): string {
+  const k = env.SEPOLIA_UITEST_KEY ?? "";
+  if (!/^0x[0-9a-fA-F]{64}$/.test(k)) throw new Error("no SEPOLIA_UITEST_KEY in .env.sepolia. First run: npx hardhat run scripts/sepolia/uitest-wallet.ts");
+  return k;
+}
+
 export function sepoliaRpcUrls(env = readEnvSepolia()): string[] {
   const own = (env.SEPOLIA_RPC_URL ?? env.SEPOLIA_RPC_URLS ?? "")
     .split(",")

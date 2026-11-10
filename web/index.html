@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Encrypted Account</title>
+<meta name="description" content="Create a smart account on Sepolia whose PIN lives in the contract. The PIN is checked under FHE and the spending rules are encrypted: a stolen key isn't enough.">
+<meta property="og:title" content="Encrypted Account — a stolen key isn't enough">
+<meta property="og:description" content="A smart account whose PIN lives in the contract, checked under FHE, with spending rules even the key holder can't see. Try it on Sepolia.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='26' height='26' rx='8' fill='%234f46e5'/%3E%3Crect x='10' y='10' width='12' height='12' rx='3' fill='%2322c3a6'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="./assets/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="logo" aria-hidden="true"></span>Encrypted Account</div>
+  <div class="chips"><span class="chip">Sepolia</span><span id="fhe" class="chip muted">FHE loading…</span></div>
+</header>
+
+<main>
+  <section class="hero">
+    <h1>A stolen key isn't enough.</h1>
+    <p class="lead">Create a smart account whose PIN lives in the contract. The PIN is checked under fully homomorphic encryption, and your spending rules are encrypted too: even whoever holds your key can't see them.</p>
+    <ul class="facts">
+      <li><b>No 2FA server.</b> Every PIN attempt is counted on-chain before its result is decrypted.</li>
+      <li><b>Your PIN never leaves this page.</b> Only an encrypted fingerprint goes on-chain.</li>
+      <li><b>Hidden rules.</b> Your limit is encrypted, and the real cap is a random point inside it.</li>
+    </ul>
+    <p class="warn">Research prototype · unaudited · Sepolia testnet only · demo timings</p>
+  </section>
+
+  <section id="connect-card" class="card">
+    <h2><span class="num">1</span>Connect</h2>
+    <p>Use a browser wallet on Sepolia. Your wallet address becomes the account's key.</p>
+    <button id="connect" class="btn primary" type="button">Connect wallet</button>
+    <p id="connect-msg" class="msg"></p>
+  </section>
+
+  <section id="create-card" class="card" hidden>
+    <h2><span class="num">2</span>Create your Encrypted Account</h2>
+    <div class="grid2">
+      <label>PIN (6+ digits)<input id="pin1" type="password" inputmode="numeric" autocomplete="new-password" maxlength="32"></label>
+      <label>Repeat PIN<input id="pin2" type="password" inputmode="numeric" autocomplete="new-password" maxlength="32"></label>
+    </div>
+    <div class="row"><button id="suggest" class="btn ghost" type="button">Suggest a random PIN</button><span id="pin-msg" class="msg"></span></div>
+    <label>Hidden daily limit (ETH)<input id="limit" type="text" inputmode="decimal" value="0.01"></label>
+    <p class="hint">Stored encrypted. Sending to a new address always needs the PIN; transfers above 10× the limit also get a longer waiting period.</p>
+    <details class="escape">
+      <summary>Escape address</summary>
+      <p>If your key is ever stolen, you start an escape and the funds can only go to this address. For the demo, this page generates one for you:</p>
+      <p class="mono" id="escape-addr"></p>
+      <button id="escape-dl" class="btn ghost" type="button">Download its key</button>
+    </details>
+    <button id="create" class="btn primary" type="button">Create account</button>
+    <ol id="setup-steps" class="steps"></ol>
+    <p id="create-msg" class="msg"></p>
+  </section>
+
+  <section id="account-card" class="card" hidden>
+    <h2><span class="num">3</span>Your Encrypted Account <button id="refresh" class="btn ghost small" type="button">Refresh</button></h2>
+    <dl class="kv">
+      <div><dt>Address</dt><dd id="acct-addr" class="mono"></dd></div>
+      <div><dt>Balance</dt><dd id="acct-bal"></dd></div>
+      <div><dt>Status</dt><dd id="acct-state"></dd></div>
+      <div><dt>Wrong-PIN score</dt><dd id="acct-score"></dd></div>
+      <div><dt>Next PIN attempt</dt><dd id="acct-next"></dd></div>
+    </dl>
+
+    <div class="split">
+      <form id="deposit-form" class="sub">
+        <h3>Deposit</h3>
+        <p class="hint">Send Sepolia ETH from your wallet into the account.</p>
+        <label>Amount (ETH)<input id="dep-amt" type="text" inputmode="decimal" value="0.001"></label>
+        <button class="btn" type="submit">Deposit</button>
+        <p id="dep-msg" class="msg"></p>
+      </form>
+      <form id="send-form" class="sub">
+        <h3>Send with your PIN</h3>
+        <p class="hint">Try a wrong PIN too: nothing moves, and the attempt is counted.</p>
+        <label>Recipient<input id="to" type="text" placeholder="0x…" autocomplete="off" spellcheck="false"></label>
+        <label>Amount (ETH)<input id="amt" type="text" inputmode="decimal" value="0.0001"></label>
+        <label>PIN<input id="pin" type="password" inputmode="numeric" autocomplete="off"></label>
+        <button id="send-btn" class="btn primary" type="submit">Send</button>
+      </form>
+    </div>
+    <ol id="send-steps" class="steps"></ol>
+    <p id="send-msg" class="msg"></p>
+  </section>
+
+  <section class="card how">
+    <h2>What happens when you send</h2>
+    <ol class="plain">
+      <li>The transfer is opened on-chain with a fresh challenge.</li>
+      <li>Your browser derives a fingerprint from the PIN (Argon2id) and encrypts <i>fingerprint + challenge</i>.</li>
+      <li>The contract compares it with the stored encrypted fingerprint under FHE and counts the attempt.</li>
+      <li>Zama's threshold network decrypts only the yes/no result, nothing else.</li>
+      <li>On yes, the ETH moves; on no, nothing moves and the next attempt waits longer.</li>
+    </ol>
+  </section>
+</main>
+
+<footer>
+  <a id="repo-link" href="#" target="_blank" rel="noopener">Code on GitHub (MIT)</a>
+  <span>·</span>
+  <a id="factory-link" href="#" target="_blank" rel="noopener">Contracts on Sepolia</a>
+  <span>·</span>
+  <span>Built with Zama FHEVM</span>
+</footer>
+<script type="module" src="./assets/app.js"></script>
+</body>
+</html>

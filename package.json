@@ -21,6 +21,10 @@
     "sepolia:wait": "hardhat run scripts/sepolia/wait-funding.ts",
     "secrets:check": "hardhat run scripts/check-secrets.ts",
     "bench:build": "node bench/build.mjs",
+    "web:abi": "node web/gen-abi.mjs",
+    "web:build": "node web/build.mjs",
+    "web:serve": "node web/serve.mjs 8790",
+    "web:test": "node web/test/run.mjs",
     "clean": "hardhat clean",
     "test:hh": "hardhat test",
     "vectors": "node sdk/scripts/gen-vectors.mjs"
