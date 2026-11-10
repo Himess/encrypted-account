@@ -1,18 +1,42 @@
+<p align="center">
+  <a href="https://encrypted-account.vercel.app"><img src="web/public/og.png" alt="Encrypted Account: a stolen key isn't enough. A phone shows a transfer to a new address blocked by a wrong PIN." width="820"></a>
+</p>
+
 # Encrypted Account
 
-> A stolen seed phrase is not enough to drain the account.
+> A stolen key isn't enough.
 
-An ERC-4337 smart account whose PIN fingerprint, spending limits, a random tripwire threshold that nobody knows
-(not even the owner) and known recipient/spender lists are **encrypted** with Zama FHEVM and enforced on-chain — also
-against whoever holds the account key (K). The PIN is asked only for unusual operations.
+An ERC-4337 smart account whose second factor lives in the contract: a PIN that is checked under fully homomorphic
+encryption (Zama FHEVM). The PIN fingerprint, the spending limits, a random tripwire threshold that nobody knows (not
+even the owner) and the known recipient/spender lists are all **encrypted** and enforced on-chain, also against whoever
+holds the account key (K). The PIN is asked only for unusual operations.
+
+**[Live demo on Sepolia](https://encrypted-account.vercel.app)** · [How it works](#how-it-works) ·
+[Measurements](RESULTS.md) · [Known issues](#known-issues-and-trust-assumptions)
 
 > **Status: research prototype.** Not audited. Testnet only — do not use it with real funds. The tests run against
 > Zama's mock (cleartext) stack; the contracts were deployed to Sepolia and measured end to end (latency, gas, HCU).
 > Every number below points to raw data in `results/`; methodology and transaction hashes are in
 > [RESULTS.md](RESULTS.md).
 
-**Try it on Sepolia:** [encrypted-account.vercel.app](https://encrypted-account.vercel.app) — create an account with a
-PIN and a hidden limit, then send with the PIN (or try a wrong one). You need a browser wallet and some Sepolia ETH.
+## How it works
+
+1. **Set a PIN.** The browser stretches it with Argon2id and encrypts the 64-bit fingerprint. Only ciphertext goes
+   on-chain; the PIN never leaves the device.
+2. **Send as usual.** A transfer to a known address within the hidden limit needs only the key. A new address, a large
+   amount, an unlimited approval or an unknown call opens an operation that needs the PIN, with a fresh challenge bound
+   to that operation.
+3. **Checked under FHE.** The contract compares encrypted values and counts the attempt before its result exists.
+4. **Only yes or no is decrypted.** Zama's threshold network decrypts a single bit. Correct: the operation proceeds
+   after its delay. Wrong: nothing moves, and from the third wrong guess each new try waits longer (15 minutes up to 7
+   days), which leaves about 12 guesses in 30 days.
+
+If the key is stolen, the owner starts an **escape**: after a delay the funds can only go to a pre-set escape address,
+and that path needs no FHE. A signature made with the key alone cannot authorize anything (ERC-1271 accepts only hashes
+approved through a PIN-verified operation), so a phished permit is void.
+
+Try it in the [web app](https://encrypted-account.vercel.app/app): create an account in about two minutes, deposit
+Sepolia ETH, send with your PIN, or try a wrong one and watch it get counted on-chain.
 
 ## What it does
 
@@ -89,9 +113,8 @@ No dates; the order may change.
 
 - **"Steal this wallet" (next):** a Sepolia account whose seed phrase is public. Without the PIN, the funds should still
   not move.
-- **Web app:** a first version is live at [encrypted-account.vercel.app](https://encrypted-account.vercel.app) (code
-  in `web/`: create an account, send with the PIN); next: key-only transfers to known addresses, the escape, and the
-  phone flow.
+- **Web app:** live at [encrypted-account.vercel.app](https://encrypted-account.vercel.app) (landing page and app, code
+  in `web/`); next: key-only transfers to known addresses, the escape, and the phone flow.
 - **Private mode:** encrypted balances and amounts with ERC-7984 tokens, viewing with the PIN, a duress PIN.
 - **Hidden inheritance:** if no PIN is entered for a long period, the funds go to heirs whose addresses and shares stay
   encrypted until then.
@@ -120,8 +143,9 @@ Live at [encrypted-account.vercel.app](https://encrypted-account.vercel.app).
 
 `web/` holds the site: a landing page (`index.html`, no wallet code) and the app at `/app` (Preact) on top of the
 deployed Sepolia contracts: connect a wallet, choose a PIN on a keypad and a hidden limit, create the account (8
-transactions), deposit, and send ETH with the PIN — or try a wrong one and watch it being counted. The PIN never leaves the page: the browser derives the Argon2id fingerprint and encrypts it with Zama's SDK.
-Accounts use short demo delays instead of the production examples.
+transactions), deposit, and send ETH with the PIN — or try a wrong one and watch it being counted. The PIN never leaves
+the page: the browser derives the Argon2id fingerprint and encrypts it with Zama's SDK. Accounts use short demo delays
+(for example, a 5-minute escape) instead of the production examples.
 
 ```bash
 npm run web:test     # the browser PIN fingerprint matches the SDK's test vectors
@@ -139,6 +163,9 @@ Add `--minify` to test the exact production bundle.
 The measurements use a burner wallet created only for this work. Its key lives in `.env.sepolia` (gitignored) and never
 appears on the command line, in logs or in outputs. `SEP_RUN` only selects a run (state and output files get a suffix);
 it holds no key.
+
+<details>
+<summary>Measurement scripts</summary>
 
 ```bash
 npx hardhat run scripts/burner.ts                    # creates the burner, prints only its address
@@ -162,7 +189,10 @@ SEP_RUN=f015 F09_N=5 npx hardhat run scripts/sepolia/f09-run.ts
 npx hardhat run scripts/sepolia/f015-slots.ts        # new slots per transaction (block access list), F0.10 vs F0.15
 ```
 
-Other tools:
+</details>
+
+<details>
+<summary>Other tools</summary>
 
 ```bash
 npx ts-node scripts/pin-attack-sim.ts   # attack simulation (exact model of the contract semantics)
@@ -170,6 +200,8 @@ node scripts/f010-cost-diff.mjs         # mock cost difference, Round 1 → F0.1
 node bench/build.mjs                    # single-file Argon2id phone bench → bench/argon2id.html
 node bench/proof/build.mjs              # input-proof phone bench → bench/proof/dist/
 ```
+
+</details>
 
 ## Layout
 
@@ -187,7 +219,7 @@ contracts/account/
 contracts/test/               test and benchmark contracts, including a deliberately vulnerable PIN verifier
 sdk/src/                      Argon2id fingerprint, PIN policy, watchtower v0
 web/                          the site: landing page and the Sepolia app (create an account, send with the PIN)
-test/                         mock-stack tests (PIN, policy, recovery, ERC-4337, exploits, cost, F0.10, F0.11)
+test/                         mock-stack tests (PIN, policy, recovery, ERC-4337, watchtower, exploits, cost, F0.10, F0.11)
 scripts/                      Sepolia measurement scripts, simulations and reports
 bench/                        phone benches (Argon2id, input proof)
 results/                      raw measurements and evidence (JSON, CSV)
