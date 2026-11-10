@@ -11,6 +11,9 @@ against whoever holds the account key (K). The PIN is asked only for unusual ope
 > Every number below points to raw data in `results/`; methodology and transaction hashes are in
 > [RESULTS.md](RESULTS.md).
 
+**Try it on Sepolia:** [encrypted-account.vercel.app](https://encrypted-account.vercel.app) — create an account with a
+PIN and a hidden limit, then send with the PIN (or try a wrong one). You need a browser wallet and some Sepolia ETH.
+
 ## What it does
 
 | Situation | What happens |
@@ -86,8 +89,9 @@ No dates; the order may change.
 
 - **"Steal this wallet" (next):** a Sepolia account whose seed phrase is public. Without the PIN, the funds should still
   not move.
-- **Web app:** a first version is in `web/` (create an account, send with the PIN); next: key-only transfers to known
-  addresses, the escape, and the phone flow.
+- **Web app:** a first version is live at [encrypted-account.vercel.app](https://encrypted-account.vercel.app) (code
+  in `web/`: create an account, send with the PIN); next: key-only transfers to known addresses, the escape, and the
+  phone flow.
 - **Private mode:** encrypted balances and amounts with ERC-7984 tokens, viewing with the PIN, a duress PIN.
 - **Hidden inheritance:** if no PIN is entered for a long period, the funds go to heirs whose addresses and shares stay
   encrypted until then.
@@ -112,6 +116,8 @@ and retries native crashes.
 
 ## Web demo (Sepolia)
 
+Live at [encrypted-account.vercel.app](https://encrypted-account.vercel.app).
+
 `web/` is a small browser app on top of the deployed Sepolia contracts: connect a wallet, choose a PIN and a hidden
 limit, create the account (8 transactions), deposit, and send ETH with the PIN — or try a wrong one and watch it being
 counted. The PIN never leaves the page: the browser derives the Argon2id fingerprint and encrypts it with Zama's SDK.
@@ -121,10 +127,12 @@ Accounts use short demo delays instead of the production examples.
 npm run web:test     # the browser PIN fingerprint matches the SDK's test vectors
 npm run web:serve    # builds web/dist and serves it on http://localhost:8790 (use a Sepolia wallet such as MetaMask)
 npm run web:build    # static build for hosting → web/dist (COOP/COEP headers in vercel.json and _headers)
+node web/og/render.mjs   # re-renders the link-preview image web/public/og.png (needs a local Chrome)
 ```
 
 `node web/serve.mjs 8790 --devwallet` injects a test wallet for end-to-end runs without a browser extension; its key
 (`SEPOLIA_UITEST_KEY`, created by `scripts/sepolia/uitest-wallet.ts`) stays in `.env.sepolia` and in the Node process.
+Add `--minify` to test the exact production bundle.
 
 ## Sepolia measurements
 

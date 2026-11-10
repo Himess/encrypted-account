@@ -1,5 +1,6 @@
 // Bundles the Sepolia web demo.
-//   node web/build.mjs   → web/dist/{index.html, assets/app.js, assets/style.css, vercel.json, _headers}
+//   node web/build.mjs   → web/dist/{index.html, assets/app.js, assets/style.css, web/public/*, vercel.json, _headers}
+// A Vercel project link in web/dist/.vercel survives rebuilds.
 // Served with COOP/COEP headers (crossOriginIsolated → multi-threaded TFHE); without them the SDK falls back to a
 // single thread, which also works (measured in F0.12b).
 import * as esbuild from "esbuild";
@@ -33,7 +34,10 @@ const HEADERS = [
 ];
 
 export async function build({ minify = true } = {}) {
-  fs.rmSync(DIST, { recursive: true, force: true });
+  fs.mkdirSync(DIST, { recursive: true });
+  for (const name of fs.readdirSync(DIST)) {
+    if (name !== ".vercel") fs.rmSync(path.join(DIST, name), { recursive: true, force: true });
+  }
   fs.mkdirSync(path.join(DIST, "assets"), { recursive: true });
   await esbuild.build({
     plugins: [stubUnused],
@@ -51,6 +55,8 @@ export async function build({ minify = true } = {}) {
   });
   fs.copyFileSync(path.join(HERE, "src", "style.css"), path.join(DIST, "assets", "style.css"));
   fs.copyFileSync(path.join(HERE, "index.html"), path.join(DIST, "index.html"));
+  const PUBLIC = path.join(HERE, "public"); // static files served from the site root (og.png)
+  if (fs.existsSync(PUBLIC)) fs.cpSync(PUBLIC, DIST, { recursive: true });
   fs.writeFileSync(path.join(DIST, "vercel.json"), JSON.stringify({ headers: [{ source: "/(.*)", headers: HEADERS }] }, null, 2) + "\n");
   fs.writeFileSync(path.join(DIST, "_headers"), "/*\n" + HEADERS.map((h) => `  ${h.key}: ${h.value}`).join("\n") + "\n");
   return fs.statSync(path.join(DIST, "assets", "app.js")).size;

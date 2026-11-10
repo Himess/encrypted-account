@@ -5,6 +5,7 @@ fhevmTemp/
 coverage/
 coverage.json
 dist/
+.vercel/
 types/
 *.log
 

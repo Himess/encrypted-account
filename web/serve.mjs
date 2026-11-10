@@ -3,6 +3,7 @@
 //   node web/serve.mjs [port] --devwallet    → end-to-end testing without a browser extension: injects a test
 //                                              wallet whose key (SEPOLIA_UITEST_KEY in .env.sepolia, Sepolia only)
 //                                              stays in this Node process; the page only sees an EIP-1193 shim.
+//   … --minify                               → serve the minified production bundle instead of the debug build
 import http from "http";
 import fs from "fs";
 import path from "path";
@@ -17,7 +18,7 @@ const PORT = Number(process.argv.find((a) => /^\d+$/.test(a)) ?? 8790);
 const RPC = "https://ethereum-sepolia-rpc.publicnode.com";
 const CHAIN = 11155111;
 
-await build({ minify: false });
+await build({ minify: process.argv.includes("--minify") });
 
 // ── optional dev wallet (never prints the key)
 let wallet = null;
@@ -105,7 +106,7 @@ async function devRpc(method, params) {
   }
 }
 
-const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".map": "application/json", ".json": "application/json" };
+const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".map": "application/json", ".json": "application/json", ".png": "image/png" };
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url ?? "/", `http://127.0.0.1:${PORT}`);
