@@ -6,7 +6,7 @@ Zama's mock · **[V]** verified by reading code or documentation · **[D]** Zama
 # Round 2 — E1, Y1/Y2 fixes, A/B hot path, mobile Argon2id
 
 - **Input:** the Round 2 work package (8 November 2026), §4; its general rules (§4.0) apply to every package.
-- **Status (9 November 2026):** F0.8 ✔ · **F0.9 ✔** — E1 PIN flow p95 47.7 s: **GO** with a desktop client; K-only
+- **Status (10 November 2026):** F0.8 ✔ · **F0.9 ✔** — E1 PIN flow p95 47.7 s: **GO** with a desktop client; K-only
   hot path p95 40.9 s (60 s threshold accepted); the empty-proof pattern confirmed live · F0.12 ◐ (Android ✔, no iOS
   device) · **9 November interim decision** (work package §7): order F0.12b → F0.10 → F0.11 → F0.15 → F0.14 · **F0.12b ✔ —
   mobile web GO** (Galaxy A73, local proof p95 13.65 s ≤ 16 s; tight margin) · **F0.10 ✔** — Y1/Y2 fixes, K53, K55:
@@ -15,7 +15,9 @@ Zama's mock · **[V]** verified by reading code or documentation · **[D]** Zama
   interim decision** (§8): **F0.10 addendum ✔** (E_addr ≠ watchtower and ≠ K, restriction re-set, open-approval warning
   in the watchtower; 87/87). **F0.11 ✔** — B variant (public list, public limit, K-only in one transaction): on Sepolia
   K-only p50 7.2 / p95 14.6 s and 59,820 gas, on A 20.1 / 26.3 s and 1,949,477 gas (N = 30, interleaved); setup 5.2×
-  cheaper; lists and limit public, no tripwire; `npm test` 98/98. Next: F0.15.
+  cheaper; lists and limit public, no tripwire; `npm test` 98/98. **F0.15 ✔** — new storage slots on a PIN-verified
+  transfer 16 → 8 (Sepolia, block access list); gas −22.6% on Sepolia (≈ −3.5% on today's mainnet schedule); stored
+  back-off: the 30-day worst case is 12 guesses without a reaction and 4 with an escape; `npm test` 101/101. Next: F0.14.
 
 ## F0.8 · Burner wallet and Sepolia preparation
 
@@ -644,7 +646,7 @@ code, it passed once memory was free.
   30 + 10 encrypted slots are a fixed cost and hide the count.
 - In B the `openMode` flag sits in a separate slot (so that A's layout does not move): creating a B account costs ≈ 110k
   gas more on Sepolia (1,417,034 against 1,306,836). Packing the flag into the flags slot removes the difference → note
-  for F0.15.
+  for F0.15 (done in F0.15: the flag now sits in the flags slot).
 - A B request that falls through to the PIN path first reads the public conditions, so it costs ≈ 27k gas more than A's
   PIN op opening (mock 186,804 against 159,621).
 - B's first K-only transfer of an asset opens the `spent` slot (Sepolia warm-up 172,248 gas); later ones cost the value
@@ -665,6 +667,7 @@ code, it passed once memory was free.
 2. **Setup screen wording (if B is chosen).** It must say plainly: "Your list and your daily limit become public; addresses
    you add to the list but never use are visible too."
 3. **Addition to F0.15.** B's `openMode` flag slot (above) and A's slots that are reset and rewritten on every request.
+   Both done in F0.15 (see that section).
 
 ## F0.12 · Mobile Argon2id measurement (E17)
 
@@ -750,6 +753,189 @@ margin); download and store the CRS before the PIN is asked.
 - The phone measurement used the single-file, header-less build (built into `bench/proof/dist/` by `node bench/proof/build.mjs`, opened on the phone as a file,
   like the Argon2id page). A page opened from a file has the origin "null"; the relayer accepts the `null` origin, S3 and
   the RPC accept `*` (CORS verified).
+
+## F0.15 · State growth: fewer new slots (work package §7.5, §8.4)
+
+On Sepolia's current gas schedule, a storage slot that goes from zero to nonzero costs 110,983 gas; on mainnet today
+it costs 22,445 (`results/sepolia/gas-schedule*.json`) [M]. On Sepolia, most of a flow's cost therefore comes from the
+state it creates, not from FHE.
+
+**Result:**
+
+- Under F0.15, a PIN-verified ETH transfer opens **8 new slots instead of 16** on Sepolia [M]. The account's own slots
+  drop from 11 to 3 (the op record); the other five are ACL entries that must be persistent.
+- Gas on Sepolia: **−22.6%** for the PIN transfer and −10.2% for the K-only transfer. On today's mainnet schedule this
+  is −3.5% and −1.9% [I].
+- The day's first transfer no longer re-creates the daily counter slot (step 2): −86k gas per day-first transfer on
+  Sepolia, about neutral on today's mainnet schedule [M + I].
+- The stored back-off (§5.2 b) is in place. 30-day worst case: 13 → 12 guesses without a reaction, 5 → 4 with an escape
+  within an hour [I].
+- `npm test` 101/101 (98 + 3 new). The contracts stay under 24 KiB (A 22,505 B, B 23,666 B).
+- Acceptance (§7.5, "at least halved"): **met**.
+
+### Where each new slot comes from [M] — `results/sepolia/f015-slots.json`
+
+`scripts/sepolia/f015-slots.ts` reads the block access list (EIP-7928, `eth_getBlockAccessList`) of every transaction in
+the F0.10 run and the F0.15 run. For each slot it takes the value before the transaction: an earlier write in the same
+block, otherwise `eth_getStorageAt` at block − 1. It then counts zero → nonzero writes per address.
+
+Both runs use the same method (`f09-run.ts`, N = 5): same account setup, test delays, limits and amount. The PIN
+transfer goes to a fresh address each time; the K-only transfer goes to a known recipient. An account's first sample
+also opens one-time slots, so the tables use samples 2–5 (medians). The counts were identical in all four samples of
+each run. The first samples are in the JSON (F0.15: 16 on the PIN path, 9 on the K-only path).
+
+**PIN-verified ETH transfer**
+
+| Step | Record | F0.10 | F0.15 | How |
+|---|---|---:|---:|---|
+| `requestTransfer` | op record: type / status / epochs, recipient, amount | 3 | 3 | stays: the op's content must survive until it executes |
+| | op content hash | 1 | 0 | recomputed from the op's fields |
+| `submitGuess` | guess record (`ok`, `big`, `isDuress` handles, flags) | 4 | 0 | one record per track, overwritten by each guess |
+| | the track's pending op | 1 | 0 | packed with the score into one slot that stays nonzero |
+| | `usedInput[handle]` | 1 | 0 | a last-input field in the track's record (I5 per track) |
+| | ACL: `ok` and `big` public; `isDuress` for the account and the guardian | 4 | 4 | required (see Limits) |
+| `finalizeGuess` | `pinCommitted` | 1 | 0 | shares a slot with `unit` |
+| `executeOp` | ACL: the auto-added known-list entry | 1 | 1 | required (a stored handle) |
+| | new account (the recipient is a fresh address, by design of the run) | 1 | 1 | — |
+| **Total** | | **16 + 1 account** | **8 + 1 account** | |
+
+**K-only ETH transfer**
+
+| Step | Record | F0.10 | F0.15 |
+|---|---|---:|---:|
+| `requestTransfer` | op record (3 slots) + `ok` handle in the op | 4 | 4 |
+| | op content hash | 1 | 0 |
+| | `reserved` (now shares a slot with `configured`) | 1 | 0 |
+| | ACL: `ok` public; `tripped` for the account and the guardian | 3 | 3 |
+| `finalizeEvaluation` | — | 0 | 0 |
+| **Total** | | **9** | **7** |
+
+### Cost on both gas schedules [M + I]
+
+Sepolia figures are medians of the steady samples [M]. "Today's mainnet" is estimated as live gas − new slots ×
+(110,983 − 22,445) − new accounts × (186,391 − 25,000) [I] (the method of the F0.9 cost model).
+
+| Flow (steady) | Sepolia F0.10 | Sepolia F0.15 | Δ | Today's mainnet F0.10 | F0.15 | Δ |
+|---|---:|---:|---:|---:|---:|---:|
+| PIN transfer (request + guess + finalize + execute) | 3,408,470 | **2,636,875** | **−22.6%** | 1,830,471 | 1,767,180 | −3.5% |
+| K-only transfer (request + finalize) | 1,949,481 | **1,750,433** | **−10.2%** | 1,152,639 | 1,130,667 | −1.9% |
+
+Per step on Sepolia (PIN transfer):
+
+| Step | F0.10 gas | F0.15 gas | Δ |
+|---|---:|---:|---:|
+| `requestTransfer` | 493,361 | 383,700 | −109,661 (one slot) |
+| `submitGuess` | 1,605,508 | 1,014,339 | −591,169 (six slots) |
+| `finalizeGuess` | 541,456 | 458,800 | −82,656 |
+| `executeOp` | 768,145 | 780,036 | +11,891 |
+
+`executeOp` and `finalizeEvaluation` cost slightly more: the slots they used to clear, and get a refund for, now stay
+nonzero. That refund was smaller than the cost of re-creating those slots in the next flow.
+
+- **Mock [Mock]** (Hardhat, mainnet-like schedule; `test/CostModel.test.ts`; `results/f015-cost-diff.json`):
+  - PIN transfer, an account's first: −40.7k gas (`requestTransfer` −21.7k, `submitGuess` −13.5k, `finalizeGuess`
+    −8.4k, `executeOp` +2.9k).
+  - A second guess on the same track: −76.0k, because the guess record is reused.
+  - K-only: `requestTransfer` −43.1k, `finalizeEvaluation` +3.1k.
+  - HCU is unchanged in every flow.
+  - The test now starts 10 minutes into an epoch. The Hardhat chain starts from the wall clock, and a run just before
+    UTC midnight had measured an epoch roll inside the flow (+10k in `executeOp`).
+- **Latency [M]** (F0.15 run, n = 5): E1 p50 24.3 s / p95 24.3 s (F0.10: 23.9 / 46.9 s); K-only p50 20.8 / p95 25.4 s.
+  The storage changes do not affect latency; inclusion and decryption dominate.
+
+### Step 2: epoch counters that restart at 1 [M + Mock]
+
+The daily counters (`spent`, `pinSpent`, `instantSpent`) used to be set to zero when the epoch rolled. So the day's
+first transfer of each asset re-created a slot: once for the K-only path, once for the PIN path. For an owner who makes
+one or two transfers a day, that is almost every transfer. This is the reset-and-rewrite pattern that §8.4 asks to
+remove.
+
+Change: once a counter has been used, it is stored as value + 1. The epoch roll writes 1 (value 0) instead of 0
+(`PolicyMath.counterOf` / `counterAdd`); views and events return the value.
+
+- **Mock [Mock]:** `Policy.test.ts` reads the raw slot. After the epoch roll it holds 1 (never 0) and `assetState`
+  returns 0; after the day's first transfer it holds amount + 1.
+- **Sepolia [M]:** one sample per build right after the UTC epoch change (10 November, from 00:01 UTC; run files
+  `e1-f015.json` #6, `e1-f015b.json` #4 and the matching hot-path files).
+  - The old build (`f015`) re-creates the counter slot on the day's first transfer: `pinSpent` in `executeOp` (877,956
+    gas against 780,036 in steady state) and `spent` in `finalizeEvaluation` (531,438 against 433,530).
+  - The new build (`f015b`) does not: both steps cost their steady-state gas (780,060 and 433,563).
+  - Per day-first transfer on Sepolia: PIN 9 → 8 new slots, 2,747,707 → 2,661,663 gas (−86.0k, −3.1%); K-only 8 → 7,
+    1,851,233 → 1,765,334 (−85.9k, −4.6%).
+  - Restarting at 1 gives up the refund for clearing the slot at the roll (≈ 12k gas in `submitGuess` and in the K-only
+    request), so on today's mainnet schedule the change is about neutral (+0.1% / +0.2%) [I].
+  - Within a day the two builds are identical (8 and 7 slots).
+
+### Changes → code [V]
+
+| Record | Before | F0.15 |
+|---|---|---|
+| Guess | `mapping(opId => Guess)`: a new entry, and new slots, on every guess | `Guess[3] trackGuesses`: one record per track, overwritten by each guess on it. A stale `bigH` stays when a non-outflow guess follows (`hasBig` tells which is valid), so no slot returns to zero. `getGuess(opId)` returns the record only while it is the latest on its track |
+| Input replay guard (I5) | `usedInput[handle]`: one new slot per guess | `inputH` in the track's record: the same input twice in a row on a track is rejected; an older input replayed later is evaluated and is wrong, because it encrypts another op's challenge (K53 binds `c` to the op's content), and it counts against the submitter. `usedInput` stays only for PIN-reset digests (rare) |
+| Op content hash | stored at opening (one slot) | recomputed from the op's fields (`PolicyMath.opHashOf`) when the challenge is checked; `challengeOf` and `OpOpened.challenge` are unchanged |
+| Track | score, decay epoch, last guess, pending op spread over slots; `pendingOp` returned to zero after every finalize | one slot: `uint32 score · uint32 decayEpoch · uint64 lastAt · uint64 waitUntil · uint64 pendingOp`; after the first guess it never returns to zero |
+| Back-off (§5.2 b) | derived from the score at read time | stored at guess time: `waitUntil = now + T2(budget score)`; on a correct result, after the refund, `lastAt + T2(new score)`; an owner change clears the old key's value |
+| Asset counters | `reserved`, `pinCommitted` in their own slots, back to zero when nothing is pending; `spent`, `pinSpent` set to zero at every epoch roll | `reserved` (uint112) shares a slot with `configured`, `pinCommitted` (uint128) with `unit`; the epoch counters are stored as value + 1 once used, so the roll writes 1, not 0 (step 2, `f015b`) |
+| `openMode` flag (B, F0.11 limit) | a separate slot (B's account creation cost ≈ 110k gas more on Sepolia) | in the flags slot |
+| Amounts above 2^112 − 1 | — | never take the K-only path (in practice the unlimited approval, which was K+P anyway), always get the long delay, and are counted capped in `pinCommitted` / `pinSpent` |
+
+**Side finding (in the Round 1 / F0.10 code, fixed) [Mock]:** after an unlimited approval on the PIN path, `pinCommitted`
+held 2^256 − 1, and after it ran `pinSpent` did. The next PIN outflow of that token overflowed in `_bigClass`
+(`pinSpent + pinCommitted + amount`), so every PIN outflow of the token reverted in `submitGuess` until the approval had
+run and the epoch had rolled over. A regression test in `Policy.test.ts` fails on commit `78badaa`
+with panic 0x11 in `PinLib._bigClass` and passes now. Funds were never at risk (the escape and the K-only path were not
+affected); it was a liveness bug.
+
+**Test hygiene:** the tests no longer rewrite the evidence files under `results/` on every run; `npm run test:record`
+does (`WRITE_RESULTS=1`). This keeps the random χ² values and the calldata-dependent gas in the committed files stable.
+
+### Attack simulation with the stored back-off [I] — `results/pin-attack-sim.json`
+
+The model (`scripts/pin-attack-sim.ts`) gains the stored-wait variant ("+SW"), copied from the contract: the wait is fixed
+when a guess is made (now + T2 of the shared budget score) and, after a correct result's refund, recomputed as last
+attempt + T2 of the new score. Same method as F0.10: worst phase of the decay calendar on an hourly grid,
+[min/median/max over phases], owner reaction 1 h.
+
+| Semantics | Owner | 24 h | 7 days | 30 days |
+|---|---|---:|---:|---:|
+| F0.10 (derived wait), no D | does not react | 8 (5.2%) | 9 (5.9%) | 13 (7.1%) [12/12/13] |
+| **F0.15 (stored wait)**, no D | does not react | 8 (5.2%) | 9 (5.9%) | **12 (6.9%)** [11/12/12] |
+| F0.15, no D | lifts the restriction again and again | 7 (4.6%) | 8 (5.2%) | 12 (6.9%) |
+| F0.15, no D | rotation (no K45) | 8 (5.2%) | 8 (5.2%) | 8 (5.2%) |
+| F0.15, no D | escape | **4 (2.6%)** | 4 | 4 |
+| F0.15 + K45, D present | rotation | **4 (2.6%)** | 4 | 4 |
+| F0.15 + K45, D present | escape | 4 (2.6%) | 4 | 4 |
+
+By reaction time, with an escape or a rotation with D: 15 min → 4, 1 h → 4, 8 h → 7 guesses (F0.10: 4 / 5 / 7). The
+expectation in the second interim decision (§8.2, item 5.2: ≤ 12 without a reaction, ≤ 5 with an escape) holds. The
+gain comes from the decay calendar: with a derived wait, a score that decays shortens a wait that is already running;
+a stored wait keeps the value it had when the guess was made. The owner's cost (K43 table above) does not change.
+
+### Limits
+
+- **What still creates slots on a PIN transfer, and why it stays.**
+  - Five ACL entries (four in `submitGuess`, one in `executeOp`). Zama's ACL keeps one entry per handle and address, and
+    each guess makes new handles. Public decryption of `ok` and `big` needs `makePubliclyDecryptable`. The guardian's
+    silent-alarm decryption of `isDuress` needs persistent permission for both the guardian and the account
+    (`checkPersistAllowed` in `@fhevm/sdk` [V]), so `allowTransient` cannot replace it. The auto-added known-list entry
+    is stored, so it needs `allowThis`. Intermediate results are already transient only (the executor allows them for
+    the transaction), so `allowTransient` has nothing left to save on this path.
+  - Three slots of the op record (four for an ERC-20: the token address). Its content must survive from the request to
+    the execution, hours or days later.
+- **Options not taken [I]:**
+  - Decrypting `ok` and `big` as one encrypted 8-bit value would save one ACL entry per PIN transfer (≈ 111k gas on
+    Sepolia's schedule) for two extra FHE operations. It changes `finalizeGuess` and the watchtower, and on today's
+    mainnet schedule it gains about nothing.
+  - Storing only the op's content hash and passing the content as calldata at the guess and the execution would save one
+    slot (two for an ERC-20). But every caller and the watchtower would have to carry the content, and `getOp` could no
+    longer show it.
+  - Recycling op records in a ring would save the three op slots in steady state, but it needs eviction rules for ops
+    that never get a guess.
+- **One-time slots:** an account's first guess on each track and its first op still open their slots once (sample #1
+  of each run).
+- **N = 5 per run.** In steady state the slot counts were identical in every sample; gas varied by tens of gas.
+- **B variant:** not measured live in F0.15. Its PIN path is A's code. Its synchronous K-only path writes only `spent`,
+  which no longer returns to zero after its first use.
 
 ---
 

@@ -4,12 +4,12 @@
   "account": "0x4465B6d44E2D8f42f04A0656ef99c173341796E5",
   "startedAtUtc": "2026-11-09T23:14:12.272Z",
   "config": {
-    "n": 3,
+    "n": 4,
     "gapS": [
       3,
       20
     ],
-    "rpc": "https://ethereum-sepolia-rpc.publicnode.com",
+    "rpc": "https://sepolia.gateway.tenderly.co",
     "tipGwei": 0.05,
     "relayer": "https://relayer.testnet.zama.org",
     "sdk": "@fhevm/sdk 0.13.7",
@@ -19,7 +19,7 @@
       "threadsAvailable": true,
       "wasmMemoryBytes": 27394048
     },
-    "clientReadyMs": 5937,
+    "clientReadyMs": 5458,
     "client": {
       "node": "v22.13.0",
       "cpu": "AMD Ryzen 5 5600 6-Core Processor              ",
@@ -387,6 +387,118 @@
           }
         }
       }
+    },
+    {
+      "i": 3,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-10T00:06:01.473Z",
+      "opId": "4",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 11119,
+        "decryptMs": 4978,
+        "finalizeMs": 6444
+      },
+      "totalMs": 22541,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 4976,
+        "httpCalls": 3,
+        "readyBlock": 12100974,
+        "lastError": null,
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 608
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 2724
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 4859
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12100974,
+        "decryptReadySeenAt": 12100974,
+        "finalize": 12100975,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#3 requestTransfer (K-only)",
+          "hash": "0x736a16e2208aa292bc8b3f4d5f24dd5df9852c7f094b99f551d613799ab66222",
+          "nonce": 366,
+          "blockNumber": 12100974,
+          "blockTimestamp": 1794269172,
+          "sentAtUtc": "2026-11-10T00:06:01.664Z",
+          "minedSeenAtUtc": "2026-11-10T00:06:12.592Z",
+          "inclusionMs": 10834,
+          "gasUsed": "1331771",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "66588571308336",
+          "replacements": 0,
+          "sentBlock": 12100973,
+          "blocksToInclusion": 1,
+          "wallMs": 11119,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#3 finalizeEvaluation (watchtower)",
+          "hash": "0xae6f915b0bacac0e9db272ce04996929999823b5375eaeceba38c8ec3d3e9afd",
+          "nonce": 173,
+          "blockNumber": 12100975,
+          "blockTimestamp": 1794269184,
+          "sentAtUtc": "2026-11-10T00:06:17.678Z",
+          "minedSeenAtUtc": "2026-11-10T00:06:24.015Z",
+          "inclusionMs": 6233,
+          "gasUsed": "433563",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "21678156937008",
+          "replacements": 0,
+          "sentBlock": 12100974,
+          "blocksToInclusion": 1,
+          "wallMs": 6444,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": 0,
+            "blockComputed": 0,
+            "meterCheck": "equal"
+          }
+        }
+      }
     }
   ],
   "failures": [],
@@ -405,47 +517,47 @@
     "escapeChange": 300
   },
   "knownRecipient": "0x1651C22C13a44e40cd3f1a8E2C94200d66AAA93A",
-  "updatedAtUtc": "2026-11-09T23:18:50.436Z",
+  "updatedAtUtc": "2026-11-10T00:08:05.832Z",
   "summary": {
-    "nOk": 3,
+    "nOk": 4,
     "nNotOk": 0,
     "totalMs": {
-      "n": 3,
+      "n": 4,
       "min": 14557,
       "p50": 20269,
-      "p95": 22011,
-      "max": 22011,
-      "mean": 18946
+      "p95": 22541,
+      "max": 22541,
+      "mean": 19845
     },
     "phases": {
       "requestMs": {
-        "n": 3,
+        "n": 4,
         "min": 1839,
         "p50": 7574,
-        "p95": 9533,
-        "max": 9533,
-        "mean": 6315
+        "p95": 11119,
+        "max": 11119,
+        "mean": 7516
       },
       "decryptMs": {
-        "n": 3,
-        "min": 6736,
-        "p50": 7143,
+        "n": 4,
+        "min": 4978,
+        "p50": 6736,
         "p95": 7495,
         "max": 7495,
-        "mean": 7125
+        "mean": 6588
       },
       "finalizeMs": {
-        "n": 3,
+        "n": 4,
         "min": 4983,
         "p50": 5575,
-        "p95": 5959,
-        "max": 5959,
-        "mean": 5506
+        "p95": 6444,
+        "max": 6444,
+        "mean": 5740
       }
     },
     "blocks": {
       "requestBlocksToInclusion": {
-        "n": 3,
+        "n": 4,
         "min": 1,
         "p50": 1,
         "p95": 1,
@@ -453,7 +565,7 @@
         "mean": 1
       },
       "decryptBlocksAfterRequest": {
-        "n": 3,
+        "n": 4,
         "min": 0,
         "p50": 0,
         "p95": 0,
@@ -461,7 +573,7 @@
         "mean": 0
       },
       "finalizeBlocksAfterRequest": {
-        "n": 3,
+        "n": 4,
         "min": 1,
         "p50": 1,
         "p95": 1,
@@ -471,26 +583,26 @@
     },
     "gas": {
       "request": {
-        "n": 3,
+        "n": 4,
         "min": 1316975,
         "p50": 1316975,
         "p95": 1419541,
         "max": 1419541,
-        "mean": 1351164
+        "mean": 1346316
       },
       "finalizeEvaluation": {
-        "n": 3,
+        "n": 4,
         "min": 433551,
-        "p50": 433575,
+        "p50": 433563,
         "p95": 715064,
         "max": 715064,
-        "mean": 527397
+        "mean": 503938
       }
     },
     "hcu": {
       "request": {
         "total": {
-          "n": 3,
+          "n": 4,
           "min": 774036,
           "p50": 774036,
           "p95": 774036,
@@ -498,7 +610,7 @@
           "mean": 774036
         },
         "depth": {
-          "n": 3,
+          "n": 4,
           "min": 634032,
           "p50": 634032,
           "p95": 634032,
@@ -508,7 +620,7 @@
       }
     },
     "meterChecks": {
-      "equal": 5,
+      "equal": 7,
       "unreadable": 1
     },
     "histogramTotal": [
@@ -525,7 +637,7 @@
       {
         "fromS": 20,
         "toS": 25,
-        "count": 2
+        "count": 3
       }
     ],
     "threshold60s": "p95 < 60 s"

@@ -1,6 +1,6 @@
 {
   "evidence": "[M] Sepolia (EIP-7928 block access list, eth_getBlockAccessList; pre-values from the same block or eth_getStorageAt at block − 1)",
-  "generatedAtUtc": "2026-11-09T23:19:13.881Z",
+  "generatedAtUtc": "2026-11-10T00:08:51.340Z",
   "rule": "new slot = value 0 before the transaction, nonzero after it; first = the account's first sample; dayFirst = the first sample in a new UTC epoch; steady = the rest; values are medians",
   "slotGas": {
     "sepolia": 110983,
@@ -1402,6 +1402,101 @@
             },
             "epoch": 20766,
             "cls": "steady"
+          },
+          {
+            "i": 5,
+            "steps": {
+              "open": {
+                "hash": "0xc886ab99b891ba9cd82f85dbc411bbc328cfae1a5c37f7709856652527c436e2",
+                "block": 12100964,
+                "blockTimestamp": 1794269052,
+                "gasUsed": 383700,
+                "newSlots": 3,
+                "changedSlots": 1,
+                "clearedSlots": 0,
+                "newAccounts": 0,
+                "byLabel": {
+                  "account (e1)": {
+                    "new": 3,
+                    "changed": 1,
+                    "cleared": 0
+                  }
+                }
+              },
+              "submitGuess": {
+                "hash": "0x8f3eda65d482297f291674bb3a39a7fd0c586503a1b716c14665183e36a11b55",
+                "block": 12100965,
+                "blockTimestamp": 1794269064,
+                "gasUsed": 1027239,
+                "newSlots": 4,
+                "changedSlots": 9,
+                "clearedSlots": 1,
+                "newAccounts": 0,
+                "byLabel": {
+                  "account (e1)": {
+                    "new": 0,
+                    "changed": 8,
+                    "cleared": 1
+                  },
+                  "fhevm HCU limit": {
+                    "new": 0,
+                    "changed": 1,
+                    "cleared": 0
+                  },
+                  "fhevm ACL": {
+                    "new": 4,
+                    "changed": 0,
+                    "cleared": 0
+                  }
+                }
+              },
+              "finalizeGuess": {
+                "hash": "0x0b49dd379c607f8e326528c2dafda2ff0b056fcda544fb32366f16882a559c2c",
+                "block": 12100966,
+                "blockTimestamp": 1794269076,
+                "gasUsed": 458812,
+                "newSlots": 0,
+                "changedSlots": 5,
+                "clearedSlots": 0,
+                "newAccounts": 0,
+                "byLabel": {
+                  "account (e1)": {
+                    "new": 0,
+                    "changed": 5,
+                    "cleared": 0
+                  }
+                }
+              },
+              "executeOp": {
+                "hash": "0x551badda788c13f1f3468f69e4c75908966f3de5e5108e517e8c8e6ae10a147a",
+                "block": 12100967,
+                "blockTimestamp": 1794269088,
+                "gasUsed": 877956,
+                "newSlots": 2,
+                "changedSlots": 5,
+                "clearedSlots": 0,
+                "newAccounts": 1,
+                "byLabel": {
+                  "account (e1)": {
+                    "new": 1,
+                    "changed": 4,
+                    "cleared": 0
+                  },
+                  "fhevm HCU limit": {
+                    "new": 0,
+                    "changed": 1,
+                    "cleared": 0
+                  },
+                  "fhevm ACL": {
+                    "new": 1,
+                    "changed": 0,
+                    "cleared": 0
+                  }
+                }
+              }
+            },
+            "epoch": 20767,
+            "cls": "dayFirst"
           }
         ],
         "first": {
@@ -1505,6 +1600,57 @@
           "newSlots": 8,
           "newAccounts": 1,
           "gasUsed": 2636875
+        },
+        "dayFirst": {
+          "open": {
+            "n": 1,
+            "newSlots": 3,
+            "changedSlots": 1,
+            "clearedSlots": 0,
+            "newAccounts": 0,
+            "gasUsed": 383700,
+            "newByLabel": {
+              "account (e1)": 3
+            }
+          },
+          "submitGuess": {
+            "n": 1,
+            "newSlots": 4,
+            "changedSlots": 9,
+            "clearedSlots": 1,
+            "newAccounts": 0,
+            "gasUsed": 1027239,
+            "newByLabel": {
+              "fhevm ACL": 4
+            }
+          },
+          "finalizeGuess": {
+            "n": 1,
+            "newSlots": 0,
+            "changedSlots": 5,
+            "clearedSlots": 0,
+            "newAccounts": 0,
+            "gasUsed": 458812,
+            "newByLabel": {}
+          },
+          "executeOp": {
+            "n": 1,
+            "newSlots": 2,
+            "changedSlots": 5,
+            "clearedSlots": 0,
+            "newAccounts": 1,
+            "gasUsed": 877956,
+            "newByLabel": {
+              "account (e1)": 1,
+              "fhevm ACL": 1
+            }
+          }
+        },
+        "dayFirstTotal": {
+          "n": 1,
+          "newSlots": 9,
+          "newAccounts": 1,
+          "gasUsed": 2747707
         }
       },
       "hot-path": {
@@ -1765,6 +1911,57 @@
             },
             "epoch": 20766,
             "cls": "steady"
+          },
+          {
+            "i": 5,
+            "steps": {
+              "request": {
+                "hash": "0xe02dffbdb530b4daccc4831784ec9917381ab685a14dc5594810b5b37385faee",
+                "block": 12100961,
+                "blockTimestamp": 1794269016,
+                "gasUsed": 1319795,
+                "newSlots": 7,
+                "changedSlots": 4,
+                "clearedSlots": 1,
+                "newAccounts": 0,
+                "byLabel": {
+                  "fhevm HCU limit": {
+                    "new": 0,
+                    "changed": 1,
+                    "cleared": 0
+                  },
+                  "account (hot)": {
+                    "new": 4,
+                    "changed": 3,
+                    "cleared": 1
+                  },
+                  "fhevm ACL": {
+                    "new": 3,
+                    "changed": 0,
+                    "cleared": 0
+                  }
+                }
+              },
+              "finalizeEvaluation": {
+                "hash": "0x9fd0a04bfa98b91e7b5fbb93898350025d15b7d72e06c5c27c071d84361bc352",
+                "block": 12100962,
+                "blockTimestamp": 1794269028,
+                "gasUsed": 531438,
+                "newSlots": 1,
+                "changedSlots": 2,
+                "clearedSlots": 0,
+                "newAccounts": 0,
+                "byLabel": {
+                  "account (hot)": {
+                    "new": 1,
+                    "changed": 2,
+                    "cleared": 0
+                  }
+                }
+              }
+            },
+            "epoch": 20767,
+            "cls": "dayFirst"
           }
         ],
         "first": {
@@ -1826,6 +2023,37 @@
           "newSlots": 7,
           "newAccounts": 0,
           "gasUsed": 1750433
+        },
+        "dayFirst": {
+          "request": {
+            "n": 1,
+            "newSlots": 7,
+            "changedSlots": 4,
+            "clearedSlots": 1,
+            "newAccounts": 0,
+            "gasUsed": 1319795,
+            "newByLabel": {
+              "account (hot)": 4,
+              "fhevm ACL": 3
+            }
+          },
+          "finalizeEvaluation": {
+            "n": 1,
+            "newSlots": 1,
+            "changedSlots": 2,
+            "clearedSlots": 0,
+            "newAccounts": 0,
+            "gasUsed": 531438,
+            "newByLabel": {
+              "account (hot)": 1
+            }
+          }
+        },
+        "dayFirstTotal": {
+          "n": 1,
+          "newSlots": 8,
+          "newAccounts": 0,
+          "gasUsed": 1851233
         }
       }
     },
@@ -2118,6 +2346,101 @@
             },
             "epoch": 20766,
             "cls": "steady"
+          },
+          {
+            "i": 3,
+            "steps": {
+              "open": {
+                "hash": "0x7e1550db71ee7d2582442288b0afeb296660d0f36994779f24eb36da32d96c94",
+                "block": 12100978,
+                "blockTimestamp": 1794269220,
+                "gasUsed": 383700,
+                "newSlots": 3,
+                "changedSlots": 1,
+                "clearedSlots": 0,
+                "newAccounts": 0,
+                "byLabel": {
+                  "account (e1)": {
+                    "new": 3,
+                    "changed": 1,
+                    "cleared": 0
+                  }
+                }
+              },
+              "submitGuess": {
+                "hash": "0x5940b7c0790e07777bdf02779a28d16937d93843a9bf96f5d5b54755a7f9979d",
+                "block": 12100980,
+                "blockTimestamp": 1794269244,
+                "gasUsed": 1039103,
+                "newSlots": 4,
+                "changedSlots": 10,
+                "clearedSlots": 0,
+                "newAccounts": 0,
+                "byLabel": {
+                  "fhevm HCU limit": {
+                    "new": 0,
+                    "changed": 1,
+                    "cleared": 0
+                  },
+                  "account (e1)": {
+                    "new": 0,
+                    "changed": 9,
+                    "cleared": 0
+                  },
+                  "fhevm ACL": {
+                    "new": 4,
+                    "changed": 0,
+                    "cleared": 0
+                  }
+                }
+              },
+              "finalizeGuess": {
+                "hash": "0x165d3639d046bbb19af9863a387e3e5aa231bc7c67756a21214716c8e73db3d8",
+                "block": 12100981,
+                "blockTimestamp": 1794269256,
+                "gasUsed": 458800,
+                "newSlots": 0,
+                "changedSlots": 5,
+                "clearedSlots": 0,
+                "newAccounts": 0,
+                "byLabel": {
+                  "account (e1)": {
+                    "new": 0,
+                    "changed": 5,
+                    "cleared": 0
+                  }
+                }
+              },
+              "executeOp": {
+                "hash": "0x02751c1d3e9c42c5f3d48128e330045c10378fa591e5fcdebc3d3ac17eaa2a90",
+                "block": 12100982,
+                "blockTimestamp": 1794269268,
+                "gasUsed": 780060,
+                "newSlots": 1,
+                "changedSlots": 6,
+                "clearedSlots": 0,
+                "newAccounts": 1,
+                "byLabel": {
+                  "fhevm HCU limit": {
+                    "new": 0,
+                    "changed": 1,
+                    "cleared": 0
+                  },
+                  "account (e1)": {
+                    "new": 0,
+                    "changed": 5,
+                    "cleared": 0
+                  },
+                  "fhevm ACL": {
+                    "new": 1,
+                    "changed": 0,
+                    "cleared": 0
+                  }
+                }
+              }
+            },
+            "epoch": 20767,
+            "cls": "dayFirst"
           }
         ],
         "first": {
@@ -2221,6 +2544,56 @@
           "newSlots": 8,
           "newAccounts": 1,
           "gasUsed": 2636914
+        },
+        "dayFirst": {
+          "open": {
+            "n": 1,
+            "newSlots": 3,
+            "changedSlots": 1,
+            "clearedSlots": 0,
+            "newAccounts": 0,
+            "gasUsed": 383700,
+            "newByLabel": {
+              "account (e1)": 3
+            }
+          },
+          "submitGuess": {
+            "n": 1,
+            "newSlots": 4,
+            "changedSlots": 10,
+            "clearedSlots": 0,
+            "newAccounts": 0,
+            "gasUsed": 1039103,
+            "newByLabel": {
+              "fhevm ACL": 4
+            }
+          },
+          "finalizeGuess": {
+            "n": 1,
+            "newSlots": 0,
+            "changedSlots": 5,
+            "clearedSlots": 0,
+            "newAccounts": 0,
+            "gasUsed": 458800,
+            "newByLabel": {}
+          },
+          "executeOp": {
+            "n": 1,
+            "newSlots": 1,
+            "changedSlots": 6,
+            "clearedSlots": 0,
+            "newAccounts": 1,
+            "gasUsed": 780060,
+            "newByLabel": {
+              "fhevm ACL": 1
+            }
+          }
+        },
+        "dayFirstTotal": {
+          "n": 1,
+          "newSlots": 8,
+          "newAccounts": 1,
+          "gasUsed": 2661663
         }
       },
       "hot-path": {
@@ -2379,6 +2752,57 @@
             },
             "epoch": 20766,
             "cls": "steady"
+          },
+          {
+            "i": 3,
+            "steps": {
+              "request": {
+                "hash": "0x736a16e2208aa292bc8b3f4d5f24dd5df9852c7f094b99f551d613799ab66222",
+                "block": 12100974,
+                "blockTimestamp": 1794269172,
+                "gasUsed": 1331771,
+                "newSlots": 7,
+                "changedSlots": 5,
+                "clearedSlots": 0,
+                "newAccounts": 0,
+                "byLabel": {
+                  "account (hot)": {
+                    "new": 4,
+                    "changed": 4,
+                    "cleared": 0
+                  },
+                  "fhevm HCU limit": {
+                    "new": 0,
+                    "changed": 1,
+                    "cleared": 0
+                  },
+                  "fhevm ACL": {
+                    "new": 3,
+                    "changed": 0,
+                    "cleared": 0
+                  }
+                }
+              },
+              "finalizeEvaluation": {
+                "hash": "0xae6f915b0bacac0e9db272ce04996929999823b5375eaeceba38c8ec3d3e9afd",
+                "block": 12100975,
+                "blockTimestamp": 1794269184,
+                "gasUsed": 433563,
+                "newSlots": 0,
+                "changedSlots": 3,
+                "clearedSlots": 0,
+                "newAccounts": 0,
+                "byLabel": {
+                  "account (hot)": {
+                    "new": 0,
+                    "changed": 3,
+                    "cleared": 0
+                  }
+                }
+              }
+            },
+            "epoch": 20767,
+            "cls": "dayFirst"
           }
         ],
         "first": {
@@ -2440,6 +2864,35 @@
           "newSlots": 7,
           "newAccounts": 0,
           "gasUsed": 1750526
+        },
+        "dayFirst": {
+          "request": {
+            "n": 1,
+            "newSlots": 7,
+            "changedSlots": 5,
+            "clearedSlots": 0,
+            "newAccounts": 0,
+            "gasUsed": 1331771,
+            "newByLabel": {
+              "account (hot)": 4,
+              "fhevm ACL": 3
+            }
+          },
+          "finalizeEvaluation": {
+            "n": 1,
+            "newSlots": 0,
+            "changedSlots": 3,
+            "clearedSlots": 0,
+            "newAccounts": 0,
+            "gasUsed": 433563,
+            "newByLabel": {}
+          }
+        },
+        "dayFirstTotal": {
+          "n": 1,
+          "newSlots": 7,
+          "newAccounts": 0,
+          "gasUsed": 1765334
         }
       }
     }
@@ -2749,7 +3202,158 @@
         }
       }
     },
-    "f015→f015b dayFirst": {},
+    "f015→f015b dayFirst": {
+      "e1": {
+        "flow": "PIN path (ETH transfer to a new address)",
+        "samples": [
+          1,
+          1
+        ],
+        "steps": {
+          "open": {
+            "newSlots": [
+              3,
+              3
+            ],
+            "gasUsed": [
+              383700,
+              383700
+            ],
+            "dGas": 0,
+            "dSlots": 0,
+            "slotGasSepolia": 0,
+            "slotGasMainnet": 0
+          },
+          "submitGuess": {
+            "newSlots": [
+              4,
+              4
+            ],
+            "gasUsed": [
+              1027239,
+              1039103
+            ],
+            "dGas": 11864,
+            "dSlots": 0,
+            "slotGasSepolia": 0,
+            "slotGasMainnet": 0
+          },
+          "finalizeGuess": {
+            "newSlots": [
+              0,
+              0
+            ],
+            "gasUsed": [
+              458812,
+              458800
+            ],
+            "dGas": -12,
+            "dSlots": 0,
+            "slotGasSepolia": 0,
+            "slotGasMainnet": 0
+          },
+          "executeOp": {
+            "newSlots": [
+              2,
+              1
+            ],
+            "gasUsed": [
+              877956,
+              780060
+            ],
+            "dGas": -97896,
+            "dSlots": -1,
+            "slotGasSepolia": -110983,
+            "slotGasMainnet": -22445
+          }
+        },
+        "total": {
+          "newSlots": [
+            9,
+            8
+          ],
+          "newAccounts": [
+            1,
+            1
+          ],
+          "gasUsed": [
+            2747707,
+            2661663
+          ],
+          "dGas": -86044,
+          "dGasPct": -3.1,
+          "dSlots": -1,
+          "slotGasSepolia": -110983,
+          "slotGasMainnet": -22445,
+          "mainnetEquivalent": [
+            1789474,
+            1791968
+          ],
+          "mainnetEquivalentDPct": 0.1
+        }
+      },
+      "hot-path": {
+        "flow": "K-only hot path (ETH transfer to a known recipient)",
+        "samples": [
+          1,
+          1
+        ],
+        "steps": {
+          "request": {
+            "newSlots": [
+              7,
+              7
+            ],
+            "gasUsed": [
+              1319795,
+              1331771
+            ],
+            "dGas": 11976,
+            "dSlots": 0,
+            "slotGasSepolia": 0,
+            "slotGasMainnet": 0
+          },
+          "finalizeEvaluation": {
+            "newSlots": [
+              1,
+              0
+            ],
+            "gasUsed": [
+              531438,
+              433563
+            ],
+            "dGas": -97875,
+            "dSlots": -1,
+            "slotGasSepolia": -110983,
+            "slotGasMainnet": -22445
+          }
+        },
+        "total": {
+          "newSlots": [
+            8,
+            7
+          ],
+          "newAccounts": [
+            0,
+            0
+          ],
+          "gasUsed": [
+            1851233,
+            1765334
+          ],
+          "dGas": -85899,
+          "dGasPct": -4.6,
+          "dSlots": -1,
+          "slotGasSepolia": -110983,
+          "slotGasMainnet": -22445,
+          "mainnetEquivalent": [
+            1142929,
+            1145568
+          ],
+          "mainnetEquivalentDPct": 0.2
+        }
+      }
+    },
     "f010→f015b steady": {
       "e1": {
         "flow": "PIN path (ETH transfer to a new address)",
@@ -6443,6 +7047,495 @@
       "blockTimestamp": 1794266256,
       "balIndex": 55,
       "gasUsed": 433575,
+      "newSlots": 0,
+      "changedSlots": 3,
+      "clearedSlots": 0,
+      "newAccounts": 0,
+      "byLabel": {
+        "account (hot)": {
+          "new": 0,
+          "changed": 3,
+          "cleared": 0
+        }
+      },
+      "newSlotList": []
+    },
+    {
+      "hash": "0xc886ab99b891ba9cd82f85dbc411bbc328cfae1a5c37f7709856652527c436e2",
+      "block": 12100964,
+      "blockTimestamp": 1794269052,
+      "balIndex": 42,
+      "gasUsed": 383700,
+      "newSlots": 3,
+      "changedSlots": 1,
+      "clearedSlots": 0,
+      "newAccounts": 0,
+      "byLabel": {
+        "account (e1)": {
+          "new": 3,
+          "changed": 1,
+          "cleared": 0
+        }
+      },
+      "newSlotList": [
+        {
+          "label": "account (e1)",
+          "address": "0x08c3acC24883E0aC7405Df0c2e86bBA71103C4Fe",
+          "key": "0xd75d1af172e3ed480b44342c8597fa1e9c0a0bcf096516b6ffc1cfdfff41fdf8",
+          "post": "0x0201"
+        },
+        {
+          "label": "account (e1)",
+          "address": "0x08c3acC24883E0aC7405Df0c2e86bBA71103C4Fe",
+          "key": "0xd75d1af172e3ed480b44342c8597fa1e9c0a0bcf096516b6ffc1cfdfff41fdfa",
+          "post": "0x10487cdc6680f371d960a494742b9d592e909063"
+        },
+        {
+          "label": "account (e1)",
+          "address": "0x08c3acC24883E0aC7405Df0c2e86bBA71103C4Fe",
+          "key": "0xd75d1af172e3ed480b44342c8597fa1e9c0a0bcf096516b6ffc1cfdfff41fdfb",
+          "post": "0xe8d4a51000"
+        }
+      ]
+    },
+    {
+      "hash": "0x8f3eda65d482297f291674bb3a39a7fd0c586503a1b716c14665183e36a11b55",
+      "block": 12100965,
+      "blockTimestamp": 1794269064,
+      "balIndex": 955,
+      "gasUsed": 1027239,
+      "newSlots": 4,
+      "changedSlots": 9,
+      "clearedSlots": 1,
+      "newAccounts": 0,
+      "byLabel": {
+        "account (e1)": {
+          "new": 0,
+          "changed": 8,
+          "cleared": 1
+        },
+        "fhevm HCU limit": {
+          "new": 0,
+          "changed": 1,
+          "cleared": 0
+        },
+        "fhevm ACL": {
+          "new": 4,
+          "changed": 0,
+          "cleared": 0
+        }
+      },
+      "newSlotList": [
+        {
+          "label": "fhevm ACL",
+          "address": "0xf0Ffdc93b7E186bC2f8CB3dAA75D86d1930A433D",
+          "key": "0x188aeb9e1dbff5dc6354a5239423cbfaa15da715b590f9941a0c838ee014987e",
+          "post": "0x01"
+        },
+        {
+          "label": "fhevm ACL",
+          "address": "0xf0Ffdc93b7E186bC2f8CB3dAA75D86d1930A433D",
+          "key": "0xcb1686ab12832f0d9e28ad5c234c97e92595c1da51fd63cbc34f7b5ca1fae6af",
+          "post": "0x01"
+        },
+        {
+          "label": "fhevm ACL",
+          "address": "0xf0Ffdc93b7E186bC2f8CB3dAA75D86d1930A433D",
+          "key": "0xdfb57e53205a128c365039035766235fad5fa7253bcd4b27ce2173c85edfaef8",
+          "post": "0x01"
+        },
+        {
+          "label": "fhevm ACL",
+          "address": "0xf0Ffdc93b7E186bC2f8CB3dAA75D86d1930A433D",
+          "key": "0xdfb758349e2b8c7d031ede34381872177104a8ecbb72c03de998fb5c9d307227",
+          "post": "0x01"
+        }
+      ]
+    },
+    {
+      "hash": "0x0b49dd379c607f8e326528c2dafda2ff0b056fcda544fb32366f16882a559c2c",
+      "block": 12100966,
+      "blockTimestamp": 1794269076,
+      "balIndex": 271,
+      "gasUsed": 458812,
+      "newSlots": 0,
+      "changedSlots": 5,
+      "clearedSlots": 0,
+      "newAccounts": 0,
+      "byLabel": {
+        "account (e1)": {
+          "new": 0,
+          "changed": 5,
+          "cleared": 0
+        }
+      },
+      "newSlotList": []
+    },
+    {
+      "hash": "0x551badda788c13f1f3468f69e4c75908966f3de5e5108e517e8c8e6ae10a147a",
+      "block": 12100967,
+      "blockTimestamp": 1794269088,
+      "balIndex": 46,
+      "gasUsed": 877956,
+      "newSlots": 2,
+      "changedSlots": 5,
+      "clearedSlots": 0,
+      "newAccounts": 1,
+      "byLabel": {
+        "account (e1)": {
+          "new": 1,
+          "changed": 4,
+          "cleared": 0
+        },
+        "fhevm HCU limit": {
+          "new": 0,
+          "changed": 1,
+          "cleared": 0
+        },
+        "fhevm ACL": {
+          "new": 1,
+          "changed": 0,
+          "cleared": 0
+        }
+      },
+      "newSlotList": [
+        {
+          "label": "account (e1)",
+          "address": "0x08c3acC24883E0aC7405Df0c2e86bBA71103C4Fe",
+          "key": "0xc8311046c3dcd1efb3f8101dcf53001ccc5e485085907d6ca00d1b790be0c730",
+          "post": "0xe8d4a51000"
+        },
+        {
+          "label": "fhevm ACL",
+          "address": "0xf0Ffdc93b7E186bC2f8CB3dAA75D86d1930A433D",
+          "key": "0xe3af3e0e3452bd172735bb8c27336a53573d4e5a19275a153c164b35a1f7b50f",
+          "post": "0x01"
+        }
+      ]
+    },
+    {
+      "hash": "0xe02dffbdb530b4daccc4831784ec9917381ab685a14dc5594810b5b37385faee",
+      "block": 12100961,
+      "blockTimestamp": 1794269016,
+      "balIndex": 49,
+      "gasUsed": 1319795,
+      "newSlots": 7,
+      "changedSlots": 4,
+      "clearedSlots": 1,
+      "newAccounts": 0,
+      "byLabel": {
+        "fhevm HCU limit": {
+          "new": 0,
+          "changed": 1,
+          "cleared": 0
+        },
+        "account (hot)": {
+          "new": 4,
+          "changed": 3,
+          "cleared": 1
+        },
+        "fhevm ACL": {
+          "new": 3,
+          "changed": 0,
+          "cleared": 0
+        }
+      },
+      "newSlotList": [
+        {
+          "label": "account (hot)",
+          "address": "0xE85064dcdb8eeeA769466b0a2c05BC9FdFB3042B",
+          "key": "0xd75d1af172e3ed480b44342c8597fa1e9c0a0bcf096516b6ffc1cfdfff41fdf8",
+          "post": "0x511f00000000000000000000000101"
+        },
+        {
+          "label": "account (hot)",
+          "address": "0xE85064dcdb8eeeA769466b0a2c05BC9FdFB3042B",
+          "key": "0xd75d1af172e3ed480b44342c8597fa1e9c0a0bcf096516b6ffc1cfdfff41fdfa",
+          "post": "0xe31d26d71bcb2330cee5d814b762ef602b453950"
+        },
+        {
+          "label": "account (hot)",
+          "address": "0xE85064dcdb8eeeA769466b0a2c05BC9FdFB3042B",
+          "key": "0xd75d1af172e3ed480b44342c8597fa1e9c0a0bcf096516b6ffc1cfdfff41fdfb",
+          "post": "0xe8d4a51000"
+        },
+        {
+          "label": "account (hot)",
+          "address": "0xE85064dcdb8eeeA769466b0a2c05BC9FdFB3042B",
+          "key": "0xd75d1af172e3ed480b44342c8597fa1e9c0a0bcf096516b6ffc1cfdfff41fdfc",
+          "post": "0x4d8aadaf98a20249b2ad009b87291611dcf148bca4ff0000000000aa36a70000"
+        },
+        {
+          "label": "fhevm ACL",
+          "address": "0xf0Ffdc93b7E186bC2f8CB3dAA75D86d1930A433D",
+          "key": "0x0270f0e44105de0a4efc472e3965bac5e07da083ee560105da2323d195dac07e",
+          "post": "0x01"
+        },
+        {
+          "label": "fhevm ACL",
+          "address": "0xf0Ffdc93b7E186bC2f8CB3dAA75D86d1930A433D",
+          "key": "0x0ac0d57f28d89d80de395a7129b0dd2242825c47d0482255d80bcd8b09371633",
+          "post": "0x01"
+        },
+        {
+          "label": "fhevm ACL",
+          "address": "0xf0Ffdc93b7E186bC2f8CB3dAA75D86d1930A433D",
+          "key": "0x382de2700b81d7a38929590f1378e61f9faa9db7f03a53ace1863caac139a273",
+          "post": "0x01"
+        }
+      ]
+    },
+    {
+      "hash": "0x9fd0a04bfa98b91e7b5fbb93898350025d15b7d72e06c5c27c071d84361bc352",
+      "block": 12100962,
+      "blockTimestamp": 1794269028,
+      "balIndex": 55,
+      "gasUsed": 531438,
+      "newSlots": 1,
+      "changedSlots": 2,
+      "clearedSlots": 0,
+      "newAccounts": 0,
+      "byLabel": {
+        "account (hot)": {
+          "new": 1,
+          "changed": 2,
+          "cleared": 0
+        }
+      },
+      "newSlotList": [
+        {
+          "label": "account (hot)",
+          "address": "0xE85064dcdb8eeeA769466b0a2c05BC9FdFB3042B",
+          "key": "0xc8311046c3dcd1efb3f8101dcf53001ccc5e485085907d6ca00d1b790be0c72f",
+          "post": "0xe8d4a51000"
+        }
+      ]
+    },
+    {
+      "hash": "0x7e1550db71ee7d2582442288b0afeb296660d0f36994779f24eb36da32d96c94",
+      "block": 12100978,
+      "blockTimestamp": 1794269220,
+      "balIndex": 39,
+      "gasUsed": 383700,
+      "newSlots": 3,
+      "changedSlots": 1,
+      "clearedSlots": 0,
+      "newAccounts": 0,
+      "byLabel": {
+        "account (e1)": {
+          "new": 3,
+          "changed": 1,
+          "cleared": 0
+        }
+      },
+      "newSlotList": [
+        {
+          "label": "account (e1)",
+          "address": "0xEbfc30346306236AC22Cbe6B0C26034C7BC1dC66",
+          "key": "0x4af916a8b9adf6671d67bff6528ec59ae76866fe75a125450522812e3fc3c9ca",
+          "post": "0x0201"
+        },
+        {
+          "label": "account (e1)",
+          "address": "0xEbfc30346306236AC22Cbe6B0C26034C7BC1dC66",
+          "key": "0x4af916a8b9adf6671d67bff6528ec59ae76866fe75a125450522812e3fc3c9cc",
+          "post": "0xce78d1c29c90fd706c186d9bbb53ed85133bce36"
+        },
+        {
+          "label": "account (e1)",
+          "address": "0xEbfc30346306236AC22Cbe6B0C26034C7BC1dC66",
+          "key": "0x4af916a8b9adf6671d67bff6528ec59ae76866fe75a125450522812e3fc3c9cd",
+          "post": "0xe8d4a51000"
+        }
+      ]
+    },
+    {
+      "hash": "0x5940b7c0790e07777bdf02779a28d16937d93843a9bf96f5d5b54755a7f9979d",
+      "block": 12100980,
+      "blockTimestamp": 1794269244,
+      "balIndex": 53,
+      "gasUsed": 1039103,
+      "newSlots": 4,
+      "changedSlots": 10,
+      "clearedSlots": 0,
+      "newAccounts": 0,
+      "byLabel": {
+        "fhevm HCU limit": {
+          "new": 0,
+          "changed": 1,
+          "cleared": 0
+        },
+        "account (e1)": {
+          "new": 0,
+          "changed": 9,
+          "cleared": 0
+        },
+        "fhevm ACL": {
+          "new": 4,
+          "changed": 0,
+          "cleared": 0
+        }
+      },
+      "newSlotList": [
+        {
+          "label": "fhevm ACL",
+          "address": "0xf0Ffdc93b7E186bC2f8CB3dAA75D86d1930A433D",
+          "key": "0x0ec3720bc3f309345fab3d96e04182a206b8af3d4f6ac2d6bac11caf14f6085e",
+          "post": "0x01"
+        },
+        {
+          "label": "fhevm ACL",
+          "address": "0xf0Ffdc93b7E186bC2f8CB3dAA75D86d1930A433D",
+          "key": "0x779b6a8900d33811aeec71bb1b28faeb6220651b9671f3a2cc2f9d3d238e9be0",
+          "post": "0x01"
+        },
+        {
+          "label": "fhevm ACL",
+          "address": "0xf0Ffdc93b7E186bC2f8CB3dAA75D86d1930A433D",
+          "key": "0x93fa5e5171e4138b4b22641e7e72b4875db1eaae81a7af16272549afb83268d2",
+          "post": "0x01"
+        },
+        {
+          "label": "fhevm ACL",
+          "address": "0xf0Ffdc93b7E186bC2f8CB3dAA75D86d1930A433D",
+          "key": "0xb4764a2154bfd6d2625b549cf5f056db3fb41a59340497c7f2878930811f674b",
+          "post": "0x01"
+        }
+      ]
+    },
+    {
+      "hash": "0x165d3639d046bbb19af9863a387e3e5aa231bc7c67756a21214716c8e73db3d8",
+      "block": 12100981,
+      "blockTimestamp": 1794269256,
+      "balIndex": 68,
+      "gasUsed": 458800,
+      "newSlots": 0,
+      "changedSlots": 5,
+      "clearedSlots": 0,
+      "newAccounts": 0,
+      "byLabel": {
+        "account (e1)": {
+          "new": 0,
+          "changed": 5,
+          "cleared": 0
+        }
+      },
+      "newSlotList": []
+    },
+    {
+      "hash": "0x02751c1d3e9c42c5f3d48128e330045c10378fa591e5fcdebc3d3ac17eaa2a90",
+      "block": 12100982,
+      "blockTimestamp": 1794269268,
+      "balIndex": 21,
+      "gasUsed": 780060,
+      "newSlots": 1,
+      "changedSlots": 6,
+      "clearedSlots": 0,
+      "newAccounts": 1,
+      "byLabel": {
+        "fhevm HCU limit": {
+          "new": 0,
+          "changed": 1,
+          "cleared": 0
+        },
+        "account (e1)": {
+          "new": 0,
+          "changed": 5,
+          "cleared": 0
+        },
+        "fhevm ACL": {
+          "new": 1,
+          "changed": 0,
+          "cleared": 0
+        }
+      },
+      "newSlotList": [
+        {
+          "label": "fhevm ACL",
+          "address": "0xf0Ffdc93b7E186bC2f8CB3dAA75D86d1930A433D",
+          "key": "0x543843986530d9fb32ca24dead177a7c09c5304e87ebd2b5dbd59f24d38393e7",
+          "post": "0x01"
+        }
+      ]
+    },
+    {
+      "hash": "0x736a16e2208aa292bc8b3f4d5f24dd5df9852c7f094b99f551d613799ab66222",
+      "block": 12100974,
+      "blockTimestamp": 1794269172,
+      "balIndex": 39,
+      "gasUsed": 1331771,
+      "newSlots": 7,
+      "changedSlots": 5,
+      "clearedSlots": 0,
+      "newAccounts": 0,
+      "byLabel": {
+        "account (hot)": {
+          "new": 4,
+          "changed": 4,
+          "cleared": 0
+        },
+        "fhevm HCU limit": {
+          "new": 0,
+          "changed": 1,
+          "cleared": 0
+        },
+        "fhevm ACL": {
+          "new": 3,
+          "changed": 0,
+          "cleared": 0
+        }
+      },
+      "newSlotList": [
+        {
+          "label": "account (hot)",
+          "address": "0x4465B6d44E2D8f42f04A0656ef99c173341796E5",
+          "key": "0x4af916a8b9adf6671d67bff6528ec59ae76866fe75a125450522812e3fc3c9ca",
+          "post": "0x511f00000000000000000000000101"
+        },
+        {
+          "label": "account (hot)",
+          "address": "0x4465B6d44E2D8f42f04A0656ef99c173341796E5",
+          "key": "0x4af916a8b9adf6671d67bff6528ec59ae76866fe75a125450522812e3fc3c9cc",
+          "post": "0x1651c22c13a44e40cd3f1a8e2c94200d66aaa93a"
+        },
+        {
+          "label": "account (hot)",
+          "address": "0x4465B6d44E2D8f42f04A0656ef99c173341796E5",
+          "key": "0x4af916a8b9adf6671d67bff6528ec59ae76866fe75a125450522812e3fc3c9cd",
+          "post": "0xe8d4a51000"
+        },
+        {
+          "label": "account (hot)",
+          "address": "0x4465B6d44E2D8f42f04A0656ef99c173341796E5",
+          "key": "0x4af916a8b9adf6671d67bff6528ec59ae76866fe75a125450522812e3fc3c9ce",
+          "post": "0xfe826da62340c2ec0016530a4b676c76e297ec8a97ff0000000000aa36a70000"
+        },
+        {
+          "label": "fhevm ACL",
+          "address": "0xf0Ffdc93b7E186bC2f8CB3dAA75D86d1930A433D",
+          "key": "0x3937a372ef2062b7846defbe4a7f464461fae2c7b23f8d819030adee7e3427c2",
+          "post": "0x01"
+        },
+        {
+          "label": "fhevm ACL",
+          "address": "0xf0Ffdc93b7E186bC2f8CB3dAA75D86d1930A433D",
+          "key": "0x451896f3cee0e856e385a027ada4de4e775398c11b43461357baacd51c933124",
+          "post": "0x01"
+        },
+        {
+          "label": "fhevm ACL",
+          "address": "0xf0Ffdc93b7E186bC2f8CB3dAA75D86d1930A433D",
+          "key": "0xacc9c50193701e04bb585e94ab9c8510942aba4257f11f3300e4b8aae0dc9e53",
+          "post": "0x01"
+        }
+      ]
+    },
+    {
+      "hash": "0xae6f915b0bacac0e9db272ce04996929999823b5375eaeceba38c8ec3d3e9afd",
+      "block": 12100975,
+      "blockTimestamp": 1794269184,
+      "balIndex": 45,
+      "gasUsed": 433563,
       "newSlots": 0,
       "changedSlots": 3,
       "clearedSlots": 0,

@@ -4,7 +4,7 @@
   "account": "0xE85064dcdb8eeeA769466b0a2c05BC9FdFB3042B",
   "startedAtUtc": "2026-11-09T23:00:50.998Z",
   "config": {
-    "n": 5,
+    "n": 6,
     "gapS": [
       3,
       20
@@ -19,7 +19,7 @@
       "threadsAvailable": true,
       "wasmMemoryBytes": 27394048
     },
-    "clientReadyMs": 5943,
+    "clientReadyMs": 6156,
     "client": {
       "node": "v22.13.0",
       "cpu": "AMD Ryzen 5 5600 6-Core Processor              ",
@@ -618,6 +618,125 @@
           }
         }
       }
+    },
+    {
+      "i": 5,
+      "kind": "hot",
+      "startedAtUtc": "2026-11-10T00:03:23.001Z",
+      "opId": "6",
+      "ok": true,
+      "executed": true,
+      "clear": [
+        true
+      ],
+      "phases": {
+        "requestMs": 11209,
+        "decryptMs": 7443,
+        "finalizeMs": 4354
+      },
+      "totalMs": 23006,
+      "decrypt": {
+        "attempts": 1,
+        "waitedMs": 7441,
+        "httpCalls": 4,
+        "readyBlock": 12100961,
+        "lastError": null,
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 671
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 2812
+          },
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 2,
+            "t": 4941
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 3,
+            "t": 7078
+          }
+        ]
+      },
+      "blocks": {
+        "request": 12100961,
+        "decryptReadySeenAt": 12100961,
+        "finalize": 12100962,
+        "decryptBlocksAfterRequest": 0,
+        "finalizeBlocksAfterRequest": 1
+      },
+      "tx": {
+        "request": {
+          "label": "hot#5 requestTransfer (K-only)",
+          "hash": "0xe02dffbdb530b4daccc4831784ec9917381ab685a14dc5594810b5b37385faee",
+          "nonce": 363,
+          "blockNumber": 12100961,
+          "blockTimestamp": 1794269016,
+          "sentAtUtc": "2026-11-10T00:03:23.238Z",
+          "minedSeenAtUtc": "2026-11-10T00:03:34.210Z",
+          "inclusionMs": 10871,
+          "gasUsed": "1319795",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "65989769796925",
+          "replacements": 0,
+          "sentBlock": 12100960,
+          "blocksToInclusion": 1,
+          "wallMs": 11209,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 774036,
+            "depth": 634032,
+            "fheOps": 8,
+            "blockMeter": 774036,
+            "blockFheTxs": 1,
+            "blockComputed": 774036,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeEvaluation": {
+          "label": "hot#5 finalizeEvaluation (watchtower)",
+          "hash": "0x9fd0a04bfa98b91e7b5fbb93898350025d15b7d72e06c5c27c071d84361bc352",
+          "nonce": 170,
+          "blockNumber": 12100962,
+          "blockTimestamp": 1794269028,
+          "sentAtUtc": "2026-11-10T00:03:41.951Z",
+          "minedSeenAtUtc": "2026-11-10T00:03:46.007Z",
+          "inclusionMs": 3936,
+          "gasUsed": "531438",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "26571907971570",
+          "replacements": 0,
+          "sentBlock": 12100961,
+          "blocksToInclusion": 1,
+          "wallMs": 4354,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": null,
+            "blockComputed": null,
+            "meterCheck": "unreadable"
+          }
+        }
+      }
     }
   ],
   "failures": [],
@@ -636,47 +755,47 @@
     "escapeChange": 300
   },
   "knownRecipient": "0xe31d26D71BCB2330cEe5D814b762ef602b453950",
-  "updatedAtUtc": "2026-11-09T23:08:23.862Z",
+  "updatedAtUtc": "2026-11-10T00:04:50.237Z",
   "summary": {
-    "nOk": 5,
+    "nOk": 6,
     "nNotOk": 0,
     "totalMs": {
-      "n": 5,
+      "n": 6,
       "min": 18590,
       "p50": 20805,
       "p95": 25387,
       "max": 25387,
-      "mean": 21489
+      "mean": 21742
     },
     "phases": {
       "requestMs": {
-        "n": 5,
+        "n": 6,
         "min": 7233,
         "p50": 9040,
         "p95": 13782,
         "max": 13782,
-        "mean": 9821
+        "mean": 10053
       },
       "decryptMs": {
-        "n": 5,
+        "n": 6,
         "min": 6411,
         "p50": 7202,
         "p95": 8772,
         "max": 8772,
-        "mean": 7278
+        "mean": 7306
       },
       "finalizeMs": {
-        "n": 5,
+        "n": 6,
         "min": 2833,
-        "p50": 4574,
+        "p50": 4564,
         "p95": 5342,
         "max": 5342,
-        "mean": 4390
+        "mean": 4384
       }
     },
     "blocks": {
       "requestBlocksToInclusion": {
-        "n": 5,
+        "n": 6,
         "min": 1,
         "p50": 1,
         "p95": 2,
@@ -684,7 +803,7 @@
         "mean": 1
       },
       "decryptBlocksAfterRequest": {
-        "n": 5,
+        "n": 6,
         "min": 0,
         "p50": 0,
         "p95": 0,
@@ -692,7 +811,7 @@
         "mean": 0
       },
       "finalizeBlocksAfterRequest": {
-        "n": 5,
+        "n": 6,
         "min": 1,
         "p50": 1,
         "p95": 1,
@@ -702,26 +821,26 @@
     },
     "gas": {
       "request": {
-        "n": 5,
+        "n": 6,
         "min": 1316903,
         "p50": 1316903,
         "p95": 1419331,
         "max": 1419331,
-        "mean": 1337389
+        "mean": 1334456
       },
       "finalizeEvaluation": {
-        "n": 5,
+        "n": 6,
         "min": 433518,
         "p50": 433530,
         "p95": 715062,
         "max": 715062,
-        "mean": 489836
+        "mean": 496770
       }
     },
     "hcu": {
       "request": {
         "total": {
-          "n": 5,
+          "n": 6,
           "min": 774036,
           "p50": 774036,
           "p95": 774036,
@@ -729,7 +848,7 @@
           "mean": 774036
         },
         "depth": {
-          "n": 5,
+          "n": 6,
           "min": 634032,
           "p50": 634032,
           "p95": 634032,
@@ -739,8 +858,8 @@
       }
     },
     "meterChecks": {
-      "equal": 8,
-      "unreadable": 2
+      "equal": 9,
+      "unreadable": 3
     },
     "histogramTotal": [
       {
@@ -751,7 +870,7 @@
       {
         "fromS": 20,
         "toS": 25,
-        "count": 2
+        "count": 3
       },
       {
         "fromS": 25,

@@ -4,7 +4,7 @@
   "account": "0x08c3acC24883E0aC7405Df0c2e86bBA71103C4Fe",
   "startedAtUtc": "2026-11-09T23:00:50.998Z",
   "config": {
-    "n": 5,
+    "n": 6,
     "gapS": [
       3,
       20
@@ -19,7 +19,7 @@
       "threadsAvailable": true,
       "wasmMemoryBytes": 27394048
     },
-    "clientReadyMs": 5943,
+    "clientReadyMs": 6156,
     "client": {
       "node": "v22.13.0",
       "cpu": "AMD Ryzen 5 5600 6-Core Processor              ",
@@ -950,6 +950,183 @@
           }
         }
       }
+    },
+    {
+      "i": 5,
+      "kind": "pin",
+      "startedAtUtc": "2026-11-10T00:04:00.182Z",
+      "to": "0x10487CDc6680F371D960a494742b9D592E909063",
+      "opId": "6",
+      "challengeSource": "open receipt (OpOpened.challenge, K53)",
+      "pinEnteredAtUtc": "2026-11-10T00:04:10.156Z",
+      "ok": true,
+      "clear": [
+        true,
+        false
+      ],
+      "phases": {
+        "argonMs": 196,
+        "challengeMs": 0,
+        "encryptMs": 4913,
+        "encrypt": {
+          "totalMs": 4913,
+          "relayerHttpMs": 553,
+          "localMs": 4360,
+          "httpCalls": 2
+        },
+        "submitMs": 6521,
+        "decryptMs": 4599,
+        "finalizeMs": 7065
+      },
+      "totalMs": 23294,
+      "openMs": 9853,
+      "clickToFinalizeMs": 33147,
+      "decrypt": {
+        "attempts": 2,
+        "waitedMs": 4599,
+        "httpCalls": 2,
+        "readyBlock": 12100965,
+        "lastError": "2 handles are not allowed for public decryption: 0x01dd06723fcf48c6c584d00df3793d30a9150df02aff0000000000aa36a70000, 0xe35366bc30e61bc905db04dbb89bd9c1fe562abbacff0000000000aa36a70000\nVersion: @fhevm/sdk@0.13.7",
+        "progress": [
+          {
+            "type": "queued",
+            "step": 0,
+            "totalSteps": 1,
+            "retryCount": 0,
+            "t": 2334
+          },
+          {
+            "type": "succeeded",
+            "step": 1,
+            "totalSteps": 1,
+            "retryCount": 1,
+            "t": 4464
+          }
+        ]
+      },
+      "blocks": {
+        "open": 12100964,
+        "submit": 12100965,
+        "decryptReadySeenAt": 12100965,
+        "finalize": 12100966,
+        "decryptBlocksAfterSubmit": 0,
+        "finalizeBlocksAfterSubmit": 1
+      },
+      "executed": true,
+      "tx": {
+        "open": {
+          "label": "e1#5 requestTransfer (PIN path)",
+          "hash": "0xc886ab99b891ba9cd82f85dbc411bbc328cfae1a5c37f7709856652527c436e2",
+          "nonce": 364,
+          "blockNumber": 12100964,
+          "blockTimestamp": 1794269052,
+          "sentAtUtc": "2026-11-10T00:04:00.555Z",
+          "minedSeenAtUtc": "2026-11-10T00:04:10.156Z",
+          "inclusionMs": 9488,
+          "gasUsed": "383700",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "19185005755500",
+          "replacements": 0,
+          "sentBlock": 12100963,
+          "blocksToInclusion": 1,
+          "wallMs": 9852,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": 0,
+            "blockComputed": 0,
+            "meterCheck": "equal"
+          }
+        },
+        "submitGuess": {
+          "label": "e1#5 submitGuess",
+          "hash": "0x8f3eda65d482297f291674bb3a39a7fd0c586503a1b716c14665183e36a11b55",
+          "nonce": 365,
+          "blockNumber": 12100965,
+          "blockTimestamp": 1794269064,
+          "sentAtUtc": "2026-11-10T00:04:15.514Z",
+          "minedSeenAtUtc": "2026-11-10T00:04:21.786Z",
+          "inclusionMs": 6135,
+          "gasUsed": "1027239",
+          "effectiveGasPriceWei": "50000015",
+          "costWei": "51361965408585",
+          "replacements": 0,
+          "sentBlock": 12100964,
+          "blocksToInclusion": 1,
+          "wallMs": 6521,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 698002,
+            "depth": 302000,
+            "fheOps": 10,
+            "blockMeter": 698002,
+            "blockFheTxs": 1,
+            "blockComputed": 698002,
+            "meterCheck": "equal"
+          }
+        },
+        "finalizeGuess": {
+          "label": "e1#5 finalizeGuess (watchtower)",
+          "hash": "0x0b49dd379c607f8e326528c2dafda2ff0b056fcda544fb32366f16882a559c2c",
+          "nonce": 171,
+          "blockNumber": 12100966,
+          "blockTimestamp": 1794269076,
+          "sentAtUtc": "2026-11-10T00:04:26.500Z",
+          "minedSeenAtUtc": "2026-11-10T00:04:33.450Z",
+          "inclusionMs": 6821,
+          "gasUsed": "458812",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "22940607340992",
+          "replacements": 0,
+          "sentBlock": 12100965,
+          "blocksToInclusion": 1,
+          "wallMs": 7065,
+          "status": 1,
+          "estimateRetries": 0,
+          "hcu": {
+            "total": 0,
+            "depth": 0,
+            "fheOps": 0,
+            "blockMeter": 0,
+            "blockFheTxs": 0,
+            "blockComputed": 0,
+            "meterCheck": "equal"
+          }
+        },
+        "executeOp": {
+          "label": "e1#5 executeOp (watchtower)",
+          "hash": "0x551badda788c13f1f3468f69e4c75908966f3de5e5108e517e8c8e6ae10a147a",
+          "nonce": 172,
+          "blockNumber": 12100967,
+          "blockTimestamp": 1794269088,
+          "sentAtUtc": "2026-11-10T00:04:35.290Z",
+          "minedSeenAtUtc": "2026-11-10T00:04:46.189Z",
+          "inclusionMs": 10779,
+          "gasUsed": "877956",
+          "effectiveGasPriceWei": "50000016",
+          "costWei": "43897814047296",
+          "replacements": 0,
+          "sentBlock": 12100966,
+          "blocksToInclusion": 1,
+          "wallMs": 12738,
+          "status": 1,
+          "estimateRetries": 1,
+          "hcu": {
+            "total": 667032,
+            "depth": 667032,
+            "fheOps": 3,
+            "blockMeter": 667032,
+            "blockFheTxs": null,
+            "blockComputed": null,
+            "meterCheck": "unreadable"
+          }
+        }
+      }
     }
   ],
   "failures": [],
@@ -967,29 +1144,29 @@
     "escape": 300,
     "escapeChange": 300
   },
-  "updatedAtUtc": "2026-11-09T23:08:23.862Z",
+  "updatedAtUtc": "2026-11-10T00:04:50.237Z",
   "summary": {
-    "nOk": 5,
+    "nOk": 6,
     "nFailedOk": 0,
     "totalMs": {
-      "n": 5,
-      "min": 23383,
-      "p50": 24255,
+      "n": 6,
+      "min": 23294,
+      "p50": 23983,
       "p95": 24345,
       "max": 24345,
-      "mean": 24052
+      "mean": 23925
     },
     "clickToFinalizeMs": {
-      "n": 5,
+      "n": 6,
       "min": 28399,
       "p50": 30901,
       "p95": 37641,
       "max": 37641,
-      "mean": 31924
+      "mean": 32128
     },
     "phases": {
       "argonMs": {
-        "n": 5,
+        "n": 6,
         "min": 178,
         "p50": 196,
         "p95": 204,
@@ -997,7 +1174,7 @@
         "mean": 195
       },
       "challengeMs": {
-        "n": 5,
+        "n": 6,
         "min": 0,
         "p50": 0,
         "p95": 0,
@@ -1005,65 +1182,65 @@
         "mean": 0
       },
       "encryptMs": {
-        "n": 5,
+        "n": 6,
         "min": 4729,
-        "p50": 4963,
+        "p50": 4913,
         "p95": 5313,
         "max": 5313,
-        "mean": 4982
+        "mean": 4970
       },
       "encryptLocalMs": {
-        "n": 5,
+        "n": 6,
         "min": 4169,
-        "p50": 4381,
+        "p50": 4360,
         "p95": 4870,
         "max": 4870,
-        "mean": 4429
+        "mean": 4418
       },
       "encryptRelayerMs": {
-        "n": 5,
+        "n": 6,
         "min": 443,
-        "p50": 559,
+        "p50": 553,
         "p95": 669,
         "max": 669,
-        "mean": 552
+        "mean": 553
       },
       "submitMs": {
-        "n": 5,
+        "n": 6,
         "min": 5941,
-        "p50": 6601,
+        "p50": 6521,
         "p95": 7093,
         "max": 7093,
-        "mean": 6508
+        "mean": 6510
       },
       "decryptMs": {
-        "n": 5,
+        "n": 6,
         "min": 4508,
-        "p50": 4951,
+        "p50": 4599,
         "p95": 5001,
         "max": 5001,
-        "mean": 4792
+        "mean": 4760
       },
       "finalizeMs": {
-        "n": 5,
-        "min": 7130,
-        "p50": 7474,
+        "n": 6,
+        "min": 7065,
+        "p50": 7444,
         "p95": 8203,
         "max": 8203,
-        "mean": 7576
+        "mean": 7491
       },
       "openMs": {
-        "n": 5,
+        "n": 6,
         "min": 4416,
         "p50": 6811,
         "p95": 13385,
         "max": 13385,
-        "mean": 7872
+        "mean": 8202
       }
     },
     "blocks": {
       "submitBlocksToInclusion": {
-        "n": 5,
+        "n": 6,
         "min": 1,
         "p50": 1,
         "p95": 1,
@@ -1071,7 +1248,7 @@
         "mean": 1
       },
       "decryptBlocksAfterSubmit": {
-        "n": 5,
+        "n": 6,
         "min": 0,
         "p50": 0,
         "p95": 0,
@@ -1079,7 +1256,7 @@
         "mean": 0
       },
       "finalizeBlocksAfterSubmit": {
-        "n": 5,
+        "n": 6,
         "min": 1,
         "p50": 1,
         "p95": 1,
@@ -1089,42 +1266,42 @@
     },
     "gas": {
       "open": {
-        "n": 5,
+        "n": 6,
         "min": 383688,
         "p50": 383700,
         "p95": 481620,
         "max": 481620,
-        "mean": 403282
+        "mean": 400018
       },
       "submitGuess": {
-        "n": 5,
+        "n": 6,
         "min": 1014315,
         "p50": 1014339,
         "p95": 1616387,
         "max": 1616387,
-        "mean": 1134744
+        "mean": 1116826
       },
       "finalizeGuess": {
-        "n": 5,
+        "n": 6,
         "min": 458788,
         "p50": 458812,
         "p95": 458812,
         "max": 458812,
-        "mean": 458805
+        "mean": 458806
       },
       "executeOp": {
-        "n": 5,
+        "n": 6,
         "min": 780032,
         "p50": 780036,
-        "p95": 877925,
-        "max": 877925,
-        "mean": 799613
+        "p95": 877956,
+        "max": 877956,
+        "mean": 812670
       }
     },
     "hcu": {
       "submitGuess": {
         "total": {
-          "n": 5,
+          "n": 6,
           "min": 698002,
           "p50": 698002,
           "p95": 698002,
@@ -1132,7 +1309,7 @@
           "mean": 698002
         },
         "depth": {
-          "n": 5,
+          "n": 6,
           "min": 302000,
           "p50": 302000,
           "p95": 302000,
@@ -1142,7 +1319,7 @@
       },
       "executeOp": {
         "total": {
-          "n": 5,
+          "n": 6,
           "min": 667032,
           "p50": 667032,
           "p95": 667032,
@@ -1150,7 +1327,7 @@
           "mean": 667032
         },
         "depth": {
-          "n": 5,
+          "n": 6,
           "min": 667032,
           "p50": 667032,
           "p95": 667032,
@@ -1160,13 +1337,14 @@
       }
     },
     "meterChecks": {
-      "equal": 20
+      "equal": 23,
+      "unreadable": 1
     },
     "histogramTotal": [
       {
         "fromS": 20,
         "toS": 25,
-        "count": 5
+        "count": 6
       }
     ],
     "goNoGo": "GO (p95 < 60 s)"
