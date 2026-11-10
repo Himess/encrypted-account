@@ -80,6 +80,22 @@ for today's mainnet. Package codes such as F0.9, F0.10 and F0.11 name the measur
 - **Governance.** Zama governance can deny-list an account in the ACL or pause the ACL; the escape path is not affected
   (tested).
 
+## Roadmap
+
+No dates; the order may change.
+
+- **"Steal this wallet" (next):** a Sepolia account whose seed phrase is public. Without the PIN, the funds should still
+  not move.
+- **Web app:** create an account, set a PIN and send from the browser, on desktop and phone.
+- **Private mode:** encrypted balances and amounts with ERC-7984 tokens, viewing with the PIN, a duress PIN.
+- **Hidden inheritance:** if no PIN is entered for a long period, the funds go to heirs whose addresses and shares stay
+  encrypted until then.
+- **Agents and teams:** agent accounts (the agent holds the key, a human holds the PIN) and team treasuries with a
+  hidden policy.
+- **Standards:** ERC drafts for the encrypted secret factor and the encrypted policy hooks.
+- **Before any mainnet use:** an independent review and an audit.
+- **Research:** a TEE back-end with a threshold across hardware vendors, for more chains including Bitcoin.
+
 ## Build and test
 
 ```bash
