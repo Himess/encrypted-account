@@ -73,6 +73,35 @@ Sepolia ETH, send with your PIN, or try a wrong one and watch it get counted on-
   (`EncryptedAccountB`): public known lists and limit, one-transaction K-only path; the PIN path is unchanged. The mode
   is fixed by the implementation an account is cloned from.
 
+## Hidden inheritance
+
+A will that sits next to the account and pays out [ERC-7984](https://ercs.ethereum.org/ERCS/erc-7984) tokens
+(`contracts/inheritance/EncryptedWill.sol`):
+
+- **Heirs stay hidden, even afterwards.** Up to four heirs, each an encrypted address with an encrypted share. Empty
+  slots hold encrypted zeros, so even the number of heirs is hidden. Only the account sets them, through its PIN path;
+  the key alone cannot reach the will.
+- **The PIN is the proof of life.** The will reads the account's last correct PIN. After the inactivity period without
+  one (months in real use, 5 minutes in the demo), anyone can start the inheritance; a correct PIN during the grace
+  period that follows voids the start.
+- **A claim reveals nothing.** After settlement anyone can claim a token: an heir receives its encrypted share, anyone
+  else an encrypted zero. On-chain, an heir's claim and a stranger's claim look the same, and the amounts stay
+  encrypted.
+- **Built on OpenZeppelin's ERC-7984** reference implementation, vendored unchanged in
+  `contracts/vendor/openzeppelin-confidential/` (its npm package pins an older `@fhevm/solidity`).
+
+In the [app](https://encrypted-account.vercel.app/app): the *Hidden will* card creates the will, sets the heirs with
+your PIN and adds worthless test tokens (tcUSD); after 5 minutes without a PIN anyone can start it, 5 minutes later
+settle it, and the claim link lets each heir claim and decrypt its own balance. Tests: `test/Will.test.ts` (10, mock
+stack, including the real account's PIN path); Sepolia run: `scripts/sepolia/will-run.ts`.
+
+Measured on Sepolia ([RESULTS.md](RESULTS.md)): the first claim of a token computes every heir's amount, 12.3M HCU of
+the 20M per-transaction limit; each later claim costs 2.1M HCU and 2,117,912 gas, the same for an heir and for a
+stranger; every claimant decrypted exactly its own share (60 %, 40 %, 0, 0).
+
+Limits: tokens that reach the will after a token's first claim are not distributed; heirs have to know about the will
+(by design nothing on-chain tells them); the escape does not touch the will; unaudited, testnet only.
+
 ## Measured
 
 | What | Result | Data |
@@ -116,8 +145,8 @@ No dates; the order may change.
 - **Web app:** live at [encrypted-account.vercel.app](https://encrypted-account.vercel.app) (landing page and app, code
   in `web/`); next: key-only transfers to known addresses, the escape, and the phone flow.
 - **Private mode:** encrypted balances and amounts with ERC-7984 tokens, viewing with the PIN, a duress PIN.
-- **Hidden inheritance:** if no PIN is entered for a long period, the funds go to heirs whose addresses and shares stay
-  encrypted until then.
+- **Hidden inheritance:** done, on Sepolia: see [Hidden inheritance](#hidden-inheritance). Next: ETH and ERC-20 through
+  an ERC-7984 wrapper, and heirs in the app's address book.
 - **Agents and teams:** agent accounts (the agent holds the key, a human holds the PIN) and team treasuries with a
   hidden policy.
 - **Standards:** ERC drafts for the encrypted secret factor and the encrypted policy hooks.
@@ -216,10 +245,14 @@ contracts/account/
   OpsLib.sol                  pending-op state machine, delays, execution, escape sweep
   OpenLib.sol                 opening ops, admin parameter checks, co-signatures, escape address (EIP-712)
   EncryptedAccountFactory.sol counterfactual ERC-1167 clone factory
+contracts/inheritance/
+  EncryptedWill.sol           hidden inheritance in ERC-7984 tokens: encrypted heirs and shares, PIN as proof of life
+  EncryptedWillFactory.sol    deterministic ERC-1167 clones, one per (account, inactivity, grace)
+contracts/vendor/             OpenZeppelin's ERC-7984 (unchanged, MIT; see its README)
 contracts/test/               test and benchmark contracts, including a deliberately vulnerable PIN verifier
 sdk/src/                      Argon2id fingerprint, PIN policy, watchtower v0
 web/                          the site: landing page and the Sepolia app (create an account, send with the PIN)
-test/                         mock-stack tests (PIN, policy, recovery, ERC-4337, watchtower, exploits, cost, F0.10, F0.11)
+test/                         mock-stack tests (PIN, policy, recovery, ERC-4337, watchtower, exploits, cost, F0.10, F0.11, will)
 scripts/                      Sepolia measurement scripts, simulations and reports
 bench/                        phone benches (Argon2id, input proof)
 results/                      raw measurements and evidence (JSON, CSV)
@@ -227,4 +260,5 @@ results/                      raw measurements and evidence (JSON, CSV)
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Zama's libraries are under their own license (BSD-3-Clause-Clear).
+MIT — see [LICENSE](LICENSE). Zama's libraries are under their own license (BSD-3-Clause-Clear); the vendored
+OpenZeppelin ERC-7984 files are MIT.

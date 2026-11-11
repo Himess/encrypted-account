@@ -1,7 +1,96 @@
 # RESULTS
 
-Round 2 is on top; the Round 1 results are kept unchanged below. Evidence classes: **[M]** measured · **[Mock]** ran on
+The hidden-inheritance results are on top, then Round 2; the Round 1 results are kept unchanged below. Evidence classes: **[M]** measured · **[Mock]** ran on
 Zama's mock · **[V]** verified by reading code or documentation · **[D]** Zama documentation · **[I]** inference.
+
+# Hidden inheritance — EncryptedWill (11 November 2026)
+
+- **What:** `contracts/inheritance/EncryptedWill.sol` and `EncryptedWillFactory.sol`, a will next to an Encrypted
+  Account that pays out ERC-7984 tokens. OpenZeppelin's ERC-7984 is vendored unchanged
+  (`contracts/vendor/openzeppelin-confidential/`, `@openzeppelin/confidential-contracts` 0.5.3); the worthless test
+  token is `contracts/test/TestConfidentialToken.sol`. The account itself is unchanged.
+- **Status:** `test/Will.test.ts` 10/10 [Mock], `npm test` 111/111 [Mock]. Sepolia run with the f015b `e1` account
+  [M]: `results/sepolia/will-run-1.json` (run 1) and `results/sepolia/will-run.json` (run 2, adds the claimants' own
+  decryptions). Script: `scripts/sepolia/will-run.ts`.
+
+## Design → code [V]
+
+- **Heirs:** four slots of an encrypted address (`eaddress`) and an encrypted share in basis points (`euint16`, stored
+  as `euint64`). Empty slots are encrypted zeros, so the number of heirs is hidden too. `setHeirs` caps each share at
+  what the earlier slots left of 10,000, under FHE, so the shares never add up to more than 100 %.
+- **Who sets them:** only the account (`msg.sender == account`), which reaches the will only through `openCall` →
+  PIN → generic-call delay → `executeOp`. The input proof must be non-empty (the empty-proof lesson of Round 2).
+- **Proof of life:** the account's existing `status().lastPinAt`, written by every correct PIN. Nothing else counts;
+  the account key alone proves nothing.
+- **Trigger:** `start` once `inactivity` seconds have passed since the last correct PIN; `settle` once `grace` seconds
+  have passed since a start that no correct PIN has followed (a PIN voids the start without a transaction).
+- **Claims:** anyone may claim a token. The first claim fixes every slot's amount from the will's balance:
+  `amount_i = q·s_i + ⌊r·s_i / 10,000⌋` with `q, r = balance ÷ 10,000`, which equals `⌊balance·s_i / 10,000⌋` and
+  never overflows 64 bits. Each claim pays `Σ_i select(heir_i == caller ∧ ¬claimed_i, amount_i, 0)` and marks the
+  matching slots claimed: an heir receives its share once, anyone else an encrypted zero.
+- **Before settlement** the account may replace the heirs or withdraw a token; after it, neither.
+
+## Sepolia measurement [M]
+
+Run 1, 11 November 2026, 13:36–13:57 UTC; gas price 0.05 gwei; Sepolia's repriced gas schedule (a new storage slot ≈
+111k gas, code deposit 1,542 gas/byte). Demo periods: inactivity 300 s, grace 300 s.
+
+| Step | Gas | HCU (depth) |
+|---|---|---|
+| Deploy: will implementation (8,565 B) / factory (934 B) / test token (6,895 B) | 13,453,173 / 1,653,426 / 11,451,671 | — |
+| `createWill` (clone + initialize) | 744,040 | — |
+| `setHeirs` through the PIN path: `openCall` / `submitGuess` / `finalizeGuess` / `executeOp` | 3,149,855 / 897,115 / 438,160 / 2,643,826 | — / 555,002 (278,002) / — / 956,160 (956,032) |
+| `mint` of 1,000,000,007 units to the will | 940,480 | 217,128 (217,032) |
+| `start` (first; second) / `settle` | 141,966; 44,090 / 53,968 | — |
+| First claim, by a stranger: fixes the four amounts, pays zero | 3,946,195 | 12,262,136 (3,698,000) |
+| Later claims: heir A / heir B / stranger D | 2,117,908 / 2,117,912 / 2,117,912 | 2,118,104 (1,214,000) each |
+| Heir A claims again (pays zero) | 2,013,658 | 2,118,072 (1,214,000) |
+
+Every HCU figure computed from the executor's events equals `HCULimit.getBlockMeter()` at that block.
+
+- **An heir's claim and a stranger's claim look the same on-chain** [M]: the same events, the same HCU, and the same
+  gas for heir B and stranger D (2,117,912); heir A differs by 4 gas. FHE execution is symbolic, so nothing depends
+  on the encrypted values. Heir A's second claim is cheaper only because its token balance slot already existed.
+  (On the mock stack gas does differ, because the mock stores every cleartext.)
+- **A correct PIN voided a live start** [M]: `start` at block time 1,794,404,652, a correct PIN on the account at
+  1,794,404,688; after the grace period `settle` reverted with `NotStarted`. The second, unanswered absence settled.
+- **The first claim carries the snapshot** [M]: 12.26M HCU, 61 % of the 20M per-transaction limit, and a depth of
+  3.70M, 74 % of the 5M depth limit. Four slots fit; each slot adds about 2.07M HCU to the snapshot [I], which is why
+  there are four.
+- **`openCall` for `setHeirs` costs 3.15M gas** [M + I]: the operation stores its call data (eight handles and the input
+  proof), and new storage is expensive on Sepolia's schedule.
+
+Transactions (run 1): createWill `0x0e491cdcd3bb5407c63eb7e6c7a09bf03bfa34389682fe44bd3a2d3a561fc452`, setHeirs
+executeOp `0x0fff1d099fd95195a6adcc10c45a785e5bed438467ffa82c512a3aa64999766b`, first claim
+`0x1b2de708ed59f51b3dd8707cb3856aca9c87a7baa569d952c8002beb2c08b9f8`, heir B
+`0xaa1e0289fcf8036ecee21295dd168795a3504ca3b2b05eb6439e76ab311ea01c`, stranger D
+`0x681da2b632699cd585849720410de1616a24e153278c829033c4f38e8eb37d5c`. Contracts: token
+`0xE552Beed2265a8666d25307079fad9eDA2D70172`, will implementation `0x568022Dc4D5121f76A5428Af1652D1ed2c5c6040`,
+factory `0x8CcC48C0FE7271123A556452822F41e5712B28E3`; run 1's will `0xEA54f77CBF1e0E409cd3E92e6D6b613560F4b10c`.
+
+**Run 2** (14:07–14:28 UTC, a new will, `results/sepolia/will-run.json`) repeats every step and figure above, and adds
+the claimants' own decryptions [M]. Each claimant signed an EIP-712 permit with its own wallet and decrypted its own
+test-token balance through Zama's relayer: heir A 600,000,004 (60 % of 1,000,000,007, floored), heir B 400,000,002,
+stranger C 0, stranger D 0, all as expected. In this run heir A, heir B and stranger D each used exactly 2,117,912 gas
+(claims: heir A `0x59127230b3cdc28e3acbe04b81df354378b9af9d27ef881f399dcfff566b8d0a`, heir B
+`0xb7631bd90071049c9b0989adf0f23454b1c395a3fc70f0a6375bcc29fea16293`, stranger D
+`0x3b32c5fa2e5f31df3561a78edf5f3a3b710fa274c84adde62ebb5819558fdadb`).
+
+**The app** [M]: the same flow through the web app with the dev wallet (a fresh account; create the will; heirs set
+with the PIN; 1,000 tcUSD added; start; settle; the claim link; claim; reveal) ended with the heir's own balance
+decrypted in the browser: 600 tcUSD. The first reveal right after the claim showed 0: a lagging RPC backend returned
+the empty balance handle; the app now reads it again before concluding there is none.
+
+## Limits [V + I]
+
+- Tokens that reach the will after a token's first claim are not distributed; the amounts come from the balance at
+  that moment.
+- Heirs have to know about the will: by design nothing on-chain tells them.
+- Anyone can claim, so anyone can spend HCU on the will: about 2.1M per claim, paid by the caller. Many such claims in
+  one block can fill the block's HCU cap for the will's calls and delay an heir's claim to a later block.
+- The will holds only ERC-7984 tokens sent to it; ETH and ERC-20 need a wrapper (OpenZeppelin's `ERC7984ERC20Wrapper`).
+- The escape does not touch the will, and the will does not touch the account's own funds.
+- Research prototype, unaudited, testnet only; the demo uses 5-minute periods.
 
 # Round 2 — E1, Y1/Y2 fixes, A/B hot path, mobile Argon2id
 

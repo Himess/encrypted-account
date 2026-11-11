@@ -1,0 +1,340 @@
+{
+  "startedAtUtc": "2026-11-11T14:07:30.342Z",
+  "network": "sepolia",
+  "inactivityS": 300,
+  "graceS": 300,
+  "txs": {
+    "createWill": {
+      "hash": "0x214950162aaaa59581100ef3d0e5a75101f58348705b61cc76228ad4dfeef8d4",
+      "block": 12112216,
+      "gasUsed": 744040,
+      "inclusionMs": 4347,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 0,
+        "blockFheTxs": 0,
+        "blockComputed": 0,
+        "meterCheck": "equal"
+      }
+    },
+    "setHeirs: openCall": {
+      "hash": "0xf30df3b0b22302ab260abb32e5d41a3c4d3594ccf9d117b297895b599f6dede4",
+      "block": 12112222,
+      "gasUsed": 3149855,
+      "inclusionMs": 12041,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 0,
+        "blockFheTxs": 1,
+        "blockComputed": 0,
+        "meterCheck": "equal"
+      }
+    },
+    "setHeirs: submitGuess": {
+      "hash": "0x5f7acef6c4e1fe38a117a4de8a4eb3c30410ac0d588a022567d10042c852296f",
+      "block": 12112223,
+      "gasUsed": 897139,
+      "inclusionMs": 4154,
+      "hcu": {
+        "total": 555002,
+        "depth": 278002,
+        "fheOps": 8,
+        "blockMeter": 555002,
+        "blockFheTxs": 2,
+        "blockComputed": 555002,
+        "meterCheck": "equal"
+      }
+    },
+    "setHeirs: finalizeGuess": {
+      "hash": "0x1cca5db098f9e2956a037c11cbb078f5352d63a96d898a37b86d657eea8ee42a",
+      "block": 12112224,
+      "gasUsed": 438160,
+      "inclusionMs": 21863,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 4416,
+        "blockFheTxs": 6,
+        "blockComputed": 4416,
+        "meterCheck": "equal"
+      }
+    },
+    "setHeirs: executeOp": {
+      "hash": "0x20f7352a5687f09591bb6829e63f66fc2d0c60353af5ffa5ebb97f894db533a3",
+      "block": 12112230,
+      "gasUsed": 2643826,
+      "inclusionMs": 10056,
+      "hcu": {
+        "total": 956160,
+        "depth": 956032,
+        "fheOps": 21,
+        "blockMeter": 5342160,
+        "blockFheTxs": 2,
+        "blockComputed": 5342160,
+        "meterCheck": "equal"
+      }
+    },
+    "mint to will": {
+      "hash": "0xc3dd70ed41002d5ad05790f1e2c3ac9933f86c24e5962cdd8837ae64a6263838",
+      "block": 12112231,
+      "gasUsed": 889215,
+      "inclusionMs": 9167,
+      "hcu": {
+        "total": 586096,
+        "depth": 531032,
+        "fheOps": 8,
+        "blockMeter": 30738096,
+        "blockFheTxs": 9,
+        "blockComputed": 30738096,
+        "meterCheck": "equal"
+      }
+    },
+    "start #1": {
+      "hash": "0x413d0ce140c094068d8dea20e151470f57e39d24f8eb5f8ed2f5acd1d49acabc",
+      "block": 12112248,
+      "gasUsed": 141966,
+      "inclusionMs": 15606,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 0,
+        "blockFheTxs": 0,
+        "blockComputed": 0,
+        "meterCheck": "equal"
+      }
+    },
+    "proof of life: openCall": {
+      "hash": "0x93eba299d767f0f77b7a54c33f6e70decf19acf7503d5c6d06b7569dbc2e4928",
+      "block": 12112249,
+      "gasUsed": 383901,
+      "inclusionMs": 8960,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 14319000,
+        "blockFheTxs": 5,
+        "blockComputed": 14319000,
+        "meterCheck": "equal"
+      }
+    },
+    "proof of life: submitGuess": {
+      "hash": "0x198c417b61bb7d0f0c13d92bbf7a2c3e23d76725e2ec4ea2152eed3d70500343",
+      "block": 12112251,
+      "gasUsed": 839782,
+      "inclusionMs": 15681,
+      "hcu": {
+        "total": 555002,
+        "depth": 278002,
+        "fheOps": 8,
+        "blockMeter": 741002,
+        "blockFheTxs": 3,
+        "blockComputed": 741002,
+        "meterCheck": "equal"
+      }
+    },
+    "proof of life: finalizeGuess": {
+      "hash": "0xd48ec3e15c95a9136952df4bb0c35a528dc4f4594888f3e7d7d05ba3c07cec3c",
+      "block": 12112252,
+      "gasUsed": 438148,
+      "inclusionMs": 8703,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 348032,
+        "blockFheTxs": 3,
+        "blockComputed": 348032,
+        "meterCheck": "equal"
+      }
+    },
+    "start #2": {
+      "hash": "0x4fe91fa8ee68414c03c3cd92a18c060bbf7a9205d550944346137ada8049d4b8",
+      "block": 12112276,
+      "gasUsed": 44090,
+      "inclusionMs": 11310,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 0,
+        "blockFheTxs": 0,
+        "blockComputed": 0,
+        "meterCheck": "equal"
+      }
+    },
+    "settle": {
+      "hash": "0x3082fd0bf46796c3541de37f9a85faa7414a5aaecc1978449b9a9c463ecab61a",
+      "block": 12112304,
+      "gasUsed": 53968,
+      "inclusionMs": 13957,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 22575000,
+        "blockFheTxs": 7,
+        "blockComputed": 22575000,
+        "meterCheck": "equal"
+      }
+    },
+    "claim: stranger C (first: fixes the amounts)": {
+      "hash": "0x657bb7ebd03218e661c6ef359684bdc5ea1b22b22c918ad07f0ce6bf0c7128d3",
+      "block": 12112305,
+      "gasUsed": 3946195,
+      "inclusionMs": 12725,
+      "hcu": {
+        "total": 12262136,
+        "depth": 3698000,
+        "fheOps": 51,
+        "blockMeter": 16519136,
+        "blockFheTxs": 2,
+        "blockComputed": 16519136,
+        "meterCheck": "equal"
+      }
+    },
+    "claim: heir A": {
+      "hash": "0x59127230b3cdc28e3acbe04b81df354378b9af9d27ef881f399dcfff566b8d0a",
+      "block": 12112306,
+      "gasUsed": 2117912,
+      "inclusionMs": 9771,
+      "hcu": {
+        "total": 2118104,
+        "depth": 1214000,
+        "fheOps": 32,
+        "blockMeter": 2118104,
+        "blockFheTxs": 1,
+        "blockComputed": 2118104,
+        "meterCheck": "equal"
+      }
+    },
+    "claim: heir B": {
+      "hash": "0xb7631bd90071049c9b0989adf0f23454b1c395a3fc70f0a6375bcc29fea16293",
+      "block": 12112307,
+      "gasUsed": 2117912,
+      "inclusionMs": 13433,
+      "hcu": {
+        "total": 2118104,
+        "depth": 1214000,
+        "fheOps": 32,
+        "blockMeter": 2118104,
+        "blockFheTxs": 1,
+        "blockComputed": 2118104,
+        "meterCheck": "equal"
+      }
+    },
+    "claim: stranger D": {
+      "hash": "0x3b32c5fa2e5f31df3561a78edf5f3a3b710fa274c84adde62ebb5819558fdadb",
+      "block": 12112308,
+      "gasUsed": 2117912,
+      "inclusionMs": 10047,
+      "hcu": {
+        "total": 2118104,
+        "depth": 1214000,
+        "fheOps": 32,
+        "blockMeter": 2118104,
+        "blockFheTxs": 1,
+        "blockComputed": 2118104,
+        "meterCheck": "equal"
+      }
+    },
+    "claim: heir A again": {
+      "hash": "0xcca58bbde1385bd42fa1d6f7e95167bc42a53bab0eb14c92ec241a6ae68d892f",
+      "block": 12112309,
+      "gasUsed": 2013658,
+      "inclusionMs": 9051,
+      "hcu": {
+        "total": 2118072,
+        "depth": 1214000,
+        "fheOps": 31,
+        "blockMeter": 27531072,
+        "blockFheTxs": 8,
+        "blockComputed": 27531072,
+        "meterCheck": "equal"
+      }
+    }
+  },
+  "account": {
+    "address": "0xEbfc30346306236AC22Cbe6B0C26034C7BC1dC66",
+    "genericCallDelayS": 60
+  },
+  "codeHashes": {
+    "token": "0x51ee8c34e440c9f540d473e0d4a7e9a76ee7eda51a0c46282331d32804133593",
+    "impl": "0xc0322a9eaaf4fa8af133a7c8551e1fa645abe656b1c570ff12d8df1c8afafe51",
+    "factory": "0xad890ba688d346587fa3c90ca1d5c1ed2a946144023d0224ed18eb885fafec10"
+  },
+  "codeBytes": {
+    "token": 6895,
+    "impl": 8565,
+    "factory": 934
+  },
+  "contracts": {
+    "token": "0xE552Beed2265a8666d25307079fad9eDA2D70172",
+    "impl": "0x568022Dc4D5121f76A5428Af1652D1ed2c5c6040",
+    "factory": "0x8CcC48C0FE7271123A556452822F41e5712B28E3"
+  },
+  "will": {
+    "address": "0xB08B691c7126215EB3ACBA8318E8089CBF0Ac087",
+    "inactivityS": 300,
+    "graceS": 301,
+    "run": 2
+  },
+  "claimants": {
+    "heirA": "0x80C4315951e97a67E6aCa6aF24Ade6594f821449",
+    "heirB": "0x0d2A7B8487C45C6565BDfA1Dd402C8ee554D4f37",
+    "strangerC": "0xb4AD80e9b06E9Bf62F100FDc9E4a0C82bB2A1258",
+    "strangerD": "0xaAD31b0389722D46D6C67AC3D6aDf64Ed12c286c"
+  },
+  "heirsEncrypt": {
+    "totalMs": 6926,
+    "relayerHttpMs": 564,
+    "localMs": 6362,
+    "httpCalls": 2
+  },
+  "setHeirsPinMs": 49561,
+  "lastPinAfterSetHeirs": 1794406164,
+  "voidCheck": {
+    "startedAt": 1794406488,
+    "lastPinAt": 1794406536,
+    "pinAfterStart": true,
+    "settleReverted": true,
+    "revert": "NotStarted"
+  },
+  "decrypted": {
+    "heirA": {
+      "value": "600000004",
+      "expected": "600000004",
+      "ok": true
+    },
+    "heirB": {
+      "value": "400000002",
+      "expected": "400000002",
+      "ok": true
+    },
+    "strangerC": {
+      "value": "0",
+      "expected": "0",
+      "ok": true
+    },
+    "strangerD": {
+      "value": "0",
+      "expected": "0",
+      "ok": true
+    }
+  },
+  "claimGas": {
+    "heirB": 2117912,
+    "strangerD": 2117912,
+    "heirAAgain": 2013658,
+    "first": 3946195
+  },
+  "gasPriceGwei": 0.050000022,
+  "finishedAtUtc": "2026-11-11T14:28:51.624Z",
+  "burnerBalanceEth": "0.022758305683121394"
+}
