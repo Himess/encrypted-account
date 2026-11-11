@@ -44,13 +44,14 @@ export const DEMO_DELAYS = {
 
 /**
  * Hidden inheritance (contracts/inheritance), deployed by scripts/sepolia/will-run.ts. The token is the worthless
- * test ERC-7984 token (tcUSD, 6 decimals) that anyone may mint. Demo wills use the shortest periods the contract
- * allows (5 minutes each); real wills use months.
+ * test ERC-7984 token (tcUSD, 6 decimals) that anyone may mint. WILL_FACTORY is the DEMO factory (testnets only):
+ * 5-minute absence and grace, a 1-day claim window. The production factory allows 90 days–5 years, 30 days–1 year and
+ * at least 1 year.
  */
-export const WILL_FACTORY = "0x8CcC48C0FE7271123A556452822F41e5712B28E3";
+export const WILL_FACTORY = "0x6941031bd1bec8C86Afea996DF3E6F8D052979D1";
 export const WILL_TOKEN = "0xE552Beed2265a8666d25307079fad9eDA2D70172";
 export const WILL_TOKEN_DECIMALS = 6;
-export const DEMO_WILL = { inactivity: 300, grace: 300 } as const;
+export const DEMO_WILL = { inactivity: 300, grace: 300, claimWindow: 86_400 } as const;
 export const WILL_SLOTS = 4;
 
 export const txUrl = (hash: string) => `${EXPLORER}/tx/${hash}`;

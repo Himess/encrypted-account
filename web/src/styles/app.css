@@ -294,7 +294,7 @@ body::before {
 .check.off { background: rgba(255, 255, 255, 0.05); color: var(--text-3); }
 .will-phase { margin: 12px 0 0; }
 .will-actions { gap: 10px; margin-top: 14px; align-items: center; }
-.heir-row { display: grid; grid-template-columns: minmax(0, 1fr) 96px; gap: 8px; align-items: center; }
+.heir-row { display: grid; grid-template-columns: auto minmax(0, 1fr) 96px; gap: 8px; align-items: center; }
 .heir-row .heir-err { grid-column: 1 / -1; }
 .heir-pct .input { padding-right: 34px; }
 .claim { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
@@ -304,7 +304,54 @@ body::before {
 .reveal { margin-top: 16px; padding: 16px; border-radius: 14px; border: 1px solid var(--accent-line); background: var(--accent-soft); display: flex; flex-direction: column; gap: 4px; }
 .reveal b { font-size: 26px; letter-spacing: -0.02em; color: var(--text); }
 .will-link-note { max-width: 560px; margin: 0 auto 18px; }
+.claim > p a { color: var(--text-2); text-decoration: underline; text-underline-offset: 3px; }
+
+/* hidden will: code mode, heir cards, claim form */
+.will-alert { margin-bottom: 12px; }
+.heir-codehint { padding: 0 4px; line-height: 1.35; }
+.mode-toggle { display: inline-flex; gap: 2px; padding: 3px; border-radius: 13px; border: 1px solid var(--line-2); background: var(--bg-2); }
+.mode-toggle button { height: 42px; padding: 0 12px; border: 0; border-radius: 10px; background: none; color: var(--text-3); font-size: 13px; font-weight: 500; cursor: pointer; transition: color 0.15s, background 0.15s; }
+.mode-toggle button:hover { color: var(--text); }
+.mode-toggle button.on { background: var(--surface-3); color: var(--text); }
+.mode-toggle.wide { display: flex; }
+.mode-toggle.wide button { flex: 1; }
+.codes-warn { text-align: left; margin: 18px 0 12px; }
+.codes-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; text-align: left; }
+.codes-list li { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line-2); background: var(--bg-2); }
+.codes-list code { font-family: var(--mono); font-size: 14px; color: var(--text); word-break: break-all; letter-spacing: 0.02em; user-select: all; }
+.claim-form { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); }
+.claim-form .link-btn { align-self: flex-start; }
+.claim-form p { margin: 0; }
+.input-static { display: flex; align-items: center; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* heir cards: a layer outside the app; printing keeps only this layer */
+.heir-cards { position: fixed; inset: 0; z-index: 90; overflow-y: auto; display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 20px var(--gutter) 48px; background: rgba(3, 4, 5, 0.92); }
+.heir-cards-bar { position: sticky; top: 0; z-index: 1; width: 100%; max-width: 640px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px 14px; border-radius: 16px; border: 1px solid var(--line-2); background: var(--surface); color: var(--text-2); font-size: 13.5px; }
+.heir-card { width: 100%; max-width: 640px; padding: 22px 24px; border-radius: 16px; background: #fff; color: #111; font-size: 13.5px; line-height: 1.5; }
+.heir-card header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; padding-bottom: 10px; border-bottom: 1.5px solid #111; }
+.heir-card header b { font-size: 17px; letter-spacing: -0.01em; }
+.heir-card header span { font-size: 12px; color: #555; }
+.heir-card-body { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 18px; align-items: start; margin-top: 14px; }
+.heir-card-qr svg { display: block; width: 150px; height: 150px; }
+.heir-card dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 12px; }
+.heir-card dt { color: #555; font-size: 12px; padding-top: 2px; }
+.heir-card dd { margin: 0; word-break: break-all; }
+.heir-card .mono { font-family: var(--mono); font-size: 12.5px; }
+.heir-card .heir-card-code { font-size: 14px; font-weight: 600; word-break: normal; overflow-wrap: normal; }
+.heir-card ol { margin: 14px 0 0; padding-left: 20px; }
+.heir-card ol li { margin: 2px 0; }
+.heir-card-warn { margin: 12px 0 0; padding: 8px 12px; border: 1.5px solid #111; border-radius: 10px; font-weight: 600; }
 @media (max-width: 560px) {
   .heir-row { grid-template-columns: minmax(0, 1fr) 84px; }
+  .heir-row .mode-toggle { grid-column: 1 / -1; justify-self: start; }
+  .heir-card { padding: 18px; }
+  .heir-card-body { grid-template-columns: 1fr; }
+  .heir-card-qr svg { width: 160px; height: 160px; }
 }
-.claim > p a { color: var(--text-2); text-decoration: underline; text-underline-offset: 3px; }
+@media print {
+  body.printing-layer > *:not(.print-layer) { display: none !important; }
+  body.printing-layer { background: #fff !important; }
+  body.printing-layer::before { display: none; }
+  .print-layer .heir-cards { position: static; overflow: visible; display: block; padding: 0; background: none; }
+  .print-layer .heir-cards-bar { display: none; }
+  .print-layer .heir-card { max-width: none; margin: 0 0 10mm; border: 1.5px solid #111; break-inside: avoid; page-break-inside: avoid; }
+}

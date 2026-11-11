@@ -8,12 +8,12 @@ import { fileURLToPath } from "url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..");
-const art = (name, dir = "account") => JSON.parse(fs.readFileSync(path.join(ROOT, "artifacts", "contracts", dir, `${name}.sol`, `${name}.json`), "utf8")).abi;
+const art = (name, dir = "account", file = name) => JSON.parse(fs.readFileSync(path.join(ROOT, "artifacts", "contracts", dir, `${file}.sol`, `${name}.json`), "utf8")).abi;
 
 const account = art("EncryptedAccount");
 const factory = art("EncryptedAccountFactory");
 const will = art("EncryptedWill", "inheritance");
-const willFactory = art("EncryptedWillFactory", "inheritance");
+const willFactory = art("EncryptedWillDemoFactory", "inheritance", "EncryptedWillFactory"); // the demo factory (testnets)
 const ctoken = art("TestConfidentialToken", "test");
 const seen = new Set();
 const errors = [];

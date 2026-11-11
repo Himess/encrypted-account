@@ -37,7 +37,7 @@ export function fheClient(provider: ethers.Provider): Promise<Client> {
 
 export async function encrypt(
   provider: ethers.Provider,
-  values: { type: "euint64" | "euint16" | "ebool" | "eaddress"; value: bigint | boolean | string | number }[],
+  values: { type: "euint64" | "euint16" | "euint128" | "ebool" | "eaddress"; value: bigint | boolean | string | number }[],
   contractAddress: string,
   userAddress: string,
 ): Promise<{ handles: string[]; inputProof: string }> {

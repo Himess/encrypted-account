@@ -41,7 +41,27 @@ export async function userDecrypt(
     transportKeyPair,
   });
   onStatus?.("Asking the threshold network…");
-  const vals = await c.decryptValues({ encryptedValues: [handle], contractAddress, transportKeyPair, signedPermit });
-  const v: any = vals[0];
-  return String(v && typeof v === "object" && "value" in v ? v.value : v);
+  // Right after a transfer the relayer may not have seen the block that granted access to the new balance yet ("not
+  // authorized"): ask again with the same permit, so the wallet signs only once. A request that hangs is given up.
+  for (let attempt = 1; ; attempt++) {
+    try {
+      const vals: any[] = await withTimeout(c.decryptValues({ encryptedValues: [handle], contractAddress, transportKeyPair, signedPermit }), 120_000);
+      const v: any = vals[0];
+      return String(v && typeof v === "object" && "value" in v ? v.value : v);
+    } catch (e: any) {
+      if (attempt >= 6 || !/not authorized/i.test(String(e?.message ?? e))) throw e;
+      onStatus?.("The relayer hasn't seen the latest block yet; asking again…");
+      await new Promise((r) => setTimeout(r, 5000));
+    }
+  }
+}
+
+function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const id = setTimeout(() => reject(new Error("The threshold network did not answer within 2 minutes. Try again.")), ms);
+    p.then(
+      (v) => (clearTimeout(id), resolve(v)),
+      (e) => (clearTimeout(id), reject(e)),
+    );
+  });
 }

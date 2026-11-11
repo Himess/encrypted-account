@@ -8,6 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks"
 import { ethers } from "ethers";
 import { CHAIN_ID, CHAIN_ID_HEX, ETH_UNIT, RPC_URL, addrUrl, txUrl } from "./chain";
 import {
+  ALIVE_STEPS,
   Activity,
   AccountView,
   CALL_STEPS,
@@ -21,6 +22,7 @@ import {
   findAccounts,
   loadActivity,
   loadPlan,
+  proveAliveWithPin,
   readAccount,
   readEscape,
   sendWithPin,
@@ -30,20 +32,29 @@ import { checkPin, randomPin } from "./pin";
 import { explainError } from "./tx";
 import { connectWallet, hasWallet, watchWallet } from "./wallet";
 import {
-  Heir,
+  HeirRow,
+  NewHeir,
   PHASE_TEXT,
   WillView,
   claimWill,
   createWill,
   decryptMyBalance,
+  escapeWithdrawWill,
+  formatCode,
   fundWill,
+  heirCardUrl,
+  parseCode,
   predictWill,
   readWill,
+  runPayoutRound,
   setHeirsWithPin,
   settleWill,
   startWill,
+  sweepWill,
+  tokenBalanceHandle,
   willUrl,
 } from "./will";
+import qrcode from "qrcode-generator";
 
 // ───────────────────────────── shared state and helpers ─────────────────────────────
 
@@ -1459,34 +1470,44 @@ function Dashboard({ ctx, account, walletBal, notify, onNewAccount, onWalletBal 
 // ───────────────────────────── hidden will ─────────────────────────────
 
 const WILL_LABELS = ["Open the call on-chain", "Encrypt your PIN guess", "Submit the encrypted guess", "Decrypt only the yes / no result", "Record the result on-chain", "Wait the delay, then set the heirs"];
+const ALIVE_LABELS = ["Open a no-op call on-chain", "Encrypt your PIN guess", "Submit the encrypted guess", "Decrypt only the yes / no result", "Record the result on-chain"];
 const FUND_UNITS = 1_000_000_000n; // 1,000 tcUSD (6 decimals)
 const fmtTc = (units: bigint) => `${(Number(units) / 1e6).toLocaleString("en-US", { maximumFractionDigits: 6 })} tcUSD`;
+/** The in-app reminder starts 30 days before the will can start (as the watchtower's), or earlier in a short demo. */
+const remindFrom = (v: WillView) => Math.min(30 * 86400, Math.round(v.inactivity * 0.4));
 
 function phaseLine(v: WillView, nowS: number): string {
   switch (v.phase) {
     case 0:
       return "No heirs yet.";
     case 1:
-      return `The owner is active. It can start in ${fmtWait(Math.max(0, v.startableAt - nowS))} if no correct PIN comes first.`;
+      return `The owner is active. The will can start in ${fmtWait(Math.max(0, v.startableAt - nowS))} if no correct PIN comes first.`;
     case 2:
-      return `No correct PIN for ${fmtWait(nowS - v.pinAt)}. Anyone can start it.`;
+      return `No correct PIN for ${fmtWait(nowS - v.pinAt)}. Anyone can start the will.`;
     case 3:
       return `Started. A correct PIN within ${fmtWait(Math.max(0, v.settleableAt - nowS))} cancels it.`;
     case 4:
-      return "The grace period is over. Anyone can settle it.";
+      return "The grace period is over. Anyone can settle the will.";
     default:
-      return "Settled. Anyone can claim: heirs get their share, everyone else an encrypted zero.";
+      return v.swept
+        ? "Settled, and the claim window has closed."
+        : "Settled. Heirs claim with their code or from their address; everyone else receives an encrypted zero.";
   }
 }
 
+/** Claims are open: settled, a payout round complete, the window not yet swept. */
+const payoutReady = (v: WillView) => v.settled && v.round > 0 && !v.preparing && !v.swept;
+
 function useWill(addr: string | null, every = 15000) {
   const [v, setV] = useState<WillView | null>(null);
+  const [failed, setFailed] = useState(false);
   const refresh = useCallback(async () => {
     if (!addr) return;
     try {
       setV(await readWill(read, addr));
+      setFailed(false);
     } catch {
-      /* transient RPC error: keep the last view */
+      setFailed(true); // a transient RPC error keeps the last view; with none yet, say so instead of loading forever
     }
   }, [addr]);
   useEffect(() => {
@@ -1494,14 +1515,46 @@ function useWill(addr: string | null, every = 15000) {
     const id = setInterval(() => void refresh(), every);
     return () => clearInterval(id);
   }, [refresh]);
-  return [v, refresh] as const;
+  return [v, refresh, failed] as const;
 }
+
+const WillUnreadable = () => (
+  <p class="small muted">This will can't be read right now. If it was made with the first version of the demo, it uses an older contract that this page no longer reads.</p>
+);
+
+/** The PIN path's step callbacks on a task list: a wrong PIN shows as a red cross, not as a failure. */
+function taskCb(setTasks: (f: (prev: TaskState[]) => TaskState[]) => void, lastStep: number): StepCb {
+  return (i, s, text, hash) =>
+    setTasks((prev) =>
+      prev.map((t, j) => {
+        if (j !== i) return t;
+        const wrong = /wrong/i.test(text ?? "");
+        const state: TaskState["s"] = s === "run" ? "run" : s === "fail" ? "fail" : wrong || (s === "skip" && i === lastStep) ? "bad" : "done";
+        return { s: state, text: s === "done" && !text ? undefined : text, hash: hash ?? t.hash };
+      }),
+    );
+}
+
+const OkIcon = () => (
+  <div class="result-icon ok">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m5 12.5 4.5 4.5L19 7.5" />
+    </svg>
+  </div>
+);
+const BadIcon = () => (
+  <div class="result-icon bad">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" />
+    </svg>
+  </div>
+);
 
 function WillCard({ ctx, account, notify }: { ctx: Ctx; account: string; notify: Notify }) {
   const [addr, setAddr] = useState<string | null>(null);
-  const [v, refresh] = useWill(addr);
+  const [v, refresh, failed] = useWill(addr);
   const [busy, setBusy] = useState<string | null>(null);
-  const [sheet, setSheet] = useState(false);
+  const [sheet, setSheet] = useState<null | "heirs" | "alive">(null);
   const now = useNow(1000);
   const nowS = Math.floor(now / 1000);
 
@@ -1522,18 +1575,24 @@ function WillCard({ ctx, account, notify }: { ctx: Ctx; account: string; notify:
     }
   }
 
+  const left = v ? v.startableAt - nowS : 0;
+  const soon = !!v && v.phase === 1 && left <= remindFrom(v);
+  // the earliest moment heirs could be paid: a start as soon as allowed, then the whole grace period
+  const earliest = !v ? 0 : v.phase === 3 || v.phase === 4 ? v.settleableAt : Math.max(v.startableAt, nowS) + v.grace;
+
   return (
     <section class="card card-pad will-card">
       <h3 class="card-title">
         Hidden will
-        <span class="badge">New</span>
+        <span class="badge">Demo · 5 min</span>
       </h3>
       {!v ? (
-        <p class="small faint">Loading…</p>
+        failed ? <WillUnreadable /> : <p class="small faint">Loading…</p>
       ) : !v.exists ? (
         <>
           <p class="small muted">
-            Leave test tokens to up to four heirs. Their addresses and shares are encrypted, even from you. If the account sees no correct PIN for 5 minutes (months, in real use), anyone can start the will; a PIN in the next 5 minutes cancels it.
+            Leave test tokens to up to four heirs, each named by a secret claim code or by an address. Heirs, codes and shares are encrypted, even from you. If the account sees no correct PIN for 5 minutes (months, in real use), anyone can start
+            the will; a correct PIN in the next 5 minutes cancels it.
           </p>
           <button type="button" class="btn btn-secondary btn-sm" disabled={!!busy} onClick={() => void act("Creating…", (st) => createWill(ctx, account, st), "Your will is created.")}>
             {busy ?? "Create a will"}
@@ -1541,11 +1600,41 @@ function WillCard({ ctx, account, notify }: { ctx: Ctx; account: string; notify:
         </>
       ) : (
         <>
+          {v.phase === 3 && (
+            <div class="notice err will-alert">
+              <IconClock />
+              <span>
+                <b>Your will has started.</b> Enter your PIN within {fmtWait(Math.max(0, v.settleableAt - nowS))} to cancel it.
+              </span>
+            </div>
+          )}
+          {v.phase === 2 && (
+            <div class="notice warn will-alert">
+              <IconClock />
+              <span>
+                <b>You have been away long enough</b> for anyone to start your will. A correct PIN resets the clock.
+              </span>
+            </div>
+          )}
+          {soon && (
+            <div class="notice info will-alert">
+              <IconInfo />
+              <span>Your will can start in {fmtWait(Math.max(0, left))}. A correct PIN pushes that back.</span>
+            </div>
+          )}
+          {v.escapeAlive && (
+            <div class="notice warn will-alert">
+              <IconShield />
+              <span>
+                <b>Your account's escape is running.</b> The will can follow it to your escape address.
+              </span>
+            </div>
+          )}
           <ul class="prot">
             <li>
               <span class={`check ${v.heirsSet ? "" : "off"}`}>{v.heirsSet ? <IconCheck /> : <IconClock />}</span>
               <span class="k">
-                Heirs<small>{v.heirsSet ? "Set, encrypted: nobody can read them" : "Not set yet"}</small>
+                Heirs<small>{v.heirsSet ? "Set and encrypted: nobody can read them" : "Not set yet"}</small>
               </span>
               <span class="v">{v.heirsSet ? "Set" : "—"}</span>
             </li>
@@ -1561,73 +1650,112 @@ function WillCard({ ctx, account, notify }: { ctx: Ctx; account: string; notify:
                 <IconClock />
               </span>
               <span class="k">
-                Last correct PIN<small>{v.pinAt ? timeAgo(v.pinAt) : "never"}</small>
+                Last correct PIN
+                <small>
+                  {v.pinAt ? timeAgo(v.pinAt) : "never"}
+                  {v.heirsSet && !v.settled ? ` · inheritance at the earliest ${earliest <= nowS ? "now" : `in ${fmtWait(earliest - nowS)}`}` : ""}
+                </small>
               </span>
               <span class="v">{PHASE_TEXT[v.phase].split(":")[0]}</span>
             </li>
           </ul>
           <p class="small muted will-phase">{phaseLine(v, nowS)}</p>
           <div class="row wrap will-actions">
-            {!v.settled && (
-              <button type="button" class="btn btn-secondary btn-sm" disabled={!!busy} onClick={() => setSheet(true)}>
-                {v.heirsSet ? "Change heirs" : "Set heirs"}
+            {!v.settled && v.heirsSet && (
+              <button type="button" class={`btn btn-sm ${v.phase >= 2 ? "btn-primary" : "btn-secondary"}`} disabled={!!busy} onClick={() => setSheet("alive")}>
+                I'm here
               </button>
             )}
             {!v.settled && (
+              <button type="button" class="btn btn-secondary btn-sm" disabled={!!busy} onClick={() => setSheet("heirs")}>
+                {v.heirsSet ? "Change heirs" : "Set heirs"}
+              </button>
+            )}
+            {!v.swept && (
               <button type="button" class="btn btn-secondary btn-sm" disabled={!!busy} onClick={() => void act("Minting…", (st) => fundWill(ctx, v.address, FUND_UNITS, st), "1,000 test tokens added to the will.")}>
                 Add 1,000 tcUSD
               </button>
             )}
             {v.phase === 2 && (
-              <button type="button" class="btn btn-primary btn-sm" disabled={!!busy} onClick={() => void act("Starting…", (st) => startWill(ctx, v.address, st), "Started.")}>
-                Start
+              <button type="button" class="btn btn-secondary btn-sm" disabled={!!busy} title="Anyone can start it; in the demo you can too." onClick={() => void act("Starting…", (st) => startWill(ctx, v.address, st), "Started.")}>
+                Start the will
               </button>
             )}
             {v.phase === 4 && (
-              <button type="button" class="btn btn-primary btn-sm" disabled={!!busy} onClick={() => void act("Settling…", (st) => settleWill(ctx, v.address, st), "Settled. Heirs can claim now.")}>
-                Settle
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                disabled={!!busy}
+                onClick={() =>
+                  void act(
+                    "Settling…",
+                    async (st) => {
+                      await settleWill(ctx, v.address, st);
+                      await runPayoutRound(ctx, v.address, st);
+                    },
+                    "Settled, and the payout is ready.",
+                  )
+                }
+              >
+                Settle and prepare the payout
               </button>
             )}
-            <button type="button" class="link-btn" onClick={() => copy(willUrl(v.address), notify, "Claim link")}>
-              Copy the claim link
+            {v.settled && (
+              <a class="btn btn-primary btn-sm" href={willUrl(v.address)}>
+                Open the claim page
+              </a>
+            )}
+            {v.escapeAlive && (
+              <button type="button" class="btn btn-secondary btn-sm" disabled={!!busy} onClick={() => void act("Moving…", (st) => escapeWithdrawWill(ctx, v.address, st), "The will followed your escape.")}>
+                Move to the escape address
+              </button>
+            )}
+            <button type="button" class="link-btn" onClick={() => copy(willUrl(v.address), notify, "Will link")}>
+              Copy the will link
             </button>
           </div>
           {busy && <p class="small faint">{busy}</p>}
         </>
       )}
-      {sheet && v && <WillSheet ctx={ctx} account={account} willAddr={v.address} onClose={() => setSheet(false)} onSettled={() => void refresh()} />}
+      {sheet === "heirs" && v && <WillSheet ctx={ctx} account={account} willAddr={v.address} replacing={v.heirsSet} onClose={() => setSheet(null)} onSettled={() => void refresh()} />}
+      {sheet === "alive" && <AliveSheet ctx={ctx} account={account} onClose={() => setSheet(null)} onSettled={() => void refresh()} />}
     </section>
   );
 }
 
-type WillResult = { kind: "ok"; hash: string } | { kind: "wrong"; score: number; next: number } | { kind: "err"; text: string };
+type RowState = { mode: "code" | "address"; address: string; percent: string };
+type WillResult = { kind: "ok"; hash: string; heirs: NewHeir[] } | { kind: "wrong"; score: number; next: number } | { kind: "err"; text: string };
 
-function WillSheet({ ctx, account, willAddr, onClose, onSettled }: { ctx: Ctx; account: string; willAddr: string; onClose: () => void; onSettled: () => void }) {
+function WillSheet({ ctx, account, willAddr, replacing, onClose, onSettled }: { ctx: Ctx; account: string; willAddr: string; replacing: boolean; onClose: () => void; onSettled: () => void }) {
   const [stage, setStage] = useState<"heirs" | "pin" | "run" | "result">("heirs");
-  const [rows, setRows] = useState<{ address: string; percent: string }[]>([
-    { address: "", percent: "60" },
-    { address: "", percent: "40" },
+  const [rows, setRows] = useState<RowState[]>([
+    { mode: "code", address: "", percent: "60" },
+    { mode: "code", address: "", percent: "40" },
   ]);
   const [pin, setPin] = useState("");
   const [tasks, setTasks] = useState<TaskState[]>(() => freshTasks(CALL_STEPS.length));
   const [result, setResult] = useState<WillResult | null>(null);
+  const [cards, setCards] = useState(false);
   const [t0, setT0] = useState(0);
-  const running = stage === "run";
   const now = useNow(1000);
 
-  const filled = rows.filter((r) => r.address.trim() || r.percent.trim());
-  const rowErr = (r: { address: string; percent: string }) => {
-    const a = r.address.trim();
+  const used = (r: RowState) => r.percent.trim() !== "" || (r.mode === "address" && r.address.trim() !== "");
+  const filled = rows.filter(used);
+  const rowErr = (r: RowState) => {
+    if (!used(r)) return null;
+    if (r.mode === "address") {
+      const a = r.address.trim();
+      if (!ethers.isAddress(a)) return "Enter a valid address.";
+      if (a.toLowerCase() === account.toLowerCase() || a.toLowerCase() === willAddr.toLowerCase()) return "Not the account or the will itself.";
+    }
     const p = Number(r.percent);
-    if (!a && !r.percent.trim()) return null;
-    if (!ethers.isAddress(a)) return "Enter a valid address.";
-    if (a.toLowerCase() === account.toLowerCase() || a.toLowerCase() === willAddr.toLowerCase()) return "Not the account or the will itself.";
     if (!(p > 0 && p <= 100)) return "Share between 0 and 100 %.";
     return null;
   };
   const total = filled.reduce((s, r) => s + (Number(r.percent) || 0), 0);
   const valid = filled.length > 0 && filled.every((r) => !rowErr(r)) && total <= 100 + 1e-9;
-  const heirs: Heir[] = filled.map((r) => ({ address: r.address.trim(), percent: Number(r.percent) }));
+  const heirRows: HeirRow[] = filled.map((r) => ({ mode: r.mode, address: r.address.trim(), percent: Number(r.percent) }));
+  const setRow = (i: number, patch: Partial<RowState>) => setRows(rows.map((x, j) => (j === i ? { ...x, ...patch } : x)));
 
   async function go(p = pin) {
     if (p.length < 6 || !valid) return;
@@ -1635,17 +1763,9 @@ function WillSheet({ ctx, account, willAddr, onClose, onSettled }: { ctx: Ctx; a
     setT0(Date.now());
     setResult(null);
     setTasks(freshTasks(CALL_STEPS.length));
-    const cb: StepCb = (i, s, text, hash) =>
-      setTasks((prev) =>
-        prev.map((t, j) => {
-          if (j !== i) return t;
-          const wrong = /wrong/i.test(text ?? "");
-          const state: TaskState["s"] = s === "run" ? "run" : s === "fail" ? "fail" : wrong || (s === "skip" && i === 5) ? "bad" : "done";
-          return { s: state, text: s === "done" && !text ? undefined : text, hash: hash ?? t.hash };
-        }),
-      );
     try {
-      setResult({ kind: "ok", hash: await setHeirsWithPin(ctx, account, willAddr, heirs, p, cb) });
+      const r = await setHeirsWithPin(ctx, account, willAddr, heirRows, p, taskCb(setTasks, 5));
+      setResult({ kind: "ok", hash: r.hash, heirs: r.heirs });
     } catch (e) {
       if (e instanceof WrongPin) setResult({ kind: "wrong", score: e.score, next: e.nextAllowedAt });
       else setResult({ kind: "err", text: explainError(e) });
@@ -1658,24 +1778,32 @@ function WillSheet({ ctx, account, willAddr, onClose, onSettled }: { ctx: Ctx; a
 
   const done = tasks.filter((t) => t.s === "done" || t.s === "bad").length;
   const current = tasks.findIndex((t) => t.s === "run");
+  const codeHeirs = result?.kind === "ok" ? result.heirs.filter((h) => h.mode === "code" && h.code !== undefined) : [];
 
   return (
-    <Sheet title={stage === "result" ? "Result" : "Heirs of your will"} onClose={onClose} locked={running}>
+    <Sheet title={stage === "result" ? "Result" : "Heirs of your will"} onClose={onClose} locked={stage === "run" || codeHeirs.length > 0}>
       {stage === "heirs" && (
         <div class="stack">
-          <p class="small muted">Up to four heirs. Addresses and shares are encrypted in your browser before they leave it; nobody can read them afterwards, including you.</p>
+          <p class="small muted">
+            Up to four heirs. <b>By code</b> (recommended): the heir claims with a secret code, to any address, even a new one, so nobody can tell heirs apart from anyone else who claims. <b>By address</b>: the heir claims from that address and is paid there.
+          </p>
           {rows.map((r, i) => (
             <div class="heir-row">
-              <input
-                class="input mono"
-                placeholder="0x… heir address"
-                value={r.address}
-                spellcheck={false}
-                autoComplete="off"
-                onInput={(e) => setRows(rows.map((x, j) => (j === i ? { ...x, address: (e.target as HTMLInputElement).value } : x)))}
-              />
+              <div class="mode-toggle" role="group" aria-label={`How heir ${i + 1} claims`}>
+                <button type="button" class={r.mode === "code" ? "on" : ""} aria-pressed={r.mode === "code"} onClick={() => setRow(i, { mode: "code" })}>
+                  Code
+                </button>
+                <button type="button" class={r.mode === "address" ? "on" : ""} aria-pressed={r.mode === "address"} onClick={() => setRow(i, { mode: "address" })}>
+                  Address
+                </button>
+              </div>
+              {r.mode === "address" ? (
+                <input class="input mono" placeholder="0x… heir address" value={r.address} spellcheck={false} autoComplete="off" onInput={(e) => setRow(i, { address: (e.target as HTMLInputElement).value })} />
+              ) : (
+                <span class="small faint heir-codehint">A secret code, made in your browser</span>
+              )}
               <div class="input-wrap heir-pct">
-                <input class="input" inputMode="decimal" value={r.percent} onInput={(e) => setRows(rows.map((x, j) => (j === i ? { ...x, percent: (e.target as HTMLInputElement).value } : x)))} />
+                <input class="input" inputMode="decimal" aria-label={`Share of heir ${i + 1}`} value={r.percent} onInput={(e) => setRow(i, { percent: (e.target as HTMLInputElement).value })} />
                 <div class="suffix">
                   <span class="small faint">%</span>
                 </div>
@@ -1685,21 +1813,22 @@ function WillSheet({ ctx, account, willAddr, onClose, onSettled }: { ctx: Ctx; a
           ))}
           <div class="chips">
             {rows.length < 4 && (
-              <button type="button" class="chip-btn" onClick={() => setRows([...rows, { address: "", percent: "" }])}>
+              <button type="button" class="chip-btn" onClick={() => setRows([...rows, { mode: "code", address: "", percent: "" }])}>
                 + Add an heir
               </button>
             )}
-            <button type="button" class="chip-btn" onClick={() => setRows(rows.map((x, j) => (j === 0 ? { ...x, address: ctx.w.address } : x)))}>
-              My wallet as heir 1 · {short(ctx.w.address)}
+            <button type="button" class="chip-btn" onClick={() => setRow(rows.length - 1, { mode: "address", address: ctx.w.address })}>
+              My wallet as heir {rows.length} · {short(ctx.w.address)}
             </button>
           </div>
           <span class={`field-hint ${total > 100 ? "field-err" : ""}`}>
-            Total: {Math.round(total * 100) / 100} %{total < 100 ? " (the rest stays in the will)" : ""}
+            Total: {Math.round(total * 100) / 100} %{total < 100 && filled.length ? " · the rest goes to the first heir" : ""}
           </span>
           <div class="notice info">
             <IconLock />
             <span>
-              Changing the heirs <b>needs your PIN</b> and the account's waiting period. The key alone can't touch the will.
+              Changing the heirs <b>needs your PIN</b> and the account's waiting period: the key alone can't touch the will. Everything is encrypted in your browser; nobody can read it afterwards, including you.
+              {replacing ? " New heirs get new codes: old heir cards stop working." : ""}
             </span>
           </div>
           <button type="button" class="btn btn-primary btn-lg btn-block" disabled={!valid} onClick={() => setStage("pin")}>
@@ -1712,15 +1841,17 @@ function WillSheet({ ctx, account, willAddr, onClose, onSettled }: { ctx: Ctx; a
         <div>
           <div class="sum">
             <b>
-              {heirs.length} heir{heirs.length === 1 ? "" : "s"}
+              {heirRows.length} heir{heirRows.length === 1 ? "" : "s"}
             </b>
             <span class="faint">·</span>
-            <span>encrypted</span>
+            <span>
+              {heirRows.filter((h) => h.mode === "code").length} by code, {heirRows.filter((h) => h.mode === "address").length} by address
+            </span>
           </div>
           <p class="center muted" style={{ margin: "18px 0 6px", fontSize: "15px" }}>
             Enter your PIN
           </p>
-          <PinPad value={pin} onChange={setPin} onEnter={(v) => void go(v)} />
+          <PinPad value={pin} onChange={setPin} onEnter={(x) => void go(x)} />
           <div class="flow-actions">
             <button type="button" class="btn btn-ghost" onClick={() => setStage("heirs")}>
               Back
@@ -1758,29 +1889,48 @@ function WillSheet({ ctx, account, willAddr, onClose, onSettled }: { ctx: Ctx; a
         <div class="result">
           {result.kind === "ok" ? (
             <>
-              <div class="result-icon ok">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="m5 12.5 4.5 4.5L19 7.5" />
-                </svg>
-              </div>
+              <OkIcon />
               <h3>Heirs set</h3>
-              <p>They are stored encrypted. From now on, every correct PIN on your account shows you are still here.</p>
+              {codeHeirs.length ? (
+                <>
+                  <div class="notice warn codes-warn">
+                    <IconLock />
+                    <span>
+                      <b>These codes are shown only now.</b> Each one is like a seed phrase: whoever holds it can claim. Print the heir cards and keep them with your will papers.
+                    </span>
+                  </div>
+                  <ul class="codes-list">
+                    {codeHeirs.map((h) => (
+                      <li>
+                        <span class="small faint">
+                          Heir {h.slot + 1} · {h.percent} %
+                        </span>
+                        <code>{formatCode(h.code!)}</code>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              ) : (
+                <p>They are stored encrypted. From now on, every correct PIN on your account shows you are still here.</p>
+              )}
               <div class="facts-row">
                 <TxLink hash={result.hash} label="View transaction" />
               </div>
               <div class="flow-actions">
+                {codeHeirs.length > 0 && (
+                  <button type="button" class="btn btn-secondary btn-lg" onClick={() => setCards(true)}>
+                    Heir cards
+                  </button>
+                )}
                 <button type="button" class="btn btn-primary btn-lg" onClick={onClose}>
-                  Done
+                  {codeHeirs.length ? "I saved them" : "Done"}
                 </button>
               </div>
+              {cards && <HeirCards willAddr={willAddr} heirs={codeHeirs} onClose={() => setCards(false)} />}
             </>
           ) : (
             <>
-              <div class="result-icon bad">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" />
-                </svg>
-              </div>
+              <BadIcon />
               <h3>{result.kind === "wrong" ? "Wrong PIN. Nothing changed." : "That didn't go through"}</h3>
               <p>{result.kind === "wrong" ? `The attempt was counted on-chain. Wrong guesses so far: ${result.score}.` : result.text}</p>
               <div class="flow-actions">
@@ -1799,21 +1949,224 @@ function WillSheet({ ctx, account, willAddr, onClose, onSettled }: { ctx: Ctx; a
   );
 }
 
-function ClaimView({ ctx, willAddr, notify }: { ctx: Ctx; willAddr: string; notify: Notify }) {
-  const [v, refresh] = useWill(willAddr, 10000);
+/**
+ * Renders its children into a layer at the end of <body>, outside the app's tree, so printing can hide the app and keep
+ * only this layer.
+ */
+function PrintLayer({ children }: { children: ComponentChildren }) {
+  const host = useMemo(() => {
+    const d = document.createElement("div");
+    d.className = "print-layer";
+    return d;
+  }, []);
+  useEffect(() => {
+    document.body.appendChild(host);
+    document.body.classList.add("printing-layer");
+    return () => {
+      render(null, host);
+      host.remove();
+      document.body.classList.remove("printing-layer");
+    };
+  }, []);
+  useEffect(() => {
+    render(<>{children}</>, host);
+  });
+  return null;
+}
+
+/** Printable heir cards: the will, the network, the code, a QR code of the claim link (the code in its fragment), the steps. */
+function HeirCards({ willAddr, heirs, onClose }: { willAddr: string; heirs: NewHeir[]; onClose: () => void }) {
+  const qr = (text: string) => {
+    const q = qrcode(0, "M");
+    q.addData(text);
+    q.make();
+    return q.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+  };
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, [onClose]);
+  return (
+    <PrintLayer>
+      <div class="heir-cards" role="dialog" aria-modal="true" aria-label="Heir cards">
+        <div class="heir-cards-bar">
+          <span>
+            {heirs.length} heir card{heirs.length === 1 ? "" : "s"}: print them, or write the codes down
+          </span>
+          <div class="row">
+            <button type="button" class="btn btn-primary btn-sm" onClick={() => window.print()}>
+              Print
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" onClick={onClose}>
+              Close
+            </button>
+          </div>
+        </div>
+        {heirs.map((h) => (
+          <article class="heir-card">
+            <header>
+              <b>Inheritance claim card</b>
+              <span>Encrypted Account · hidden will</span>
+            </header>
+            <div class="heir-card-body">
+              <div class="heir-card-qr" dangerouslySetInnerHTML={{ __html: qr(heirCardUrl(willAddr, h.code!)) }} />
+              <dl>
+                <dt>Heir</dt>
+                <dd>
+                  {h.slot + 1} of this will · {h.percent} %
+                </dd>
+                <dt>Will</dt>
+                <dd class="mono">{willAddr}</dd>
+                <dt>Network</dt>
+                <dd>Ethereum Sepolia (a testnet demo)</dd>
+                <dt>Claim code</dt>
+                <dd class="mono heir-card-code">{formatCode(h.code!)}</dd>
+              </dl>
+            </div>
+            <ol>
+              <li>Scan the QR code, or open {location.host}/app?will= followed by the will address above.</li>
+              <li>Connect any wallet. Enter the claim code and an address to receive the tokens; a fresh one keeps the claim private.</li>
+              <li>Once the will is settled, claim. Then open the page with the receiving wallet to see the amount.</li>
+            </ol>
+            <p class="heir-card-warn">This code is like a seed phrase: whoever holds it can claim.</p>
+          </article>
+        ))}
+      </div>
+    </PrintLayer>
+  );
+}
+
+function AliveSheet({ ctx, account, onClose, onSettled }: { ctx: Ctx; account: string; onClose: () => void; onSettled: () => void }) {
+  const [stage, setStage] = useState<"pin" | "run" | "result">("pin");
+  const [pin, setPin] = useState("");
+  const [tasks, setTasks] = useState<TaskState[]>(() => freshTasks(ALIVE_STEPS.length));
+  const [result, setResult] = useState<WillResult | null>(null);
+  const [t0, setT0] = useState(0);
+  const now = useNow(1000);
+
+  async function go(p = pin) {
+    if (p.length < 6) return;
+    setStage("run");
+    setT0(Date.now());
+    setResult(null);
+    setTasks(freshTasks(ALIVE_STEPS.length));
+    try {
+      setResult({ kind: "ok", hash: await proveAliveWithPin(ctx, account, p, taskCb(setTasks, -1)), heirs: [] });
+    } catch (e) {
+      if (e instanceof WrongPin) setResult({ kind: "wrong", score: e.score, next: e.nextAllowedAt });
+      else setResult({ kind: "err", text: explainError(e) });
+    } finally {
+      setPin("");
+      setStage("result");
+      onSettled();
+    }
+  }
+
+  const done = tasks.filter((t) => t.s === "done" || t.s === "bad").length;
+  const current = tasks.findIndex((t) => t.s === "run");
+  return (
+    <Sheet title="I'm here" onClose={onClose} locked={stage === "run"}>
+      {stage === "pin" && (
+        <div>
+          <p class="center muted" style={{ margin: "4px 0 6px", fontSize: "15px" }}>
+            A correct PIN resets your will's clock. Nothing moves.
+          </p>
+          <PinPad value={pin} onChange={setPin} onEnter={(x) => void go(x)} />
+          <div class="flow-actions">
+            <button type="button" class="btn btn-ghost" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="button" class="btn btn-primary" disabled={pin.length < 6} onClick={() => void go()}>
+              Confirm
+            </button>
+          </div>
+        </div>
+      )}
+      {stage === "run" && (
+        <div>
+          <div class="progress-head">
+            <Ring done={done} total={ALIVE_STEPS.length} />
+            <div>
+              <div class="progress-title">Checking your PIN</div>
+              <div class="progress-sub">{current >= 0 ? ALIVE_LABELS[current] : "Preparing…"}</div>
+              <div class="timer">{mmss(now - t0)}</div>
+            </div>
+          </div>
+          <ul class="tasks">
+            {tasks.map((t, i) => (
+              <Task label={ALIVE_LABELS[i]} t={t} extra={t.s === "run" && (i === 1 || i === 3) ? <Cipher n={12} /> : undefined} />
+            ))}
+          </ul>
+        </div>
+      )}
+      {stage === "result" && result && (
+        <div class="result">
+          {result.kind === "ok" ? <OkIcon /> : <BadIcon />}
+          <h3>{result.kind === "ok" ? "Clock reset" : result.kind === "wrong" ? "Wrong PIN" : "That didn't go through"}</h3>
+          <p>
+            {result.kind === "ok"
+              ? "The will's inactivity period starts again from now, and a will that had started is cancelled."
+              : result.kind === "wrong"
+                ? `Nothing changed. Wrong guesses so far: ${result.score}.`
+                : result.text}
+          </p>
+          {result.kind === "ok" && (
+            <div class="facts-row">
+              <TxLink hash={result.hash} label="View transaction" />
+            </div>
+          )}
+          <div class="flow-actions">
+            <button type="button" class="btn btn-primary btn-lg" onClick={onClose}>
+              Done
+            </button>
+          </div>
+        </div>
+      )}
+    </Sheet>
+  );
+}
+
+function ClaimView({ ctx, willAddr, initialCode, notify }: { ctx: Ctx; willAddr: string; initialCode: string; notify: Notify }) {
+  const [v, refresh, failed] = useWill(willAddr, 10000);
   const [busy, setBusy] = useState<string | null>(null);
-  const [claimed, setClaimed] = useState<string | null>(null);
+  const [mode, setMode] = useState<"code" | "address">("code");
+  const [codeText, setCodeText] = useState(initialCode);
+  const [recipient, setRecipient] = useState("");
+  const [claimed, setClaimed] = useState<{ hash: string; to: string } | null>(null);
   const [revealed, setRevealed] = useState<bigint | null>(null);
+  const [staleHandle, setStaleHandle] = useState<string | undefined>(undefined);
   const now = useNow(1000);
   const nowS = Math.floor(now / 1000);
+  const code = parseCode(codeText);
+  // An heir named by address is paid only in a claim to its own address: there the recipient is the wallet itself.
+  const to = mode === "address" ? ctx.w.address : recipient.trim() || ctx.w.address;
+  const toOk = ethers.isAddress(to);
 
-  async function act(label: string, fn: (st: (t: string) => void) => Promise<string | void>, okText: string, isClaim = false) {
+  async function act(label: string, fn: (st: (t: string) => void) => Promise<unknown>, okText: string) {
     setBusy(label);
     try {
-      const h = await fn((t) => setBusy(t));
-      if (isClaim && h) setClaimed(h);
+      await fn((t) => setBusy(t));
       notify(okText, "ok");
       await refresh();
+    } catch (e) {
+      notify(explainError(e), "err");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function doClaim() {
+    setBusy("Claiming…");
+    try {
+      const recipientAddr = ethers.getAddress(to);
+      const toSelf = recipientAddr.toLowerCase() === ctx.w.address.toLowerCase();
+      const before = toSelf ? await tokenBalanceHandle(ctx.read, recipientAddr).catch(() => undefined) : undefined;
+      const h = await claimWill(ctx, willAddr, recipientAddr, mode === "code" ? code : null, (t) => setBusy(t));
+      setClaimed({ hash: h, to: recipientAddr });
+      if (toSelf) setStaleHandle(before);
+      setRevealed(null);
+      notify("Claimed.", "ok");
     } catch (e) {
       notify(explainError(e), "err");
     } finally {
@@ -1824,13 +2177,18 @@ function ClaimView({ ctx, willAddr, notify }: { ctx: Ctx; willAddr: string; noti
   async function reveal() {
     setBusy("Preparing…");
     try {
-      setRevealed(await decryptMyBalance(ctx, (t) => setBusy(t)));
+      setRevealed(await decryptMyBalance(ctx, (t) => setBusy(t), staleHandle));
     } catch (e) {
       notify(explainError(e), "err");
     } finally {
       setBusy(null);
     }
   }
+
+  const settleAndPrepare = async (st: (t: string) => void) => {
+    await settleWill(ctx, willAddr, st);
+    await runPayoutRound(ctx, willAddr, st);
+  };
 
   return (
     <div class="claim">
@@ -1840,7 +2198,7 @@ function ClaimView({ ctx, willAddr, notify }: { ctx: Ctx; willAddr: string; noti
           <AddrChip a={willAddr} notify={notify} />
         </div>
         {!v ? (
-          <p class="small faint">Loading…</p>
+          failed ? <WillUnreadable /> : <p class="small faint">Loading…</p>
         ) : !v.exists ? (
           <p class="muted">There is no will at this address on Sepolia.</p>
         ) : (
@@ -1866,43 +2224,119 @@ function ClaimView({ ctx, willAddr, notify }: { ctx: Ctx; willAddr: string; noti
                 </span>
                 <span class="v">{fmtWait(v.inactivity)} rule</span>
               </li>
+              {v.settled && (
+                <li>
+                  <span class="check">
+                    <IconClock />
+                  </span>
+                  <span class="k">
+                    Claim window
+                    <small>{v.swept ? "Closed: the rest went to the owner's escape address" : `Open until ${new Date(v.sweepableAt * 1000).toLocaleString()}`}</small>
+                  </span>
+                  <span class="v">{v.round ? `Round ${v.round}${v.preparing ? " · open" : ""}` : "No round yet"}</span>
+                </li>
+              )}
             </ul>
+
             <div class="row wrap will-actions">
               {v.phase === 2 && (
                 <button type="button" class="btn btn-primary" disabled={!!busy} onClick={() => void act("Starting…", (st) => startWill(ctx, willAddr, st), "Started.")}>
-                  Start
+                  Start the will
                 </button>
               )}
               {v.phase === 4 && (
-                <button type="button" class="btn btn-primary" disabled={!!busy} onClick={() => void act("Settling…", (st) => settleWill(ctx, willAddr, st), "Settled.")}>
-                  Settle
+                <button type="button" class="btn btn-primary" disabled={!!busy} onClick={() => void act("Settling…", settleAndPrepare, "Settled, and the payout is ready.")}>
+                  Settle and prepare the payout
                 </button>
               )}
-              {v.phase === 5 && (
-                <button type="button" class="btn btn-primary" disabled={!!busy} onClick={() => void act("Claiming…", (st) => claimWill(ctx, willAddr, st), "Claimed.", true)}>
-                  Claim
+              {v.settled && !v.swept && (v.round === 0 || v.preparing) && (
+                <button type="button" class="btn btn-primary" disabled={!!busy} onClick={() => void act("Preparing…", (st) => runPayoutRound(ctx, willAddr, st), "The payout is ready.")}>
+                  Prepare the payout
                 </button>
               )}
-              {v.phase === 5 && (
-                <button type="button" class="btn btn-secondary" disabled={!!busy} onClick={() => void reveal()}>
-                  Reveal my tcUSD balance
+              {v.escapeAlive && (
+                <button type="button" class="btn btn-secondary" disabled={!!busy} onClick={() => void act("Moving…", (st) => escapeWithdrawWill(ctx, willAddr, st), "The will followed the owner's escape.")}>
+                  Move to the owner's escape address
+                </button>
+              )}
+              {v.settled && !v.swept && v.sweepableAt > 0 && nowS >= v.sweepableAt && (
+                <button type="button" class="btn btn-secondary" disabled={!!busy} onClick={() => void act("Closing…", (st) => sweepWill(ctx, willAddr, st), "The rest went to the owner's escape address.")}>
+                  Close the claim window
                 </button>
               )}
             </div>
+
+            {payoutReady(v) && (
+              <div class="claim-form">
+                <div class="mode-toggle wide" role="group" aria-label="How you claim">
+                  <button type="button" class={mode === "code" ? "on" : ""} aria-pressed={mode === "code"} onClick={() => setMode("code")}>
+                    I have a claim code
+                  </button>
+                  <button type="button" class={mode === "address" ? "on" : ""} aria-pressed={mode === "address"} onClick={() => setMode("address")}>
+                    I'm named by my address
+                  </button>
+                </div>
+                {mode === "code" && (
+                  <label class="field">
+                    <span>Claim code</span>
+                    <input class="input mono" placeholder="xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx" value={codeText} spellcheck={false} autoComplete="off" onInput={(e) => setCodeText((e.target as HTMLInputElement).value)} />
+                    {codeText.trim() !== "" && !code && <span class="field-err">A claim code has 32 hexadecimal digits.</span>}
+                  </label>
+                )}
+                {mode === "code" ? (
+                  <label class="field">
+                    <span>Send to</span>
+                    <input class="input mono" placeholder={`${short(ctx.w.address)} (this wallet) or any address`} value={recipient} spellcheck={false} autoComplete="off" onInput={(e) => setRecipient((e.target as HTMLInputElement).value)} />
+                    {toOk ? (
+                      <span class="field-hint">Any address you control; a fresh one keeps the claim unlinkable to you. The claim is bound to it: nobody can redirect it.</span>
+                    ) : (
+                      <span class="field-err">Enter a valid address.</span>
+                    )}
+                  </label>
+                ) : (
+                  <div class="field">
+                    <span>Paid to</span>
+                    <div class="input mono input-static">{ctx.w.address}</div>
+                    <span class="field-hint">An heir named by address claims from that address, and its share is paid to that same address: connect the wallet the owner named.</span>
+                  </div>
+                )}
+                <button type="button" class="btn btn-primary btn-lg btn-block" disabled={!!busy || !toOk || (mode === "code" && !code)} onClick={() => void doClaim()}>
+                  Claim
+                </button>
+                <p class="small faint">You send the claim from the wallet connected here, and it pays the gas. Heirs receive their encrypted share, everyone else an encrypted zero.</p>
+                <button type="button" class="link-btn" disabled={!!busy} onClick={() => void act("Preparing…", (st) => runPayoutRound(ctx, willAddr, st), "A new round is ready.")}>
+                  Tokens arrived after the payout? Prepare a new round
+                </button>
+              </div>
+            )}
             {busy && <p class="small faint">{busy}</p>}
             {claimed && (
               <div class="notice ok">
                 <IconCheck />
                 <span>
-                  Claimed. If you are an heir, your share just arrived, encrypted; otherwise you received an encrypted zero. Nobody watching the chain can tell which. <TxLink hash={claimed} label="Transaction" />
+                  Claimed to {short(claimed.to)}. If the code or the address belongs to an heir, the share arrived there, encrypted; otherwise an encrypted zero did. Nobody watching the chain can tell which.{" "}
+                  <TxLink hash={claimed.hash} label="Transaction" />
                 </span>
+              </div>
+            )}
+            {v.settled && (
+              <div class="row wrap will-actions">
+                <button type="button" class="btn btn-secondary" disabled={!!busy} onClick={() => void reveal()}>
+                  Reveal this wallet's tcUSD balance
+                </button>
               </div>
             )}
             {revealed !== null && (
               <div class="reveal">
-                <span class="small faint">Your tcUSD balance, decrypted only for you</span>
+                <span class="small faint">The tcUSD balance of {short(ctx.w.address)}, decrypted only for you</span>
                 <b>{fmtTc(revealed)}</b>
-                <span class="small muted">{revealed > 0n ? "That's what you hold of the test token." : "Zero: you are not an heir of this will, or you haven't claimed yet."}</span>
+                <span class="small muted">
+                  {revealed > 0n
+                    ? "That's what this wallet holds of the test token."
+                    : claimed && claimed.to.toLowerCase() !== ctx.w.address.toLowerCase()
+                      ? "You sent the claim to another address: open this page with that wallet to see it."
+                      : "Zero: nothing for this wallet, or no claim yet."}
+                </span>
               </div>
             )}
           </>
@@ -1944,6 +2378,13 @@ function App() {
   const willParam = useMemo(() => {
     const w = new URLSearchParams(location.search).get("will");
     return w && ethers.isAddress(w) ? ethers.getAddress(w) : null;
+  }, []);
+  // An heir card's link carries the claim code in the fragment, which browsers never send to a server: read it once,
+  // then drop it from the address bar and the history.
+  const codeParam = useMemo(() => {
+    const m = /(?:^#|&)code=([0-9a-fA-F-]{32,40})(?:&|$)/.exec(location.hash);
+    if (m) history.replaceState(history.state, "", location.pathname + location.search);
+    return m ? m[1] : "";
   }, []);
   const [ctx, setCtx] = useState<Ctx | null>(null);
   const [walletBal, setWalletBal] = useState<bigint | null>(null);
@@ -2011,11 +2452,11 @@ function App() {
         {phase === "connect" && willParam && (
           <div class="notice info will-link-note">
             <IconLock />
-            <span>You opened a hidden will. Connect a wallet to see it and claim.</span>
+            <span>You opened a hidden will{codeParam ? " with a claim code" : ""}. Connect a wallet to see it and claim.</span>
           </div>
         )}
         {phase === "connect" && <ConnectView connecting={connecting} onConnect={() => void connect()} notify={notify} />}
-        {phase === "claim" && ctx && willParam && <ClaimView ctx={ctx} willAddr={willParam} notify={notify} />}
+        {phase === "claim" && ctx && willParam && <ClaimView ctx={ctx} willAddr={willParam} initialCode={codeParam} notify={notify} />}
         {phase === "create" && ctx && (
           <CreateFlow
             ctx={ctx}

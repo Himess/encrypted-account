@@ -227,8 +227,20 @@ export async function createAndSetup(
   }
   const A = plan.account;
   const a = acct(A, ctx.read);
+  // Right after a transaction, a load-balanced RPC backend can lag a block behind and answer a call to the just-created
+  // account with empty data ("could not decode result data"): read again before treating it as an error.
+  const check = async (done: () => Promise<boolean>): Promise<boolean> => {
+    for (let n = 1; ; n++) {
+      try {
+        return await done();
+      } catch (e: any) {
+        if (n >= 6 || !(e?.code === "BAD_DATA" || /could not decode result data/i.test(String(e?.message ?? "")))) throw e;
+        await sleep(2000);
+      }
+    }
+  };
   const run = async (i: number, done: () => Promise<boolean>, go: (st: Status) => Promise<ethers.TransactionReceipt>) => {
-    if (await done()) return cb(i, "skip");
+    if (await check(done)) return cb(i, "skip");
     cb(i, "run");
     try {
       const r = await go((t, h) => cb(i, "run", t, h));
@@ -435,13 +447,13 @@ export const CALL_STEPS = [
   "Wait out the delay and run it",
 ] as const;
 
-/**
- * A call from the account to another contract (`openCall`): the PIN, then the generic-call delay, then `executeOp`.
- * The will's owner functions are reached this way only, so the key alone never touches a will.
- */
-export async function callWithPin(ctx: Ctx, account: string, target: string, data: string, pin: string, cb: StepCb): Promise<string> {
-  const owner = ctx.w.address;
-  const step = async <T>(i: number, go: (st: Status) => Promise<T>): Promise<T> => {
+/** "I'm here": the first five steps only; the no-op call is never run. */
+export const ALIVE_STEPS = CALL_STEPS.slice(0, 5);
+
+type Step = <T>(i: number, go: (st: Status) => Promise<T>) => Promise<T>;
+
+function stepper(cb: StepCb): Step {
+  return async (i, go) => {
     cb(i, "run");
     try {
       return await go((t, h) => cb(i, "run", t, h));
@@ -450,8 +462,12 @@ export async function callWithPin(ctx: Ctx, account: string, target: string, dat
       throw e;
     }
   };
-  const fpP = pinFingerprint(pin, CHAIN_ID, account);
+}
 
+/** Opens a generic call and verifies the PIN for it (steps 0–4). A correct PIN updates the account's lastPinAt. */
+async function openCallWithPin(ctx: Ctx, account: string, target: string, data: string, pin: string, cb: StepCb, step: Step) {
+  const owner = ctx.w.address;
+  const fpP = pinFingerprint(pin, CHAIN_ID, account);
   const opened = await step(0, async (st) => {
     await finalizePending(ctx, account, st);
     const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("openCall", [target, 0, data]) }, st);
@@ -482,25 +498,50 @@ export async function callWithPin(ctx: Ctx, account: string, target: string, dat
     const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("finalizeGuess", [opened.opId, dec.cleartexts, dec.proof]) }, st);
     const ev = eventOf(r, account, "GuessFinalized");
     cb(4, "done", undefined, r.hash);
-    return { ok: Boolean(ev.args.ok), readyAt: Number(ev.args.readyAt) };
+    return { ok: Boolean(ev.args.ok), readyAt: Number(ev.args.readyAt), hash: r.hash };
   });
   if (!fin.ok) {
     const ts = await acct(account, ctx.read).trackState(TRACK_OWNER);
-    cb(5, "skip", "Not run: wrong PIN");
     throw new WrongPin(Number(ts[1]), Number(ts[0]));
+  }
+  return { opId: opened.opId, readyAt: fin.readyAt, hash: fin.hash };
+}
+
+/**
+ * A call from the account to another contract (`openCall`): the PIN, then the generic-call delay, then `executeOp`.
+ * The will's owner functions are reached this way only, so the key alone never touches a will.
+ */
+export async function callWithPin(ctx: Ctx, account: string, target: string, data: string, pin: string, cb: StepCb): Promise<string> {
+  const step = stepper(cb);
+  let op: { opId: bigint; readyAt: number };
+  try {
+    op = await openCallWithPin(ctx, account, target, data, pin, cb, step);
+  } catch (e) {
+    if (e instanceof WrongPin) cb(5, "skip", "Not run: wrong PIN");
+    throw e;
   }
   return await step(5, async (st) => {
     for (;;) {
       const now = (await ctx.read.getBlock("latest"))?.timestamp ?? 0;
-      if (now >= fin.readyAt) break;
-      st(`Waiting period: ${fin.readyAt - now} s`);
+      if (now >= op.readyAt) break;
+      st(`Waiting period: ${op.readyAt - now} s`);
       await sleep(4000);
     }
-    const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("executeOp", [opened.opId]) }, st);
+    const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("executeOp", [op.opId]) }, st);
     eventOf(r, account, "OpExecuted");
     cb(5, "done", undefined, r.hash);
     return r.hash;
   });
+}
+
+/**
+ * "I'm here": the cheapest PIN operation on the account, with no account change. It opens a call with no data to
+ * the owner's own wallet and verifies the PIN; the correct PIN updates lastPinAt, which is what a will reads as
+ * proof of life. The call itself is never run.
+ */
+export async function proveAliveWithPin(ctx: Ctx, account: string, pin: string, cb: StepCb): Promise<string> {
+  const op = await openCallWithPin(ctx, account, ctx.w.address, "0x", pin, cb, stepper(cb));
+  return op.hash;
 }
 
 export async function deposit(ctx: Ctx, account: string, wei: bigint, st: Status): Promise<string> {

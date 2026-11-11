@@ -53,6 +53,7 @@
     "hardhat": "2.29.1",
     "mocha": "^11.7.5",
     "preact": "10.29.8",
+    "qrcode-generator": "2.0.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
