@@ -14,6 +14,9 @@
  *  - F0.11 (variant B): notifies the owner of every K-only outflow (OpenOutflow) that executes in a single transaction
  *    to a recipient on the open list within the limit, and of every change to the open list (OpenKnownChanged);
  *    in B there is no evaluation to finalize.
+ *  - W1.7 (hidden inheritance): `WillWatcher` reminds the owner 30 and 7 days before the will's inactivity period
+ *    ends (a correct PIN resets it), and alerts on WillStarted on every channel: unless a correct PIN comes within the
+ *    grace period, the inheritance goes ahead.
  * The watchtower can only restrict; it cannot move funds or widen permissions (I9).
  */
 import { Contract as EthersContract } from "ethers";
@@ -43,6 +46,9 @@ export type Alert =
   | { kind: "open-approval"; token: string; spender: string; allowance: bigint; advice: string }
   | { kind: "open-outflow"; sub: number; asset: string; to: string; amount: bigint; spent: bigint }
   | { kind: "known-changed"; spenders: boolean; who: string; added: boolean }
+  | { kind: "will-reminder"; will: string; daysLeft: number; startableAt: bigint }
+  | { kind: "will-started"; will: string; settleableAt: bigint }
+  | { kind: "will-settled"; will: string }
   | { kind: "error"; message: string };
 
 /** K55: if control of the escape address has not been proven for longer than this, the owner is reminded (it blocks nothing). */
@@ -184,5 +190,64 @@ export class Watchtower {
         }
       }
     }
+  }
+}
+
+// ───────────────────────────── hidden inheritance (W1.7) ─────────────────────────────
+
+/** Days before a will's inactivity period ends at which the owner is reminded to enter a PIN. */
+export const WILL_REMIND_DAYS: readonly number[] = [30, 7];
+
+/**
+ * Reminders due for one inactivity period: every threshold d not yet sent, once now ≥ startableAt − d days. Pure: the
+ * caller remembers what it sent and forgets it when `startableAt` moves (a correct PIN moves it).
+ */
+export function dueWillReminders(nowS: bigint, startableAt: bigint, sent: ReadonlySet<number>, days: readonly number[] = WILL_REMIND_DAYS): number[] {
+  return days.filter((d) => !sent.has(d) && nowS >= startableAt - BigInt(d) * 86400n).sort((a, b) => b - a);
+}
+
+export interface WillWatcherDeps {
+  will: Contract; // EncryptedWill, connected to a provider
+  notify: (a: Alert) => void; // the integration sends "will-started" on every channel it has
+  remindDays?: readonly number[];
+}
+
+/** Watches one will: reminders before the inactivity period ends, alerts when it starts and settles. Read-only. */
+export class WillWatcher {
+  private lastBlock = -1;
+  private sentFor = -1n;
+  private readonly sent = new Set<number>();
+
+  constructor(private readonly d: WillWatcherDeps) {}
+
+  async tick(): Promise<void> {
+    const will = this.d.will;
+    const provider = will.runner?.provider;
+    if (!provider) throw new Error("will must be connected to a provider");
+    const latest = await provider.getBlockNumber();
+    const addr = await will.getAddress();
+    if (latest > this.lastBlock) {
+      const logs = await will.queryFilter("*" as any, this.lastBlock + 1, latest);
+      this.lastBlock = latest;
+      for (const log of logs as any[]) {
+        const name: string | undefined = log.fragment?.name ?? log.eventName;
+        if (name === "WillStarted") this.d.notify({ kind: "will-started", will: addr, settleableAt: BigInt(log.args.settleableAt) });
+        else if (name === "WillSettled") this.d.notify({ kind: "will-settled", will: addr });
+      }
+    }
+    const st = await will.state();
+    const phase = Number(st.phase);
+    if (phase !== 1 && phase !== 2) return; // no heirs yet, started or settled: no reminders
+    const startableAt = BigInt(st.startableAt);
+    if (startableAt !== this.sentFor) {
+      this.sentFor = startableAt;
+      this.sent.clear();
+    }
+    const now = BigInt((await provider.getBlock(latest))?.timestamp ?? 0);
+    const due = dueWillReminders(now, startableAt, this.sent, this.d.remindDays ?? WILL_REMIND_DAYS);
+    if (!due.length) return;
+    for (const x of due) this.sent.add(x);
+    const daysLeft = startableAt > now ? Number((startableAt - now) / 86400n) : 0;
+    this.d.notify({ kind: "will-reminder", will: addr, daysLeft, startableAt });
   }
 }

@@ -86,3 +86,24 @@ describe("SDK — PIN fingerprint (13.1) and PIN policy (13.8)", function () {
     for (const c of counts) expect(Math.abs(c - expected) / expected).to.be.lessThan(0.1);
   });
 });
+
+describe("SDK — will reminders (W1.7)", () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { dueWillReminders, WILL_REMIND_DAYS } = require("../src/watchtower");
+  const DAY = 86400n;
+  const end = 1_000_000_000n;
+
+  it("reminds 30 and then 7 days before the inactivity period ends, once each", () => {
+    expect(WILL_REMIND_DAYS).to.deep.eq([30, 7]);
+    expect(dueWillReminders(end - 31n * DAY, end, new Set())).to.deep.eq([]);
+    expect(dueWillReminders(end - 30n * DAY, end, new Set())).to.deep.eq([30]);
+    expect(dueWillReminders(end - 20n * DAY, end, new Set([30]))).to.deep.eq([]);
+    expect(dueWillReminders(end - 7n * DAY, end, new Set([30]))).to.deep.eq([7]);
+    expect(dueWillReminders(end - DAY, end, new Set([30, 7]))).to.deep.eq([]);
+  });
+
+  it("a late first check returns every missed threshold (the watcher sends one reminder for them)", () => {
+    expect(dueWillReminders(end - 5n * DAY, end, new Set())).to.deep.eq([30, 7]);
+    expect(dueWillReminders(end + DAY, end, new Set(), [14, 3])).to.deep.eq([14, 3]);
+  });
+});

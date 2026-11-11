@@ -1,0 +1,56 @@
+{
+  "limits": {
+    "tx": 20000000,
+    "depth": 5000000
+  },
+  "rows": [
+    {
+      "op": "setHeirs (4 slots)",
+      "hcu": 2776232,
+      "depth": 1104064,
+      "gas": 4742171
+    },
+    {
+      "op": "prepare",
+      "hcu": 2237032,
+      "depth": 1370032,
+      "gas": 565784
+    },
+    {
+      "op": "snapshot (4 slots)",
+      "hcu": 8276032,
+      "depth": 1473000,
+      "gas": 1318668
+    },
+    {
+      "op": "snapshot (2 slots)",
+      "hcu": 4572032,
+      "depth": 1690000,
+      "gas": 1001152
+    },
+    {
+      "op": "claim",
+      "hcu": 2939136,
+      "depth": 1305000,
+      "gas": 3563472
+    },
+    {
+      "op": "escapeWithdraw",
+      "hcu": 586064,
+      "depth": 369000,
+      "gas": 696046
+    },
+    {
+      "op": "sweepResidual",
+      "hcu": 586064,
+      "depth": 369000,
+      "gas": 696793
+    },
+    {
+      "op": "snapshot (1 slot)",
+      "hcu": 2069032,
+      "depth": 1473000,
+      "gas": 469527
+    }
+  ]
+}
