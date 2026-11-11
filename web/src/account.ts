@@ -5,7 +5,7 @@
  */
 import { ethers } from "ethers";
 import { ACCOUNT_ABI, FACTORY_ABI } from "./abi";
-import { CHAIN_ID, DEMO_DELAYS, ETH, ETH_UNIT, FACTORY, FACTORY_DEPLOY_BLOCK, N_RECIPIENTS, N_SPENDERS, TRACK_OWNER, ZERO32 } from "./chain";
+import { CHAIN_ID, DEMO_DELAYS, ETH, ETH_UNIT, FACTORY, FACTORY_DEPLOY_BLOCK, LOG_RPC_URLS, N_RECIPIENTS, N_SPENDERS, TRACK_OWNER, ZERO32 } from "./chain";
 import { asBool, encrypt, publicDecrypt } from "./fhe";
 import { guessValue, pinFingerprint, randomUint64 } from "./pin";
 import { Status, sendTx } from "./tx";
@@ -34,16 +34,38 @@ function eventOf(receipt: ethers.TransactionReceipt, account: string, name: stri
 
 // ───────────────────────────── reading ─────────────────────────────
 
-/** eth_getLogs in windows: the public RPC refuses ranges of 50,000 blocks or more. */
+/**
+ * eth_getLogs in windows: the public RPC refuses ranges of 50,000 blocks or more. The last window ends at "latest",
+ * not at a block number: the RPC is load-balanced, and a backend one block behind refuses a range that ends past its
+ * own head ("block range extends beyond current head block").
+ */
 export async function getLogsChunked(read: ethers.JsonRpcProvider, filter: { address: string; topics?: (string | null)[] }, fromBlock: number, toBlock: number, step = 45_000): Promise<ethers.Log[]> {
-  const ranges: [number, number][] = [];
-  for (let a = fromBlock; a <= toBlock; a += step) ranges.push([a, Math.min(toBlock, a + step - 1)]);
+  const ranges: [number, number | "latest"][] = [];
+  for (let a = fromBlock; a <= toBlock; a += step) ranges.push([a, a + step - 1 >= toBlock ? "latest" : a + step - 1]);
   const out: ethers.Log[] = [];
   for (let i = 0; i < ranges.length; i += 4) {
-    const res = await Promise.all(ranges.slice(i, i + 4).map(([a, b]) => read.getLogs({ ...filter, fromBlock: a, toBlock: b })));
+    const res = await Promise.all(ranges.slice(i, i + 4).map(([a, b]) => getLogsAny(read, { ...filter, fromBlock: a, toBlock: b })));
     for (const r of res) out.push(...r);
   }
   return out;
+}
+
+const logProviders = LOG_RPC_URLS.map((u) => new ethers.JsonRpcProvider(u, Number(CHAIN_ID), { staticNetwork: ethers.Network.from(Number(CHAIN_ID)) }));
+
+/** One getLogs call: the log RPCs in order, then the main one; each tried twice. */
+async function getLogsAny(read: ethers.JsonRpcProvider, filter: ethers.Filter): Promise<ethers.Log[]> {
+  let last: unknown = null;
+  for (const p of [...logProviders, read]) {
+    for (let k = 0; k < 2; k++) {
+      try {
+        return await p.getLogs(filter);
+      } catch (e) {
+        last = e;
+        await sleep(600);
+      }
+    }
+  }
+  throw last;
 }
 
 export async function findAccounts(read: ethers.JsonRpcProvider, owner: string): Promise<string[]> {
@@ -388,6 +410,85 @@ export async function sendWithPin(ctx: Ctx, account: string, to: string, amountW
     throw new WrongPin(Number(ts[1]), Number(ts[0]));
   }
 
+  return await step(5, async (st) => {
+    for (;;) {
+      const now = (await ctx.read.getBlock("latest"))?.timestamp ?? 0;
+      if (now >= fin.readyAt) break;
+      st(`Waiting period: ${fin.readyAt - now} s`);
+      await sleep(4000);
+    }
+    const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("executeOp", [opened.opId]) }, st);
+    eventOf(r, account, "OpExecuted");
+    cb(5, "done", undefined, r.hash);
+    return r.hash;
+  });
+}
+
+// ───────────────────────────── a generic call with the PIN ─────────────────────────────
+
+export const CALL_STEPS = [
+  "Open the operation",
+  "Encrypt your PIN guess",
+  "Submit the encrypted guess",
+  "Zama decrypts only the yes/no result",
+  "Record the result on-chain",
+  "Wait out the delay and run it",
+] as const;
+
+/**
+ * A call from the account to another contract (`openCall`): the PIN, then the generic-call delay, then `executeOp`.
+ * The will's owner functions are reached this way only, so the key alone never touches a will.
+ */
+export async function callWithPin(ctx: Ctx, account: string, target: string, data: string, pin: string, cb: StepCb): Promise<string> {
+  const owner = ctx.w.address;
+  const step = async <T>(i: number, go: (st: Status) => Promise<T>): Promise<T> => {
+    cb(i, "run");
+    try {
+      return await go((t, h) => cb(i, "run", t, h));
+    } catch (e: any) {
+      cb(i, "fail", e?.message ?? String(e));
+      throw e;
+    }
+  };
+  const fpP = pinFingerprint(pin, CHAIN_ID, account);
+
+  const opened = await step(0, async (st) => {
+    await finalizePending(ctx, account, st);
+    const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("openCall", [target, 0, data]) }, st);
+    const ev = eventOf(r, account, "OpOpened");
+    cb(0, "done", undefined, r.hash);
+    return { opId: BigInt(ev.args.opId), c: BigInt(ev.args.challenge) };
+  });
+  const enc = await step(1, async (st) => {
+    st("Deriving the fingerprint (Argon2id)…");
+    const fp = await fpP;
+    st("Encrypting…");
+    const e = await encrypt(ctx.read, [{ type: "euint64", value: guessValue(fp, opened.c) }], account, owner);
+    cb(1, "done");
+    return e;
+  });
+  const handles = await step(2, async (st) => {
+    const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("submitGuess", [opened.opId, opened.c, enc.handles[0], enc.inputProof]) }, st);
+    const ev = eventOf(r, account, "GuessSubmitted");
+    cb(2, "done", undefined, r.hash);
+    return ev.args.bigHandle === ZERO32 ? [String(ev.args.okHandle)] : [String(ev.args.okHandle), String(ev.args.bigHandle)];
+  });
+  const dec = await step(3, async (st) => {
+    const d = await publicDecrypt(ctx.read, handles, (s) => st(`Waiting for the threshold network… ${s} s`));
+    cb(3, "done", asBool(d.clear[0]) ? "Result: correct PIN" : "Result: wrong PIN");
+    return d;
+  });
+  const fin = await step(4, async (st) => {
+    const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("finalizeGuess", [opened.opId, dec.cleartexts, dec.proof]) }, st);
+    const ev = eventOf(r, account, "GuessFinalized");
+    cb(4, "done", undefined, r.hash);
+    return { ok: Boolean(ev.args.ok), readyAt: Number(ev.args.readyAt) };
+  });
+  if (!fin.ok) {
+    const ts = await acct(account, ctx.read).trackState(TRACK_OWNER);
+    cb(5, "skip", "Not run: wrong PIN");
+    throw new WrongPin(Number(ts[1]), Number(ts[0]));
+  }
   return await step(5, async (st) => {
     for (;;) {
       const now = (await ctx.read.getBlock("latest"))?.timestamp ?? 0;

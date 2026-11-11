@@ -10,6 +10,7 @@ import { CHAIN_ID, CHAIN_ID_HEX, ETH_UNIT, RPC_URL, addrUrl, txUrl } from "./cha
 import {
   Activity,
   AccountView,
+  CALL_STEPS,
   Ctx,
   SEND_STEPS,
   SETUP_STEPS,
@@ -28,6 +29,21 @@ import { fheClient } from "./fhe";
 import { checkPin, randomPin } from "./pin";
 import { explainError } from "./tx";
 import { connectWallet, hasWallet, watchWallet } from "./wallet";
+import {
+  Heir,
+  PHASE_TEXT,
+  WillView,
+  claimWill,
+  createWill,
+  decryptMyBalance,
+  fundWill,
+  predictWill,
+  readWill,
+  setHeirsWithPin,
+  settleWill,
+  startWill,
+  willUrl,
+} from "./will";
 
 // ───────────────────────────── shared state and helpers ─────────────────────────────
 
@@ -1389,6 +1405,8 @@ function Dashboard({ ctx, account, walletBal, notify, onNewAccount, onWalletBal 
             </ul>
           </section>
 
+          <WillCard ctx={ctx} account={account} notify={notify} />
+
           <section class="card card-pad">
             <h3 class="card-title">
               Wrong PIN guesses
@@ -1438,6 +1456,465 @@ function Dashboard({ ctx, account, walletBal, notify, onNewAccount, onWalletBal 
   );
 }
 
+// ───────────────────────────── hidden will ─────────────────────────────
+
+const WILL_LABELS = ["Open the call on-chain", "Encrypt your PIN guess", "Submit the encrypted guess", "Decrypt only the yes / no result", "Record the result on-chain", "Wait the delay, then set the heirs"];
+const FUND_UNITS = 1_000_000_000n; // 1,000 tcUSD (6 decimals)
+const fmtTc = (units: bigint) => `${(Number(units) / 1e6).toLocaleString("en-US", { maximumFractionDigits: 6 })} tcUSD`;
+
+function phaseLine(v: WillView, nowS: number): string {
+  switch (v.phase) {
+    case 0:
+      return "No heirs yet.";
+    case 1:
+      return `The owner is active. It can start in ${fmtWait(Math.max(0, v.startableAt - nowS))} if no correct PIN comes first.`;
+    case 2:
+      return `No correct PIN for ${fmtWait(nowS - v.pinAt)}. Anyone can start it.`;
+    case 3:
+      return `Started. A correct PIN within ${fmtWait(Math.max(0, v.settleableAt - nowS))} cancels it.`;
+    case 4:
+      return "The grace period is over. Anyone can settle it.";
+    default:
+      return "Settled. Anyone can claim: heirs get their share, everyone else an encrypted zero.";
+  }
+}
+
+function useWill(addr: string | null, every = 15000) {
+  const [v, setV] = useState<WillView | null>(null);
+  const refresh = useCallback(async () => {
+    if (!addr) return;
+    try {
+      setV(await readWill(read, addr));
+    } catch {
+      /* transient RPC error: keep the last view */
+    }
+  }, [addr]);
+  useEffect(() => {
+    void refresh();
+    const id = setInterval(() => void refresh(), every);
+    return () => clearInterval(id);
+  }, [refresh]);
+  return [v, refresh] as const;
+}
+
+function WillCard({ ctx, account, notify }: { ctx: Ctx; account: string; notify: Notify }) {
+  const [addr, setAddr] = useState<string | null>(null);
+  const [v, refresh] = useWill(addr);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [sheet, setSheet] = useState(false);
+  const now = useNow(1000);
+  const nowS = Math.floor(now / 1000);
+
+  useEffect(() => {
+    retry(() => predictWill(read, account)).then(setAddr, () => undefined);
+  }, [account]);
+
+  async function act(label: string, fn: (st: (t: string) => void) => Promise<unknown>, okText: string) {
+    setBusy(label);
+    try {
+      await fn((t) => setBusy(t));
+      notify(okText, "ok");
+      await refresh();
+    } catch (e) {
+      notify(explainError(e), "err");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  return (
+    <section class="card card-pad will-card">
+      <h3 class="card-title">
+        Hidden will
+        <span class="badge">New</span>
+      </h3>
+      {!v ? (
+        <p class="small faint">Loading…</p>
+      ) : !v.exists ? (
+        <>
+          <p class="small muted">
+            Leave test tokens to up to four heirs. Their addresses and shares are encrypted, even from you. If the account sees no correct PIN for 5 minutes (months, in real use), anyone can start the will; a PIN in the next 5 minutes cancels it.
+          </p>
+          <button type="button" class="btn btn-secondary btn-sm" disabled={!!busy} onClick={() => void act("Creating…", (st) => createWill(ctx, account, st), "Your will is created.")}>
+            {busy ?? "Create a will"}
+          </button>
+        </>
+      ) : (
+        <>
+          <ul class="prot">
+            <li>
+              <span class={`check ${v.heirsSet ? "" : "off"}`}>{v.heirsSet ? <IconCheck /> : <IconClock />}</span>
+              <span class="k">
+                Heirs<small>{v.heirsSet ? "Set, encrypted: nobody can read them" : "Not set yet"}</small>
+              </span>
+              <span class="v">{v.heirsSet ? "Set" : "—"}</span>
+            </li>
+            <li>
+              <span class={`check ${v.balanceKnown ? "" : "off"}`}>{v.balanceKnown ? <IconCheck /> : <IconClock />}</span>
+              <span class="k">
+                Test tokens<small>{v.balanceKnown ? "The will holds an encrypted tcUSD balance" : "Empty"}</small>
+              </span>
+              <span class="v">{v.balanceKnown ? "Funded" : "—"}</span>
+            </li>
+            <li>
+              <span class="check">
+                <IconClock />
+              </span>
+              <span class="k">
+                Last correct PIN<small>{v.pinAt ? timeAgo(v.pinAt) : "never"}</small>
+              </span>
+              <span class="v">{PHASE_TEXT[v.phase].split(":")[0]}</span>
+            </li>
+          </ul>
+          <p class="small muted will-phase">{phaseLine(v, nowS)}</p>
+          <div class="row wrap will-actions">
+            {!v.settled && (
+              <button type="button" class="btn btn-secondary btn-sm" disabled={!!busy} onClick={() => setSheet(true)}>
+                {v.heirsSet ? "Change heirs" : "Set heirs"}
+              </button>
+            )}
+            {!v.settled && (
+              <button type="button" class="btn btn-secondary btn-sm" disabled={!!busy} onClick={() => void act("Minting…", (st) => fundWill(ctx, v.address, FUND_UNITS, st), "1,000 test tokens added to the will.")}>
+                Add 1,000 tcUSD
+              </button>
+            )}
+            {v.phase === 2 && (
+              <button type="button" class="btn btn-primary btn-sm" disabled={!!busy} onClick={() => void act("Starting…", (st) => startWill(ctx, v.address, st), "Started.")}>
+                Start
+              </button>
+            )}
+            {v.phase === 4 && (
+              <button type="button" class="btn btn-primary btn-sm" disabled={!!busy} onClick={() => void act("Settling…", (st) => settleWill(ctx, v.address, st), "Settled. Heirs can claim now.")}>
+                Settle
+              </button>
+            )}
+            <button type="button" class="link-btn" onClick={() => copy(willUrl(v.address), notify, "Claim link")}>
+              Copy the claim link
+            </button>
+          </div>
+          {busy && <p class="small faint">{busy}</p>}
+        </>
+      )}
+      {sheet && v && <WillSheet ctx={ctx} account={account} willAddr={v.address} onClose={() => setSheet(false)} onSettled={() => void refresh()} />}
+    </section>
+  );
+}
+
+type WillResult = { kind: "ok"; hash: string } | { kind: "wrong"; score: number; next: number } | { kind: "err"; text: string };
+
+function WillSheet({ ctx, account, willAddr, onClose, onSettled }: { ctx: Ctx; account: string; willAddr: string; onClose: () => void; onSettled: () => void }) {
+  const [stage, setStage] = useState<"heirs" | "pin" | "run" | "result">("heirs");
+  const [rows, setRows] = useState<{ address: string; percent: string }[]>([
+    { address: "", percent: "60" },
+    { address: "", percent: "40" },
+  ]);
+  const [pin, setPin] = useState("");
+  const [tasks, setTasks] = useState<TaskState[]>(() => freshTasks(CALL_STEPS.length));
+  const [result, setResult] = useState<WillResult | null>(null);
+  const [t0, setT0] = useState(0);
+  const running = stage === "run";
+  const now = useNow(1000);
+
+  const filled = rows.filter((r) => r.address.trim() || r.percent.trim());
+  const rowErr = (r: { address: string; percent: string }) => {
+    const a = r.address.trim();
+    const p = Number(r.percent);
+    if (!a && !r.percent.trim()) return null;
+    if (!ethers.isAddress(a)) return "Enter a valid address.";
+    if (a.toLowerCase() === account.toLowerCase() || a.toLowerCase() === willAddr.toLowerCase()) return "Not the account or the will itself.";
+    if (!(p > 0 && p <= 100)) return "Share between 0 and 100 %.";
+    return null;
+  };
+  const total = filled.reduce((s, r) => s + (Number(r.percent) || 0), 0);
+  const valid = filled.length > 0 && filled.every((r) => !rowErr(r)) && total <= 100 + 1e-9;
+  const heirs: Heir[] = filled.map((r) => ({ address: r.address.trim(), percent: Number(r.percent) }));
+
+  async function go(p = pin) {
+    if (p.length < 6 || !valid) return;
+    setStage("run");
+    setT0(Date.now());
+    setResult(null);
+    setTasks(freshTasks(CALL_STEPS.length));
+    const cb: StepCb = (i, s, text, hash) =>
+      setTasks((prev) =>
+        prev.map((t, j) => {
+          if (j !== i) return t;
+          const wrong = /wrong/i.test(text ?? "");
+          const state: TaskState["s"] = s === "run" ? "run" : s === "fail" ? "fail" : wrong || (s === "skip" && i === 5) ? "bad" : "done";
+          return { s: state, text: s === "done" && !text ? undefined : text, hash: hash ?? t.hash };
+        }),
+      );
+    try {
+      setResult({ kind: "ok", hash: await setHeirsWithPin(ctx, account, willAddr, heirs, p, cb) });
+    } catch (e) {
+      if (e instanceof WrongPin) setResult({ kind: "wrong", score: e.score, next: e.nextAllowedAt });
+      else setResult({ kind: "err", text: explainError(e) });
+    } finally {
+      setPin("");
+      setStage("result");
+      onSettled();
+    }
+  }
+
+  const done = tasks.filter((t) => t.s === "done" || t.s === "bad").length;
+  const current = tasks.findIndex((t) => t.s === "run");
+
+  return (
+    <Sheet title={stage === "result" ? "Result" : "Heirs of your will"} onClose={onClose} locked={running}>
+      {stage === "heirs" && (
+        <div class="stack">
+          <p class="small muted">Up to four heirs. Addresses and shares are encrypted in your browser before they leave it; nobody can read them afterwards, including you.</p>
+          {rows.map((r, i) => (
+            <div class="heir-row">
+              <input
+                class="input mono"
+                placeholder="0x… heir address"
+                value={r.address}
+                spellcheck={false}
+                autoComplete="off"
+                onInput={(e) => setRows(rows.map((x, j) => (j === i ? { ...x, address: (e.target as HTMLInputElement).value } : x)))}
+              />
+              <div class="input-wrap heir-pct">
+                <input class="input" inputMode="decimal" value={r.percent} onInput={(e) => setRows(rows.map((x, j) => (j === i ? { ...x, percent: (e.target as HTMLInputElement).value } : x)))} />
+                <div class="suffix">
+                  <span class="small faint">%</span>
+                </div>
+              </div>
+              {rowErr(r) && <span class="field-err heir-err">{rowErr(r)}</span>}
+            </div>
+          ))}
+          <div class="chips">
+            {rows.length < 4 && (
+              <button type="button" class="chip-btn" onClick={() => setRows([...rows, { address: "", percent: "" }])}>
+                + Add an heir
+              </button>
+            )}
+            <button type="button" class="chip-btn" onClick={() => setRows(rows.map((x, j) => (j === 0 ? { ...x, address: ctx.w.address } : x)))}>
+              My wallet as heir 1 · {short(ctx.w.address)}
+            </button>
+          </div>
+          <span class={`field-hint ${total > 100 ? "field-err" : ""}`}>
+            Total: {Math.round(total * 100) / 100} %{total < 100 ? " (the rest stays in the will)" : ""}
+          </span>
+          <div class="notice info">
+            <IconLock />
+            <span>
+              Changing the heirs <b>needs your PIN</b> and the account's waiting period. The key alone can't touch the will.
+            </span>
+          </div>
+          <button type="button" class="btn btn-primary btn-lg btn-block" disabled={!valid} onClick={() => setStage("pin")}>
+            Continue
+          </button>
+        </div>
+      )}
+
+      {stage === "pin" && (
+        <div>
+          <div class="sum">
+            <b>
+              {heirs.length} heir{heirs.length === 1 ? "" : "s"}
+            </b>
+            <span class="faint">·</span>
+            <span>encrypted</span>
+          </div>
+          <p class="center muted" style={{ margin: "18px 0 6px", fontSize: "15px" }}>
+            Enter your PIN
+          </p>
+          <PinPad value={pin} onChange={setPin} onEnter={(v) => void go(v)} />
+          <div class="flow-actions">
+            <button type="button" class="btn btn-ghost" onClick={() => setStage("heirs")}>
+              Back
+            </button>
+            <button type="button" class="btn btn-primary" disabled={pin.length < 6} onClick={() => void go()}>
+              Set heirs
+            </button>
+          </div>
+        </div>
+      )}
+
+      {stage === "run" && (
+        <div>
+          <div class="progress-head">
+            <Ring done={done} total={CALL_STEPS.length} />
+            <div>
+              <div class="progress-title">Setting your heirs</div>
+              <div class="progress-sub">{current >= 0 ? WILL_LABELS[current] : "Preparing…"}</div>
+              <div class="timer">{mmss(now - t0)}</div>
+            </div>
+          </div>
+          <ul class="tasks">
+            {tasks.map((t, i) => (
+              <Task label={WILL_LABELS[i]} t={t} extra={t.s === "run" && (i === 1 || i === 3) ? <Cipher n={12} /> : undefined} />
+            ))}
+          </ul>
+          <div class="notice" style={{ marginTop: "14px" }}>
+            <IconInfo />
+            <span>Up to 4 wallet confirmations, then the account's 1-minute waiting period.</span>
+          </div>
+        </div>
+      )}
+
+      {stage === "result" && result && (
+        <div class="result">
+          {result.kind === "ok" ? (
+            <>
+              <div class="result-icon ok">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m5 12.5 4.5 4.5L19 7.5" />
+                </svg>
+              </div>
+              <h3>Heirs set</h3>
+              <p>They are stored encrypted. From now on, every correct PIN on your account shows you are still here.</p>
+              <div class="facts-row">
+                <TxLink hash={result.hash} label="View transaction" />
+              </div>
+              <div class="flow-actions">
+                <button type="button" class="btn btn-primary btn-lg" onClick={onClose}>
+                  Done
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div class="result-icon bad">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" />
+                </svg>
+              </div>
+              <h3>{result.kind === "wrong" ? "Wrong PIN. Nothing changed." : "That didn't go through"}</h3>
+              <p>{result.kind === "wrong" ? `The attempt was counted on-chain. Wrong guesses so far: ${result.score}.` : result.text}</p>
+              <div class="flow-actions">
+                <button type="button" class="btn btn-secondary" onClick={onClose}>
+                  Close
+                </button>
+                <button type="button" class="btn btn-primary" onClick={() => setStage("pin")}>
+                  Try again
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </Sheet>
+  );
+}
+
+function ClaimView({ ctx, willAddr, notify }: { ctx: Ctx; willAddr: string; notify: Notify }) {
+  const [v, refresh] = useWill(willAddr, 10000);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [claimed, setClaimed] = useState<string | null>(null);
+  const [revealed, setRevealed] = useState<bigint | null>(null);
+  const now = useNow(1000);
+  const nowS = Math.floor(now / 1000);
+
+  async function act(label: string, fn: (st: (t: string) => void) => Promise<string | void>, okText: string, isClaim = false) {
+    setBusy(label);
+    try {
+      const h = await fn((t) => setBusy(t));
+      if (isClaim && h) setClaimed(h);
+      notify(okText, "ok");
+      await refresh();
+    } catch (e) {
+      notify(explainError(e), "err");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function reveal() {
+    setBusy("Preparing…");
+    try {
+      setRevealed(await decryptMyBalance(ctx, (t) => setBusy(t)));
+    } catch (e) {
+      notify(explainError(e), "err");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  return (
+    <div class="claim">
+      <section class="card card-pad">
+        <div class="acct-row">
+          <span class="acct-name">Hidden will</span>
+          <AddrChip a={willAddr} notify={notify} />
+        </div>
+        {!v ? (
+          <p class="small faint">Loading…</p>
+        ) : !v.exists ? (
+          <p class="muted">There is no will at this address on Sepolia.</p>
+        ) : (
+          <>
+            <h2 class="claim-phase">{PHASE_TEXT[v.phase]}</h2>
+            <p class="muted">{phaseLine(v, nowS)}</p>
+            <ul class="prot">
+              <li>
+                <span class="check">
+                  <IconShield />
+                </span>
+                <span class="k">
+                  Belongs to<small class="mono">{short(v.account)}</small>
+                </span>
+                <span class="v">Encrypted Account</span>
+              </li>
+              <li>
+                <span class="check">
+                  <IconClock />
+                </span>
+                <span class="k">
+                  Last correct PIN<small>{v.pinAt ? timeAgo(v.pinAt) : "never"}</small>
+                </span>
+                <span class="v">{fmtWait(v.inactivity)} rule</span>
+              </li>
+            </ul>
+            <div class="row wrap will-actions">
+              {v.phase === 2 && (
+                <button type="button" class="btn btn-primary" disabled={!!busy} onClick={() => void act("Starting…", (st) => startWill(ctx, willAddr, st), "Started.")}>
+                  Start
+                </button>
+              )}
+              {v.phase === 4 && (
+                <button type="button" class="btn btn-primary" disabled={!!busy} onClick={() => void act("Settling…", (st) => settleWill(ctx, willAddr, st), "Settled.")}>
+                  Settle
+                </button>
+              )}
+              {v.phase === 5 && (
+                <button type="button" class="btn btn-primary" disabled={!!busy} onClick={() => void act("Claiming…", (st) => claimWill(ctx, willAddr, st), "Claimed.", true)}>
+                  Claim
+                </button>
+              )}
+              {v.phase === 5 && (
+                <button type="button" class="btn btn-secondary" disabled={!!busy} onClick={() => void reveal()}>
+                  Reveal my tcUSD balance
+                </button>
+              )}
+            </div>
+            {busy && <p class="small faint">{busy}</p>}
+            {claimed && (
+              <div class="notice ok">
+                <IconCheck />
+                <span>
+                  Claimed. If you are an heir, your share just arrived, encrypted; otherwise you received an encrypted zero. Nobody watching the chain can tell which. <TxLink hash={claimed} label="Transaction" />
+                </span>
+              </div>
+            )}
+            {revealed !== null && (
+              <div class="reveal">
+                <span class="small faint">Your tcUSD balance, decrypted only for you</span>
+                <b>{fmtTc(revealed)}</b>
+                <span class="small muted">{revealed > 0n ? "That's what you hold of the test token." : "Zero: you are not an heir of this will, or you haven't claimed yet."}</span>
+              </div>
+            )}
+          </>
+        )}
+      </section>
+      <p class="small faint center">
+        Anyone can claim: heirs receive their encrypted share, everyone else an encrypted zero. <a href="/app">Open my account instead</a>
+      </p>
+    </div>
+  );
+}
+
 // ───────────────────────────── app ─────────────────────────────
 
 async function pickAccount(owner: string): Promise<string | null> {
@@ -1463,7 +1940,11 @@ async function pickAccount(owner: string): Promise<string | null> {
 
 function App() {
   const [fhe, setFhe] = useState<Fhe>("loading");
-  const [phase, setPhase] = useState<"boot" | "connect" | "create" | "account">("boot");
+  const [phase, setPhase] = useState<"boot" | "connect" | "create" | "account" | "claim">("boot");
+  const willParam = useMemo(() => {
+    const w = new URLSearchParams(location.search).get("will");
+    return w && ethers.isAddress(w) ? ethers.getAddress(w) : null;
+  }, []);
   const [ctx, setCtx] = useState<Ctx | null>(null);
   const [walletBal, setWalletBal] = useState<bigint | null>(null);
   const [account, setAccount] = useState<string | null>(null);
@@ -1484,6 +1965,7 @@ function App() {
       watchWallet();
       setCtx({ w, read });
       read.getBalance(w.address).then(setWalletBal, () => undefined);
+      if (willParam) return void setPhase("claim");
       const acc = await retry(() => pickAccount(w.address));
       setAccount(acc);
       setPhase(acc ? "account" : "create");
@@ -1526,7 +2008,14 @@ function App() {
             <span class="spinner" />
           </div>
         )}
+        {phase === "connect" && willParam && (
+          <div class="notice info will-link-note">
+            <IconLock />
+            <span>You opened a hidden will. Connect a wallet to see it and claim.</span>
+          </div>
+        )}
         {phase === "connect" && <ConnectView connecting={connecting} onConnect={() => void connect()} notify={notify} />}
+        {phase === "claim" && ctx && willParam && <ClaimView ctx={ctx} willAddr={willParam} notify={notify} />}
         {phase === "create" && ctx && (
           <CreateFlow
             ctx={ctx}

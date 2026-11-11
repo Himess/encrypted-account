@@ -28,6 +28,20 @@ const stubUnused = {
   },
 };
 
+// The decrypt bundle: no TFHE at all (user decryption only needs the KMS library).
+const stubTfhe = {
+  name: "stub-tfhe",
+  setup(b) {
+    b.onResolve({ filter: /^\.\/v1\.(5\.3|6\.2)\// }, (args) =>
+      /loadTfheLib\.js$/.test(args.importer) ? { path: args.path, namespace: "stub" } : undefined,
+    );
+    b.onLoad({ filter: /.*/, namespace: "stub" }, (args) => ({
+      contents: `throw new Error("not bundled in the decrypt module: ${args.path}");`,
+      loader: "js",
+    }));
+  },
+};
+
 const ISOLATION = [
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   { key: "Cross-Origin-Embedder-Policy", value: "require-corp" },
@@ -73,11 +87,34 @@ export async function build({ minify = true } = {}) {
     const name = base.replace(/-[A-Z0-9]{8}\.(js|css)$/, "");
     out[`${name}.${path.extname(base).slice(1)}`] = `/assets/${base}`;
   }
+  // User decryption (Zama's KMS client) is a separate bundle, loaded only when an heir reveals its balance. It keeps
+  // the KMS library and leaves out every TFHE version (it never encrypts).
+  const dec = await esbuild.build({
+    plugins: [stubTfhe],
+    entryPoints: { decrypt: path.join(HERE, "src", "decrypt.ts") },
+    bundle: true,
+    format: "esm",
+    platform: "browser",
+    target: ["es2022", "safari16"],
+    entryNames: "[name]-[hash]",
+    outdir: path.join(DIST, "assets"),
+    metafile: true,
+    minify,
+    sourcemap: !minify,
+    legalComments: "none",
+    external: ["node:url"],
+    logLevel: "warning",
+  });
+  for (const file of Object.keys(dec.metafile.outputs)) {
+    if (file.endsWith(".js")) out["decrypt.js"] = `/assets/${path.basename(file)}`;
+  }
+
   const refs = {
     "/assets/landing.js": out["landing.js"],
     "/assets/landing.css": out["landing-style.css"],
     "/assets/app.js": out["app.js"],
     "/assets/app.css": out["app-style.css"],
+    "/assets/decrypt.js": out["decrypt.js"],
   };
   for (const page of PAGES) {
     let html = fs.readFileSync(path.join(HERE, page), "utf8");
@@ -103,10 +140,10 @@ export async function build({ minify = true } = {}) {
   fs.writeFileSync(path.join(DIST, "_headers"), "/*\n" + ISOLATION.map((h) => `  ${h.key}: ${h.value}`).join("\n") + "\n");
 
   const size = (k) => fs.statSync(path.join(DIST, out[k].slice(1))).size;
-  return { app: size("app.js"), landing: size("landing.js"), files: out };
+  return { app: size("app.js"), landing: size("landing.js"), decrypt: size("decrypt.js"), files: out };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const r = await build();
-  console.log(`web/dist ready · app.js ${(r.app / 1e6).toFixed(2)} MB · landing.js ${(r.landing / 1e3).toFixed(1)} kB`);
+  console.log(`web/dist ready · app.js ${(r.app / 1e6).toFixed(2)} MB · decrypt.js ${(r.decrypt / 1e6).toFixed(2)} MB (on demand) · landing.js ${(r.landing / 1e3).toFixed(1)} kB`);
 }

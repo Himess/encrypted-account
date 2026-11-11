@@ -9,7 +9,7 @@ import { sepolia } from "@fhevm/sdk/chains";
 
 type Client = {
   ready: Promise<void>;
-  encryptValues(p: { values: { type: string; value: bigint | boolean | string }[]; contractAddress: string; userAddress: string }): Promise<{
+  encryptValues(p: { values: { type: string; value: bigint | boolean | string | number }[]; contractAddress: string; userAddress: string }): Promise<{
     encryptedValues: readonly string[];
     inputProof: string;
   }>;
@@ -37,7 +37,7 @@ export function fheClient(provider: ethers.Provider): Promise<Client> {
 
 export async function encrypt(
   provider: ethers.Provider,
-  values: { type: "euint64" | "ebool" | "eaddress"; value: bigint | boolean | string }[],
+  values: { type: "euint64" | "euint16" | "ebool" | "eaddress"; value: bigint | boolean | string | number }[],
   contractAddress: string,
   userAddress: string,
 ): Promise<{ handles: string[]; inputProof: string }> {
