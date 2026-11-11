@@ -1,0 +1,34 @@
+{
+  "startedAtUtc": "2026-11-11T15:18:38.339Z",
+  "network": "sepolia",
+  "periods": {
+    "inactivity": 300,
+    "grace": 300,
+    "claimWindow": 86400
+  },
+  "txs": {
+    "deploy demo factory (+ implementation)": {
+      "hash": "0x45ea5a41d7c67fdf00abb924eef40cd1aa11e912a0ab5e64ec359f926eaa0b0a",
+      "block": 12112562,
+      "gasUsed": 22162039,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 0,
+        "blockFheTxs": 0,
+        "blockComputed": 0,
+        "meterCheck": "equal"
+      }
+    }
+  },
+  "contracts": {
+    "token": "0xE552Beed2265a8666d25307079fad9eDA2D70172",
+    "demoFactory": "0xEB3442Ed486ec3aEdf8E558cd3F6d5909141dc07",
+    "implementation": "0xb4bcc007cf8eeda6DB7a81275fDaD10810bCd828"
+  },
+  "codeBytes": {
+    "will": 12730,
+    "demoFactory": 1336
+  }
+}

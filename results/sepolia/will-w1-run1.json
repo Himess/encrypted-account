@@ -1,0 +1,472 @@
+{
+  "startedAtUtc": "2026-11-11T15:19:20.328Z",
+  "network": "sepolia",
+  "periods": {
+    "inactivity": 300,
+    "grace": 300,
+    "claimWindow": 86400
+  },
+  "txs": {
+    "createWill": {
+      "hash": "0xfba7d1ec40cb5a4fcf193dfbf15679ee51548d0280b9d3b2ef603a77afba5e04",
+      "block": 12112565,
+      "gasUsed": 745047,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 0,
+        "blockFheTxs": 0,
+        "blockComputed": 0,
+        "meterCheck": "equal"
+      }
+    },
+    "setHeirs: openCall": {
+      "hash": "0xdb4cf358b4280523e837eedff0531fe78febc870ea875fbeab304a28c933d6cf",
+      "block": 12112570,
+      "gasUsed": 4034383,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 0,
+        "blockFheTxs": 0,
+        "blockComputed": 0,
+        "meterCheck": "equal"
+      }
+    },
+    "setHeirs: submitGuess": {
+      "hash": "0x970ae2052ac171cff8f33f14d2d6bacb5ecd59ba2c8a39b644aedb8d889a30ab",
+      "block": 12112571,
+      "gasUsed": 914742,
+      "hcu": {
+        "total": 555002,
+        "depth": 278002,
+        "fheOps": 8,
+        "blockMeter": 555002,
+        "blockFheTxs": 1,
+        "blockComputed": 555002,
+        "meterCheck": "equal"
+      }
+    },
+    "setHeirs: finalizeGuess": {
+      "hash": "0x97853deefad654a6833be49002c879e69aa063dce090ed2c73900e20d1315653",
+      "block": 12112572,
+      "gasUsed": 438160,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 162032,
+        "blockFheTxs": 1,
+        "blockComputed": 162032,
+        "meterCheck": "equal"
+      }
+    },
+    "setHeirs: executeOp": {
+      "hash": "0x8b5f57e6544f6eabd191c8821db4a702f99cdff3bd2afd7fbdb253986a4e12cf",
+      "block": 12112578,
+      "gasUsed": 5304868,
+      "hcu": {
+        "total": 2776232,
+        "depth": 1104064,
+        "fheOps": 59,
+        "blockMeter": 2776264,
+        "blockFheTxs": 2,
+        "blockComputed": 2776264,
+        "meterCheck": "equal"
+      }
+    },
+    "mint F1": {
+      "hash": "0x7b157b0baa32c562af44149e13bc009f4ceea82371034d6c49482e8ec2c3e663",
+      "block": 12112579,
+      "gasUsed": 889215,
+      "hcu": {
+        "total": 586096,
+        "depth": 531032,
+        "fheOps": 8,
+        "blockMeter": 586096,
+        "blockFheTxs": 1,
+        "blockComputed": 586096,
+        "meterCheck": "equal"
+      }
+    },
+    "start": {
+      "hash": "0x7a3aaa29acb6ed0e35c7dc456b7c722eeb6e8034b1ec055779d5ec9d9a2fefbc",
+      "block": 12112599,
+      "gasUsed": 44610,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 0,
+        "blockFheTxs": 0,
+        "blockComputed": 0,
+        "meterCheck": "equal"
+      }
+    },
+    "settle": {
+      "hash": "0x09f30bcd5a373b693d146942407d2f2997812f0b8f6daa0c972a07d9fc85d896",
+      "block": 12112625,
+      "gasUsed": 43890,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 0,
+        "blockFheTxs": 0,
+        "blockComputed": 0,
+        "meterCheck": "equal"
+      }
+    },
+    "round 1: prepare": {
+      "hash": "0x2baf0d30bd37b2802e8f0e53099bcd52b5b6bbd776d560248494720ee1ab1085",
+      "block": 12112626,
+      "gasUsed": 734429,
+      "hcu": {
+        "total": 2237032,
+        "depth": 1370032,
+        "fheOps": 6,
+        "blockMeter": 2237032,
+        "blockFheTxs": 1,
+        "blockComputed": 2237032,
+        "meterCheck": "equal"
+      }
+    },
+    "round 1: snapshot 0–4": {
+      "hash": "0xc2d4a5f7918df0faf0511c15409d71fdac3e1cd3d53428a14d886d81f4c80cef",
+      "block": 12112627,
+      "gasUsed": 1852964,
+      "hcu": {
+        "total": 8276032,
+        "depth": 1473000,
+        "fheOps": 17,
+        "blockMeter": 8276032,
+        "blockFheTxs": 1,
+        "blockComputed": 8276032,
+        "meterCheck": "equal"
+      }
+    },
+    "claim 1: stranger → itself": {
+      "hash": "0x8cb1f0ce56ecde8e8f07cb61b07e4861afbeabed200e0bf106d065fca624a051",
+      "block": 12112628,
+      "gasUsed": 2561202,
+      "hcu": {
+        "total": 2839104,
+        "depth": 1305000,
+        "fheOps": 46,
+        "blockMeter": 2839104,
+        "blockFheTxs": 1,
+        "blockComputed": 2839104,
+        "meterCheck": "equal"
+      }
+    },
+    "claim 1: relayer, code → fresh address X": {
+      "hash": "0xbb1116d167ab8bda193b963388c57e4446b59d38db31be2d2c76632fa5f88202",
+      "block": 12112629,
+      "gasUsed": 2567166,
+      "hcu": {
+        "total": 2839104,
+        "depth": 1305000,
+        "fheOps": 46,
+        "blockMeter": 2839104,
+        "blockFheTxs": 1,
+        "blockComputed": 2839104,
+        "meterCheck": "equal"
+      }
+    },
+    "claim 1: heir B, address → itself": {
+      "hash": "0x9a05193d0163e59325cc9b771b8b655744114f9f50f88eb2c3122a4aacc35709",
+      "block": 12112630,
+      "gasUsed": 2567190,
+      "hcu": {
+        "total": 2839104,
+        "depth": 1305000,
+        "fheOps": 46,
+        "blockMeter": 2839104,
+        "blockFheTxs": null,
+        "blockComputed": null,
+        "meterCheck": "unreadable"
+      }
+    },
+    "mint F2": {
+      "hash": "0x634b49358fcf45bf9a7419305a8953e5eaf8b0e5565d25a3d28a4b62d13f658e",
+      "block": 12112631,
+      "gasUsed": 784961,
+      "hcu": {
+        "total": 586064,
+        "depth": 531032,
+        "fheOps": 7,
+        "blockMeter": 586064,
+        "blockFheTxs": 1,
+        "blockComputed": 586064,
+        "meterCheck": "equal"
+      }
+    },
+    "round 2: prepare": {
+      "hash": "0xbe5d6ab58143cbe4d59960aa76f85310f829daacc852d52be78abf13116b4bc8",
+      "block": 12112632,
+      "gasUsed": 622664,
+      "hcu": {
+        "total": 3105032,
+        "depth": 2073032,
+        "fheOps": 14,
+        "blockMeter": 3105032,
+        "blockFheTxs": 1,
+        "blockComputed": 3105032,
+        "meterCheck": "equal"
+      }
+    },
+    "round 2: snapshot 0–2": {
+      "hash": "0x6f33e374c6ea993cdf76f9978ed3ff7a5a2bbb5ea75572a5b14807615a718995",
+      "block": 12112633,
+      "gasUsed": 723496,
+      "hcu": {
+        "total": 4572032,
+        "depth": 1690000,
+        "fheOps": 13,
+        "blockMeter": 4572032,
+        "blockFheTxs": null,
+        "blockComputed": null,
+        "meterCheck": "unreadable"
+      }
+    },
+    "round 2: snapshot 2–4": {
+      "hash": "0x49e54044e230ae604c3340f2bf4ee4fa8b6b647ea1dae4877ea0efe2d7d97bd5",
+      "block": 12112634,
+      "gasUsed": 725035,
+      "hcu": {
+        "total": 4572032,
+        "depth": 1690000,
+        "fheOps": 13,
+        "blockMeter": 4572032,
+        "blockFheTxs": null,
+        "blockComputed": null,
+        "meterCheck": "unreadable"
+      }
+    },
+    "claim 2: relayer, code → X": {
+      "hash": "0x0ecc5d67254d617c0c344ba5961e392a3c8284189c7c827a23f2f241be01aef2",
+      "block": 12112635,
+      "gasUsed": 2458960,
+      "hcu": {
+        "total": 2839072,
+        "depth": 1305000,
+        "fheOps": 45,
+        "blockMeter": 2839072,
+        "blockFheTxs": 1,
+        "blockComputed": 2839072,
+        "meterCheck": "equal"
+      }
+    },
+    "claim 2: heir B, address → itself": {
+      "hash": "0x511c64908bb429bfb82e02fab5b7824ec4858c0ea2985c70428d34118d02e529",
+      "block": 12112636,
+      "gasUsed": 2462936,
+      "hcu": {
+        "total": 2839072,
+        "depth": 1305000,
+        "fheOps": 45,
+        "blockMeter": 11744488,
+        "blockFheTxs": 9,
+        "blockComputed": 11744488,
+        "meterCheck": "equal"
+      }
+    },
+    "proof of life: openCall": {
+      "hash": "0xd5e1002a77b21132b0bd29f2ba3a04a52543e132038387438690d4f79ded80ac",
+      "block": 12112637,
+      "gasUsed": 275607,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 4386000,
+        "blockFheTxs": 1,
+        "blockComputed": 4386000,
+        "meterCheck": "equal"
+      }
+    },
+    "proof of life: submitGuess": {
+      "hash": "0xf04de34893645c80aa84b6369370a2618781e6f076ce8d474fe3f0ec3afe47c4",
+      "block": 12112638,
+      "gasUsed": 839808,
+      "hcu": {
+        "total": 555002,
+        "depth": 278002,
+        "fheOps": 8,
+        "blockMeter": 555002,
+        "blockFheTxs": 1,
+        "blockComputed": 555002,
+        "meterCheck": "equal"
+      }
+    },
+    "proof of life: finalizeGuess": {
+      "hash": "0x0a7007a5d58be8544bab48ca1361a8a3e59d1e00dc76048ee03f2034504f40b9",
+      "block": 12112639,
+      "gasUsed": 438172,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 2748128,
+        "blockFheTxs": 4,
+        "blockComputed": 2748128,
+        "meterCheck": "equal"
+      }
+    },
+    "escape account: createAccount": {
+      "hash": "0x2441959f711f7402420a921f8991c077b6aa50b6ca00fcacf7a0d45fcdb4a853",
+      "block": 12112640,
+      "gasUsed": 1306870,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 29928000,
+        "blockFheTxs": 7,
+        "blockComputed": 29928000,
+        "meterCheck": "equal"
+      }
+    },
+    "escape account: setupPin": {
+      "hash": "0x2e03be521dfcc22cc7fd34265c3bfc433a870dec5a8fc7dc0e5a3a0e8bda69c6",
+      "block": 12112641,
+      "gasUsed": 842261,
+      "hcu": {
+        "total": 79000,
+        "depth": 79000,
+        "fheOps": 5,
+        "blockMeter": 79000,
+        "blockFheTxs": 1,
+        "blockComputed": 79000,
+        "meterCheck": "equal"
+      }
+    },
+    "escape account: createWill": {
+      "hash": "0x2202c1b1ff3583cb1eab27e89e1b926b925a5fa99d10820316b733e778bae513",
+      "block": 12112642,
+      "gasUsed": 745047,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 26703000,
+        "blockFheTxs": null,
+        "blockComputed": null,
+        "meterCheck": "unreadable"
+      }
+    },
+    "escape account: mint F3": {
+      "hash": "0xeeef790654faf477c7b2785a91c67714a40cb6a07ddc5de6c75d528402198b9c",
+      "block": 12112643,
+      "gasUsed": 889215,
+      "hcu": {
+        "total": 586096,
+        "depth": 531032,
+        "fheOps": 8,
+        "blockMeter": 865428,
+        "blockFheTxs": null,
+        "blockComputed": null,
+        "meterCheck": "unreadable"
+      }
+    },
+    "escape account: startEscape": {
+      "hash": "0x4879818b236b72589c3a5115be66f0ab3732ae07ba19c5afa71bef92e1491245",
+      "block": 12112644,
+      "gasUsed": 149660,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 40510576,
+        "blockFheTxs": null,
+        "blockComputed": null,
+        "meterCheck": "unreadable"
+      }
+    },
+    "escapeWithdraw (by a stranger)": {
+      "hash": "0xcc04c6f136e0fa8f517ebd1ac47f9e3c5a534aafa5555bd92bfc848019feaf0c",
+      "block": 12112645,
+      "gasUsed": 1165708,
+      "hcu": {
+        "total": 586064,
+        "depth": 369000,
+        "fheOps": 7,
+        "blockMeter": 4714096,
+        "blockFheTxs": 3,
+        "blockComputed": 4714096,
+        "meterCheck": "equal"
+      }
+    }
+  },
+  "contracts": {
+    "token": "0xE552Beed2265a8666d25307079fad9eDA2D70172",
+    "demoFactory": "0xEB3442Ed486ec3aEdf8E558cd3F6d5909141dc07",
+    "implementation": "0xb4bcc007cf8eeda6DB7a81275fDaD10810bCd828"
+  },
+  "codeBytes": {
+    "will": 12730,
+    "demoFactory": 1336
+  },
+  "will": {
+    "address": "0x445f1564d0b0Bb05d649a41cf84a12Bc5Aafaf74",
+    "account": "0xEbfc30346306236AC22Cbe6B0C26034C7BC1dC66",
+    "claimWindow": 86400
+  },
+  "wallets": {
+    "relayer": "0xB39A2f8E32E8Aebc240aa17c2884427BDE6cCa2d",
+    "heirB": "0x806cEc8b825e4F352B63eAC026fa4d3feE586c44",
+    "stranger": "0x756E025C0402318778DC9395D33387E042feDcA6",
+    "recipientX": "0xBB3F7c8C0Ec63bA12Ef7ce0353992dACDe1E62D2",
+    "escapeE": "0x47D359bDd69725F62CBb14b36a880ce2e1A9a638"
+  },
+  "heirsEncrypt": {
+    "totalMs": 6742,
+    "relayerHttpMs": 587,
+    "localMs": 6155,
+    "httpCalls": 2
+  },
+  "proofOfLife": {
+    "gas": 1553587,
+    "ms": 36369
+  },
+  "escapeAccount": {
+    "account": "0xc5e3c07e1Eab1B43Ae5A4f9329BE2e0AdD2906B3",
+    "will": "0x3d930D55D4511e162dE228348618Dc6DAa3fc638",
+    "escape": "0x47D359bDd69725F62CBb14b36a880ce2e1A9a638"
+  },
+  "decrypted": {
+    "recipientX": {
+      "value": "900000006",
+      "expected": "900000006",
+      "ok": true,
+      "expectedAtRun": "900000005"
+    },
+    "heirB": {
+      "value": "600000003",
+      "expected": "600000003",
+      "ok": true
+    },
+    "stranger": {
+      "value": "0",
+      "expected": "0",
+      "ok": true
+    },
+    "escapeE": {
+      "value": "777000000",
+      "expected": "777000000",
+      "ok": true
+    }
+  },
+  "claimGas": {
+    "stranger": 2561202,
+    "codeToFreshX": 2567166,
+    "addressHeir": 2567190
+  },
+  "gasPriceGwei": 0.05000002,
+  "finishedAtUtc": "2026-11-11T15:36:23.937Z",
+  "burnerBalanceEth": "0.01975679934282829",
+  "decryptedNote": "Expected values follow the contract's rounding: each round splits delta = balance - unpaid as q*s + floor(r*s/10000), so round 2 splits F2 plus the 1 unit of dust round 1 left (delta 500000004). The run itself left that dust out of the expectation for recipientX (expectedAtRun); the decrypted values are unchanged.",
+  "claimGasNote": "Claim HCU is identical for the stranger, the code claim and the address claim (2839104 in round 1, 2839072 in round 2, when no recipient is new). Gas depends on the claim's position in a round, not on who claims: after a snapshot the four 'not claimed' flags share one handle per snapshot call, so the first claim of a round reads fewer cold ACL slots (round 1, one snapshot call: 5964 gas less; round 2, two snapshot calls: 3976 less). The second and third claims of round 1, a code claim and an address claim, differ by 24 gas (calldata)."
+}

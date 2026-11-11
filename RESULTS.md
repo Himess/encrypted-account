@@ -1,9 +1,185 @@
 # RESULTS
 
-The hidden-inheritance results are on top, then Round 2; the Round 1 results are kept unchanged below. Evidence classes: **[M]** measured · **[Mock]** ran on
+The hidden-inheritance results are on top (W1 first, then v1 as measured), then Round 2; the Round 1 results are kept unchanged below. Evidence classes: **[M]** measured · **[Mock]** ran on
 Zama's mock · **[V]** verified by reading code or documentation · **[D]** Zama documentation · **[I]** inference.
 
-# Hidden inheritance — EncryptedWill (11 November 2026)
+# Hidden inheritance W1 — claim codes, payout rounds, exits (11 November 2026)
+
+- **Input:** the W1 work package (§9.3 of the hidden-inheritance review): W1.1–W1.8 and the invariants M1–M8 (§9.4);
+  the general rules (§4.0) apply. One decision was added after the first app run: an heir named by address is paid
+  only in a claim to its own address (below).
+- **What changed:** `contracts/inheritance/EncryptedWill.sol` (12,771 B; v1 8,565 B) and
+  `contracts/inheritance/EncryptedWillFactory.sol`, now a production and a demo factory (1,681 B and 1,336 B). **The
+  account is unchanged:** W1.4 and W1.7 need only views it already had (`status`, `escapeState`, `delays`).
+- **Status:** `test/Will.test.ts` 18/18 [Mock] (replaces v1's 10), `npm test` 119/119 [Mock], SDK 10/10 [Mock].
+  Sepolia acceptance run on the final code [M]: `results/sepolia/will-w1.json` (script
+  `scripts/sepolia/will-w1-run.ts`); an earlier run, before the address rule: `results/sepolia/will-w1-run1.json`. HCU
+  table [Mock]: `results/will-hcu-mock.json` (`WRITE_RESULTS=1 node scripts/run-tests.mjs test/Will.test.ts`). The app,
+  end to end [M].
+
+## Design → code [V]
+
+| Item | Code |
+|---|---|
+| W1.1 · remainder | `setHeirs`: after the cap, `left = 10,000 − Σ s_i` goes to the first filled slot (filled = heir ≠ 0 ∨ code active), all under FHE. With at least one heir the shares total exactly 10,000 bp. |
+| W1.2 · rounds | Per token. `prepare(token)`: unpaid = Σ select(claimed_i, 0, amount_i); delta = balance − unpaid, or 0 if the balance is smaller; stores q, r = delta ÷ 10,000. `snapshot(token, from, to)`: for each slot not yet computed, fresh_i = q·s_i + ⌊r·s_i / 10,000⌋, amount_i = claimed_i ? fresh_i : amount_i + fresh_i, claimed_i = false. Claims are open only while a round is complete; anyone may run or finish a round, so nobody can hold the claims back. Rounding dust stays in the balance and is paid by the next round. |
+| W1.3 · codes | Per slot an `euint128` code and `codeActive = code ≠ 0`. `claim(token, recipient, input, proof)`: input = code ⊕ h, where h is the first 128 bits of keccak256(will, chainId, recipient); the contract computes x = input ⊕ h. A slot matches if `(heir == msg.sender ∧ toSelf) ∨ (codeActive ∧ x == code)`, where `toSelf` is the public condition `recipient == msg.sender` entered as an encrypted boolean, so every claim runs the same operations. An address-mode heir or a stranger sends a random input. The setup fits one input proof: 4 eaddress + 4 euint128 + 4 euint16 = 1,216 bits. |
+| Address rule (decision) | W1.3 as written paid every matching slot to the recipient, so an address heir that relayed someone else's code claim paid its own share there too; the first app run did exactly that. Decision: an address match counts only in a claim to the sender itself, through the encrypted `toSelf` above (one trivial encryption and four encrypted ANDs per claim, +100,032 HCU). |
+| W1.4 · escape withdrawal | `escapeWithdraw(token)`, anyone: the account's escape is running (`readyAt ≠ 0`; a cancellation zeroes it), it started before lastPinAt + inactivity (start = readyAt − `delays().escape`, fixed at initialization), and the will is not settled → the whole balance goes to `escapeTo`, the account's escape snapshot. |
+| W1.5 · sweep | `sweepResidual(token)`, anyone, from settledAt + claimWindow: the rest goes to the account's escape address (to the snapshot if an escape runs); claims for that token close. |
+| W1.6 · periods | `EncryptedWillFactory`: inactivity 90 days–5 years and never below the account's PIN pulse, grace 30 days–1 year, claim window 365 days–10 years (defaults 180, 30 and 730 days). `EncryptedWillDemoFactory`: from 5 minutes; its constructor reverts outside Sepolia and the local chain. Each factory deploys its own implementation, which only that factory can initialize. |
+| W1.7 · proof of life | The cheapest PIN-verified operation with no account change: `openCall(owner's wallet, 0, "")`, guess, finalize; the call itself is never executed. Watchtower SDK: `WillWatcher` reminds 30 and 7 days before the will can start (once each, and again after a PIN moves the date) and alerts on `WillStarted` and `WillSettled`. |
+| W1.8 · app | Heir form with code mode (default) and address mode; the codes are shown once; printable heir cards with a QR code of the claim link (the code travels in the URL fragment, which browsers never send to a server, and the app removes it from the address bar); "I'm here"; the card line "last correct PIN … · inheritance at the earliest in …" and alerts by phase; settle chained with the payout round; a claim page with code, recipient (locked to the connected wallet in address mode), prepare, escape withdrawal, sweep and reveal. The optional testnet relayer was not built: a claim is sent from the claimant's own wallet. |
+
+## Invariants → evidence
+
+| Invariant | Evidence |
+|---|---|
+| M1 · heirs, shares and codes are never decrypted for anyone | [V] the will gives these handles only `allowThis`; no `allow` to any address |
+| M2 · no start before `inactivity`; no settle after a PIN in the grace period | [Mock] trigger test, and with the real account's PIN path; [M] v1 run 1 on Sepolia (the trigger code is unchanged) |
+| M3 · a claim's FHE sequence, events and gas do not depend on who claims or in which mode | [Mock] same HCU and the same events for a stranger, a code claim, and an address heir claiming to itself or to another address; [M] same HCU and the same execution gas on Sepolia (below) |
+| M4 · a slot never gets more than its share of each round's delta; no double claim | [Mock] rounds tests (a repeat claim pays zero; after a new deposit an earlier claimer gets only the new part); [M] decryptions below |
+| M5 · with one filled slot the shares total 10,000 bp; nothing stays locked | [Mock] W1.1 tests; rounds, sweep and escape withdrawal tests; [M] round 2 pays round 1's dust |
+| M6 · nobody without the code can change a code claim's recipient | [Mock] a swapped recipient pays zero; a wrong code pays zero; code 0 never matches; an address heir that relays a code claim pays only the code slot to that recipient; [M] the same on Sepolia |
+| M7 · funds leave only by a claim, `withdrawAll` before settlement, an escape withdrawal or the sweep | [V] the only transfers out are in `claim` and `_sendAll` (`withdrawAll`, `escapeWithdraw`, `sweepResidual`); [Mock] each path's conditions |
+| M8 · every encrypted input needs a non-empty proof | [Mock] `setHeirs` with an empty proof reverts with `EmptyProof`; `claim` checks the same |
+
+## HCU per call [Mock = M]
+
+The HCU of every call measured on Sepolia equals the mock's.
+
+| Call | HCU | Of 20M | Depth | Of 5M |
+|---|---|---|---|---|
+| `setHeirs` (4 slots) | 2,776,232 | 13.9 % | 1,104,064 | 22.1 % |
+| `prepare`, first round | 2,237,032 | 11.2 % | 1,370,032 | 27.4 % |
+| `prepare`, later rounds (sums the unpaid amounts) [M] | 3,105,032 | 15.5 % | 2,073,032 | 41.5 % |
+| `snapshot`, first round, 1 slot | 2,069,032 | 10.3 % | 1,473,000 | 29.5 % |
+| `snapshot`, first round, 4 slots (the app's group) | 8,276,032 | 41.4 % | 1,473,000 | 29.5 % |
+| `snapshot`, later round, 2 slots | 4,572,032 | 22.9 % | 1,690,000 | 33.8 % |
+| `snapshot`, later round, 4 slots [I] | ≈ 9,144,000 | ≈ 45.7 % | ≈ 1,690,000 | ≈ 33.8 % |
+| `claim` | 2,939,136 (2,939,104 when the recipient already holds the token) | 14.7 % | 1,305,000 | 26.1 % |
+| `escapeWithdraw`, `sweepResidual` | 586,064 | 2.9 % | 369,000 | 7.4 % |
+
+Every single-slot call stays within half of both limits, as W1.2 requires; the deepest is a later round's `prepare`,
+41.5 % of the depth limit. In v1 the first claim carried the whole snapshot: 12.26M HCU and 74 % of the depth limit.
+
+## Sepolia acceptance run [M] — `results/sepolia/will-w1.json`
+
+11 November 2026, 16:43–17:01 UTC; gas price 0.05 gwei. Demo factory `0x6941031bd1bec8C86Afea996DF3E6F8D052979D1`
+(implementation `0x4d13B3FD8f14D36b1f69ee77BE2C1971Ca785eCc`; both deployed in one transaction, 22,225,509 gas), the
+test token from v1. The f015b `e1` account (owner = the burner, test PIN, 60-second generic-call delay) with a new
+will, `0xE6f61fA26EDB902EBB72ecCC49454bD04eFa847E`; inactivity and grace 300 s.
+
+| Step | Gas | HCU (depth) |
+|---|---|---|
+| `createWill` | 745,047 | — |
+| `setHeirs` through the PIN path (slot 0 by code, 60 %; slot 1 = heir B by address, 40 %): `openCall` / `submitGuess` / `finalizeGuess` / `executeOp` | 4,034,407 / 914,754 / 438,112 / 5,304,868 | — / 555,002 (278,002) / — / 2,776,232 (1,104,064) |
+| `mint` of 1,000,000,007 units (F1) | 889,215 | 586,096 (531,032) |
+| `start` / `settle`, after a real absence and the grace period | 44,610 / 43,890 | — |
+| Round 1: `prepare` / `snapshot(0, 4)` | 734,429 / 1,852,964 | 2,237,032 (1,370,032) / 8,276,032 (1,473,000) |
+| Round 1 claims: a stranger to itself / heir B relays the code heir's claim to a fresh address X / heir B by address to another address Y / heir B by address to itself | 2,639,699 / 2,645,722 / 2,645,710 / 2,645,699 | 2,939,136 (1,305,000) each |
+| `mint` of 500,000,003 more (F2), after the claims | 784,961 | 586,064 (531,032) |
+| Round 2: `prepare` / `snapshot(0, 2)` / `snapshot(2, 4)` | 622,664 / 723,496 / 725,035 | 3,105,032 (2,073,032) / 4,572,032 (1,690,000) each |
+| Round 2 claims: a relayer with the code to X / heir B to itself | 2,537,444 / 2,541,457 | 2,939,104 (1,305,000) each |
+| Proof of life ("I'm here"): `openCall` / `submitGuess` / `finalizeGuess` | 275,607 / 839,784 / 438,160 (1,553,551 in all; 32.4 s) | — / 555,002 (278,002) / — |
+| A separate account (created in the run, escape address E): `startEscape` by the key while the owner is alive / `escapeWithdraw` by a stranger | 149,660 / 1,165,708 | — / 586,064 (369,000) |
+
+HCU from the executor's events equals `HCULimit.getBlockMeter()` for 30 of the 30 transactions.
+
+**Decryptions** [M]: each recipient signed an EIP-712 permit with its own wallet and decrypted its own test-token
+balance through Zama's relayer.
+
+| Recipient | Decrypted | Owed |
+|---|---|---|
+| X, the fresh address of the code claims (60 %) | 900,000,006 | 600,000,004 (round 1) + 300,000,002 (round 2) |
+| Heir B, by address (40 %) | 600,000,003 | 400,000,002 + 200,000,001 |
+| Y, where heir B claimed by address | 0 | 0: an address claim pays only to the heir itself |
+| The stranger | 0 | 0 |
+| E, the escape address of the separate account | 777,000,000 | the whole will |
+
+Heir B, an heir named by address, relayed the code heir's claim to X: X received the code slot only, and heir B's own
+slot stayed unclaimed until heir B claimed to itself; heir B's claim to Y matched nothing. Round 2 splits F2 plus the 1
+unit that round 1 left (1,000,000,007 − 600,000,004 − 400,000,002), so its delta is 500,000,004: what one round leaves
+as dust, the next round pays.
+
+**Gas and M3** [M + I]: every claim's input proof has the same shape (230 bytes: 1 handle, 3 coprocessor signatures)
+and the claim HCU is identical: 2,939,136 in round 1, where every recipient was new, and 2,939,104 in round 2. Without
+the 21,000 base and the calldata (whose zero bytes vary with the random handle), the execution gas depends only on
+public facts. A claim to the sender itself costs 11 gas less than a claim to another address (the public condition
+`recipient == msg.sender` takes one branch when it becomes an encrypted boolean): in round 1, heir B's relayed code
+claim to X and its address claim to Y used 2,619,526 each, its claim to itself 2,619,515. The first claim of a round
+is cheaper: the stranger's claim to itself used 2,613,515, exactly 6,000 less than heir B's claim to itself, because a
+`snapshot` call sets every slot it computes to one shared encrypted `false`, and the first claim afterwards reads that
+handle's ACL entry cold once and warm three times (EIP-2929: 2,100 against 100 gas), 3 × 2,000. Round 2 used two
+`snapshot` calls, so two shared handles: its first claim (to X) used 2,511,272, the second (heir B to itself)
+2,515,261, that is 2 × 2,000 = 4,000 less minus the 11. Neither who claims nor how (code or address) shows in the gas;
+a claim's position in a round and its recipient are public anyway. Equal gas regardless of position would need a
+separate handle per slot, at the cost of more ACL entries in every `snapshot`; not done.
+
+**Claim spam and the block HCU cap** [M]: v1 listed claim spam filling a per-block HCU cap as a limit. Round 1's live
+read (8 November, `results/live-chain-probe.json`) shows `capPerBlock` = 2^48 − 1 on both Sepolia and mainnet: there
+is no practical per-block cap today. Each claim costs its sender 2.94M HCU within the per-transaction limit. No
+deposit was added, because it would deter strangers and shrink the set an heir hides in.
+
+**Run 1** (15:19–15:36 UTC, before the address rule; `results/sepolia/will-w1-run1.json`, demo factory
+`0xEB3442Ed486ec3aEdf8E558cd3F6d5909141dc07`) measured every other call with the same HCU. Its claims cost 2,839,104
+HCU (100,032 less than now: the four ANDs of the address rule), and a separate relayer sent the code claim. The same
+pattern held: 2,541,018 execution gas for both a code claim and an address claim, 6,000 less for the first claim of
+round 1, 4,000 less for the first of round 2. Its decryptions matched too (X 900,000,006, heir B 600,000,003, a
+stranger 0, E 777,000,000); the run's own expectation for X had left out round 1's dust and is kept as
+`expectedAtRun`.
+
+## The app [M]
+
+The whole flow ran in the web app against Sepolia through the dev wallet (`node web/serve.mjs 8790 --devwallet
+--minify`, driven by puppeteer), before the address rule:
+
+- A fresh account and its will; heir 1 by code (60 %) and heir 2 = the connected wallet by address (40 %), set with the
+  PIN. The code was shown once, the sheet stayed locked until "I saved them", and afterwards the code was in neither the
+  page nor local storage. The heir card showed the will, the code and a QR code; in print media only the card remained.
+- 1,000 tcUSD added; "I'm here" (29 s) set the last correct PIN to "just now". After 5 minutes without a PIN the card
+  showed the alert and "Start the will"; after the grace period, "Settle and prepare the payout".
+- The heir card's link opened the claim page with the code filled in and the fragment gone from the address bar; the
+  code claim went to a fresh address X. The connected wallet was heir 2 by address and also sent heir 1's code claim,
+  so under W1.3 as written both slots matched and X received 1,000 tcUSD (decrypted with X's key); the wallet's own
+  claim afterwards paid zero. This led to the address rule.
+- On the same will: tokens added after the claims, a new round opened from the claim page, the wallet's address claim
+  first (its balance went from 1,000 to 1,400 tcUSD), then the code claim to a fresh address Z, which decrypted 600
+  tcUSD.
+- At phone width (390 px) neither the dashboard nor the claim page scrolls sideways.
+
+With the address rule, the claim page shows the recipient of an address claim as the connected wallet, with no field to
+change it (checked with a wallet that puppeteer injects into a build without the dev wallet). A will made by the first
+W1 demo factory still opens from its link and keeps the rule it was deployed with; a v1 will's link shows that the
+page no longer reads that older contract.
+
+The runs found three timing faults, all from an RPC backend or the relayer lagging a block behind, and all are fixed:
+the account setup failed with "could not decode result data" right after creating the account (the setup now reads
+again); after `prepare`, a stale read of the previous round made the app skip the snapshot and left a round open (anyone
+can finish it, and the app no longer reads the new round back); the relayer refused a balance granted a block earlier
+("not authorized") and once never answered (the decryption now asks again with the same permit and gives up after 2
+minutes). A fourth case of the same kind, a reveal right after a claim reading the balance from before it, is closed
+the same way: the app waits for the new balance handle.
+
+## Limits [V + I]
+
+- Heirs have to know about the will; the heir card is the channel, off-chain by design.
+- A claim code is a bearer secret. A lost code's share stays in the will until the claim window ends and then goes to
+  the escape address; whoever holds a leaked code can claim.
+- An heir named by address is paid only at that address; to move the tokens elsewhere it claims first and then
+  transfers them (a confidential transfer, amounts stay encrypted).
+- The owner cannot read the heirs back (they are never decrypted, by decision); the heir cards are the owner's record.
+- The will holds only ERC-7984 tokens. ETH and ERC-20 need a wrapper such as `ERC7984ERC20Wrapper`, which shows the
+  amount when wrapping and unwrapping (planned for W2).
+- No relayer: the claimant's wallet sends the claim and pays its gas; the recipient needs none.
+- A claim's gas depends on its position in a round (above), and a first-time recipient costs 32 HCU more (the token
+  encrypts a zero balance); both are public facts, not the claimant's role.
+- Research prototype, unaudited, testnet only; the demo uses 5-minute periods.
+
+# Hidden inheritance v1 — EncryptedWill (11 November 2026)
+
+> Kept as measured. W1 (above) replaced the snapshot at a token's first claim with payout rounds and addressed
+> the limits listed at the end of this section; the app no longer uses v1's will factory.
 
 - **What:** `contracts/inheritance/EncryptedWill.sol` and `EncryptedWillFactory.sol`, a will next to an Encrypted
   Account that pays out ERC-7984 tokens. OpenZeppelin's ERC-7984 is vendored unchanged

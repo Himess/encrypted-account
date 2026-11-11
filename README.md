@@ -78,29 +78,47 @@ Sepolia ETH, send with your PIN, or try a wrong one and watch it get counted on-
 A will that sits next to the account and pays out [ERC-7984](https://ercs.ethereum.org/ERCS/erc-7984) tokens
 (`contracts/inheritance/EncryptedWill.sol`):
 
-- **Heirs stay hidden, even afterwards.** Up to four heirs, each an encrypted address with an encrypted share. Empty
-  slots hold encrypted zeros, so even the number of heirs is hidden. Only the account sets them, through its PIN path;
-  the key alone cannot reach the will.
+- **Heirs stay hidden, even afterwards.** Up to four heirs with encrypted shares. Each heir is named by a secret claim
+  code (128 bits, the default) or by an address. Codes, addresses and shares are encrypted and never decrypted for
+  anyone, the owner included; empty slots hold encrypted zeros, so even the number of heirs is hidden. Only the account
+  sets them, through its PIN path: the key alone cannot reach the will.
+- **Heirs claim with a code, to any address.** The claimant encrypts the code XOR a hash of (will, chain, recipient), so
+  a claim is bound to its recipient: whoever relays it and changes the recipient gets zero. An heir can claim to a fresh
+  address, so the list of claimants does not reveal the list of heirs. A code is a bearer secret: whoever holds it can
+  claim. An heir named by address is paid only in a claim to its own address, so it cannot hand its share to someone
+  else's claim by relaying it.
 - **The PIN is the proof of life.** The will reads the account's last correct PIN. After the inactivity period without
-  one (months in real use, 5 minutes in the demo), anyone can start the inheritance; a correct PIN during the grace
-  period that follows voids the start.
-- **A claim reveals nothing.** After settlement anyone can claim a token: an heir receives its encrypted share, anyone
-  else an encrypted zero. On-chain, an heir's claim and a stranger's claim look the same, and the amounts stay
-  encrypted.
+  one, anyone can start the inheritance; a correct PIN during the grace period that follows voids the start. "I'm here"
+  in the app is the cheapest PIN operation and changes nothing on the account. The watchtower SDK reminds the owner 30
+  and 7 days before the will can start, and alerts when it starts.
+- **A claim reveals nothing.** After settlement anyone can claim: an heir receives its encrypted share, anyone else an
+  encrypted zero. Every claim runs the same FHE operations and emits the same events, whoever claims and in whichever
+  mode.
+- **Nothing stays locked.** A share total below 100 % goes to the first heir. Tokens that arrive later, and the rounding
+  dust of a round, are paid by the next payout round with the same shares; anyone can run a round (`prepare`, then
+  `snapshot` over the slots). After the claim window, whatever is left goes to the account's escape address. An escape started while the owner was alive also lets
+  anyone move the will to the escape address (`escapeWithdraw`); an escape started after the inactivity period cannot.
+- **Periods.** `EncryptedWillFactory` enforces inactivity 90 days–5 years (default 180 days, never shorter than the
+  account's PIN pulse), grace 30 days–1 year (default 30 days) and a claim window of at least 365 days (default 730).
+  The demo uses `EncryptedWillDemoFactory`: 5-minute periods, and it deploys only on Sepolia or a local chain.
 - **Built on OpenZeppelin's ERC-7984** reference implementation, vendored unchanged in
   `contracts/vendor/openzeppelin-confidential/` (its npm package pins an older `@fhevm/solidity`).
 
-In the [app](https://encrypted-account.vercel.app/app): the *Hidden will* card creates the will, sets the heirs with
-your PIN and adds worthless test tokens (tcUSD); after 5 minutes without a PIN anyone can start it, 5 minutes later
-settle it, and the claim link lets each heir claim and decrypt its own balance. Tests: `test/Will.test.ts` (10, mock
-stack, including the real account's PIN path); Sepolia run: `scripts/sepolia/will-run.ts`.
+In the [app](https://encrypted-account.vercel.app/app), with 5-minute demo periods: the *Hidden will* card creates the
+will and sets the heirs with your PIN. Each code is shown once, with a printable heir card (will, network, code, and a
+QR code of the claim link). "I'm here" resets the clock. After 5 minutes without a PIN anyone can start the will, and 5
+minutes later settle it; the app then prepares the payout. On the claim page an heir enters the code and any address,
+and sends the claim from its own wallet; each recipient decrypts its own balance. Tests: `test/Will.test.ts` (18, mock
+stack, including the real account's PIN path and escape); Sepolia run: `scripts/sepolia/will-w1-run.ts`.
 
-Measured on Sepolia ([RESULTS.md](RESULTS.md)): the first claim of a token computes every heir's amount, 12.3M HCU of
-the 20M per-transaction limit; each later claim costs 2.1M HCU and 2,117,912 gas, the same for an heir and for a
-stranger; every claimant decrypted exactly its own share (60 %, 40 %, 0, 0).
+Measured on Sepolia ([RESULTS.md](RESULTS.md)): a claim costs 2.94M HCU, 15 % of the 20M per-transaction limit, the same
+for a stranger, a code claim and an address claim, and about 2.6M gas. A payout round costs 2.24M HCU to prepare and
+2.07M per slot; all four slots fit in one call (8.28M). A code claim to a fresh address, the address heir, a stranger
+and an escape address each decrypted exactly what the contract owed them.
 
-Limits: tokens that reach the will after a token's first claim are not distributed; heirs have to know about the will
-(by design nothing on-chain tells them); the escape does not touch the will; unaudited, testnet only.
+Limits: heirs have to know about the will (the heir card is the channel, off-chain by design); a lost code cannot be
+recovered and a leaked one can be claimed; the will holds only ERC-7984 tokens (ETH and ERC-20 need a wrapper); claims
+are sent from the claimant's own wallet (no relayer yet); unaudited, testnet only.
 
 ## Measured
 
@@ -112,6 +130,7 @@ Limits: tokens that reach the will after a token's first claim are not distribut
 | Account setup gas | A: 17,048,629 · B: 3,259,034 | `results/sepolia/setup-f011.json` |
 | New storage slots per PIN-verified transfer (block access list), before → after F0.15 | 16 → 8; gas −22.6% on Sepolia, ≈ −3.5% on today's mainnet schedule | `results/sepolia/f015-slots.json` |
 | Attack simulation: key stolen, human-chosen 6-digit PIN, 30 days | ≈ 7% with no reaction · ≈ 3% if the owner escapes within an hour · negligible for a random PIN | `results/pin-attack-sim.json` |
+| Hidden-will claim: heir by code, heir by address or stranger | 2,939,136 HCU each (15 % of the per-transaction limit), ≈ 2.6M gas | `results/sepolia/will-w1.json` |
 
 Sepolia runs a newer gas schedule than mainnet (a new storage slot costs ≈ 111k gas), so the gas figures are pessimistic
 for today's mainnet. Package codes such as F0.9, F0.10 and F0.11 name the measurement rounds described in
@@ -145,8 +164,9 @@ No dates; the order may change.
 - **Web app:** live at [encrypted-account.vercel.app](https://encrypted-account.vercel.app) (landing page and app, code
   in `web/`); next: key-only transfers to known addresses, the escape, and the phone flow.
 - **Private mode:** encrypted balances and amounts with ERC-7984 tokens, viewing with the PIN, a duress PIN.
-- **Hidden inheritance:** done, on Sepolia: see [Hidden inheritance](#hidden-inheritance). Next: ETH and ERC-20 through
-  an ERC-7984 wrapper, and heirs in the app's address book.
+- **Hidden inheritance:** on Sepolia, with claim codes, payout rounds and escape withdrawal: see
+  [Hidden inheritance](#hidden-inheritance). Next: ETH and ERC-20 through an ERC-7984 wrapper, and an optional relayer
+  for claims.
 - **Agents and teams:** agent accounts (the agent holds the key, a human holds the PIN) and team treasuries with a
   hidden policy.
 - **Standards:** ERC drafts for the encrypted secret factor and the encrypted policy hooks.
@@ -246,8 +266,8 @@ contracts/account/
   OpenLib.sol                 opening ops, admin parameter checks, co-signatures, escape address (EIP-712)
   EncryptedAccountFactory.sol counterfactual ERC-1167 clone factory
 contracts/inheritance/
-  EncryptedWill.sol           hidden inheritance in ERC-7984 tokens: encrypted heirs and shares, PIN as proof of life
-  EncryptedWillFactory.sol    deterministic ERC-1167 clones, one per (account, inactivity, grace)
+  EncryptedWill.sol           hidden inheritance in ERC-7984 tokens: encrypted heirs, claim codes and shares, payout rounds
+  EncryptedWillFactory.sol    production and demo factories: deterministic ERC-1167 clones within period bounds
 contracts/vendor/             OpenZeppelin's ERC-7984 (unchanged, MIT; see its README)
 contracts/test/               test and benchmark contracts, including a deliberately vulnerable PIN verifier
 sdk/src/                      Argon2id fingerprint, PIN policy, watchtower v0

@@ -1,0 +1,530 @@
+{
+  "startedAtUtc": "2026-11-11T16:43:13.364Z",
+  "network": "sepolia",
+  "periods": {
+    "inactivity": 300,
+    "grace": 300,
+    "claimWindow": 86400
+  },
+  "txs": {
+    "deploy demo factory (+ implementation)": {
+      "hash": "0x179835805ad8735a0be6e6bf67500520436275de82a3e4ba52a2040554e41df6",
+      "block": 12112981,
+      "gasUsed": 22225509,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 0,
+        "blockFheTxs": 0,
+        "blockComputed": 0,
+        "meterCheck": "equal"
+      }
+    },
+    "createWill": {
+      "hash": "0xf2ba953ed9672a0f27f7fb0431b9a780c008359e55a89b789e1a9a042aa8ca6b",
+      "block": 12112982,
+      "gasUsed": 745047,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 0,
+        "blockFheTxs": 0,
+        "blockComputed": 0,
+        "meterCheck": "equal"
+      }
+    },
+    "setHeirs: openCall": {
+      "hash": "0x2fc9a5cbb936697b3dfc8dffe543b7adc63b9073fe2bac8333e3ac9cc16a0042",
+      "block": 12112987,
+      "gasUsed": 4034407,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 0,
+        "blockFheTxs": 0,
+        "blockComputed": 0,
+        "meterCheck": "equal"
+      }
+    },
+    "setHeirs: submitGuess": {
+      "hash": "0xdee121347273eeab74fa2e3c68f4bc1aadcc3f7e3da0ce641ee3238dfc8b109a",
+      "block": 12112989,
+      "gasUsed": 914754,
+      "hcu": {
+        "total": 555002,
+        "depth": 278002,
+        "fheOps": 8,
+        "blockMeter": 555002,
+        "blockFheTxs": 1,
+        "blockComputed": 555002,
+        "meterCheck": "equal"
+      }
+    },
+    "setHeirs: finalizeGuess": {
+      "hash": "0x5108d3c9e46bb411002c1c467ee7be77224b1fb564fa8ec24b468c475945f9d1",
+      "block": 12112990,
+      "gasUsed": 438112,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 0,
+        "blockFheTxs": 0,
+        "blockComputed": 0,
+        "meterCheck": "equal"
+      }
+    },
+    "setHeirs: executeOp": {
+      "hash": "0x0081c0be651f04c0c83a633d16e2c18d69ece29e422dda09216ae53b52dcf53e",
+      "block": 12112996,
+      "gasUsed": 5304868,
+      "hcu": {
+        "total": 2776232,
+        "depth": 1104064,
+        "fheOps": 59,
+        "blockMeter": 2776232,
+        "blockFheTxs": 1,
+        "blockComputed": 2776232,
+        "meterCheck": "equal"
+      }
+    },
+    "mint F1": {
+      "hash": "0x2dd757f047b9b2cada998fde1d6b0199fae71164456ad5364843f02e00b34a85",
+      "block": 12112997,
+      "gasUsed": 889215,
+      "hcu": {
+        "total": 586096,
+        "depth": 531032,
+        "fheOps": 8,
+        "blockMeter": 772096,
+        "blockFheTxs": 3,
+        "blockComputed": 772096,
+        "meterCheck": "equal"
+      }
+    },
+    "start": {
+      "hash": "0xedb154c31d21ef9b73be6b0f639f4cf00ca1575ee63d949336e4600aec20be27",
+      "block": 12113017,
+      "gasUsed": 44610,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 162032,
+        "blockFheTxs": 1,
+        "blockComputed": 162032,
+        "meterCheck": "equal"
+      }
+    },
+    "settle": {
+      "hash": "0x2bbf0ed348a5a239127910b00b920377b8c0a20c119f72c6830d48ea4788122a",
+      "block": 12113043,
+      "gasUsed": 43890,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 0,
+        "blockFheTxs": 0,
+        "blockComputed": 0,
+        "meterCheck": "equal"
+      }
+    },
+    "round 1: prepare": {
+      "hash": "0x5afa113491a458749179f2ebf969801303d1afa8a805a8cc11b585dddb0dfcbc",
+      "block": 12113044,
+      "gasUsed": 734429,
+      "hcu": {
+        "total": 2237032,
+        "depth": 1370032,
+        "fheOps": 6,
+        "blockMeter": 2237032,
+        "blockFheTxs": 1,
+        "blockComputed": 2237032,
+        "meterCheck": "equal"
+      }
+    },
+    "round 1: snapshot 0–4": {
+      "hash": "0xe10482869fb7d7942444b0db77b4037d430ed2e515ec29de7ff010c750ba8f62",
+      "block": 12113045,
+      "gasUsed": 1852964,
+      "hcu": {
+        "total": 8276032,
+        "depth": 1473000,
+        "fheOps": 17,
+        "blockMeter": 8276032,
+        "blockFheTxs": 1,
+        "blockComputed": 8276032,
+        "meterCheck": "equal"
+      }
+    },
+    "claim 1: stranger → itself": {
+      "hash": "0x5885bf7b225e7d9e87d1f61d45200bc7fc84075c5f422a1f621901270ce51278",
+      "block": 12113047,
+      "gasUsed": 2639699,
+      "hcu": {
+        "total": 2939136,
+        "depth": 1305000,
+        "fheOps": 51,
+        "blockMeter": 2939136,
+        "blockFheTxs": 1,
+        "blockComputed": 2939136,
+        "meterCheck": "equal"
+      }
+    },
+    "claim 1: heir B relays the code claim → fresh address X": {
+      "hash": "0x0d2c035a29d79a3caf1964ad039325ee4167cf187e87d090ee62f33a0ad61efe",
+      "block": 12113049,
+      "gasUsed": 2645722,
+      "hcu": {
+        "total": 2939136,
+        "depth": 1305000,
+        "fheOps": 51,
+        "blockMeter": 2939136,
+        "blockFheTxs": 1,
+        "blockComputed": 2939136,
+        "meterCheck": "equal"
+      }
+    },
+    "claim 1: heir B, address → another address Y": {
+      "hash": "0xef30d9eec0abcfe5ac82119b68e9a0a9cd18e7110aaca75a3c2eecde406de8cd",
+      "block": 12113051,
+      "gasUsed": 2645710,
+      "hcu": {
+        "total": 2939136,
+        "depth": 1305000,
+        "fheOps": 51,
+        "blockMeter": 2939136,
+        "blockFheTxs": 1,
+        "blockComputed": 2939136,
+        "meterCheck": "equal"
+      }
+    },
+    "claim 1: heir B, address → itself": {
+      "hash": "0x12d68fefc63cdd7f7a73003b685a1387444f22634ef98ee77fd18b35516f137d",
+      "block": 12113052,
+      "gasUsed": 2645699,
+      "hcu": {
+        "total": 2939136,
+        "depth": 1305000,
+        "fheOps": 51,
+        "blockMeter": 2939136,
+        "blockFheTxs": 1,
+        "blockComputed": 2939136,
+        "meterCheck": "equal"
+      }
+    },
+    "mint F2": {
+      "hash": "0x3139f935f3c42aa10a267ac9424cf9fc4d3c3b2c00efc4c2a1ab408abb967566",
+      "block": 12113053,
+      "gasUsed": 784961,
+      "hcu": {
+        "total": 586064,
+        "depth": 531032,
+        "fheOps": 7,
+        "blockMeter": 586064,
+        "blockFheTxs": 1,
+        "blockComputed": 586064,
+        "meterCheck": "equal"
+      }
+    },
+    "round 2: prepare": {
+      "hash": "0x26d8d14201bc5c43940593bf41aabf4bb19bfa5fe749d904bd64b48da10b3f90",
+      "block": 12113054,
+      "gasUsed": 622664,
+      "hcu": {
+        "total": 3105032,
+        "depth": 2073032,
+        "fheOps": 14,
+        "blockMeter": 3105032,
+        "blockFheTxs": 1,
+        "blockComputed": 3105032,
+        "meterCheck": "equal"
+      }
+    },
+    "round 2: snapshot 0–2": {
+      "hash": "0xd6a85635dfebf7e61685c93edcdde2b90703caa66e66032e48b47daf6f5ed7d8",
+      "block": 12113055,
+      "gasUsed": 723496,
+      "hcu": {
+        "total": 4572032,
+        "depth": 1690000,
+        "fheOps": 13,
+        "blockMeter": 4572032,
+        "blockFheTxs": 1,
+        "blockComputed": 4572032,
+        "meterCheck": "equal"
+      }
+    },
+    "round 2: snapshot 2–4": {
+      "hash": "0x0cd47e9bf01a17d471c54d57d3839e68bcd5e2435789d644fa597aaecb2f41bf",
+      "block": 12113056,
+      "gasUsed": 725035,
+      "hcu": {
+        "total": 4572032,
+        "depth": 1690000,
+        "fheOps": 13,
+        "blockMeter": 4572032,
+        "blockFheTxs": 1,
+        "blockComputed": 4572032,
+        "meterCheck": "equal"
+      }
+    },
+    "claim 2: relayer, code → X": {
+      "hash": "0x7ddeb562090f05579ce39307fcfab97f3cd208ccf785fb789bb35308ab5aa170",
+      "block": 12113057,
+      "gasUsed": 2537444,
+      "hcu": {
+        "total": 2939104,
+        "depth": 1305000,
+        "fheOps": 50,
+        "blockMeter": 2939104,
+        "blockFheTxs": 1,
+        "blockComputed": 2939104,
+        "meterCheck": "equal"
+      }
+    },
+    "claim 2: heir B, address → itself": {
+      "hash": "0xa9049c070f2fc284f88bbc6192f39d204d993c04130980b82528e69fefec9455",
+      "block": 12113058,
+      "gasUsed": 2541457,
+      "hcu": {
+        "total": 2939104,
+        "depth": 1305000,
+        "fheOps": 50,
+        "blockMeter": 2939104,
+        "blockFheTxs": 1,
+        "blockComputed": 2939104,
+        "meterCheck": "equal"
+      }
+    },
+    "proof of life: openCall": {
+      "hash": "0xde32bd25411f59fe2ba39cbe42c0da911b227de6e152846ed9e1196f3aa5418d",
+      "block": 12113059,
+      "gasUsed": 275607,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 0,
+        "blockFheTxs": 0,
+        "blockComputed": 0,
+        "meterCheck": "equal"
+      }
+    },
+    "proof of life: submitGuess": {
+      "hash": "0xba6b9fc54faf3a8b77ecddd47d281f8fcd669d0599b8c18d5f1caf6a50cf63d1",
+      "block": 12113060,
+      "gasUsed": 839784,
+      "hcu": {
+        "total": 555002,
+        "depth": 278002,
+        "fheOps": 8,
+        "blockMeter": 555002,
+        "blockFheTxs": 1,
+        "blockComputed": 555002,
+        "meterCheck": "equal"
+      }
+    },
+    "proof of life: finalizeGuess": {
+      "hash": "0xb06c14fca61a558ce79ceb9082c3756b2548f02339fbea93088739827d4139f1",
+      "block": 12113061,
+      "gasUsed": 438160,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 0,
+        "blockFheTxs": 0,
+        "blockComputed": 0,
+        "meterCheck": "equal"
+      }
+    },
+    "escape account: createAccount": {
+      "hash": "0xc8e846fe9b086caf6449241fdb60d2703a0116c9e4e6bd93c656b008b0c9c1c9",
+      "block": 12113062,
+      "gasUsed": 1306858,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 0,
+        "blockFheTxs": 0,
+        "blockComputed": 0,
+        "meterCheck": "equal"
+      }
+    },
+    "escape account: setupPin": {
+      "hash": "0x26cbff647895e37e2c5da214970415ac3ddb13dbf6fc55d2708df6726d2c70f0",
+      "block": 12113063,
+      "gasUsed": 842261,
+      "hcu": {
+        "total": 79000,
+        "depth": 79000,
+        "fheOps": 5,
+        "blockMeter": 79000,
+        "blockFheTxs": 1,
+        "blockComputed": 79000,
+        "meterCheck": "equal"
+      }
+    },
+    "escape account: createWill": {
+      "hash": "0x5d5974837ad5de2427712f5e539929ab8417bc67b1d1f582e27c17639265ccc7",
+      "block": 12113064,
+      "gasUsed": 745047,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 16147024,
+        "blockFheTxs": 1,
+        "blockComputed": 16147024,
+        "meterCheck": "equal"
+      }
+    },
+    "escape account: mint F3": {
+      "hash": "0x23601128f297f74bb964eadbdf1fdaf5250efa886ce67817112566e944d3ad9e",
+      "block": 12113065,
+      "gasUsed": 889211,
+      "hcu": {
+        "total": 586096,
+        "depth": 531032,
+        "fheOps": 8,
+        "blockMeter": 748128,
+        "blockFheTxs": 2,
+        "blockComputed": 748128,
+        "meterCheck": "equal"
+      }
+    },
+    "escape account: startEscape": {
+      "hash": "0xec5fb3c65a8893d023cfdf68aea3ef0145f429e789972a5a4f57d5bddebe2328",
+      "block": 12113066,
+      "gasUsed": 149660,
+      "hcu": {
+        "total": 0,
+        "depth": 0,
+        "fheOps": 0,
+        "blockMeter": 0,
+        "blockFheTxs": 0,
+        "blockComputed": 0,
+        "meterCheck": "equal"
+      }
+    },
+    "escapeWithdraw (by a stranger)": {
+      "hash": "0x1522bb063038c636724647082860a279facc5d0362dca2633ab9fcb29f8f09de",
+      "block": 12113067,
+      "gasUsed": 1165708,
+      "hcu": {
+        "total": 586064,
+        "depth": 369000,
+        "fheOps": 7,
+        "blockMeter": 586064,
+        "blockFheTxs": 1,
+        "blockComputed": 586064,
+        "meterCheck": "equal"
+      }
+    }
+  },
+  "contracts": {
+    "token": "0xE552Beed2265a8666d25307079fad9eDA2D70172",
+    "demoFactory": "0x6941031bd1bec8C86Afea996DF3E6F8D052979D1",
+    "implementation": "0x4d13B3FD8f14D36b1f69ee77BE2C1971Ca785eCc"
+  },
+  "codeBytes": {
+    "will": 12771,
+    "demoFactory": 1336
+  },
+  "will": {
+    "address": "0xE6f61fA26EDB902EBB72ecCC49454bD04eFa847E",
+    "account": "0xEbfc30346306236AC22Cbe6B0C26034C7BC1dC66",
+    "claimWindow": 86401
+  },
+  "wallets": {
+    "relayer": "0x48F0e5977C3f17fb836359f9C6f744C9a33422d8",
+    "heirB": "0xba387E3533A6e2AD3CcA70b9ABb0cCEcD06EF632",
+    "stranger": "0x73b6A6ca72E59E371062433D95D1C2205c354bDC",
+    "recipientX": "0xA4D8e9c006eb3Cf3994DDBd4b184AED201BE5669",
+    "recipientY": "0xb2Ac48Ca9BCd9B11a2A6A727c61dF45d61CFF5c8",
+    "escapeE": "0xC8fdC53A45b588aC839eBBFEdf523b9aAa63BdeE"
+  },
+  "heirsEncrypt": {
+    "totalMs": 12145,
+    "relayerHttpMs": 1212,
+    "localMs": 10933,
+    "httpCalls": 2
+  },
+  "proofOfLife": {
+    "gas": 1553551,
+    "ms": 32362
+  },
+  "escapeAccount": {
+    "account": "0x8E9792A91D18e3deF0D71B3D70b2bd6177d4958C",
+    "will": "0x9a83A36147D445D88Fd5d9A4951aACBF52f6384F",
+    "escape": "0xC8fdC53A45b588aC839eBBFEdf523b9aAa63BdeE"
+  },
+  "decrypted": {
+    "recipientX": {
+      "value": "900000006",
+      "expected": "900000006",
+      "ok": true
+    },
+    "heirB": {
+      "value": "600000003",
+      "expected": "600000003",
+      "ok": true
+    },
+    "recipientY": {
+      "value": "0",
+      "expected": "0",
+      "ok": true
+    },
+    "stranger": {
+      "value": "0",
+      "expected": "0",
+      "ok": true
+    },
+    "escapeE": {
+      "value": "777000000",
+      "expected": "777000000",
+      "ok": true
+    }
+  },
+  "claimGas": {
+    "claim 1: stranger → itself": {
+      "gas": 2639699,
+      "calldataGas": 5184,
+      "executionGas": 2613515
+    },
+    "claim 1: heir B relays the code claim → fresh address X": {
+      "gas": 2645722,
+      "calldataGas": 5196,
+      "executionGas": 2619526
+    },
+    "claim 1: heir B, address → another address Y": {
+      "gas": 2645710,
+      "calldataGas": 5184,
+      "executionGas": 2619526
+    },
+    "claim 1: heir B, address → itself": {
+      "gas": 2645699,
+      "calldataGas": 5184,
+      "executionGas": 2619515
+    },
+    "claim 2: relayer, code → X": {
+      "gas": 2537444,
+      "calldataGas": 5172,
+      "executionGas": 2511272
+    },
+    "claim 2: heir B, address → itself": {
+      "gas": 2541457,
+      "calldataGas": 5196,
+      "executionGas": 2515261
+    }
+  },
+  "gasPriceGwei": 0.050000018,
+  "finishedAtUtc": "2026-11-11T17:01:35.812Z",
+  "burnerBalanceEth": "0.016600208829862064"
+}
