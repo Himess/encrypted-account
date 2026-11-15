@@ -50,6 +50,9 @@ body::before {
 .notice.err { border-color: var(--danger-line); background: var(--danger-soft); color: #ffc2bc; }
 .notice.ok { border-color: var(--accent-line); background: var(--accent-soft); color: #e3f8bf; }
 .notice svg { width: 16px; height: 16px; flex: none; margin-top: 2px; }
+.refund-offer { margin-top: 14px; align-items: center; text-align: left; }
+.refund-offer .btn { flex: none; }
+.refund-err { display: block; margin-top: 4px; color: #ffc2bc; }
 
 /* ── form fields ── */
 .field { display: flex; flex-direction: column; gap: 8px; }

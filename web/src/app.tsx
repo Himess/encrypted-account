@@ -31,6 +31,7 @@ import {
   readAccount,
   readEthFee,
   readEscape,
+  readRefund,
   sendWithPin,
 } from "./account";
 import { fheClient } from "./fhe";
@@ -1102,6 +1103,8 @@ function SendSheet({ ctx, account, view, walletBal, onClose, onSettled }: { ctx:
   const [tasks, setTasks] = useState<TaskState[]>(() => freshTasks(SEND_STEPS.length));
   const [result, setResult] = useState<SendResult | null>(null);
   const [t0, setT0] = useState(0);
+  const [verified, setVerified] = useState(false);
+  const offer = useRefundOffer(ctx, account, verified, view.bond !== null, onSettled);
   const running = stage === "run";
   const now = useNow(1000);
 
@@ -1142,16 +1145,9 @@ function SendSheet({ ctx, account, view, walletBal, onClose, onSettled }: { ctx:
     setStage("run");
     setT0(Date.now());
     setResult(null);
+    setVerified(false);
     setTasks(freshTasks(SEND_STEPS.length));
-    const cb: StepCb = (i, s, text, hash) =>
-      setTasks((prev) =>
-        prev.map((t, j) => {
-          if (j !== i) return t;
-          const wrong = /wrong/i.test(text ?? "");
-          const state: TaskState["s"] = s === "run" ? "run" : s === "fail" ? "fail" : wrong || (s === "skip" && i === 5) ? "bad" : "done";
-          return { s: state, text: s === "done" && !text ? undefined : text, hash: hash ?? t.hash };
-        }),
-      );
+    const cb = taskCb(setTasks, 5, () => setVerified(true));
     try {
       const h = await sendWithPin(ctx, account, ethers.getAddress(toTrim), wei, p, cb, view.bond?.required);
       setResult({ kind: "ok", hash: h });
@@ -1259,6 +1255,7 @@ function SendSheet({ ctx, account, view, walletBal, onClose, onSettled }: { ctx:
             <IconInfo />
             <span>Up to 4 wallet confirmations. The yes / no decryption takes about half a minute.</span>
           </div>
+          <RefundNotice offer={offer} />
         </div>
       )}
 
@@ -1279,6 +1276,7 @@ function SendSheet({ ctx, account, view, walletBal, onClose, onSettled }: { ctx:
                 <TxLink hash={result.hash} label="View transaction" />
                 <span class="badge">{mmss(now - t0)}</span>
               </div>
+              <RefundNotice offer={offer} />
               <div class="flow-actions">
                 <button type="button" class="btn btn-primary btn-lg" onClick={onClose}>
                   Done
@@ -1351,6 +1349,8 @@ function ChangePinSheet({ ctx, account, walletBal, onClose, onSettled }: { ctx: 
   const [result, setResult] = useState<SendResult | null>(null);
   const [t0, setT0] = useState(0);
   const info = useTryInfo(account);
+  const [verified, setVerified] = useState(false);
+  const offer = useRefundOffer(ctx, account, verified, !!info?.bond, onSettled);
   const now = useNow(1000);
   const running = stage === "run";
 
@@ -1393,9 +1393,10 @@ function ChangePinSheet({ ctx, account, walletBal, onClose, onSettled }: { ctx: 
     setStage("run");
     setT0(Date.now());
     setResult(null);
+    setVerified(false);
     setTasks(freshTasks(PIN_CHANGE_STEPS.length));
     try {
-      setResult({ kind: "ok", hash: await changePinWithPin(ctx, account, p, pinNew, taskCb(setTasks, 5), info?.bond?.required) });
+      setResult({ kind: "ok", hash: await changePinWithPin(ctx, account, p, pinNew, taskCb(setTasks, 5, () => setVerified(true)), info?.bond?.required) });
     } catch (e) {
       if (e instanceof WrongPin) setResult({ kind: "wrong", score: e.score, next: e.nextAllowedAt });
       else setResult({ kind: "err", text: explainError(e) });
@@ -1506,6 +1507,7 @@ function ChangePinSheet({ ctx, account, walletBal, onClose, onSettled }: { ctx: 
               <Task label={PIN_CHANGE_LABELS[i]} t={t} extra={t.s === "run" && (i === 0 || i === 1 || i === 3) ? <Cipher n={12} /> : undefined} />
             ))}
           </ul>
+          <RefundNotice offer={offer} />
         </div>
       )}
 
@@ -1525,6 +1527,7 @@ function ChangePinSheet({ ctx, account, walletBal, onClose, onSettled }: { ctx: 
               <TxLink hash={result.hash} label="View transaction" />
             </div>
           )}
+          {result.kind === "ok" && <RefundNotice offer={offer} />}
           <div class="flow-actions">
             <button type="button" class="btn btn-primary btn-lg" onClick={onClose}>
               Done
@@ -1943,9 +1946,13 @@ const WillUnreadable = () => (
   <p class="small muted">This will can't be read right now. If it was made with the first version of the demo, it uses an older contract that this page no longer reads.</p>
 );
 
-/** The PIN path's step callbacks on a task list: a wrong PIN shows as a red cross, not as a failure. */
-function taskCb(setTasks: (f: (prev: TaskState[]) => TaskState[]) => void, lastStep: number): StepCb {
-  return (i, s, text, hash) =>
+/**
+ * The PIN path's step callbacks on a task list: a wrong PIN shows as a red cross, not as a failure. The last step
+ * only starts after a correct PIN was recorded, so its start calls `onVerified` (the bond is claimable from then on).
+ */
+function taskCb(setTasks: (f: (prev: TaskState[]) => TaskState[]) => void, lastStep: number, onVerified?: () => void): StepCb {
+  return (i, s, text, hash) => {
+    if (onVerified && i === lastStep && s === "run") onVerified();
     setTasks((prev) =>
       prev.map((t, j) => {
         if (j !== i) return t;
@@ -1954,6 +1961,76 @@ function taskCb(setTasks: (f: (prev: TaskState[]) => TaskState[]) => void, lastS
         return { s: state, text: s === "done" && !text ? undefined : text, hash: hash ?? t.hash };
       }),
     );
+  };
+}
+
+type RefundOffer = { amount: bigint | null; state: "idle" | "run" | "done" | "err"; text: string; hash: string | null; claim: () => Promise<void> };
+
+/**
+ * After a correct key-track PIN (`verified`): the bond of that try is credited when the guess is finalized and can
+ * go back to the wallet at once. The app offers it on its own; one click sends claimRefund (one wallet signature).
+ * `enabled` is false on accounts from before F0.16 (no bonds).
+ */
+function useRefundOffer(ctx: Ctx, account: string, verified: boolean, enabled: boolean, onClaimed?: () => void): RefundOffer {
+  const [amount, setAmount] = useState<bigint | null>(null);
+  const [state, setState] = useState<RefundOffer["state"]>("idle");
+  const [text, setText] = useState("");
+  const [hash, setHash] = useState<string | null>(null);
+  useEffect(() => {
+    if (!verified || !enabled) return;
+    let live = true;
+    // a load-balanced public RPC can still show the balance from before the finalize for a moment
+    retry(async () => {
+      const r = await readRefund(ctx.read, account, ctx.w.address);
+      if (r === 0n) throw new Error("not credited yet");
+      return r;
+    }, 4).then(
+      (r) => live && setAmount(r),
+      () => undefined,
+    );
+    return () => {
+      live = false;
+    };
+  }, [verified, enabled, account, ctx.w.address]);
+  async function claim() {
+    setState("run");
+    setText("");
+    try {
+      setHash(await claimRefund(ctx, account, (t) => setText(t)));
+      setState("done");
+      onClaimed?.();
+    } catch (e) {
+      setText(explainError(e));
+      setState("err");
+    }
+  }
+  return { amount, state, text, hash, claim };
+}
+
+function RefundNotice({ offer }: { offer: RefundOffer }) {
+  if (!offer.amount) return null;
+  if (offer.state === "done")
+    return (
+      <div class="notice ok refund-offer">
+        <IconCheck />
+        <span style={{ flex: 1 }}>
+          Your bond of <b>{fmtEth(offer.amount)} ETH</b> is back in your wallet.
+        </span>
+        {offer.hash && <TxLink hash={offer.hash} />}
+      </div>
+    );
+  return (
+    <div class="notice info refund-offer">
+      <IconInfo />
+      <span style={{ flex: 1 }}>
+        Correct PIN: your bond of <b>{fmtEth(offer.amount)} ETH</b> can go back to your wallet now.
+        {offer.state === "err" && <span class="refund-err">{offer.text}</span>}
+      </span>
+      <button type="button" class="btn btn-secondary btn-sm" disabled={offer.state === "run"} onClick={() => void offer.claim()}>
+        {offer.state === "run" ? offer.text || "Confirm in your wallet…" : offer.state === "err" ? "Try again" : "Get it back"}
+      </button>
+    </div>
+  );
 }
 
 const OkIcon = () => (
@@ -2158,6 +2235,8 @@ function WillSheet({ ctx, account, willAddr, replacing, onClose, onSettled }: { 
   const [result, setResult] = useState<WillResult | null>(null);
   const [cards, setCards] = useState(false);
   const info = useTryInfo(account);
+  const [verified, setVerified] = useState(false);
+  const offer = useRefundOffer(ctx, account, verified, !!info?.bond, onSettled);
   const [t0, setT0] = useState(0);
   const now = useNow(1000);
 
@@ -2184,9 +2263,10 @@ function WillSheet({ ctx, account, willAddr, replacing, onClose, onSettled }: { 
     setStage("run");
     setT0(Date.now());
     setResult(null);
+    setVerified(false);
     setTasks(freshTasks(CALL_STEPS.length));
     try {
-      const r = await setHeirsWithPin(ctx, account, willAddr, heirRows, p, taskCb(setTasks, 5), info?.bond?.required);
+      const r = await setHeirsWithPin(ctx, account, willAddr, heirRows, p, taskCb(setTasks, 5, () => setVerified(true)), info?.bond?.required);
       setResult({ kind: "ok", hash: r.hash, heirs: r.heirs });
     } catch (e) {
       if (e instanceof WrongPin) setResult({ kind: "wrong", score: e.score, next: e.nextAllowedAt });
@@ -2305,6 +2385,7 @@ function WillSheet({ ctx, account, willAddr, replacing, onClose, onSettled }: { 
             <IconInfo />
             <span>Up to 4 wallet confirmations, then the account's 1-minute waiting period.</span>
           </div>
+          <RefundNotice offer={offer} />
         </div>
       )}
 
@@ -2339,6 +2420,7 @@ function WillSheet({ ctx, account, willAddr, replacing, onClose, onSettled }: { 
               <div class="facts-row">
                 <TxLink hash={result.hash} label="View transaction" />
               </div>
+              <RefundNotice offer={offer} />
               <div class="flow-actions">
                 {codeHeirs.length > 0 && (
                   <button type="button" class="btn btn-secondary btn-lg" onClick={() => setCards(true)}>
@@ -2467,6 +2549,7 @@ function AliveSheet({ ctx, account, onClose, onSettled }: { ctx: Ctx; account: s
   const [tasks, setTasks] = useState<TaskState[]>(() => freshTasks(ALIVE_STEPS.length));
   const [result, setResult] = useState<WillResult | null>(null);
   const [t0, setT0] = useState(0);
+  const offer = useRefundOffer(ctx, account, result?.kind === "ok", !!info?.bond, onSettled);
   const now = useNow(1000);
 
   async function go(p = pin) {
@@ -2541,6 +2624,7 @@ function AliveSheet({ ctx, account, onClose, onSettled }: { ctx: Ctx; account: s
               <TxLink hash={result.hash} label="View transaction" />
             </div>
           )}
+          {result.kind === "ok" && <RefundNotice offer={offer} />}
           <div class="flow-actions">
             <button type="button" class="btn btn-primary btn-lg" onClick={onClose}>
               Done

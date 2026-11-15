@@ -172,7 +172,8 @@ export async function readOwnerBond(read: ethers.JsonRpcProvider, address: strin
   }
 }
 
-async function readRefund(read: ethers.JsonRpcProvider, address: string, payer: string): Promise<bigint> {
+/** F0.16: bonds waiting for claimRefund for `payer` (0 on an account from before F0.16). */
+export async function readRefund(read: ethers.JsonRpcProvider, address: string, payer: string): Promise<bigint> {
   try {
     return BigInt(await acct(address, read).refundOf(payer));
   } catch (e) {
