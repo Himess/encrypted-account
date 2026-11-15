@@ -77,9 +77,13 @@ export async function sendTx(w: Wallet, read: ethers.JsonRpcProvider, req: ether
   if (gas === 0n) throw new Error(explainError(lastErr));
 
   status("Confirm in your wallet…");
+  // `req.gasLimit` is a floor: an estimate taken on a backend that has not seen the previous block yet can follow a
+  // cheaper path (e.g. claimRefund before the refund is credited) and be too low for the real one
+  const est = (gas * 125n) / 100n;
+  const floor = req.gasLimit != null ? BigInt(req.gasLimit) : 0n;
   let resp: ethers.TransactionResponse;
   try {
-    resp = await w.signer.sendTransaction({ ...req, gasLimit: (gas * 125n) / 100n, maxFeePerGas, maxPriorityFeePerGas: tip, type: 2 });
+    resp = await w.signer.sendTransaction({ ...req, gasLimit: est > floor ? est : floor, maxFeePerGas, maxPriorityFeePerGas: tip, type: 2 });
   } catch (e) {
     throw new Error(explainError(e));
   }

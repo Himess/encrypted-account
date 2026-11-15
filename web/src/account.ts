@@ -460,9 +460,13 @@ export async function boundFee(read: ethers.JsonRpcProvider, account: string, op
   }
 }
 
-/** F0.16: pulls the bonds of correct PIN tries back to the wallet that posted them. */
+/**
+ * F0.16: pulls the bonds of correct PIN tries back to the wallet that posted them. Right after a correct PIN the gas
+ * estimate can come from a backend that does not see the refund yet (the cheap "nothing to pay" path), so the gas limit
+ * has a floor that covers the ETH transfer (47,594 gas on Sepolia in the F0.16 run).
+ */
 export async function claimRefund(ctx: Ctx, account: string, st: Status): Promise<string> {
-  const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("claimRefund", []) }, st);
+  const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("claimRefund", []), gasLimit: 120_000n }, st);
   return r.hash;
 }
 
