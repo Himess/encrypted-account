@@ -52,8 +52,9 @@ contract PrivateModule is IPrivateHooks, ReentrancyGuardTransient {
 
     /// @notice Setup (before arming): turns on the private paths for an ERC-7984 token, with its own encrypted limits and
     ///         the decoy cap. The account must have been created with bigTransfer ≥ 72 h (§17.1).
-    /// @param decoyCap client-encrypted in every account (a random value when no duress PIN is set), so the dataflow does
-    ///        not show whether a duress PIN exists.
+    /// @param decoyCap client-encrypted in every account, so the dataflow does not show whether a duress PIN exists.
+    ///        Without a duress PIN its value never matters; the web app sends 0, so that a duress PIN stored by an
+    ///        interrupted earlier setup would show and move nothing.
     function privateSetupAsset(address token, externalEuint64 lmin, externalEuint64 lmax, externalEuint64 decoyCap, bytes calldata proof)
         external
         viaAccount

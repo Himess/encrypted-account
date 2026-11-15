@@ -14,7 +14,7 @@ async function main() {
     "EncryptedWill",
     "EncryptedWillFactory",
     "EncryptedWillDemoFactory",
-    // SPIKE (private mode)
+    // private mode (optional; its own implementation and factory)
     "EncryptedAccountP",
     "PrivateModule",
   ];

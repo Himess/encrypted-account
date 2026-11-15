@@ -1,0 +1,342 @@
+{
+  "generatedAt": "2026-11-15T21:59:33Z",
+  "claim": "A standard account (no private mode) runs the same code as on main, so its flow and gas are unchanged.",
+  "runtimeBytecode": {
+    "method": "deployedBytecode of each contract on feature/private-mode vs main, the trailing CBOR metadata stripped (source edits that do not change code, such as `virtual`, change only the metadata hash)",
+    "contracts": {
+      "EncryptedAccount": {
+        "bytes": 23264,
+        "identicalWithoutMetadata": true
+      },
+      "EncryptedAccountB": {
+        "bytes": 24476,
+        "identicalWithoutMetadata": true
+      },
+      "PinLib": {
+        "bytes": 10641,
+        "identicalWithoutMetadata": true
+      },
+      "PolicyLib": {
+        "bytes": 9277,
+        "identicalWithoutMetadata": true
+      },
+      "OpsLib": {
+        "bytes": 12760,
+        "identicalWithoutMetadata": true
+      },
+      "OpenLib": {
+        "bytes": 13993,
+        "identicalWithoutMetadata": true
+      },
+      "EncryptedAccountFactory": {
+        "bytes": 1868,
+        "identicalWithoutMetadata": true
+      },
+      "FeeConfig": {
+        "bytes": 2944,
+        "identicalWithoutMetadata": true
+      },
+      "EncryptedWill": {
+        "bytes": 12771,
+        "identicalWithoutMetadata": true
+      },
+      "EncryptedWillFactory": {
+        "bytes": 1681,
+        "identicalWithoutMetadata": true
+      },
+      "EncryptedWillDemoFactory": {
+        "bytes": 1336,
+        "identicalWithoutMetadata": true
+      }
+    }
+  },
+  "costModel": {
+    "method": "[Mock] test/CostModel.test.ts on main and twice on feature/private-mode; the mock's gas depends on encrypted values and calldata zero bytes of random handles and proofs, so the same code varies run to run",
+    "rows": 35,
+    "maxAbsGasDiffVsMain": 36,
+    "rowsDifferingBetweenTwoFeatureRuns": 7,
+    "hcuIdenticalInEveryRow": true,
+    "table": [
+      {
+        "flow": "factory.createAccount (clone + initialize + E_addr EIP-712 consent)",
+        "main": 295465,
+        "feature1": 295465,
+        "feature2": 295465,
+        "hcuMain": 0,
+        "hcuFeature": 0
+      },
+      {
+        "flow": "setupPin (fingerprint + duress slot select/rand)",
+        "main": 813692,
+        "feature1": 813704,
+        "feature2": 813716,
+        "hcuMain": 79000,
+        "hcuFeature": 79000
+      },
+      {
+        "flow": "setupAsset (L_min, L, L_big + τ draw)",
+        "main": 1477563,
+        "feature1": 1477563,
+        "feature2": 1477563,
+        "hcuMain": 1345064,
+        "hcuFeature": 1345064
+      },
+      {
+        "flow": "setupKnown (12 eaddress / proof)",
+        "main": 2062936,
+        "feature1": 2062936,
+        "feature2": 2062900,
+        "hcuMain": 0,
+        "hcuFeature": 0
+      },
+      {
+        "flow": "setupOwnerBond (F0.16, optional; packed into an existing slot)",
+        "main": 56003,
+        "feature1": 56003,
+        "feature2": 56003,
+        "hcuMain": 0,
+        "hcuFeature": 0
+      },
+      {
+        "flow": "arm",
+        "main": 65715,
+        "feature1": 65715,
+        "feature2": 65715,
+        "hcuMain": 0,
+        "hcuFeature": 0
+      },
+      {
+        "flow": "requestTransfer K-only (isIn N=30 + threshold + sticky tripwire)",
+        "main": 1194866,
+        "feature1": 1194866,
+        "feature2": 1194866,
+        "hcuMain": 774036,
+        "hcuFeature": 774036
+      },
+      {
+        "flow": "finalizeEvaluation (KMS proof + transfer)",
+        "main": 307417,
+        "feature1": 307441,
+        "feature2": 307429,
+        "hcuMain": 0,
+        "hcuFeature": 0
+      },
+      {
+        "flow": "requestTransfer PIN path (opens op)",
+        "main": 127401,
+        "feature1": 127401,
+        "feature2": 127401,
+        "hcuMain": 0,
+        "hcuFeature": 0
+      },
+      {
+        "flow": "submitGuess (transfer; okAny + isDuress + big)",
+        "main": 1191237,
+        "feature1": 1191237,
+        "feature2": 1191237,
+        "hcuMain": 698002,
+        "hcuFeature": 698002
+      },
+      {
+        "flow": "finalizeGuess (2-handle KMS proof)",
+        "main": 306795,
+        "feature1": 306771,
+        "feature2": 306759,
+        "hcuMain": 0,
+        "hcuFeature": 0
+      },
+      {
+        "flow": "executeOp transfer (+ auto-add to known list: isIn + select)",
+        "main": 752801,
+        "feature1": 752801,
+        "feature2": 752801,
+        "hcuMain": 667032,
+        "hcuFeature": 667032
+      },
+      {
+        "flow": "submitGuess (admin; okAny + isDuress)",
+        "main": 948387,
+        "feature1": 948387,
+        "feature2": 948363,
+        "hcuMain": 555002,
+        "hcuFeature": 555002
+      },
+      {
+        "flow": "finalizeGuess + resetTrip (τ redrawn)",
+        "main": 963479,
+        "feature1": 963503,
+        "feature2": 963479,
+        "hcuMain": 1127064,
+        "hcuFeature": 1127064
+      },
+      {
+        "flow": "tightenLimits (K-only; 4× min)",
+        "main": 907407,
+        "feature1": 907395,
+        "feature2": 907418,
+        "hcuMain": 876000,
+        "hcuFeature": 876000
+      },
+      {
+        "flow": "removeKnown (K-only; select)",
+        "main": 510127,
+        "feature1": 510127,
+        "feature2": 510127,
+        "hcuMain": 83032,
+        "hcuFeature": 83032
+      },
+      {
+        "flow": "startEscape (no FHE)",
+        "main": 42940,
+        "feature1": 42940,
+        "feature2": 42940,
+        "hcuMain": 0,
+        "hcuFeature": 0
+      },
+      {
+        "flow": "executeEscape (no FHE; ETH + 1 token)",
+        "main": 50246,
+        "feature1": 50246,
+        "feature2": 50246,
+        "hcuMain": 0,
+        "hcuFeature": 0
+      },
+      {
+        "flow": "isIn N=8",
+        "main": 320025,
+        "feature1": 320025,
+        "feature2": 320025,
+        "hcuMain": 286032,
+        "hcuFeature": 286032
+      },
+      {
+        "flow": "eq+or linear N=8",
+        "main": 945492,
+        "feature1": 945492,
+        "feature2": 945492,
+        "hcuMain": 1264032,
+        "hcuFeature": 1264032
+      },
+      {
+        "flow": "eq+or tree N=8",
+        "main": 949812,
+        "feature1": 949812,
+        "feature2": 949812,
+        "hcuMain": 1264032,
+        "hcuFeature": 1264032
+      },
+      {
+        "flow": "isIn N=10",
+        "main": 325858,
+        "feature1": 325858,
+        "feature2": 325858,
+        "hcuMain": 286032,
+        "hcuFeature": 286032
+      },
+      {
+        "flow": "eq+or linear N=10",
+        "main": 1152280,
+        "feature1": 1152280,
+        "feature2": 1152280,
+        "hcuMain": 1586032,
+        "hcuFeature": 1586032
+      },
+      {
+        "flow": "eq+or tree N=10",
+        "main": 1158175,
+        "feature1": 1158175,
+        "feature2": 1158175,
+        "hcuMain": 1586032,
+        "hcuFeature": 1586032
+      },
+      {
+        "flow": "isIn N=16",
+        "main": 394684,
+        "feature1": 394684,
+        "feature2": 394684,
+        "hcuMain": 584032,
+        "hcuFeature": 584032
+      },
+      {
+        "flow": "eq+or linear N=16",
+        "main": 1772645,
+        "feature1": 1772645,
+        "feature2": 1772645,
+        "hcuMain": 2552032,
+        "hcuFeature": 2552032
+      },
+      {
+        "flow": "eq+or tree N=16",
+        "main": 1780891,
+        "feature1": 1780891,
+        "feature2": 1780891,
+        "hcuMain": 2552032,
+        "hcuFeature": 2552032
+      },
+      {
+        "flow": "isIn N=30",
+        "main": 555239,
+        "feature1": 555239,
+        "feature2": 555239,
+        "hcuMain": 584032,
+        "hcuFeature": 584032
+      },
+      {
+        "flow": "eq+or linear N=30",
+        "main": 3220167,
+        "feature1": 3220167,
+        "feature2": 3220167,
+        "hcuMain": 4806032,
+        "hcuFeature": 4806032
+      },
+      {
+        "flow": "eq+or tree N=30",
+        "main": 3235425,
+        "feature1": 3235425,
+        "feature2": 3235425,
+        "hcuMain": 4806032,
+        "hcuFeature": 4806032
+      },
+      {
+        "flow": "isIn N=32",
+        "main": 578176,
+        "feature1": 578176,
+        "feature2": 578176,
+        "hcuMain": 885032,
+        "hcuFeature": 885032
+      },
+      {
+        "flow": "eq+or linear N=32",
+        "main": 3426956,
+        "feature1": 3426956,
+        "feature2": 3426956,
+        "hcuMain": 5128032,
+        "hcuFeature": 5128032
+      },
+      {
+        "flow": "eq+or tree N=32",
+        "main": 3442917,
+        "feature1": 3442917,
+        "feature2": 3442917,
+        "hcuMain": 5128032,
+        "hcuFeature": 5128032
+      },
+      {
+        "flow": "isIn N=60",
+        "main": 899365,
+        "feature1": 899365,
+        "feature2": 899365,
+        "hcuMain": 885032,
+        "hcuFeature": 885032
+      },
+      {
+        "flow": "τ draw ×16 (one tx)",
+        "main": 5878501,
+        "feature1": 5878501,
+        "feature2": 5878501,
+        "hcuMain": 15632512,
+        "hcuFeature": 15632512
+      }
+    ]
+  }
+}

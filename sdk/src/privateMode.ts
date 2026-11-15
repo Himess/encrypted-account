@@ -15,16 +15,21 @@
  *     everything off-chain (exchange leaks, social media, the victim's lifestyle): a guide, not a guarantee.
  */
 
+/** `reason` is a short sentence for the owner, without the path itself (the app names the path). */
 export type PrivateRoute = { path: "k-only" | "pin"; reason: string };
 
-/** Which path a private send takes. `lmin` and `sentToday` are null when this device has no record of them. */
-export function routePrivateSend(p: { amount: bigint; recipientKnown: boolean; lmin: bigint | null; sentToday: bigint | null }): PrivateRoute {
-  if (p.amount <= 0n) return { path: "pin", reason: "nothing to send" };
-  if (!p.recipientKnown) return { path: "pin", reason: "new recipient: the PIN path (a K-only send would move zero)" };
-  if (p.lmin === null || p.sentToday === null) return { path: "pin", reason: "this device has no record of today's sends: the PIN path" };
+/**
+ * Which path a private send takes. `lmin` and `sentToday` are null when this device has no record of them; `restricted`:
+ * the account is restricted (a watchtower after a tripwire, for example), so the key alone cannot send at all.
+ */
+export function routePrivateSend(p: { amount: bigint; recipientKnown: boolean; lmin: bigint | null; sentToday: bigint | null; restricted?: boolean }): PrivateRoute {
+  if (p.amount <= 0n) return { path: "pin", reason: "Nothing to send" };
+  if (p.restricted) return { path: "pin", reason: "The account is restricted, so the key alone cannot send" };
+  if (!p.recipientKnown) return { path: "pin", reason: "A new recipient: a key-only send would move zero" };
+  if (p.lmin === null || p.sentToday === null) return { path: "pin", reason: "This device has no record of today's key-only sends" };
   const room = p.lmin > p.sentToday ? p.lmin - p.sentToday : 0n;
-  if (p.amount > room) return { path: "pin", reason: "above what is sure to pass today without the PIN: the PIN path" };
-  return { path: "k-only", reason: "known recipient, within today's safe amount: one transaction with the key" };
+  if (p.amount > room) return { path: "pin", reason: "Above what is sure to pass today with the key alone" };
+  return { path: "k-only", reason: "A known recipient, within today's safe amount" };
 }
 
 /** A local record of this device's K-only private sends: { day: UTC day index, amount } entries. */

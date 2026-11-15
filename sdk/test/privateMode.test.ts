@@ -18,6 +18,10 @@ describe("private mode — client rules", () => {
       expect(routePrivateSend({ amount: 1n, recipientKnown: true, lmin: null, sentToday: 0n }).path).to.eq("pin");
       expect(routePrivateSend({ amount: 1n, recipientKnown: true, lmin, sentToday: null }).path).to.eq("pin");
     });
+    it("a restricted account (after a tripwire, say) → the PIN path, whatever the amount", () => {
+      expect(routePrivateSend({ amount: 1n, recipientKnown: true, lmin, sentToday: 0n, restricted: true }).path).to.eq("pin");
+      expect(routePrivateSend({ amount: 1n, recipientKnown: true, lmin, sentToday: 0n, restricted: false }).path).to.eq("k-only");
+    });
     it("today's sends count per UTC day, like the contract's counter", () => {
       const now = Date.UTC(2026, 10, 16, 10, 0, 0);
       const recs = [

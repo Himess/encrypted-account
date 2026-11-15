@@ -330,6 +330,29 @@ describe("Private mode (optional): EncryptedAccountP + PrivateModule", function 
       OUT.escape = { executeEscapeTouchesFhe: false, confidentialMoved: FUND };
     });
 
+    it("an escape cancels a scheduled PIN private transfer (K54); without a second device the escape cannot be cancelled at all", async () => {
+      const acct = await createAccountP(s, owner, escape.address, guardian.address, { known: [] });
+      const addr = await acct.getAddress();
+      await (await s.token.mint(addr, FUND)).wait();
+      const o0 = await balanceOf(s, other.address);
+      // a thief with K and the PIN schedules a private transfer to himself: it must wait ≥ 72 h
+      const enc = await encAmount(acct, owner, tc(5000));
+      const { id } = await pinOp(acct, () => acct.openPrivateTransfer(token, other.address, enc.handles[0], enc.inputProof), PIN);
+      expect((await acct.getOp(id)).status).to.eq(BigInt(Status.Delayed));
+      // the owner starts the escape with K alone: the scheduled transfer dies
+      await (await acct.startEscape()).wait();
+      expect((await acct.getOp(id)).status).to.eq(BigInt(Status.Cancelled));
+      expect(await rejects(acct.openAdmin.staticCall(19, "0x"))).to.eq(true); // A_CANCEL_ESCAPE needs the lane (I22)
+      await time.increase(MIN_BIG_DELAY + 1);
+      expect(await rejects(acct.connect(stranger).executeOp(id))).to.eq(true);
+      await time.increase(30 * DAY);
+      const e0 = await balanceOf(s, escape.address);
+      await (await acct.connect(stranger).executeEscapeConfidential([token])).wait();
+      expect((await balanceOf(s, escape.address)) - e0).to.eq(FUND);
+      expect(await balanceOf(s, other.address)).to.eq(o0);
+      OUT.escapeCancelsScheduledPrivateTransfer = true;
+    });
+
     it("with the FHE executor down, the ETH / ERC-20 escape still runs; the confidential sweep does not", async () => {
       const acct = await createAccountP(s, owner, escape.address, guardian.address, { known: [R1.address] });
       const addr = await acct.getAddress();

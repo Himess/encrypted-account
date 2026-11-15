@@ -1,5 +1,8 @@
 # Spike: private mode as a module (ERC-7984)
 
+> The design that followed this spike is in [private-mode.md](private-mode.md) (branch `feature/private-mode`): private
+> mode is optional and chosen at account creation, and the default contracts stay byte-for-byte as on `main`.
+
 Branch `spike/private-mode`. Research code, not audited, Sepolia only. It answers the questions that had to be measured
 before a full design of the private mode ("deniable account") from design doc v0.4, Phase 2 (F2.1–F2.3).
 

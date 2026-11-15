@@ -194,7 +194,9 @@ No dates; the order may change.
   not move.
 - **Web app:** live at [encrypted-account.vercel.app](https://encrypted-account.vercel.app) (landing page and app, code
   in `web/`); next: key-only transfers to known addresses, the escape, and the phone flow.
-- **Private mode:** encrypted balances and amounts with ERC-7984 tokens, viewing with the PIN, a duress PIN.
+- **Private mode (optional):** encrypted balances and amounts with ERC-7984 tokens, viewing with the PIN, an optional
+  duress PIN; chosen at account creation, standard accounts unchanged. On the `feature/private-mode` branch, not merged:
+  [docs/private-mode.md](docs/private-mode.md).
 - **Hidden inheritance:** on Sepolia, with claim codes, payout rounds and escape withdrawal: see
   [Hidden inheritance](#hidden-inheritance). Next: ETH and ERC-20 through an ERC-7984 wrapper, and an optional relayer
   for claims.
