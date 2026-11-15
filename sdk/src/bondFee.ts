@@ -4,9 +4,9 @@
  *
  *  - Bond (PolicyMath.ownerBondFor): a K-track guess carries a bond, paid by K's EOA in a direct call (never by the
  *    account, never through the EntryPoint). A wrong guess leaves it in the account; a correct one credits it back to
- *    the payer (claimRefund). score == 0 → BASE_BOND; score ≥ 1 → max(BASE_BOND << min(score, 20),
- *    ownerBaseBond << min(score − 1, 20)). With the default ownerBaseBond (= BASE_BOND) this is the recovery track's
- *    doubling. The lane (TRACK_LANE) and the escape stay unbonded.
+ *    the owner key (claimRefund). bond = ownerBaseBond << min(score, 20): the first guess costs the base too. With
+ *    the default ownerBaseBond (= BASE_BOND) this is the recovery track's doubling. The lane (TRACK_LANE) and the
+ *    escape stay unbonded.
  *  - Fee (FeeConfig.quote): PIN-verified ETH / ERC-20 transfers pay clamp(amount · bps / 10 000, minFee, maxFee),
  *    never more than 1% of the amount, on top of the amount (the payee gets the exact amount). The fee is bound to the
  *    op when it opens (op.fee); read it from getOp(opId).fee rather than recomputing it.
@@ -24,12 +24,9 @@ export function recoveryBondFor(score: number): bigint {
   return BASE_BOND << shift(score);
 }
 
-/** The K-track bond at the score counted when the guess is submitted (PolicyMath.ownerBondFor). */
+/** The K-track bond at the score counted when the guess is submitted: base << min(score, 20) (PolicyMath.ownerBondFor). */
 export function ownerBondFor(score: number, base: bigint = BASE_BOND): bigint {
-  if (score <= 0) return BASE_BOND;
-  const a = BASE_BOND << shift(score);
-  const b = base << shift(score - 1);
-  return a > b ? a : b;
+  return base << shift(score);
 }
 
 /** Valid ownerBaseBond: BASE_BOND … MAX_OWNER_BOND, a multiple of BASE_BOND (PolicyMath.ownerBondUnits). */
@@ -77,10 +74,11 @@ export function randomPinSuccess(n: number, space: number): number {
 }
 
 /**
- * A suggested ownerBaseBond for an account value (wei). A thief pays the base from the second guess on and loses it on
- * a wrong guess. Human-chosen PIN: each of the first guesses succeeds with about 0.65% (6.5% in 10), so a base of about
- * 1% of the value makes every guess after the first a losing bet. Random PIN: about 1 in 10^6 per guess, so the
- * minimum already makes guessing a losing bet below about 1,000 ETH; the suggestion is value / 10^6 (≥ BASE_BOND).
+ * A suggested ownerBaseBond for an account value (wei). Every guess costs at least the base, and a wrong one loses it.
+ * Human-chosen PIN: each of the first guesses succeeds with about 0.65% (6.5% in 10), so a base of about 1% of the value
+ * makes every guess a losing bet. Random PIN: about 1 in 10^6 per guess, so the minimum already makes guessing a losing
+ * bet below about 1,000 ETH; the suggestion is value / 10^6 (≥ BASE_BOND). The owner's own PIN entries carry the base
+ * too and get it back when the PIN is right.
  * Rounded up to a multiple of BASE_BOND, capped at MAX_OWNER_BOND.
  */
 export function suggestOwnerBaseBond(valueWei: bigint, opts: { randomPin?: boolean } = {}): bigint {

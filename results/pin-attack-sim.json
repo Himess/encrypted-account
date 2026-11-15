@@ -1,6 +1,6 @@
 {
   "evidence": "[I] model (event-driven simulation; an exact model of the contract semantics: F0.10 derived back-off, and F0.15 stored back-off in the +SW variants); success curve interpolated from v0.3 §13.8",
-  "generatedAtUtc": "2026-11-15T12:21:09.746Z",
+  "generatedAtUtc": "2026-11-15T13:21:04.037Z",
   "tables": [
     {
       "name": "T0",
@@ -3597,77 +3597,77 @@
           7
         ],
         "bondsEth": [
-          0.001,
           0.01,
           0.02,
           0.04,
-          0.04,
+          0.08,
           0.08,
           0.16,
           0.32,
           0.64,
-          0.64,
-          0.64,
-          0.64
+          1.28,
+          1.28,
+          1.28,
+          1.28
         ],
-        "totalBondEth": 3.231,
-        "totalBondUsd": 9693,
+        "totalBondEth": 6.47,
+        "totalBondUsd": 19410,
         "pSuccess": 0.068983,
         "perValue": [
           {
             "valueEth": 1,
             "expectedGainEth": 0.068983,
-            "expectedBondLossEth": 3.034972,
-            "expectedProfitEth": -2.965989,
+            "expectedBondLossEth": 6.077892,
+            "expectedProfitEth": -6.008909,
             "expectedGainUsd": 207,
-            "expectedBondLossUsd": 9105,
+            "expectedBondLossUsd": 18234,
             "rationalThief": {
-              "guesses": 1,
-              "pSuccess": 0.0065,
-              "expectedProfitEth": 0.005507,
-              "expectedProfitUsd": 17
+              "guesses": 0,
+              "pSuccess": 0,
+              "expectedProfitEth": 0,
+              "expectedProfitUsd": 0
             }
           },
           {
             "valueEth": 10,
             "expectedGainEth": 0.689829,
-            "expectedBondLossEth": 3.034972,
-            "expectedProfitEth": -2.345142,
+            "expectedBondLossEth": 6.077892,
+            "expectedProfitEth": -5.388062,
             "expectedGainUsd": 2069,
-            "expectedBondLossUsd": 9105,
+            "expectedBondLossUsd": 18234,
             "rationalThief": {
-              "guesses": 5,
-              "pSuccess": 0.0325,
-              "expectedProfitEth": 0.216867,
-              "expectedProfitUsd": 651
+              "guesses": 3,
+              "pSuccess": 0.0195,
+              "expectedProfitEth": 0.126105,
+              "expectedProfitUsd": 378
             }
           },
           {
             "valueEth": 100,
             "expectedGainEth": 6.898295,
-            "expectedBondLossEth": 3.034972,
-            "expectedProfitEth": 3.863323,
+            "expectedBondLossEth": 6.077892,
+            "expectedProfitEth": 0.820403,
             "expectedGainUsd": 20695,
-            "expectedBondLossUsd": 9105,
+            "expectedBondLossUsd": 18234,
             "rationalThief": {
-              "guesses": 10,
-              "pSuccess": 0.065,
-              "expectedProfitEth": 4.657947,
-              "expectedProfitUsd": 13974
+              "guesses": 8,
+              "pSuccess": 0.052,
+              "expectedProfitEth": 3.909865,
+              "expectedProfitUsd": 11730
             }
           },
           {
             "valueEth": 1000,
             "expectedGainEth": 68.98295,
-            "expectedBondLossEth": 3.034972,
-            "expectedProfitEth": 65.947978,
+            "expectedBondLossEth": 6.077892,
+            "expectedProfitEth": 62.905058,
             "expectedGainUsd": 206949,
-            "expectedBondLossUsd": 9105,
+            "expectedBondLossUsd": 18234,
             "rationalThief": {
               "guesses": 12,
               "pSuccess": 0.068983,
-              "expectedProfitEth": 65.947978,
-              "expectedProfitUsd": 197844
+              "expectedProfitEth": 62.905058,
+              "expectedProfitUsd": 188715
             }
           }
         ]
@@ -3692,30 +3692,30 @@
           7
         ],
         "bondsEth": [
-          0.001,
           0.01,
           0.02,
           0.04,
-          0.04,
+          0.08,
           0.08,
           0.16,
           0.32,
           0.64,
-          0.64,
-          0.64,
-          0.64
+          1.28,
+          1.28,
+          1.28,
+          1.28
         ],
-        "totalBondEth": 3.231,
-        "totalBondUsd": 9693,
+        "totalBondEth": 6.47,
+        "totalBondUsd": 19410,
         "pSuccess": 0.000015,
         "perValue": [
           {
             "valueEth": 1,
             "expectedGainEth": 0.000015,
-            "expectedBondLossEth": 3.23096,
-            "expectedProfitEth": -3.230944,
+            "expectedBondLossEth": 6.469919,
+            "expectedProfitEth": -6.469904,
             "expectedGainUsd": 0,
-            "expectedBondLossUsd": 9693,
+            "expectedBondLossUsd": 19410,
             "rationalThief": {
               "guesses": 0,
               "pSuccess": 0,
@@ -3726,10 +3726,10 @@
           {
             "valueEth": 10,
             "expectedGainEth": 0.000154,
-            "expectedBondLossEth": 3.23096,
-            "expectedProfitEth": -3.230806,
+            "expectedBondLossEth": 6.469919,
+            "expectedProfitEth": -6.469765,
             "expectedGainUsd": 0,
-            "expectedBondLossUsd": 9693,
+            "expectedBondLossUsd": 19410,
             "rationalThief": {
               "guesses": 0,
               "pSuccess": 0,
@@ -3740,10 +3740,10 @@
           {
             "valueEth": 100,
             "expectedGainEth": 0.00154,
-            "expectedBondLossEth": 3.23096,
-            "expectedProfitEth": -3.22942,
+            "expectedBondLossEth": 6.469919,
+            "expectedProfitEth": -6.46838,
             "expectedGainUsd": 5,
-            "expectedBondLossUsd": 9693,
+            "expectedBondLossUsd": 19410,
             "rationalThief": {
               "guesses": 0,
               "pSuccess": 0,
@@ -3754,15 +3754,15 @@
           {
             "valueEth": 1000,
             "expectedGainEth": 0.015396,
-            "expectedBondLossEth": 3.23096,
-            "expectedProfitEth": -3.215563,
+            "expectedBondLossEth": 6.469919,
+            "expectedProfitEth": -6.454523,
             "expectedGainUsd": 46,
-            "expectedBondLossUsd": 9693,
+            "expectedBondLossUsd": 19410,
             "rationalThief": {
-              "guesses": 1,
-              "pSuccess": 0.000001,
-              "expectedProfitEth": 0.000283,
-              "expectedProfitUsd": 1
+              "guesses": 0,
+              "pSuccess": 0,
+              "expectedProfitEth": 0,
+              "expectedProfitUsd": 0
             }
           }
         ]
@@ -3787,77 +3787,77 @@
           7
         ],
         "bondsEth": [
-          0.001,
           0.1,
           0.2,
           0.4,
-          0.4,
+          0.8,
           0.8,
           1.6,
           3.2,
           6.4,
-          6.4,
-          6.4,
-          6.4
+          12.8,
+          12.8,
+          12.8,
+          12.8
         ],
-        "totalBondEth": 32.301,
-        "totalBondUsd": 96903,
+        "totalBondEth": 64.7,
+        "totalBondUsd": 194100,
         "pSuccess": 0.068983,
         "perValue": [
           {
             "valueEth": 1,
             "expectedGainEth": 0.068983,
-            "expectedBondLossEth": 30.340777,
-            "expectedProfitEth": -30.271794,
+            "expectedBondLossEth": 60.778917,
+            "expectedProfitEth": -60.709934,
             "expectedGainUsd": 207,
-            "expectedBondLossUsd": 91022,
+            "expectedBondLossUsd": 182337,
             "rationalThief": {
-              "guesses": 1,
-              "pSuccess": 0.0065,
-              "expectedProfitEth": 0.005507,
-              "expectedProfitUsd": 17
+              "guesses": 0,
+              "pSuccess": 0,
+              "expectedProfitEth": 0,
+              "expectedProfitUsd": 0
             }
           },
           {
             "valueEth": 10,
             "expectedGainEth": 0.689829,
-            "expectedBondLossEth": 30.340777,
-            "expectedProfitEth": -29.650948,
+            "expectedBondLossEth": 60.778917,
+            "expectedProfitEth": -60.089088,
             "expectedGainUsd": 2069,
-            "expectedBondLossUsd": 91022,
+            "expectedBondLossUsd": 182337,
             "rationalThief": {
-              "guesses": 1,
-              "pSuccess": 0.0065,
-              "expectedProfitEth": 0.064007,
-              "expectedProfitUsd": 192
+              "guesses": 0,
+              "pSuccess": 0,
+              "expectedProfitEth": 0,
+              "expectedProfitUsd": 0
             }
           },
           {
             "valueEth": 100,
             "expectedGainEth": 6.898295,
-            "expectedBondLossEth": 30.340777,
-            "expectedProfitEth": -23.442482,
+            "expectedBondLossEth": 60.778917,
+            "expectedProfitEth": -53.880622,
             "expectedGainUsd": 20695,
-            "expectedBondLossUsd": 91022,
+            "expectedBondLossUsd": 182337,
             "rationalThief": {
-              "guesses": 5,
-              "pSuccess": 0.0325,
-              "expectedProfitEth": 2.177607,
-              "expectedProfitUsd": 6533
+              "guesses": 3,
+              "pSuccess": 0.0195,
+              "expectedProfitEth": 1.26105,
+              "expectedProfitUsd": 3783
             }
           },
           {
             "valueEth": 1000,
             "expectedGainEth": 68.98295,
-            "expectedBondLossEth": 30.340777,
-            "expectedProfitEth": 38.642173,
+            "expectedBondLossEth": 60.778917,
+            "expectedProfitEth": 8.204032,
             "expectedGainUsd": 206949,
-            "expectedBondLossUsd": 91022,
+            "expectedBondLossUsd": 182337,
             "rationalThief": {
-              "guesses": 10,
-              "pSuccess": 0.065,
-              "expectedProfitEth": 46.588407,
-              "expectedProfitUsd": 139765
+              "guesses": 8,
+              "pSuccess": 0.052,
+              "expectedProfitEth": 39.09865,
+              "expectedProfitUsd": 117296
             }
           }
         ]
@@ -3882,30 +3882,30 @@
           7
         ],
         "bondsEth": [
-          0.001,
           0.1,
           0.2,
           0.4,
-          0.4,
+          0.8,
           0.8,
           1.6,
           3.2,
           6.4,
-          6.4,
-          6.4,
-          6.4
+          12.8,
+          12.8,
+          12.8,
+          12.8
         ],
-        "totalBondEth": 32.301,
-        "totalBondUsd": 96903,
+        "totalBondEth": 64.7,
+        "totalBondUsd": 194100,
         "pSuccess": 0.000015,
         "perValue": [
           {
             "valueEth": 1,
             "expectedGainEth": 0.000015,
-            "expectedBondLossEth": 32.300596,
-            "expectedProfitEth": -32.300581,
+            "expectedBondLossEth": 64.699192,
+            "expectedProfitEth": -64.699177,
             "expectedGainUsd": 0,
-            "expectedBondLossUsd": 96902,
+            "expectedBondLossUsd": 194098,
             "rationalThief": {
               "guesses": 0,
               "pSuccess": 0,
@@ -3916,10 +3916,10 @@
           {
             "valueEth": 10,
             "expectedGainEth": 0.000154,
-            "expectedBondLossEth": 32.300596,
-            "expectedProfitEth": -32.300442,
+            "expectedBondLossEth": 64.699192,
+            "expectedProfitEth": -64.699038,
             "expectedGainUsd": 0,
-            "expectedBondLossUsd": 96902,
+            "expectedBondLossUsd": 194098,
             "rationalThief": {
               "guesses": 0,
               "pSuccess": 0,
@@ -3930,10 +3930,10 @@
           {
             "valueEth": 100,
             "expectedGainEth": 0.00154,
-            "expectedBondLossEth": 32.300596,
-            "expectedProfitEth": -32.299056,
+            "expectedBondLossEth": 64.699192,
+            "expectedProfitEth": -64.697652,
             "expectedGainUsd": 5,
-            "expectedBondLossUsd": 96902,
+            "expectedBondLossUsd": 194098,
             "rationalThief": {
               "guesses": 0,
               "pSuccess": 0,
@@ -3944,15 +3944,15 @@
           {
             "valueEth": 1000,
             "expectedGainEth": 0.015396,
-            "expectedBondLossEth": 32.300596,
-            "expectedProfitEth": -32.2852,
+            "expectedBondLossEth": 64.699192,
+            "expectedProfitEth": -64.683796,
             "expectedGainUsd": 46,
-            "expectedBondLossUsd": 96902,
+            "expectedBondLossUsd": 194098,
             "rationalThief": {
-              "guesses": 1,
-              "pSuccess": 0.000001,
-              "expectedProfitEth": 0.000283,
-              "expectedProfitUsd": 1
+              "guesses": 0,
+              "pSuccess": 0,
+              "expectedProfitEth": 0,
+              "expectedProfitUsd": 0
             }
           }
         ]
@@ -3977,77 +3977,77 @@
           7
         ],
         "bondsEth": [
-          0.001,
           1,
           2,
           4,
-          4,
+          8,
           8,
           16,
           32,
           64,
-          64,
-          64,
-          64
+          128,
+          128,
+          128,
+          128
         ],
-        "totalBondEth": 323.001,
-        "totalBondUsd": 969003,
+        "totalBondEth": 647,
+        "totalBondUsd": 1941000,
         "pSuccess": 0.068983,
         "perValue": [
           {
             "valueEth": 1,
             "expectedGainEth": 0.068983,
-            "expectedBondLossEth": 303.398829,
-            "expectedProfitEth": -303.329846,
+            "expectedBondLossEth": 607.789171,
+            "expectedProfitEth": -607.720188,
             "expectedGainUsd": 207,
-            "expectedBondLossUsd": 910196,
+            "expectedBondLossUsd": 1823368,
             "rationalThief": {
-              "guesses": 1,
-              "pSuccess": 0.0065,
-              "expectedProfitEth": 0.005507,
-              "expectedProfitUsd": 17
+              "guesses": 0,
+              "pSuccess": 0,
+              "expectedProfitEth": 0,
+              "expectedProfitUsd": 0
             }
           },
           {
             "valueEth": 10,
             "expectedGainEth": 0.689829,
-            "expectedBondLossEth": 303.398829,
-            "expectedProfitEth": -302.708999,
+            "expectedBondLossEth": 607.789171,
+            "expectedProfitEth": -607.099341,
             "expectedGainUsd": 2069,
-            "expectedBondLossUsd": 910196,
+            "expectedBondLossUsd": 1823368,
             "rationalThief": {
-              "guesses": 1,
-              "pSuccess": 0.0065,
-              "expectedProfitEth": 0.064007,
-              "expectedProfitUsd": 192
+              "guesses": 0,
+              "pSuccess": 0,
+              "expectedProfitEth": 0,
+              "expectedProfitUsd": 0
             }
           },
           {
             "valueEth": 100,
             "expectedGainEth": 6.898295,
-            "expectedBondLossEth": 303.398829,
-            "expectedProfitEth": -296.500534,
+            "expectedBondLossEth": 607.789171,
+            "expectedProfitEth": -600.890876,
             "expectedGainUsd": 20695,
-            "expectedBondLossUsd": 910196,
+            "expectedBondLossUsd": 1823368,
             "rationalThief": {
-              "guesses": 1,
-              "pSuccess": 0.0065,
-              "expectedProfitEth": 0.649007,
-              "expectedProfitUsd": 1947
+              "guesses": 0,
+              "pSuccess": 0,
+              "expectedProfitEth": 0,
+              "expectedProfitUsd": 0
             }
           },
           {
             "valueEth": 1000,
             "expectedGainEth": 68.98295,
-            "expectedBondLossEth": 303.398829,
-            "expectedProfitEth": -234.415879,
+            "expectedBondLossEth": 607.789171,
+            "expectedProfitEth": -538.806221,
             "expectedGainUsd": 206949,
-            "expectedBondLossUsd": 910196,
+            "expectedBondLossUsd": 1823368,
             "rationalThief": {
-              "guesses": 5,
-              "pSuccess": 0.0325,
-              "expectedProfitEth": 21.785007,
-              "expectedProfitUsd": 65355
+              "guesses": 3,
+              "pSuccess": 0.0195,
+              "expectedProfitEth": 12.6105,
+              "expectedProfitUsd": 37832
             }
           }
         ]
@@ -4072,30 +4072,30 @@
           7
         ],
         "bondsEth": [
-          0.001,
           1,
           2,
           4,
-          4,
+          8,
           8,
           16,
           32,
           64,
-          64,
-          64,
-          64
+          128,
+          128,
+          128,
+          128
         ],
-        "totalBondEth": 323.001,
-        "totalBondUsd": 969003,
+        "totalBondEth": 647,
+        "totalBondUsd": 1941000,
         "pSuccess": 0.000015,
         "perValue": [
           {
             "valueEth": 1,
             "expectedGainEth": 0.000015,
-            "expectedBondLossEth": 322.996961,
-            "expectedProfitEth": -322.996946,
+            "expectedBondLossEth": 646.991921,
+            "expectedProfitEth": -646.991905,
             "expectedGainUsd": 0,
-            "expectedBondLossUsd": 968991,
+            "expectedBondLossUsd": 1940976,
             "rationalThief": {
               "guesses": 0,
               "pSuccess": 0,
@@ -4106,10 +4106,10 @@
           {
             "valueEth": 10,
             "expectedGainEth": 0.000154,
-            "expectedBondLossEth": 322.996961,
-            "expectedProfitEth": -322.996807,
+            "expectedBondLossEth": 646.991921,
+            "expectedProfitEth": -646.991767,
             "expectedGainUsd": 0,
-            "expectedBondLossUsd": 968991,
+            "expectedBondLossUsd": 1940976,
             "rationalThief": {
               "guesses": 0,
               "pSuccess": 0,
@@ -4120,10 +4120,10 @@
           {
             "valueEth": 100,
             "expectedGainEth": 0.00154,
-            "expectedBondLossEth": 322.996961,
-            "expectedProfitEth": -322.995421,
+            "expectedBondLossEth": 646.991921,
+            "expectedProfitEth": -646.990381,
             "expectedGainUsd": 5,
-            "expectedBondLossUsd": 968991,
+            "expectedBondLossUsd": 1940976,
             "rationalThief": {
               "guesses": 0,
               "pSuccess": 0,
@@ -4134,15 +4134,15 @@
           {
             "valueEth": 1000,
             "expectedGainEth": 0.015396,
-            "expectedBondLossEth": 322.996961,
-            "expectedProfitEth": -322.981565,
+            "expectedBondLossEth": 646.991921,
+            "expectedProfitEth": -646.976524,
             "expectedGainUsd": 46,
-            "expectedBondLossUsd": 968991,
+            "expectedBondLossUsd": 1940976,
             "rationalThief": {
-              "guesses": 1,
-              "pSuccess": 0.000001,
-              "expectedProfitEth": 0.000283,
-              "expectedProfitUsd": 1
+              "guesses": 0,
+              "pSuccess": 0,
+              "expectedProfitEth": 0,
+              "expectedProfitUsd": 0
             }
           }
         ]
@@ -4317,69 +4317,69 @@
           3
         ],
         "bondsEth": [
-          0.001,
           0.01,
           0.02,
-          0.04
+          0.04,
+          0.08
         ],
-        "totalBondEth": 0.071,
-        "totalBondUsd": 213,
+        "totalBondEth": 0.15,
+        "totalBondUsd": 450,
         "pSuccess": 0.026,
         "perValue": [
           {
             "valueEth": 1,
             "expectedGainEth": 0.026,
-            "expectedBondLossEth": 0.069434,
-            "expectedProfitEth": -0.043434,
+            "expectedBondLossEth": 0.146815,
+            "expectedProfitEth": -0.120815,
             "expectedGainUsd": 78,
-            "expectedBondLossUsd": 208,
+            "expectedBondLossUsd": 440,
             "rationalThief": {
-              "guesses": 1,
-              "pSuccess": 0.0065,
-              "expectedProfitEth": 0.005507,
-              "expectedProfitUsd": 17
+              "guesses": 0,
+              "pSuccess": 0,
+              "expectedProfitEth": 0,
+              "expectedProfitUsd": 0
             }
           },
           {
             "valueEth": 10,
             "expectedGainEth": 0.26,
-            "expectedBondLossEth": 0.069434,
-            "expectedProfitEth": 0.190567,
+            "expectedBondLossEth": 0.146815,
+            "expectedProfitEth": 0.113185,
             "expectedGainUsd": 780,
-            "expectedBondLossUsd": 208,
+            "expectedBondLossUsd": 440,
             "rationalThief": {
-              "guesses": 4,
-              "pSuccess": 0.026,
-              "expectedProfitEth": 0.190567,
-              "expectedProfitUsd": 572
+              "guesses": 3,
+              "pSuccess": 0.0195,
+              "expectedProfitEth": 0.126105,
+              "expectedProfitUsd": 378
             }
           },
           {
             "valueEth": 100,
             "expectedGainEth": 2.6,
-            "expectedBondLossEth": 0.069434,
-            "expectedProfitEth": 2.530567,
+            "expectedBondLossEth": 0.146815,
+            "expectedProfitEth": 2.453185,
             "expectedGainUsd": 7800,
-            "expectedBondLossUsd": 208,
+            "expectedBondLossUsd": 440,
             "rationalThief": {
               "guesses": 4,
               "pSuccess": 0.026,
-              "expectedProfitEth": 2.530567,
-              "expectedProfitUsd": 7592
+              "expectedProfitEth": 2.453185,
+              "expectedProfitUsd": 7360
             }
           },
           {
             "valueEth": 1000,
             "expectedGainEth": 26,
-            "expectedBondLossEth": 0.069434,
-            "expectedProfitEth": 25.930567,
+            "expectedBondLossEth": 0.146815,
+            "expectedProfitEth": 25.853185,
             "expectedGainUsd": 78000,
-            "expectedBondLossUsd": 208,
+            "expectedBondLossUsd": 440,
             "rationalThief": {
               "guesses": 4,
               "pSuccess": 0.026,
-              "expectedProfitEth": 25.930567,
-              "expectedProfitUsd": 77792
+              "expectedProfitEth": 25.853185,
+              "expectedProfitUsd": 77560
             }
           }
         ]
@@ -4396,22 +4396,22 @@
           3
         ],
         "bondsEth": [
-          0.001,
           0.01,
           0.02,
-          0.04
+          0.04,
+          0.08
         ],
-        "totalBondEth": 0.071,
-        "totalBondUsd": 213,
+        "totalBondEth": 0.15,
+        "totalBondUsd": 450,
         "pSuccess": 0.000005,
         "perValue": [
           {
             "valueEth": 1,
             "expectedGainEth": 0.000005,
-            "expectedBondLossEth": 0.071,
-            "expectedProfitEth": -0.070995,
+            "expectedBondLossEth": 0.149999,
+            "expectedProfitEth": -0.149994,
             "expectedGainUsd": 0,
-            "expectedBondLossUsd": 213,
+            "expectedBondLossUsd": 450,
             "rationalThief": {
               "guesses": 0,
               "pSuccess": 0,
@@ -4422,10 +4422,10 @@
           {
             "valueEth": 10,
             "expectedGainEth": 0.000051,
-            "expectedBondLossEth": 0.071,
-            "expectedProfitEth": -0.070948,
+            "expectedBondLossEth": 0.149999,
+            "expectedProfitEth": -0.149948,
             "expectedGainUsd": 0,
-            "expectedBondLossUsd": 213,
+            "expectedBondLossUsd": 450,
             "rationalThief": {
               "guesses": 0,
               "pSuccess": 0,
@@ -4436,10 +4436,10 @@
           {
             "valueEth": 100,
             "expectedGainEth": 0.000513,
-            "expectedBondLossEth": 0.071,
-            "expectedProfitEth": -0.070486,
+            "expectedBondLossEth": 0.149999,
+            "expectedProfitEth": -0.149486,
             "expectedGainUsd": 2,
-            "expectedBondLossUsd": 213,
+            "expectedBondLossUsd": 450,
             "rationalThief": {
               "guesses": 0,
               "pSuccess": 0,
@@ -4450,15 +4450,15 @@
           {
             "valueEth": 1000,
             "expectedGainEth": 0.005132,
-            "expectedBondLossEth": 0.071,
-            "expectedProfitEth": -0.065868,
+            "expectedBondLossEth": 0.149999,
+            "expectedProfitEth": -0.144867,
             "expectedGainUsd": 15,
-            "expectedBondLossUsd": 213,
+            "expectedBondLossUsd": 450,
             "rationalThief": {
-              "guesses": 1,
-              "pSuccess": 0.000001,
-              "expectedProfitEth": 0.000283,
-              "expectedProfitUsd": 1
+              "guesses": 0,
+              "pSuccess": 0,
+              "expectedProfitEth": 0,
+              "expectedProfitUsd": 0
             }
           }
         ]
@@ -4475,69 +4475,69 @@
           3
         ],
         "bondsEth": [
-          0.001,
           0.1,
           0.2,
-          0.4
+          0.4,
+          0.8
         ],
-        "totalBondEth": 0.701,
-        "totalBondUsd": 2103,
+        "totalBondEth": 1.5,
+        "totalBondUsd": 4500,
         "pSuccess": 0.026,
         "perValue": [
           {
             "valueEth": 1,
             "expectedGainEth": 0.026,
-            "expectedBondLossEth": 0.685394,
-            "expectedProfitEth": -0.659393,
+            "expectedBondLossEth": 1.46815,
+            "expectedProfitEth": -1.44215,
             "expectedGainUsd": 78,
-            "expectedBondLossUsd": 2056,
+            "expectedBondLossUsd": 4404,
             "rationalThief": {
-              "guesses": 1,
-              "pSuccess": 0.0065,
-              "expectedProfitEth": 0.005507,
-              "expectedProfitUsd": 17
+              "guesses": 0,
+              "pSuccess": 0,
+              "expectedProfitEth": 0,
+              "expectedProfitUsd": 0
             }
           },
           {
             "valueEth": 10,
             "expectedGainEth": 0.26,
-            "expectedBondLossEth": 0.685394,
-            "expectedProfitEth": -0.425393,
+            "expectedBondLossEth": 1.46815,
+            "expectedProfitEth": -1.20815,
             "expectedGainUsd": 780,
-            "expectedBondLossUsd": 2056,
+            "expectedBondLossUsd": 4404,
             "rationalThief": {
-              "guesses": 1,
-              "pSuccess": 0.0065,
-              "expectedProfitEth": 0.064007,
-              "expectedProfitUsd": 192
+              "guesses": 0,
+              "pSuccess": 0,
+              "expectedProfitEth": 0,
+              "expectedProfitUsd": 0
             }
           },
           {
             "valueEth": 100,
             "expectedGainEth": 2.6,
-            "expectedBondLossEth": 0.685394,
-            "expectedProfitEth": 1.914607,
+            "expectedBondLossEth": 1.46815,
+            "expectedProfitEth": 1.13185,
             "expectedGainUsd": 7800,
-            "expectedBondLossUsd": 2056,
+            "expectedBondLossUsd": 4404,
             "rationalThief": {
-              "guesses": 4,
-              "pSuccess": 0.026,
-              "expectedProfitEth": 1.914607,
-              "expectedProfitUsd": 5744
+              "guesses": 3,
+              "pSuccess": 0.0195,
+              "expectedProfitEth": 1.26105,
+              "expectedProfitUsd": 3783
             }
           },
           {
             "valueEth": 1000,
             "expectedGainEth": 26,
-            "expectedBondLossEth": 0.685394,
-            "expectedProfitEth": 25.314607,
+            "expectedBondLossEth": 1.46815,
+            "expectedProfitEth": 24.53185,
             "expectedGainUsd": 78000,
-            "expectedBondLossUsd": 2056,
+            "expectedBondLossUsd": 4404,
             "rationalThief": {
               "guesses": 4,
               "pSuccess": 0.026,
-              "expectedProfitEth": 25.314607,
-              "expectedProfitUsd": 75944
+              "expectedProfitEth": 24.53185,
+              "expectedProfitUsd": 73596
             }
           }
         ]
@@ -4554,22 +4554,22 @@
           3
         ],
         "bondsEth": [
-          0.001,
           0.1,
           0.2,
-          0.4
+          0.4,
+          0.8
         ],
-        "totalBondEth": 0.701,
-        "totalBondUsd": 2103,
+        "totalBondEth": 1.5,
+        "totalBondUsd": 4500,
         "pSuccess": 0.000005,
         "perValue": [
           {
             "valueEth": 1,
             "expectedGainEth": 0.000005,
-            "expectedBondLossEth": 0.700997,
-            "expectedProfitEth": -0.700992,
+            "expectedBondLossEth": 1.499994,
+            "expectedProfitEth": -1.499989,
             "expectedGainUsd": 0,
-            "expectedBondLossUsd": 2103,
+            "expectedBondLossUsd": 4500,
             "rationalThief": {
               "guesses": 0,
               "pSuccess": 0,
@@ -4580,10 +4580,10 @@
           {
             "valueEth": 10,
             "expectedGainEth": 0.000051,
-            "expectedBondLossEth": 0.700997,
-            "expectedProfitEth": -0.700946,
+            "expectedBondLossEth": 1.499994,
+            "expectedProfitEth": -1.499942,
             "expectedGainUsd": 0,
-            "expectedBondLossUsd": 2103,
+            "expectedBondLossUsd": 4500,
             "rationalThief": {
               "guesses": 0,
               "pSuccess": 0,
@@ -4594,10 +4594,10 @@
           {
             "valueEth": 100,
             "expectedGainEth": 0.000513,
-            "expectedBondLossEth": 0.700997,
-            "expectedProfitEth": -0.700484,
+            "expectedBondLossEth": 1.499994,
+            "expectedProfitEth": -1.499481,
             "expectedGainUsd": 2,
-            "expectedBondLossUsd": 2103,
+            "expectedBondLossUsd": 4500,
             "rationalThief": {
               "guesses": 0,
               "pSuccess": 0,
@@ -4608,15 +4608,15 @@
           {
             "valueEth": 1000,
             "expectedGainEth": 0.005132,
-            "expectedBondLossEth": 0.700997,
-            "expectedProfitEth": -0.695865,
+            "expectedBondLossEth": 1.499994,
+            "expectedProfitEth": -1.494862,
             "expectedGainUsd": 15,
-            "expectedBondLossUsd": 2103,
+            "expectedBondLossUsd": 4500,
             "rationalThief": {
-              "guesses": 1,
-              "pSuccess": 0.000001,
-              "expectedProfitEth": 0.000283,
-              "expectedProfitUsd": 1
+              "guesses": 0,
+              "pSuccess": 0,
+              "expectedProfitEth": 0,
+              "expectedProfitUsd": 0
             }
           }
         ]
@@ -4633,69 +4633,69 @@
           3
         ],
         "bondsEth": [
-          0.001,
           1,
           2,
-          4
+          4,
+          8
         ],
-        "totalBondEth": 7.001,
-        "totalBondUsd": 21003,
+        "totalBondEth": 15,
+        "totalBondUsd": 45000,
         "pSuccess": 0.026,
         "perValue": [
           {
             "valueEth": 1,
             "expectedGainEth": 0.026,
-            "expectedBondLossEth": 6.844994,
-            "expectedProfitEth": -6.818993,
+            "expectedBondLossEth": 14.6815,
+            "expectedProfitEth": -14.6555,
             "expectedGainUsd": 78,
-            "expectedBondLossUsd": 20535,
+            "expectedBondLossUsd": 44045,
             "rationalThief": {
-              "guesses": 1,
-              "pSuccess": 0.0065,
-              "expectedProfitEth": 0.005507,
-              "expectedProfitUsd": 17
+              "guesses": 0,
+              "pSuccess": 0,
+              "expectedProfitEth": 0,
+              "expectedProfitUsd": 0
             }
           },
           {
             "valueEth": 10,
             "expectedGainEth": 0.26,
-            "expectedBondLossEth": 6.844994,
-            "expectedProfitEth": -6.584993,
+            "expectedBondLossEth": 14.6815,
+            "expectedProfitEth": -14.4215,
             "expectedGainUsd": 780,
-            "expectedBondLossUsd": 20535,
+            "expectedBondLossUsd": 44045,
             "rationalThief": {
-              "guesses": 1,
-              "pSuccess": 0.0065,
-              "expectedProfitEth": 0.064007,
-              "expectedProfitUsd": 192
+              "guesses": 0,
+              "pSuccess": 0,
+              "expectedProfitEth": 0,
+              "expectedProfitUsd": 0
             }
           },
           {
             "valueEth": 100,
             "expectedGainEth": 2.6,
-            "expectedBondLossEth": 6.844994,
-            "expectedProfitEth": -4.244993,
+            "expectedBondLossEth": 14.6815,
+            "expectedProfitEth": -12.0815,
             "expectedGainUsd": 7800,
-            "expectedBondLossUsd": 20535,
+            "expectedBondLossUsd": 44045,
             "rationalThief": {
-              "guesses": 1,
-              "pSuccess": 0.0065,
-              "expectedProfitEth": 0.649007,
-              "expectedProfitUsd": 1947
+              "guesses": 0,
+              "pSuccess": 0,
+              "expectedProfitEth": 0,
+              "expectedProfitUsd": 0
             }
           },
           {
             "valueEth": 1000,
             "expectedGainEth": 26,
-            "expectedBondLossEth": 6.844994,
-            "expectedProfitEth": 19.155007,
+            "expectedBondLossEth": 14.6815,
+            "expectedProfitEth": 11.3185,
             "expectedGainUsd": 78000,
-            "expectedBondLossUsd": 20535,
+            "expectedBondLossUsd": 44045,
             "rationalThief": {
-              "guesses": 4,
-              "pSuccess": 0.026,
-              "expectedProfitEth": 19.155007,
-              "expectedProfitUsd": 57465
+              "guesses": 3,
+              "pSuccess": 0.0195,
+              "expectedProfitEth": 12.6105,
+              "expectedProfitUsd": 37832
             }
           }
         ]
@@ -4712,22 +4712,22 @@
           3
         ],
         "bondsEth": [
-          0.001,
           1,
           2,
-          4
+          4,
+          8
         ],
-        "totalBondEth": 7.001,
-        "totalBondUsd": 21003,
+        "totalBondEth": 15,
+        "totalBondUsd": 45000,
         "pSuccess": 0.000005,
         "perValue": [
           {
             "valueEth": 1,
             "expectedGainEth": 0.000005,
-            "expectedBondLossEth": 7.000969,
-            "expectedProfitEth": -7.000964,
+            "expectedBondLossEth": 14.999937,
+            "expectedProfitEth": -14.999932,
             "expectedGainUsd": 0,
-            "expectedBondLossUsd": 21003,
+            "expectedBondLossUsd": 45000,
             "rationalThief": {
               "guesses": 0,
               "pSuccess": 0,
@@ -4738,10 +4738,10 @@
           {
             "valueEth": 10,
             "expectedGainEth": 0.000051,
-            "expectedBondLossEth": 7.000969,
-            "expectedProfitEth": -7.000918,
+            "expectedBondLossEth": 14.999937,
+            "expectedProfitEth": -14.999886,
             "expectedGainUsd": 0,
-            "expectedBondLossUsd": 21003,
+            "expectedBondLossUsd": 45000,
             "rationalThief": {
               "guesses": 0,
               "pSuccess": 0,
@@ -4752,10 +4752,10 @@
           {
             "valueEth": 100,
             "expectedGainEth": 0.000513,
-            "expectedBondLossEth": 7.000969,
-            "expectedProfitEth": -7.000456,
+            "expectedBondLossEth": 14.999937,
+            "expectedProfitEth": -14.999424,
             "expectedGainUsd": 2,
-            "expectedBondLossUsd": 21003,
+            "expectedBondLossUsd": 45000,
             "rationalThief": {
               "guesses": 0,
               "pSuccess": 0,
@@ -4766,15 +4766,15 @@
           {
             "valueEth": 1000,
             "expectedGainEth": 0.005132,
-            "expectedBondLossEth": 7.000969,
-            "expectedProfitEth": -6.995837,
+            "expectedBondLossEth": 14.999937,
+            "expectedProfitEth": -14.994805,
             "expectedGainUsd": 15,
-            "expectedBondLossUsd": 21003,
+            "expectedBondLossUsd": 45000,
             "rationalThief": {
-              "guesses": 1,
-              "pSuccess": 0.000001,
-              "expectedProfitEth": 0.000283,
-              "expectedProfitUsd": 1
+              "guesses": 0,
+              "pSuccess": 0,
+              "expectedProfitEth": 0,
+              "expectedProfitUsd": 0
             }
           }
         ]

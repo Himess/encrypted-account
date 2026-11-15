@@ -1,16 +1,16 @@
 {
   "evidence": "[Mock]",
-  "generatedAt": "2026-11-15T12:18:54.505Z",
+  "generatedAt": "2026-11-15T13:21:24.056Z",
   "rows": [
     {
       "flow": "factory.createAccount (clone + initialize + E_addr EIP-712 consent)",
-      "gas": 295443,
+      "gas": 295465,
       "hcuTotal": 0,
       "hcuDepth": 0
     },
     {
       "flow": "setupPin (fingerprint + duress slot select/rand)",
-      "gas": 813716,
+      "gas": 813704,
       "hcuTotal": 79000,
       "hcuDepth": 79000
     },
@@ -22,7 +22,7 @@
     },
     {
       "flow": "setupKnown (12 eaddress / proof)",
-      "gas": 2062936,
+      "gas": 2062948,
       "hcuTotal": 0,
       "hcuDepth": 0,
       "note": "2048-bit CRS limit: at most 12 eaddress"
@@ -41,7 +41,7 @@
     },
     {
       "flow": "requestTransfer K-only (isIn N=30 + threshold + sticky tripwire)",
-      "gas": 1194640,
+      "gas": 1194866,
       "hcuTotal": 774036,
       "hcuDepth": 634032
     },
@@ -53,25 +53,25 @@
     },
     {
       "flow": "requestTransfer PIN path (opens op)",
-      "gas": 127198,
+      "gas": 127401,
       "hcuTotal": 0,
       "hcuDepth": 0
     },
     {
       "flow": "submitGuess (transfer; okAny + isDuress + big)",
-      "gas": 1191173,
+      "gas": 1191237,
       "hcuTotal": 698002,
       "hcuDepth": 302000
     },
     {
       "flow": "finalizeGuess (2-handle KMS proof)",
-      "gas": 306785,
+      "gas": 306783,
       "hcuTotal": 0,
       "hcuDepth": 0
     },
     {
       "flow": "executeOp transfer (+ auto-add to known list: isIn + select)",
-      "gas": 752773,
+      "gas": 752801,
       "hcuTotal": 667032,
       "hcuDepth": 667032
     },
@@ -83,25 +83,25 @@
     },
     {
       "flow": "submitGuess (admin; okAny + isDuress)",
-      "gas": 948317,
+      "gas": 948399,
       "hcuTotal": 555002,
       "hcuDepth": 278002
     },
     {
       "flow": "finalizeGuess + resetTrip (τ redrawn)",
-      "gas": 963529,
+      "gas": 963491,
       "hcuTotal": 1127064,
       "hcuDepth": 1104000
     },
     {
       "flow": "tightenLimits (K-only; 4× min)",
-      "gas": 907418,
+      "gas": 907407,
       "hcuTotal": 876000,
       "hcuDepth": 438000
     },
     {
       "flow": "removeKnown (K-only; select)",
-      "gas": 510091,
+      "gas": 510127,
       "hcuTotal": 83032,
       "hcuDepth": 83032
     },
@@ -221,11 +221,11 @@
       "note": "per draw ≈ HCU/16"
     },
     {
-      "flow": "τ distribution: buckets 36/39/34/19/26/30/36/36",
+      "flow": "τ distribution: buckets 35/40/26/34/30/29/31/31",
       "gas": 0,
       "hcuTotal": 0,
       "hcuDepth": 0,
-      "note": "χ²=9.69 (df=7, p=0.001 threshold 24.32)"
+      "note": "χ²=4.00 (df=7, p=0.001 threshold 24.32)"
     }
   ]
 }

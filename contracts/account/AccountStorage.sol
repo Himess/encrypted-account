@@ -155,6 +155,9 @@ library AccountStorage {
         uint64 readyAt;
         uint8 guessTrack; // track of the latest guess (F0.15: guesses live in per-track records)
         address target; // asset / token / call target
+        // F0.16: the fee bound to an ETH-carrying generic call. Packed with `target`, the one non-zero address of a call
+        // op (its `counterparty` is zero), so binding it opens no new slot. Transfers use `fee` below.
+        uint96 callFee;
         address counterparty; // recipient or spender
         // F0.16: protocol fee bound when a transfer op opens (paid only if it runs on the PIN path). Packed with
         // `counterparty`, never zero for a transfer — `target` is zero for ETH, and a fee there would open a new slot.

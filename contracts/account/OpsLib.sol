@@ -135,12 +135,16 @@ library OpsLib {
                 }
             }
         } else if (op.kind == S.Kind.Call) {
+            // F0.16: an ETH-carrying call pays the fee bound at opening, exactly like an ETH transfer
+            uint256 fee = op.callFee;
+            if (fee != 0) _requireFunds(S.OUT_ETH, address(0), op.amount + fee);
             (bool s, bytes memory ret) = op.target.call{value: op.amount}(op.data);
             if (!s) {
                 assembly {
                     revert(add(ret, 32), mload(ret))
                 }
             }
+            if (fee != 0) _payFee(opId, S.OUT_ETH, address(0), fee, feeConfig);
         } else if (op.kind == S.Kind.Recovery) {
             if (op.counterparty == l.escapeAddress) {
                 _void(l, opId, op); // E_addr changed to this key meanwhile (role separation)

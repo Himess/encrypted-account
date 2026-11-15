@@ -7,8 +7,9 @@ Status: implemented on the local branch, not deployed. Code, tests and measureme
 Goal: every wrong K-track guess costs the guesser money, and the money stays with the account owner.
 
 - **Formula.** `s` is the K-track score at submission (decayed, before this guess's provisional +1):
-  `s == 0: bond = BASE_BOND`; `s >= 1: bond = max(BASE_BOND << min(s, 20), ownerBaseBond << min(s - 1, 20))`.
-  With the default `ownerBaseBond = BASE_BOND` this is exactly the recovery track's `bondFor(s)`.
+  `bond = ownerBaseBond << min(s, 20)`. The first guess costs the base too (decision after the first report: on a
+  large account no guess should be cheap). With the default `ownerBaseBond = BASE_BOND` this is exactly the recovery
+  track's `bondFor(s)`, so default accounts behave as before.
 - **When the score is read.** At submission, from the stored score (PolicyMath.score). A track holds one guess in
   flight (`SlotBusy`), so no second K-track guess can be priced at an old score; the next guess sees the previous
   wrong guess's +1. The lane and the recovery track have their own scores and do not lower the K-track bond.
@@ -53,6 +54,9 @@ Goal: every wrong K-track guess costs the guesser money, and the money stays wit
   the K-track unusable until the lane or the escape is used.
 - **Who sets it.** The owner at setup (`setupOwnerBond`), later only with a PIN-verified admin op
   (`A_SET_OWNER_BOND`, settings delay). K alone cannot change it.
+- **The owner's side.** A raised base is sent with every PIN entry of the owner as well (send, "I'm here", heirs, PIN
+  change) and comes back with `claimRefund` when the PIN is right. The app says so on every PIN screen and points to the
+  lane, which needs no bond; the web app has no lane flow yet (not coded, as decided).
 - **No lock-out.** At a high score the bond can exceed what the owner wants to post. The owner then uses the lane
   (unbonded, needs D or the helper) or the escape (no PIN); the score also decays by one point a week.
 - **Privacy.** Only this setting is public (a guesser must know what to send). Limits, tripwire and known sets stay
@@ -60,9 +64,16 @@ Goal: every wrong K-track guess costs the guesser money, and the money stays wit
 
 ## 3. Protocol fee on PIN-verified transfers
 
-- **Scope.** PIN-verified ETH and ERC-20 transfers executed by `executeOp`. Free: K-only transfers, approvals,
-  generic calls, admin, recovery, cancellation, the escape, will claims, deposits, the instant bucket and variant
-  B's synchronous K-only transfers.
+- **Scope.** PIN-verified ETH and ERC-20 transfers executed by `executeOp`, and generic calls that carry ETH (the same
+  fee as an ETH transfer of the call's value: otherwise `openCall(recipient, value, "")` would send ETH without it).
+  Free: K-only transfers, approvals, calls without value, admin, recovery, cancellation, the escape, will claims,
+  deposits, the instant bucket and variant B's synchronous K-only transfers.
+- **No token route through generic calls.** `openCall` already rejected `transfer` and `approve`. It now also rejects
+  `increaseAllowance`, `transferFrom` out of this account (DAI and WETH9 skip the allowance when the owner calls
+  it), the ERC-1363 `transferAndCall` / `approveAndCall` / `transferFromAndCall` (out of this account), ERC-777 `send`,
+  `operatorSend` (out of this account) and `authorizeOperator`, and DAI's `push` and `move` (out of this account).
+  Pulls into the account stay allowed. Cost: +339 bytes in OpenLib, nothing in the account. What stays open: a token's
+  other non-standard functions, and approvals, which carry no fee, so an approved spender can pull without one.
 - **Formula.** `fee = clamp(amount * feeBps / 10_000, minFee, maxFee)`, per asset, in the asset's unit. A flat fee
   is `feeBps = 0, minFee = maxFee`. The fee is added on top: the payee always receives exactly `amount`.
 - **FeeConfig.** One contract that every account clone reads (its address is an immutable of the implementation):
@@ -72,7 +83,8 @@ Goal: every wrong K-track guess costs the guesser money, and the money stays wit
   can leave first); decreases apply at once. The initial table is set in the constructor, before any account exists.
   Unknown assets pay no fee.
 - **Bound at opening.** When a transfer op opens, the account asks FeeConfig for the fee and stores it in the op: a
-  uint96 packed next to `counterparty`, which is never zero for a transfer, so no new slot. (Packing it next to `target`
+  uint96 packed next to `counterparty`, which is never zero for a transfer, so no new slot. An ETH-carrying call keeps
+  its fee in `callFee`, packed next to `target` (a call's counterparty is zero). (Packing it next to `target`
   was the first layout; `target` is zero for ETH, so every ETH transfer opened a new slot. The F0.16 cost measurement
   caught it.) A non-zero fee is part of the op's content hash, hence of the PIN challenge: the PIN approves amount and
   fee together, and later config changes do not touch the op.
@@ -86,6 +98,9 @@ Goal: every wrong K-track guess costs the guesser money, and the money stays wit
   do not exist in the account yet; FeeConfig is keyed by asset address, so a confidential path can add its own quote.
 - **Limits.** The fee does not count against the spending limits (they count `amount`).
 - **Testnet default.** ETH: 10 bps, min 0.00001 ETH, max 0.001 ETH; `feeRecipient` is a deploy parameter.
+- **Admin.** On testnets the deployer; on mainnet a multisig.
+- **Bytes (F0.16 round 2).** The ETH fee on calls: +77 bytes in the account (it passes `feeConfig` to `openCall`),
+  +425 in OpenLib, +453 in OpsLib; the token-route checks: +339 in OpenLib. EncryptedAccountB: 24,476 of 24,576 bytes.
 
 ## 4. PIN choice: the user decides, the app guides
 

@@ -90,15 +90,15 @@ describe("SDK — F0.16 PIN guidance (warnings, never new blocks)", () => {
 });
 
 describe("SDK — F0.16 bond and fee (mirrors PolicyMath and FeeConfig)", () => {
-  it("default base: the K-track bond equals the recovery doubling; a higher base starts from the second guess", () => {
+  it("default base: the K-track bond equals the recovery doubling; a higher base prices every guess, the first included", () => {
     for (let s = 0; s <= 25; s++) expect(ownerBondFor(s), `score ${s}`).to.eq(recoveryBondFor(s));
     expect(recoveryBondFor(25)).to.eq(BASE_BOND << 20n);
     const base = eth("0.1");
-    expect(ownerBondFor(0, base)).to.eq(BASE_BOND);
-    expect(ownerBondFor(1, base)).to.eq(base);
-    expect(ownerBondFor(2, base)).to.eq(2n * base);
+    expect(ownerBondFor(0, base)).to.eq(base);
+    expect(ownerBondFor(1, base)).to.eq(2n * base);
+    expect(ownerBondFor(2, base)).to.eq(4n * base);
     expect(ownerBondFor(30, base)).to.eq(base << 20n);
-    expect(ownerBondTotal(3, base)).to.eq(BASE_BOND + 3n * base);
+    expect(ownerBondTotal(3, base)).to.eq(7n * base);
     expect(ownerBondTotal(5)).to.eq(31n * BASE_BOND);
   });
 

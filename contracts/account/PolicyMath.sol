@@ -106,14 +106,11 @@ library PolicyMath {
     ///         in another unit) cannot price the owner out of the K-track for good.
     uint256 internal constant MAX_OWNER_BOND = 100 ether;
 
-    /// @notice K-track bond at score `s` (counted at submission, before this guess's +1). The first guess always costs
-    ///         BASE_BOND, so the owner's everyday PIN stays cheap; after a wrong guess the bond starts at the base and
-    ///         doubles. With base = BASE_BOND this is bondFor(s), the recovery track's doubling.
+    /// @notice K-track bond at score `s` (counted at submission, before this guess's +1): ownerBaseBond << min(s, 20).
+    ///         The first guess costs the base too, so on a large account no guess is cheap; the owner gets every bond of
+    ///         a correct PIN back. With the default base (BASE_BOND) this is bondFor(s), the recovery track's doubling.
     function ownerBondFor(uint32 s, uint256 base) internal pure returns (uint256) {
-        if (s == 0) return BASE_BOND;
-        uint256 a = BASE_BOND << (s > 20 ? 20 : s);
-        uint256 b = base << (s > 21 ? 20 : s - 1);
-        return a > b ? a : b;
+        return base << (s > 20 ? 20 : s);
     }
 
     function ownerBaseBond(S.Layout storage l) internal view returns (uint256) {
@@ -194,7 +191,8 @@ library PolicyMath {
     }
 
     function opHashOf(uint256 opId, S.Op storage op) internal view returns (bytes32) {
-        return opHash(opId, op.kind, op.sub, op.target, op.counterparty, op.amount, keccak256(op.data), [op.h0, op.h1, op.h2], op.fee);
+        // F0.16: a transfer's fee or an ETH-carrying call's fee (at most one of the two is set)
+        return opHash(opId, op.kind, op.sub, op.target, op.counterparty, op.amount, keccak256(op.data), [op.h0, op.h1, op.h2], uint256(op.fee) + op.callFee);
     }
 
     /// @notice Challenge c of an op; the client encrypts (h + c) mod 2^64 (Section 13.2).

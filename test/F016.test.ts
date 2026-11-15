@@ -216,20 +216,28 @@ describe("F0.16 — adjustable base bond", function () {
     ERR = await errs();
   });
 
-  it("set at setup: the first guess stays BASE_BOND; after a wrong one the bond starts at the base and doubles", async () => {
+  it("set at setup: every guess is priced from the base, the first one included, and doubles; a correct PIN refunds it", async () => {
     await alignDecay();
     const base = E.parseEther("0.1");
     const acct = await createAccount(stack, owner, escape.address, guardian.address, { knownRecipients: [alice.address], ownerBaseBond: base });
     await owner.sendTransaction({ to: await acct.getAddress(), value: E.parseEther("1") });
     const [r0, b0] = await acct.ownerBond();
-    expect(r0).to.eq(BASE_BOND);
+    expect(r0).to.eq(base); // the first guess costs the base too
     expect(b0).to.eq(base);
     const opId = await requestTransfer(acct, owner, ETH, bob.address, E.parseEther("0.01"), true);
-    expect(await wrongGuess(acct, owner, stack.chainId, opId)).to.eq(BASE_BOND);
-    expect((await acct.ownerBond())[0]).to.eq(base); // max(0.002, 0.1)
+    const enc = await encGuess(acct, owner.address, stack.chainId, opId, WRONG);
+    await expect(
+      acct.connect(owner).submitGuess.staticCall(opId, enc.c, enc.handles[0], enc.inputProof, { value: BASE_BOND }),
+    ).to.be.revertedWithCustomError(ERR, "BondTooLow").withArgs(base);
     expect(await wrongGuess(acct, owner, stack.chainId, opId)).to.eq(base);
-    expect((await acct.ownerBond())[0]).to.eq(2n * base); // max(0.004, 0.2)
-    expect(ownerBondFor(2, base)).to.eq(2n * base);
+    expect((await acct.ownerBond())[0]).to.eq(2n * base);
+    expect(await wrongGuess(acct, owner, stack.chainId, opId)).to.eq(2n * base);
+    expect((await acct.ownerBond())[0]).to.eq(4n * base);
+    expect(ownerBondFor(2, base)).to.eq(4n * base);
+    await time.increase(backoffT2(2) + 1);
+    await guess(acct, owner, stack.chainId, opId, PIN); // the owner: 0.4 ETH, back on the correct PIN
+    await finalizeGuess(acct, opId);
+    expect(await acct.refundOf(owner.address)).to.eq(4n * base);
   });
 
   it("only a PIN-verified admin op changes it after arming; K alone cannot", async () => {
@@ -275,8 +283,8 @@ describe("F0.16 — adjustable base bond", function () {
     });
     await owner.sendTransaction({ to: await acct.getAddress(), value: E.parseEther("1") });
     const opId = await requestTransfer(acct, owner, ETH, bob.address, E.parseEther("0.01"), true);
-    for (let i = 0; i < 3; i++) await wrongGuess(acct, owner, stack.chainId, opId); // 0.001 + 10 + 20 ETH, kept
-    expect((await acct.ownerBond())[0]).to.eq(4n * base); // 40 ETH
+    for (let i = 0; i < 3; i++) await wrongGuess(acct, owner, stack.chainId, opId); // 10 + 20 + 40 ETH, kept
+    expect((await acct.ownerBond())[0]).to.eq(8n * base); // 80 ETH
     await laneGuess(acct, owner, helper, stack.chainId, opId, PIN); // free
     await finalizeGuess(acct, opId);
     expect((await acct.getOp(opId)).status).to.eq(Status.Delayed);
@@ -463,6 +471,123 @@ describe("F0.16 — protocol fee on PIN-verified transfers", function () {
     await time.increase(30 * DAY + 1);
     await (await acct.executeEscape([])).wait();
     expect(await ethers.provider.getBalance(await acct.getAddress())).to.eq(0n);
+  });
+});
+
+describe("F0.16 — generic calls: the ETH fee, and no token route around the outflow path", function () {
+  let stack: Stack;
+  let owner: any, escape: any, guardian: any, alice: any, bob: any, stranger: any, recipient: any;
+  let ERR: any;
+
+  before(async () => {
+    [owner, escape, guardian, alice, bob, stranger, , recipient] = await ethers.getSigners();
+    stack = await deployStack([{ asset: ETH, bps: 10, minFee: E.parseEther("0.00001"), maxFee: E.parseEther("0.001") }], recipient.address);
+    ERR = await errs();
+  });
+
+  async function fresh() {
+    const acct = await createAccount(stack, owner, escape.address, guardian.address, { knownRecipients: [alice.address] });
+    await owner.sendTransaction({ to: await acct.getAddress(), value: E.parseEther("2") });
+    return acct;
+  }
+
+  async function openCallOp(acct: any, target: string, value: bigint, data: string): Promise<bigint> {
+    await (await acct.connect(owner).openCall(target, value, data)).wait();
+    return await acct.opCount();
+  }
+
+  it("an ETH-carrying openCall pays the fee of an ETH transfer of its value; the target gets exactly the value", async () => {
+    const acct = await fresh();
+    const addr = await acct.getAddress();
+    const value = E.parseEther("0.2");
+    const fee = (value * 10n) / 10_000n;
+    const opId = await openCallOp(acct, bob.address, value, "0x");
+    const op = await acct.getOp(opId);
+    expect(op.callFee).to.eq(fee);
+    expect(op.fee).to.eq(0n);
+    await guess(acct, owner, stack.chainId, opId, "482915");
+    await finalizeGuess(acct, opId);
+    await time.increase(48 * HOUR + 1); // generic-call delay
+    const [b0, r0, a0] = await Promise.all([bob.address, recipient.address, addr].map((x) => ethers.provider.getBalance(x)));
+    await expect(acct.connect(stranger).executeOp(opId)).to.emit(acct, "FeePaid").withArgs(opId, recipient.address, fee);
+    expect((await ethers.provider.getBalance(bob.address)) - b0).to.eq(value);
+    expect((await ethers.provider.getBalance(recipient.address)) - r0).to.eq(fee);
+    expect(a0 - (await ethers.provider.getBalance(addr))).to.eq(value + fee);
+  });
+
+  it("a call without value pays nothing; the fee is bound at opening and part of the PIN challenge", async () => {
+    const acct = await fresh();
+    const noValue = await openCallOp(acct, bob.address, 0n, "0x");
+    expect((await acct.getOp(noValue)).callFee).to.eq(0n);
+    // the same call with value has another challenge: the fee is in the op's content hash
+    const withValue = await openCallOp(acct, bob.address, E.parseEther("0.2"), "0x");
+    expect(await acct.challengeOf(withValue)).to.not.eq(await acct.challengeOf(noValue));
+    await (await stack.feeConfig.setFee(ETH, 5, E.parseEther("0.00001"), E.parseEther("0.001"))).wait(); // decrease: at once
+    expect((await acct.getOp(withValue)).callFee).to.eq(E.parseEther("0.0002")); // unchanged
+    await (await stack.feeConfig.setFee(ETH, 10, E.parseEther("0.00001"), E.parseEther("0.001"))).wait();
+    await time.increase(7 * DAY + 1);
+    await (await stack.feeConfig.applyFee(ETH)).wait();
+  });
+
+  it("value + fee not covered: the call reverts and stays delayed", async () => {
+    const acct = await createAccount(stack, owner, escape.address, guardian.address, { knownRecipients: [alice.address] });
+    const value = E.parseEther("0.2");
+    await owner.sendTransaction({ to: await acct.getAddress(), value });
+    const opId = await openCallOp(acct, bob.address, value, "0x");
+    await guess(acct, owner, stack.chainId, opId, "482915");
+    await finalizeGuess(acct, opId);
+    await (await acct.connect(owner).claimRefund()).wait(); // exactly `value` left
+    await time.increase(48 * HOUR + 1);
+    const fee = (await acct.getOp(opId)).callFee;
+    await expect(acct.executeOp.staticCall(opId)).to.be.revertedWithCustomError(ERR, "InsufficientBalance").withArgs(value + fee);
+    expect((await acct.getOp(opId)).status).to.eq(Status.Delayed);
+  });
+
+  it("token transfers and approvals cannot go through openCall (ERC-20, ERC-1363, ERC-777, DAI); pulls into the account can", async () => {
+    const acct = await fresh();
+    const addr = await acct.getAddress();
+    const token = await stack.usdc.getAddress();
+    const I = new E.Interface([
+      "function transfer(address,uint256)",
+      "function approve(address,uint256)",
+      "function increaseAllowance(address,uint256)",
+      "function transferFrom(address,address,uint256)",
+      "function transferAndCall(address,uint256)",
+      "function transferAndCall(address,uint256,bytes)",
+      "function approveAndCall(address,uint256)",
+      "function approveAndCall(address,uint256,bytes)",
+      "function transferFromAndCall(address,address,uint256)",
+      "function transferFromAndCall(address,address,uint256,bytes)",
+      "function send(address,uint256,bytes)",
+      "function operatorSend(address,address,uint256,bytes,bytes)",
+      "function authorizeOperator(address)",
+      "function push(address,uint256)",
+      "function move(address,address,uint256)",
+    ]);
+    const blocked = [
+      I.encodeFunctionData("transfer", [bob.address, 1]),
+      I.encodeFunctionData("approve", [bob.address, 1]),
+      I.encodeFunctionData("increaseAllowance", [bob.address, 1]),
+      I.encodeFunctionData("transferFrom", [addr, bob.address, 1]),
+      I.encodeFunctionData("transferAndCall(address,uint256)", [bob.address, 1]),
+      I.encodeFunctionData("transferAndCall(address,uint256,bytes)", [bob.address, 1, "0x"]),
+      I.encodeFunctionData("approveAndCall(address,uint256)", [bob.address, 1]),
+      I.encodeFunctionData("approveAndCall(address,uint256,bytes)", [bob.address, 1, "0x"]),
+      I.encodeFunctionData("transferFromAndCall(address,address,uint256)", [addr, bob.address, 1]),
+      I.encodeFunctionData("transferFromAndCall(address,address,uint256,bytes)", [addr, bob.address, 1, "0x"]),
+      I.encodeFunctionData("send", [bob.address, 1, "0x"]),
+      I.encodeFunctionData("operatorSend", [addr, bob.address, 1, "0x", "0x"]),
+      I.encodeFunctionData("authorizeOperator", [bob.address]),
+      I.encodeFunctionData("push", [bob.address, 1]),
+      I.encodeFunctionData("move", [addr, bob.address, 1]),
+      I.getFunction("transferFrom")!.selector, // too short to read `from`: rejected
+    ];
+    for (const data of blocked) {
+      await expect(acct.connect(owner).openCall.staticCall(token, 0, data), data.slice(0, 10)).to.be.revertedWithCustomError(ERR, "ForbiddenTarget");
+    }
+    // pulling into the account from someone who approved it is not an outflow
+    expect(await acct.connect(owner).openCall.staticCall(token, 0, I.encodeFunctionData("transferFrom", [bob.address, addr, 1]))).to.be.gt(0n);
+    expect(await acct.connect(owner).openCall.staticCall(token, 0, I.encodeFunctionData("move", [bob.address, addr, 1]))).to.be.gt(0n);
   });
 });
 

@@ -49,14 +49,45 @@ library OpenLib {
 
     // ─────────────────────────────── generic call (default deny) ───────────────────────────────
 
-    function openCall(address target, uint256 value, bytes calldata data, address acl, address executor) external returns (uint256) {
+    /// @param feeConfig F0.16: an ETH-carrying call pays the same fee as an ETH transfer of `value`, bound now and paid by
+    ///        executeOp (a generic call always takes the PIN path); a call without value pays nothing.
+    function openCall(address target, uint256 value, bytes calldata data, address acl, address executor, address feeConfig)
+        external
+        returns (uint256)
+    {
         if (target == address(0) || target == address(this) || target == acl || target == executor) revert Errors.ForbiddenTarget();
-        if (data.length >= 4) {
-            bytes4 sel = bytes4(data[:4]);
-            // token transfers / approvals must go through the parsed (counted) outflow path
-            if (sel == IERC20.transfer.selector || sel == IERC20.approve.selector) revert Errors.ForbiddenTarget();
+        if (data.length >= 4) _checkTokenCall(bytes4(data[:4]), data);
+        uint96 fee = value == 0 ? 0 : _quote(feeConfig, address(0), value);
+        return _newOp(S.layout(), S.Kind.Call, 0, target, address(0), value, data, 0, 0, 0, fee);
+    }
+
+    /// @dev Token transfers and approvals must take the parsed outflow path: counted against the limits and, on the PIN
+    ///      path, charged the fee (F0.16). Rejected here: ERC-20 transfer / approve / increaseAllowance and transferFrom
+    ///      out of this account (DAI and WETH9 let an owner skip the allowance); ERC-1363 transferAndCall /
+    ///      approveAndCall / transferFromAndCall out of this account; ERC-777 send, operatorSend out of this account and
+    ///      authorizeOperator; DAI's push and move out of this account. Pulls into the account stay allowed. A token's
+    ///      other non-standard functions cannot all be listed (design note §3).
+    function _checkTokenCall(bytes4 sel, bytes calldata data) private view {
+        if (
+            sel == IERC20.transfer.selector ||
+            sel == IERC20.approve.selector ||
+            sel == 0x39509351 || // increaseAllowance(address,uint256)
+            sel == 0x1296ee62 || // transferAndCall(address,uint256)
+            sel == 0x4000aea0 || // transferAndCall(address,uint256,bytes)
+            sel == 0x3177029f || // approveAndCall(address,uint256)
+            sel == 0xcae9ca51 || // approveAndCall(address,uint256,bytes)
+            sel == 0x9bd9bbc6 || // send(address,uint256,bytes) (ERC-777)
+            sel == 0x959b8c3f || // authorizeOperator(address) (ERC-777)
+            sel == 0xb753a98c // push(address,uint256) (DAI: from the caller)
+        ) revert Errors.ForbiddenTarget();
+        bool fromFirstArg = sel == IERC20.transferFrom.selector ||
+            sel == 0xd8fbe994 || // transferFromAndCall(address,address,uint256)
+            sel == 0xc1d34b89 || // transferFromAndCall(address,address,uint256,bytes)
+            sel == 0x62ad1b83 || // operatorSend(address,address,uint256,bytes,bytes) (ERC-777)
+            sel == 0xbb35783b; // move(address,address,uint256) (DAI)
+        if (fromFirstArg && (data.length < 36 || address(uint160(uint256(bytes32(data[4:36])))) == address(this))) {
+            revert Errors.ForbiddenTarget();
         }
-        return _newOp(S.layout(), S.Kind.Call, 0, target, address(0), value, data, 0, 0, 0, 0);
     }
 
     // ─────────────────────────────── admin ───────────────────────────────
@@ -222,7 +253,12 @@ library OpenLib {
         op.sub = sub;
         op.target = target;
         op.counterparty = cp;
-        if (fee != 0) op.fee = fee; // F0.16: same slot as `counterparty` (written just above: no new slot)
+        // F0.16: a transfer's fee shares the slot of `counterparty`, a call's fee the slot of `target` (both written just
+        // above and non-zero for their kind: no new slot)
+        if (fee != 0) {
+            if (kind == S.Kind.Call) op.callFee = fee;
+            else op.fee = fee;
+        }
         op.amount = amount;
         op.data = data;
         op.ownerEpoch = l.ownerEpoch;

@@ -191,7 +191,7 @@ contract EncryptedAccount is IAccount, IERC1271, ReentrancyGuardTransient, IAcco
     /// @notice Any other call (default deny): always K+P and a delay. Token transfers / approvals must use the
     ///         parsed outflow path so that they are counted; FHE infrastructure and self-calls are forbidden.
     function openCall(address target, uint256 value, bytes calldata data) external onlyK whenArmed returns (uint256) {
-        return OpenLib.openCall(target, value, data, aclAddress, executorAddress);
+        return OpenLib.openCall(target, value, data, aclAddress, executorAddress, feeConfig);
     }
 
     /// @notice Admin actions without encrypted payload.

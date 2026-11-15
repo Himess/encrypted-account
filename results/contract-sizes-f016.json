@@ -1,27 +1,30 @@
 {
   "evidence": "[V] runtime bytecode bytes (npm run size; EIP-170 limit 24,576); F0.15 = commit 6fda10b (account contracts unchanged since F0.15)",
-  "generatedAtUtc": "2026-11-15T12:25:06.025Z",
+  "generatedAtUtc": "2026-11-15T13:21:46.749Z",
+  "notes": [
+    "Round 2 (openCall fee, token-route checks, bond formula): the account +77 bytes (feeConfig passed to openCall); the token-route checks +339 bytes, all in OpenLib."
+  ],
   "rows": [
     {
       "contract": "EncryptedAccount",
       "bytesF015": 22505,
-      "bytesF016": 23187,
-      "delta": 682,
-      "headroom": 1389
+      "bytesF016": 23264,
+      "delta": 759,
+      "headroom": 1312
     },
     {
       "contract": "EncryptedAccountB",
       "bytesF015": 23666,
-      "bytesF016": 24399,
-      "delta": 733,
-      "headroom": 177
+      "bytesF016": 24476,
+      "delta": 810,
+      "headroom": 100
     },
     {
       "contract": "PinLib",
       "bytesF015": 9391,
-      "bytesF016": 10742,
-      "delta": 1351,
-      "headroom": 13834
+      "bytesF016": 10641,
+      "delta": 1250,
+      "headroom": 13935
     },
     {
       "contract": "PolicyLib",
@@ -33,16 +36,16 @@
     {
       "contract": "OpsLib",
       "bytesF015": 11039,
-      "bytesF016": 12307,
-      "delta": 1268,
-      "headroom": 12269
+      "bytesF016": 12760,
+      "delta": 1721,
+      "headroom": 11816
     },
     {
       "contract": "OpenLib",
       "bytesF015": 12756,
-      "bytesF016": 13229,
-      "delta": 473,
-      "headroom": 11347
+      "bytesF016": 13993,
+      "delta": 1237,
+      "headroom": 10583
     },
     {
       "contract": "EncryptedAccountFactory",

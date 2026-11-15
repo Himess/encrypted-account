@@ -49,8 +49,8 @@ Sepolia ETH, send with your PIN, or try a wrong one and watch it get counted on-
 | K-only attempt above the hidden tripwire τ | Nothing moves; sticky tripwire, silent alarm to the watchtower, restricted mode |
 | Unlimited approvals, unknown calls | Always PIN + delay (default deny) |
 | Wrong PIN | Every guess adds 1 to a wrong-guess score before its result is revealed; a correct PIN never lowers it; the 3rd wrong guess restricts the account; back-off 15 min · 4^(n−3), capped at 7 days; the score decays by 1 every 7 days |
-| PIN guess with the key (K-track) | Carries a bond paid by K in a direct transaction, never by the account: 0.001 ETH, doubling with each wrong guess still counted. Right PIN: the bond comes back (`claimRefund`); wrong PIN: it stays in the account. The lane (K + second device or helper) and the escape need no bond |
-| Large account | The owner sets a higher base bond at setup (0.001–100 ETH, public), so every guess after the first costs a thief at least that much; changing it later needs the PIN, K alone cannot |
+| PIN guess with the key (K-track) | Carries a bond paid by K in a direct transaction, never by the account: the account's base bond (0.001 ETH by default), doubling with each wrong guess still counted. Right PIN: the bond comes back (`claimRefund`); wrong PIN: it stays in the account. The lane (K + second device or helper) and the escape need no bond |
+| Large account | The owner sets a higher base bond at setup (0.001–100 ETH, public), so every guess, the first included, costs a thief at least that much; the owner's own PIN entries send it too and get it back. Changing it later needs the PIN, K alone cannot |
 | Choosing a PIN | The user picks it. The app offers a random PIN (shown large, typed twice to confirm), a short note, and warnings that never block for dates, repeats, sequences and keypad patterns; only a short list of very common PINs is refused |
 | Key stolen (panic button) | Escape: K alone, immediately. Every pending op is cancelled and PIN guessing closes; after 30 days the funds can go only to the pre-set escape address. Only the second device or recovery helper + PIN can cancel it |
 | Key rotation in progress | With a second device or recovery helper, PIN guesses with the old key are closed until the rotation executes or is cancelled |
@@ -79,12 +79,14 @@ Sepolia ETH, send with your PIN, or try a wrong one and watch it get counted on-
 
 ## Protocol fee
 
-PIN-verified ETH and ERC-20 transfers pay a small fee on top of the amount; the recipient always gets exactly the
-amount. Per asset, `fee = clamp(amount × feeBps / 10,000, minFee, maxFee)`, and never more than 1% of the amount. The
+PIN-verified ETH and ERC-20 transfers, and generic calls that carry ETH, pay a small fee on top of the amount; the
+recipient always gets exactly the amount. Per asset, `fee = clamp(amount × feeBps / 10,000, minFee, maxFee)`, and never more than 1% of the amount. The
 account asks for the fee when the transfer opens and binds it to the operation, so the PIN approves amount and fee
 together and a later change never touches an open transfer. One shared `FeeConfig` contract
 (`contracts/fee/FeeConfig.sol`) holds the table: increases wait 7 days, decreases apply at once. Free: key-only
-transfers, approvals, admin, recovery, cancellation, the escape, will claims and deposits. A broken fee module never
+transfers, approvals, calls without value, admin, recovery, cancellation, the escape, will claims and deposits. Token
+transfers and approvals cannot be sent as generic calls (ERC-20, ERC-1363, ERC-777 and DAI's functions are rejected), so
+they always take the counted, charged path. A broken fee module never
 blocks a transfer (the fee reads as zero or is skipped). Testnet default: ETH 10 bps, min 0.00001 ETH, max 0.001 ETH;
 the fee recipient is a deploy parameter. Design and reasoning: [docs/F016-bond-fee.md](docs/F016-bond-fee.md).
 
@@ -176,9 +178,12 @@ for today's mainnet. Package codes such as F0.9, F0.10 and F0.11 name the measur
   lane. Nobody else can post the bond for K.
 - **Bond refunds are not reserved.** An escape sweeps the whole ETH balance, unclaimed refunds included (for the K-track
   that money reaches the owner's escape address anyway).
-- **Fee admin.** The fee admin can raise a fee with 7 days' notice, up to 1%, and change the recipient at once; it cannot
-  change the fee of an open transfer or block a verified one. The fee does not count against the spending limits, and
-  generic calls with value are not charged.
+- **Fee admin.** On mainnet the fee admin will be a multisig. It can raise a fee with 7 days' notice, up to 1%, and
+  change the recipient at once; it cannot change the fee of an open transfer or block a verified one. The fee does not
+  count against the spending limits.
+- **Fee coverage.** Approvals carry no fee, so a spender the owner approved can pull tokens without one; a token's
+  non-standard transfer functions cannot all be blocked for generic calls (the standard ERC-20, ERC-1363 and ERC-777 ones
+  and DAI's are); assets without a fee row pay nothing.
 
 ## Roadmap
 

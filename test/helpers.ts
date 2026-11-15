@@ -42,11 +42,9 @@ export const A = {
 } as const;
 /** F0.16: K-track bond at score s with base `base` (mirrors PolicyMath.ownerBondFor). */
 export const BASE_BOND = E.parseEther("0.001");
+/** F0.16: K-track bond = ownerBaseBond << min(score, 20) (PolicyMath.ownerBondFor). */
 export function ownerBondFor(s: number, base: bigint = BASE_BOND): bigint {
-  if (s === 0) return BASE_BOND;
-  const a = BASE_BOND << BigInt(Math.min(s, 20));
-  const b = base << BigInt(Math.min(s - 1, 20));
-  return a > b ? a : b;
+  return base << BigInt(Math.min(s, 20));
 }
 export const TRACK = { OWNER: 0, RECOVERY: 1, LANE: 2 } as const;
 export const R = { STRIKES: 1, GUARDIAN: 2, OWNER: 4, PIN: 8 } as const;

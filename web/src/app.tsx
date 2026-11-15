@@ -467,9 +467,14 @@ function TryCost(p: { info: TryInfo | null; fee?: bigint | null; amount?: bigint
           <b>{fmtEth(fee)} ETH</b>
         </div>
       )}
-      {b && p.info.score >= 1 && (
+      {b && b.base > BASE_BOND && (
         <p class="small faint" style={{ margin: "8px 0 0" }}>
-          The bond doubles with each wrong PIN still counted. The lane (your key plus a second device or a recovery helper) needs no bond; this demo account has neither.
+          You raised your PIN-try bond to {fmtEth(b.base)} ETH: every PIN entry sends at least that much from your wallet, and it comes back when the PIN is right (claim it on the account page). The lane (your key plus a second device or a recovery helper) needs no bond; this demo app has no lane yet.
+        </p>
+      )}
+      {b && b.base <= BASE_BOND && p.info.score >= 1 && (
+        <p class="small faint" style={{ margin: "8px 0 0" }}>
+          The bond doubles with each wrong PIN still counted. The lane (your key plus a second device or a recovery helper) needs no bond; this demo app has no lane yet.
         </p>
       )}
       {b && p.walletBal != null && p.walletBal < b.required && (
@@ -861,7 +866,7 @@ function CreateFlow({ ctx, fhe, walletBal, onDone, onCancel }: { ctx: Ctx; fhe: 
               <div class="bond-box">
                 <div style={{ fontWeight: 600, fontSize: "14px" }}>PIN-try bond</div>
                 <div class="small faint" style={{ marginTop: "2px" }}>
-                  A thief holding your key locks this much for every PIN try after the first and loses it on a wrong one; your own correct tries get it back.
+                  A thief holding your key locks this much for every PIN try and loses it on a wrong one. Your own PIN entries send it too, and get it back when the PIN is right.
                 </div>
                 <div class="row wrap" style={{ gap: "10px", marginTop: "12px", alignItems: "flex-end" }}>
                   <label class="field" style={{ flex: "1 1 150px" }}>
@@ -874,7 +879,7 @@ function CreateFlow({ ctx, fhe, walletBal, onDone, onCancel }: { ctx: Ctx; fhe: 
                     </div>
                   </label>
                   <label class="field" style={{ flex: "1 1 150px" }}>
-                    <span>Bond from the 2nd try</span>
+                    <span>Bond per PIN try</span>
                     <div class="input-wrap">
                       <input class="input" inputMode="decimal" value={bond} aria-label="PIN-try bond in ETH" onInput={(e) => setBond((e.target as HTMLInputElement).value)} style={{ paddingRight: "52px" }} />
                       <div class="suffix">
@@ -956,7 +961,7 @@ function CreateFlow({ ctx, fhe, walletBal, onDone, onCancel }: { ctx: Ctx; fhe: 
                   </span>
                   <span class="k">PIN-try bond</span>
                   <span class="v">
-                    {bondOk ? fmtEth(bondWei!) : "0.001"} ETH<small>from the 2nd try in a row; back to you when the PIN is right</small>
+                    {bondOk ? fmtEth(bondWei!) : "0.001"} ETH<small>sent with each PIN try, doubling after wrong ones; back to you when the PIN is right</small>
                   </span>
                 </div>
               </div>
