@@ -131,9 +131,30 @@ unprofitable from the first guess on (k* = 0 on the diagonal 0.01/1, 0.1/10, 1/1
 (`suggestOwnerBaseBond`). The default bond already deters guessing against a random PIN at every size, and against a
 human PIN on small accounts.
 
-## Sepolia [M]
+## Sepolia [M] — `results/sepolia/f016-summary.json`
 
-Prepared (`scripts/sepolia/f016-prepare.ts`, N = 5 with `f09-run.ts`); the run and its numbers follow in the next commit.
+Run `f016` on 15 November 2026 with the same scripts, accounts, test delays and amount as F0.15 step 2 (`f015b`):
+`SEP_RUN=f016 scripts/sepolia/snapshot-f015.ts` → `f016-prepare.ts` (FeeConfig with the testnet table, recipient = the
+burner wallet) → `f09-run.ts`, N = 5 PIN flows and 5 K-only transfers, 0 failures. Each PIN guess posted the bond
+(0.001 ETH, the default base); one `claimRefund` at the end returned all 0.005 ETH (47,594 gas). Contracts: FeeConfig
+`0xe555608B8768580DC28D4445cfE343b5eb1769c0`, implementation `0x18Aba6aE7CE9BAD4F0741b0Bd65e99703c2CC9B7`, factory
+`0x2264E6A8362BbF4d4EDC6F34B97E7FBb1EAD6A3A` (the web app still points at the f015b factory; the site is not
+redeployed).
+
+| Step (p50 gas) | F0.15 step 2 | F0.16 | Δ |
+|---|---:|---:|---:|
+| Account setup (9 transactions) | 17,048,987 | 17,049,666 | +679 |
+| PIN path: requestTransfer | 383,700 | 393,760 | +10,060 |
+| PIN path: submitGuess (with the bond) | 1,014,398 | 1,019,520 | +5,122 |
+| PIN path: finalizeGuess (bond credited) | 458,788 | 469,512 | +10,724 |
+| PIN path: executeOp (fee paid) | 780,060 | 801,225 | +21,165 |
+| K-only: requestTransfer (fee quoted, not charged) | 1,316,975 | 1,327,044 | +10,069 |
+| K-only: finalizeEvaluation | 433,563 | 433,601 | +38 |
+
+No step grew by a new slot (≈111k gas): the layout work above holds on Sepolia. The deltas are larger than on the mock
+because Sepolia's newer schedule prices state access higher. Latency, total from the PIN entry (E1): p50 23.7 s, p95
+24.4 s (F0.15 step 2: 23.9 s / 33.7 s); K-only: p50 18.6 s, p95 27.4 s (20.3 s / 22.5 s). N = 5 is small; read the
+latency as unchanged, not as faster.
 
 ## Limits and open questions
 

@@ -1,0 +1,186 @@
+{
+  "evidence": "[M] Sepolia (gas: receipts; latency: wall clock from the user's click/PIN to the result) — F0.15 step 2 (f015b) vs F0.16 (f016)",
+  "generatedAtUtc": "2026-11-15T13:40:21.553Z",
+  "samples": {
+    "f015b": {
+      "e1": 4,
+      "hot": 4
+    },
+    "f016": {
+      "e1": 5,
+      "hot": 5
+    }
+  },
+  "f016": {
+    "contracts": {
+      "FeeConfig": "0xe555608B8768580DC28D4445cfE343b5eb1769c0",
+      "PinLib": "0xe9eFae2f9C11cF7319a7eca23847ff5C99E197FB",
+      "PolicyLib": "0x8029e4f3bdD913b0Ab35e8DBF6B7b8c7B16dDA75",
+      "OpenLib": "0xA72C37Ee7305A2c79b57e3d5456b9C3804366c15",
+      "OpsLib": "0x537EC15E00fdf6e9Cb8d3BF5d0F46A06A09A7fA2",
+      "EncryptedAccount": "0x18Aba6aE7CE9BAD4F0741b0Bd65e99703c2CC9B7",
+      "EncryptedAccountFactory": "0x2264E6A8362BbF4d4EDC6F34B97E7FBb1EAD6A3A"
+    },
+    "implConfig": {
+      "aclAddress": "0xf0Ffdc93b7E186bC2f8CB3dAA75D86d1930A433D",
+      "executorAddress": "0x92C920834Ec8941d2C77D188936E1f7A6f49c127",
+      "entryPoint": "0x4337084D9E255Ff0702461CF8895CE9E3b5Ff108",
+      "feeConfig": "0xe555608B8768580DC28D4445cfE343b5eb1769c0",
+      "feeRecipient": "0xcBdaED7D91644c771Aa84C5AbE5afFBB42a4d502",
+      "ethFee": {
+        "bps": 10,
+        "minFee": "10000000000000",
+        "maxFee": "1000000000000000"
+      }
+    },
+    "bondWeiPerGuess": [
+      "1000000000000000"
+    ],
+    "claimRefund": {
+      "refundedWei": "5000000000000000",
+      "gasUsed": 47594,
+      "hash": "0x097e63bfbea6346fd7fe46334e8583551fab71ab216cae65df718c68186b0f72",
+      "atUtc": "2026-11-15T13:40:12.199Z"
+    },
+    "failures": {
+      "e1": 0,
+      "hot": 0
+    }
+  },
+  "gas": [
+    {
+      "step": "setup createAccount",
+      "f015b": 1306846,
+      "f016": 1306936,
+      "delta": 90
+    },
+    {
+      "step": "setup setupPin",
+      "f015b": 842273,
+      "f016": 842444,
+      "delta": 171
+    },
+    {
+      "step": "setup setupAsset",
+      "f015b": 1959471,
+      "f016": 1959537,
+      "delta": 66
+    },
+    {
+      "step": "setup setupKnownR0",
+      "f015b": 3787449,
+      "f016": 3787479,
+      "delta": 30
+    },
+    {
+      "step": "setup setupKnownR12",
+      "f015b": 3787425,
+      "f016": 3787515,
+      "delta": 90
+    },
+    {
+      "step": "setup setupKnownR24",
+      "f015b": 2033513,
+      "f016": 2033591,
+      "delta": 78
+    },
+    {
+      "step": "setup setupKnownS0",
+      "f015b": 3235141,
+      "f016": 3235207,
+      "delta": 66
+    },
+    {
+      "step": "setup setupRoles",
+      "f015b": 29576,
+      "f016": 29642,
+      "delta": 66
+    },
+    {
+      "step": "setup arm",
+      "f015b": 67293,
+      "f016": 67315,
+      "delta": 22
+    },
+    {
+      "step": "setup total (e1 account, without funding)",
+      "f015b": 17048987,
+      "f016": 17049666,
+      "delta": 679
+    },
+    {
+      "step": "PIN path: requestTransfer",
+      "f015b": 383700,
+      "f016": 393760,
+      "delta": 10060
+    },
+    {
+      "step": "PIN path: submitGuess",
+      "f015b": 1014398,
+      "f016": 1019520,
+      "delta": 5122
+    },
+    {
+      "step": "PIN path: finalizeGuess",
+      "f015b": 458788,
+      "f016": 469512,
+      "delta": 10724
+    },
+    {
+      "step": "PIN path: executeOp",
+      "f015b": 780060,
+      "f016": 801225,
+      "delta": 21165
+    },
+    {
+      "step": "K-only: requestTransfer",
+      "f015b": 1316975,
+      "f016": 1327044,
+      "delta": 10069
+    },
+    {
+      "step": "K-only: finalizeEvaluation",
+      "f015b": 433563,
+      "f016": 433601,
+      "delta": 38
+    }
+  ],
+  "latency": {
+    "e1TotalMs": {
+      "f015b": {
+        "n": 4,
+        "min": 23374,
+        "p50": 23922,
+        "p95": 33675,
+        "max": 33675,
+        "mean": 26416
+      },
+      "f016": {
+        "n": 5,
+        "min": 22839,
+        "p50": 23683,
+        "p95": 24377,
+        "max": 24377,
+        "mean": 23726
+      }
+    },
+    "hotTotalMs": {
+      "f015b": {
+        "n": 4,
+        "min": 14557,
+        "p50": 20269,
+        "p95": 22541,
+        "max": 22541,
+        "mean": 19845
+      },
+      "f016": {
+        "n": 5,
+        "min": 17346,
+        "p50": 18604,
+        "p95": 27419,
+        "max": 27419,
+        "mean": 20048
+      }
+    }
+  }
+}

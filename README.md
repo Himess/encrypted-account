@@ -147,8 +147,9 @@ are sent from the claimant's own wallet (no relayer yet); unaudited, testnet onl
 | Account setup gas | A: 17,048,629 · B: 3,259,034 | `results/sepolia/setup-f011.json` |
 | New storage slots per PIN-verified transfer (block access list), before → after F0.15 | 16 → 8; gas −22.6% on Sepolia, ≈ −3.5% on today's mainnet schedule | `results/sepolia/f015-slots.json` |
 | Attack simulation: key stolen, human-chosen 6-digit PIN, 30 days | ≈ 7% with no reaction · ≈ 3% if the owner escapes within an hour · negligible for a random PIN | `results/pin-attack-sim.json` |
-| The thief's bonds over 30 days (key stolen, no reaction, 12 guesses) | 0.647 ETH at the default base bond · 3.23 ETH at 0.01 · 32.3 ETH at 0.1 · 323 ETH at 1 ETH | `results/pin-attack-sim.json` (`f016`) |
-| Bond and fee cost (mock, F0.15 → F0.16) | transfer opening +9.4k gas (fee quote) · PIN-verified execution +15.5k (fee payment) · no new storage slot · HCU unchanged | `results/f016-cost-diff.json` |
+| The thief's bonds over 30 days (key stolen, no reaction, 12 guesses) | 0.647 ETH at the default base bond · 6.47 ETH at 0.01 · 64.7 ETH at 0.1 · 647 ETH at 1 ETH | `results/pin-attack-sim.json` (`f016`) |
+| Bond and fee cost (mock, F0.15 → F0.16) | transfer opening +9.6k gas (fee quote) · PIN-verified execution +15.6k (fee payment) · no new storage slot · HCU unchanged | `results/f016-cost-diff.json` |
+| Bond and fee on Sepolia (N = 5, p50, F0.15 → F0.16) | opening +10.1k · guess +5.1k · finalize +10.7k · execution +21.2k gas · no new storage slot · PIN flow p95 24.4 s | `results/sepolia/f016-summary.json` |
 | Hidden-will claim: heir by code, heir by address or stranger | 2,939,136 HCU each (15 % of the per-transaction limit), ≈ 2.6M gas | `results/sepolia/will-w1.json` |
 
 Sepolia runs a newer gas schedule than mainnet (a new storage slot costs ≈ 111k gas), so the gas figures are pessimistic
