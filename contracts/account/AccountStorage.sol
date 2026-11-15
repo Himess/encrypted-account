@@ -56,6 +56,9 @@ library AccountStorage {
     uint8 internal constant A_CANCEL_ESCAPE = 19;
     uint8 internal constant A_SET_OPEN_LIMIT = 20; // B variant (F0.11): raising the public K-only limit (K+P, loosen delay)
     uint8 internal constant A_SET_OWNER_BOND = 21; // F0.16: the K-track base bond (K+P, settings delay)
+    // SPIKE (private mode, contracts/private/): opened only by PrivateModule on EncryptedAccountP, run through its hook
+    uint8 internal constant A_PRIVATE_TRANSFER = 22; // K+P transfer of an ERC-7984 token, encrypted amount (pinTransfer delay)
+    uint8 internal constant A_PRIVATE_VIEW = 23; // K+P balance view: an encrypted snapshot allowed to K (no delay)
 
     uint8 internal constant TRACK_OWNER = 0; // K-track: guesses from K (EOA or EntryPoint) — anonymous (anyone with K)
     uint8 internal constant TRACK_RECOVERY = 1; // anonymous track (relayer), bonded; only Recovery / Freeze ops

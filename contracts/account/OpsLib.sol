@@ -13,6 +13,11 @@ interface IAutoKnownHook {
     function autoKnownHook(bool spenders, address who) external;
 }
 
+/// @dev SPIKE (private mode): the module entry EncryptedAccountP routes through its fallback.
+interface IPrivateHook {
+    function privateExecute(uint256 opId) external;
+}
+
 /// @title OpsLib — pending-op state machine (Section 12.2 `PendingOps`), delays and execution.
 /// @notice External library executed via DELEGATECALL in the account's context.
 library OpsLib {
@@ -84,6 +89,10 @@ library OpsLib {
             cfg.pinCommitted += uint128(PolicyMath.capped(op.amount));
         } else if (op.kind == S.Kind.Admin && op.sub == S.A_ROTATE_OWNER) {
             l.rotationsPending += 1; // K45: closes the K-track (if D / helper exists) until it runs or is cancelled
+        } else if (_isPrivate(op)) {
+            // SPIKE (private mode): the encrypted duress flag of this verification stays with the op (§17.6); the
+            // per-track guess record that holds it now is reused by the next guess
+            op.h2 = l.trackGuesses[track].duressFlagH;
         }
         emit IAccountEvents.GuessFinalized(opId, track, true, readyAt);
         if (readyAt == block.timestamp && op.kind == S.Kind.Admin) {
@@ -153,6 +162,8 @@ library OpsLib {
             _setOwner(l, op.counterparty);
         } else if (op.kind == S.Kind.PinReset) {
             _setFingerprint(l, op.h0);
+        } else if (_isPrivate(op)) {
+            IPrivateHook(address(this)).privateExecute(opId); // SPIKE: PrivateModule through EncryptedAccountP
         } else if (!_executeAdmin(l, op)) {
             _void(l, opId, op);
             return;
@@ -249,6 +260,9 @@ library OpsLib {
             return op.viaDevice || l.deviceSigner == address(0) ? d.recovery : d.recoveryNoDevice;
         }
         uint8 a = op.sub;
+        // SPIKE (private mode): a view moves nothing; a private transfer has one delay class (no public amount class)
+        if (a == S.A_PRIVATE_VIEW) return 0;
+        if (a == S.A_PRIVATE_TRANSFER) return d.pinTransfer;
         if (a == S.A_CANCEL || a == S.A_UNRESTRICT || a == S.A_FREEZE || a == S.A_CANCEL_ESCAPE || a == S.A_RESET_TRIP) return 0;
         if (
             a == S.A_ROTATE_OWNER ||
@@ -264,6 +278,10 @@ library OpsLib {
         if (a == S.A_SET_ESCAPE) return d.escapeChange;
         if (a == S.A_APPROVE_HASH) return d.genericCall;
         return d.loosen; // SET_LIMITS, SET_PULSE, SET_RECOVERY, SET_AUTOKNOWN, SET_INSTANT
+    }
+
+    function _isPrivate(S.Op storage op) private view returns (bool) {
+        return op.kind == S.Kind.Admin && (op.sub == S.A_PRIVATE_TRANSFER || op.sub == S.A_PRIVATE_VIEW);
     }
 
     // ─────────────────────────────── cancellation ───────────────────────────────
