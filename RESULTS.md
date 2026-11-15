@@ -138,8 +138,8 @@ Run `f016` on 15 November 2026 with the same scripts, accounts, test delays and 
 burner wallet) → `f09-run.ts`, N = 5 PIN flows and 5 K-only transfers, 0 failures. Each PIN guess posted the bond
 (0.001 ETH, the default base); one `claimRefund` at the end returned all 0.005 ETH (47,594 gas). Contracts: FeeConfig
 `0xe555608B8768580DC28D4445cfE343b5eb1769c0`, implementation `0x18Aba6aE7CE9BAD4F0741b0Bd65e99703c2CC9B7`, factory
-`0x2264E6A8362BbF4d4EDC6F34B97E7FBb1EAD6A3A` (the web app still points at the f015b factory; the site is not
-redeployed).
+`0x2264E6A8362BbF4d4EDC6F34B97E7FBb1EAD6A3A`. The web app creates accounts on this factory from 15 November 2026 and
+still finds accounts made on the f015b factory (they keep working, without bond or fee).
 
 | Step (p50 gas) | F0.15 step 2 | F0.16 | Δ |
 |---|---:|---:|---:|

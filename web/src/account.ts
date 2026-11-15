@@ -10,7 +10,7 @@
  */
 import { ethers } from "ethers";
 import { ACCOUNT_ABI, FACTORY_ABI } from "./abi";
-import { CHAIN_ID, DEMO_DELAYS, ETH, ETH_UNIT, FACTORY, FACTORY_DEPLOY_BLOCK, LOG_RPC_URLS, N_RECIPIENTS, N_SPENDERS, TRACK_OWNER, ZERO32 } from "./chain";
+import { CHAIN_ID, DEMO_DELAYS, ETH, ETH_UNIT, FACTORY, FEE_CONFIG, LEGACY_FACTORIES, LOGS_FROM_BLOCK, LOG_RPC_URLS, N_RECIPIENTS, N_SPENDERS, TRACK_OWNER, ZERO32 } from "./chain";
 import { asBool, encrypt, publicDecrypt } from "./fhe";
 import { guessValue, pinFingerprint, randomUint64 } from "./pin";
 import { BASE_BOND } from "../../sdk/src/bondFee";
@@ -50,7 +50,7 @@ function eventOf(receipt: ethers.TransactionReceipt, account: string, name: stri
  * not at a block number: the RPC is load-balanced, and a backend one block behind refuses a range that ends past its
  * own head ("block range extends beyond current head block").
  */
-export async function getLogsChunked(read: ethers.JsonRpcProvider, filter: { address: string; topics?: (string | null)[] }, fromBlock: number, toBlock: number, step = 45_000): Promise<ethers.Log[]> {
+export async function getLogsChunked(read: ethers.JsonRpcProvider, filter: { address: string | string[]; topics?: (string | null)[] }, fromBlock: number, toBlock: number, step = 45_000): Promise<ethers.Log[]> {
   const ranges: [number, number | "latest"][] = [];
   for (let a = fromBlock; a <= toBlock; a += step) ranges.push([a, a + step - 1 >= toBlock ? "latest" : a + step - 1]);
   const out: ethers.Log[] = [];
@@ -81,7 +81,8 @@ async function getLogsAny(read: ethers.JsonRpcProvider, filter: ethers.Filter): 
 
 export async function findAccounts(read: ethers.JsonRpcProvider, owner: string): Promise<string[]> {
   const topics = (await factory(read).filters.AccountCreated(null, owner).getTopicFilter()) as (string | null)[];
-  const logs = await getLogsChunked(read, { address: FACTORY, topics }, FACTORY_DEPLOY_BLOCK, await read.getBlockNumber());
+  // the current factory and the pre-F0.16 one (same event): older demo accounts stay reachable
+  const logs = await getLogsChunked(read, { address: [FACTORY, ...LEGACY_FACTORIES], topics }, LOGS_FROM_BLOCK, await read.getBlockNumber());
   return logs.map((l) => String(FIFACE.parseLog(l)!.args.account));
 }
 
@@ -101,7 +102,7 @@ export type Activity = {
 /** The account's history from its own events: PIN transfers (sent, wrong PIN, pending) and activation. */
 export async function loadActivity(read: ethers.JsonRpcProvider, address: string, limit = 12): Promise<Activity[]> {
   const latest = await read.getBlockNumber();
-  const logs = await getLogsChunked(read, { address }, FACTORY_DEPLOY_BLOCK, latest);
+  const logs = await getLogsChunked(read, { address }, LOGS_FROM_BLOCK, latest);
   type OpRec = { amount: bigint; to: string; block: number; hash: string; ok?: boolean; fin?: [number, string]; exec?: [number, string]; cancel?: [number, string] };
   const ops = new Map<string, OpRec>();
   const items: Activity[] = [];
@@ -193,6 +194,16 @@ export async function quoteFee(read: ethers.JsonRpcProvider, address: string, as
     return fee > UINT96_MAX ? 0n : fee;
   } catch (e) {
     return missingFunction(e) ? 0n : null;
+  }
+}
+
+/** F0.16: the current ETH fee row of the shared FeeConfig (for the setup review); null if it cannot be read. */
+export async function readEthFee(read: ethers.JsonRpcProvider): Promise<{ bps: number; minFee: bigint; maxFee: bigint } | null> {
+  try {
+    const r = await new ethers.Contract(FEE_CONFIG, ["function feeOf(address) view returns (uint16 bps, uint96 minFee, uint96 maxFee, bool set)"], read).feeOf(ETH);
+    return r[3] ? { bps: Number(r[0]), minFee: BigInt(r[1]), maxFee: BigInt(r[2]) } : { bps: 0, minFee: 0n, maxFee: 0n };
+  } catch {
+    return null;
   }
 }
 

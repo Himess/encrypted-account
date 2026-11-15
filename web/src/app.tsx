@@ -29,6 +29,7 @@ import {
   proveAliveWithPin,
   quoteFee,
   readAccount,
+  readEthFee,
   readEscape,
   sendWithPin,
 } from "./account";
@@ -646,6 +647,10 @@ function CreateFlow({ ctx, fhe, walletBal, onDone, onCancel }: { ctx: Ctx; fhe: 
   const [limit, setLimit] = useState(plan ? ethers.formatEther(BigInt(plan.limitUnits) * ETH_UNIT) : "0.01");
   const [bond, setBond] = useState(plan?.bondBase ? ethers.formatEther(BigInt(plan.bondBase)) : "0.001");
   const [size, setSize] = useState("1");
+  const [feeRow, setFeeRow] = useState<{ bps: number; minFee: bigint; maxFee: bigint } | null>(null);
+  useEffect(() => {
+    readEthFee(read).then(setFeeRow, () => undefined);
+  }, []);
   const [tasks, setTasks] = useState<TaskState[]>(() => freshTasks(SETUP_STEPS.length));
   const [runErr, setRunErr] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
@@ -964,6 +969,20 @@ function CreateFlow({ ctx, fhe, walletBal, onDone, onCancel }: { ctx: Ctx; fhe: 
                     {bondOk ? fmtEth(bondWei!) : "0.001"} ETH<small>sent with each PIN try, doubling after wrong ones; back to you when the PIN is right</small>
                   </span>
                 </div>
+                {feeRow && feeRow.bps > 0 && (
+                  <div class="review-row">
+                    <span class="check">
+                      <IconCheck />
+                    </span>
+                    <span class="k">Protocol fee</span>
+                    <span class="v">
+                      {feeRow.bps / 100}% of PIN-verified sends
+                      <small>
+                        min {fmtEth(feeRow.minFee)}, max {fmtEth(feeRow.maxFee)} ETH, on top of the amount; key-only sends are free
+                      </small>
+                    </span>
+                  </div>
+                )}
               </div>
               <div class="notice" style={{ marginTop: "14px" }}>
                 <IconInfo />

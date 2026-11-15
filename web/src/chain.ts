@@ -1,4 +1,4 @@
-/** Sepolia deployment the demo talks to (the F0.15 build: libraries, implementation and factory). */
+/** Sepolia deployment the demo talks to (the F0.16 build: libraries, implementation, factory and the shared FeeConfig). */
 export const CHAIN_ID = 11155111n;
 export const CHAIN_ID_HEX = "0xaa36a7";
 export const RPC_URL = "https://ethereum-sepolia-rpc.publicnode.com";
@@ -11,8 +11,17 @@ export const LOG_RPC_URLS = ["https://sepolia.gateway.tenderly.co", "https://rpc
 export const EXPLORER = "https://sepolia.etherscan.io";
 export const REPO_URL = "https://github.com/Himess/encrypted-account";
 
-export const FACTORY = "0xd03C6a944ccC168Fceb1253Efc741403FC67e541";
-export const FACTORY_DEPLOY_BLOCK = 12_100_695;
+export const FACTORY = "0x2264E6A8362BbF4d4EDC6F34B97E7FBb1EAD6A3A";
+export const FACTORY_DEPLOY_BLOCK = 12_140_517;
+/** F0.16: the fee table the implementation reads (ETH: 10 bps, min 0.00001, max 0.001 ETH). Each account reads its own. */
+export const FEE_CONFIG = "0xe555608B8768580DC28D4445cfE343b5eb1769c0";
+/**
+ * Accounts created before F0.16 on the F0.15 factory (no bond, no fee) keep working: the app still finds them and shows
+ * them without the bond and fee lines. New accounts are created on FACTORY only.
+ */
+export const LEGACY_FACTORIES = ["0xd03C6a944ccC168Fceb1253Efc741403FC67e541"];
+/** Factory and account logs are read from the oldest factory's deployment, so older accounts keep their history. */
+export const LOGS_FROM_BLOCK = 12_100_695;
 
 export const ETH = "0x0000000000000000000000000000000000000000";
 /** Amounts in the encrypted policy are counted in units of 10^12 wei (0.000001 ETH). */

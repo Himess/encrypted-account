@@ -223,9 +223,10 @@ Live at [encrypted-account.vercel.app](https://encrypted-account.vercel.app).
 
 `web/` holds the site: a landing page (`index.html`, no wallet code) and the app at `/app` (Preact) on top of the
 deployed Sepolia contracts: connect a wallet, choose a PIN on a keypad and a hidden limit, create the account (8
-transactions), deposit, and send ETH with the PIN — or try a wrong one and watch it being counted. The F0.16 screens
-(the bond and fee before the PIN pad, refund claims, changing the PIN, the base bond at setup) are in the code and need
-the F0.16 contracts on Sepolia, which are not deployed yet; against the current deployment they show no bond and no fee. The PIN never leaves
+transactions), deposit, and send ETH with the PIN — or try a wrong one and watch it being counted. The app runs on the
+F0.16 deployment (factory `0x2264E6A8362BbF4d4EDC6F34B97E7FBb1EAD6A3A`): the bond and fee before the PIN pad, refund
+claims, changing the PIN and the base bond at setup. Accounts created earlier on the F0.15 factory keep working and the
+app still finds them; they have no bond and no fee. The PIN never leaves
 the page: the browser derives the Argon2id fingerprint and encrypts it with Zama's SDK. Accounts use short demo delays
 (for example, a 5-minute escape) instead of the production examples.
 
