@@ -1,7 +1,135 @@
 # RESULTS
 
-The hidden-inheritance results are on top (W1 first, then v1 as measured), then Round 2; the Round 1 results are kept unchanged below. Evidence classes: **[M]** measured · **[Mock]** ran on
+F0.16 (bond, fee, PIN guidance) is on top, then the hidden-inheritance results (W1 first, then v1 as measured), then Round 2; the Round 1 results are kept unchanged below. Evidence classes: **[M]** measured · **[Mock]** ran on
 Zama's mock · **[V]** verified by reading code or documentation · **[D]** Zama documentation · **[I]** inference.
+
+# F0.16 — K-track bond, adjustable base bond, protocol fee, PIN guidance (15 November 2026)
+
+- **Input:** the F0.16 work package; design note `docs/F016-bond-fee.md`.
+- **What changed:** the account (`AccountStorage`, `PinLib`, `OpenLib`, `OpsLib`, `PolicyMath`, `EncryptedAccount`,
+  `EncryptedAccountB`), the new shared `contracts/fee/FeeConfig.sol` (+ `IFeeConfig.sol`), the SDK (`sdk/src/bondFee.ts`,
+  `sdk/src/pinPolicy.ts`), the app (bond and fee shown before the PIN pad, refund claim, PIN change, bond choice at
+  setup), `scripts/pin-attack-sim.ts` (section `f016`), the Sepolia scripts (prepared, not run).
+- **Status:** `npm test` 146/146 [Mock] (`test/F016.test.ts` 21, `test/Exploits.test.ts` 10 of which 5 new, the AA
+  UserOp case rewritten); SDK 19/19 [Mock]; `web/` type check and build pass; the app's new screens were checked in the
+  browser against the live Sepolia deployment, which predates F0.16 (every new read falls back to "no bond, no fee").
+  Not deployed anywhere.
+
+## Design → code [V]
+
+| Requirement | Code | Test |
+|---|---|---|
+| K-track guess needs a bond; less reverts `BondTooLow(required)` and counts nothing | `PinLib.submitGuess` | F016 "first K-track guess…" |
+| Doubling; priced at the score counted at submission; one guess in flight per track | `PolicyMath.ownerBondFor` | F016 "doubling…", "one guess in flight…" |
+| Correct PIN: refund (pull); wrong PIN: the bond stays in the account | `PinLib.finalizeGuess`, `claimRefund` | F016 "doubling…", Exploits F0.16-5 |
+| Never paid by the account: direct call by K only (UserOp → `DirectBondRequired`; no self-call, no generic execute) | `EncryptedAccount.submitGuess`, `OpenLib.openCall` | AA "F0.16: a K-track guess inside a UserOp…", Exploits F0.16-1 |
+| Lane unbonded; escape untouched (no FHE, bond or fee) | — | F016 "the lane stays unbonded…", "no lock-out…" |
+| Unsettled guesses: finalize still refunds a correct one after an escape; a wrong or never-finalized one stays | `PinLib.finalizeGuess` | F016 "escape while a bonded guess…" |
+| Refund cannot be re-entered | `claimRefund` (nonReentrant, state cleared first) | F016 "claimRefund cannot be re-entered…" |
+| `ownerBaseBond`: public, default = minimum 0.001 ETH, maximum 100 ETH, multiple of 0.001; setup or PIN-verified admin op (settings delay) | `PolicyMath.ownerBondUnits`, `A_SET_OWNER_BOND` | F016 "set at setup…", "only a PIN-verified admin op…", "bounds…", Exploits F0.16-3 |
+| No lock-out at a high score (lane, escape) | — | F016 "no lock-out at a high score…" |
+| Fee on PIN-verified ETH / ERC-20 transfers, on top, clamp(min, max), never above 1% of the amount | `FeeConfig.quote`, `OpsLib._payFee` | F016 fee block, Exploits F0.16-4 |
+| Fee bound at opening and part of the op's content hash; later config changes do not touch it | `OpenLib._newOp`, `PolicyMath.opHash` | F016 "a config change after opening…" |
+| 7-day delay on increases, decreases at once, hard cap 1% | `FeeConfig.setFee / applyFee` | F016 "FeeConfig: increases wait 7 days…" |
+| Amount + fee not covered → revert, op stays delayed | `OpsLib._requireFunds` | F016 "amount + fee not covered…" |
+| A broken fee module never blocks: quote → 0, recipient failure → `FeeSkipped`; escape and K-only unaffected | `OpenLib._quote`, `OpsLib._payFee` | F016 "a reverting FeeConfig…", "a fee recipient that rejects…" |
+| No detour: a K-only request that fails evaluation and goes to the PIN path pays the fee bound at opening | `OpenLib.openOutflow` | Exploits F0.16-2 |
+| Variant B: PIN path pays, synchronous K-only is free | `EncryptedAccountB._outflow` | F016 "B: …" |
+| PIN guidance: note, warnings without blocks, random PIN without warnings, duress ≠ PIN | `sdk/src/pinPolicy.ts`, `web/src/app.tsx` | `sdk/test/f016.test.ts` |
+
+Two layout decisions came out of the measurement below: the fee is packed with `counterparty` (not `target`, which is
+zero for ETH), and the K-track refund is kept next to the owner address (a K-track bond is always paid by K in a direct
+call, so it is owed to the owner key; after a rotation that ran in between, the new key). Recovery-track bonds keep the
+per-payer `refunds` map, as before.
+
+## Cost [Mock] — `results/f016-cost-diff.json`
+
+`test/CostModel.test.ts` on the F0.15 account contracts (commit 6fda10b, run in a worktree) and on F0.16 with the testnet
+default fee table, back to back (`results/cost-model-mock-f015.json`, `results/cost-model-mock.json`). **HCU: unchanged
+in every row.** Rows that changed by more than 300 gas:
+
+| Flow | F0.15 gas | F0.16 gas | Δ | Why |
+|---|---:|---:|---:|---|
+| requestTransfer K-only | 1,185,220 | 1,194,640 | +9,420 | FeeConfig.quote (external view call) + fee in an already written slot |
+| requestTransfer PIN path | 117,764 | 127,198 | +9,434 | same |
+| submitGuess (transfer) | 1,192,174 | 1,191,173 | −1,001 | the K-track no longer writes a payer field |
+| finalizeGuess (2 handles) | 303,235 | 306,785 | +3,550 | the bond credited next to the owner address |
+| executeOp transfer | 737,236 | 752,773 | +15,537 | balance check + feeRecipient read + fee transfer |
+| claimRefund | — | 43,194 | new | the bond back to K |
+| setupOwnerBond (optional) | — | 56,003 | new | opens the account slot the escape snapshot shares |
+| submitGuess (admin) | 949,573 | 948,317 | −1,256 | as above |
+| finalizeGuess + resetTrip | 959,984 | 963,529 | +3,545 | as above |
+| startEscape | 60,040 | 42,940 | −17,100 | artefact: setupOwnerBond had opened the shared slot (default bond: unchanged) |
+
+**New storage slots on Sepolia (≈111k gas each since the F0.15 measurement): none on any transfer.** The first layout
+packed `op.fee` with `op.target`; for ETH that slot is zero, so every ETH transfer opened a new slot (+20.8k on the mock,
+≈111k on Sepolia). Moving the fee next to `counterparty` and the K-track refund next to `owner` removed both.
+
+## Contract sizes [V] — `results/contract-sizes-f016.json`
+
+| Contract | F0.15 | F0.16 | Δ | Headroom |
+|---|---:|---:|---:|---:|
+| EncryptedAccount | 22,505 | 23,187 | +682 | 1,389 |
+| EncryptedAccountB | 23,666 | 24,399 | +733 | **177** |
+| PinLib | 9,391 | 10,742 | +1,351 | 13,834 |
+| OpsLib | 11,039 | 12,307 | +1,268 | 12,269 |
+| OpenLib | 12,756 | 13,229 | +473 | 11,347 |
+| PolicyLib · Factory | 9,277 · 1,868 | unchanged | 0 | |
+| FeeConfig | — | 2,944 | new | |
+
+## The thief's 30 days [I] — `results/pin-attack-sim.json` (section `f016`)
+
+`npx ts-node scripts/pin-attack-sim.ts --eth-usd=3000 --values=1,10,100,1000`. Only K is stolen; the contract's final
+semantics (K43 + T2 + K44, stored wait); the worst decay phase. Each wrong guess loses its bond to the account.
+Human PIN: the Markert curve without a blocklist (overstates the thief's odds; the app rejects the most common PINs).
+Random PIN: uniform over the 779,404 PINs the app's generator can return. ETH = $3,000 (a parameter).
+
+Bonds the thief loses when every guess is wrong:
+
+| ownerBaseBond | no reaction: guesses · bonds lost | escape within 1 h: guesses · bonds lost |
+|---|---|---|
+| 0.001 ETH (default) | 12 · 0.647 ETH ($1,941) | 4 · 0.015 ETH ($45) |
+| 0.01 ETH | 12 · 3.23 ETH ($9,693) | 4 · 0.071 ETH ($213) |
+| 0.1 ETH | 12 · 32.30 ETH ($96,903) | 4 · 0.701 ETH ($2,103) |
+| 1 ETH | 12 · 323 ETH ($969,003) | 4 · 7.00 ETH ($21,003) |
+
+Expected gain (P(PIN found) × account value, an upper bound) vs expected bond loss, in ETH; k* = the number of
+guesses that maximizes the thief's expected profit (0: guessing does not pay). **No reaction, human PIN** (P = 6.9%):
+
+| ownerBaseBond | 1 ETH account | 10 ETH account | 100 ETH account | 1000 ETH account |
+|---|---|---|---|---|
+| 0.001 ETH | 0.069 vs 0.608 · k*=3 | 0.690 vs 0.608 · k*=8 | 6.90 vs 0.608 · k*=12 | 68.98 vs 0.608 · k*=12 |
+| 0.01 ETH | 0.069 vs 3.03 · k*=1 | 0.690 vs 3.03 · k*=5 | 6.90 vs 3.03 · k*=10 | 68.98 vs 3.03 · k*=12 |
+| 0.1 ETH | 0.069 vs 30.34 · k*=1 | 0.690 vs 30.34 · k*=1 | 6.90 vs 30.34 · k*=5 | 68.98 vs 30.34 · k*=10 |
+| 1 ETH | 0.069 vs 303 · k*=1 | 0.690 vs 303 · k*=1 | 6.90 vs 303 · k*=1 | 68.98 vs 303 · k*=5 |
+
+**No reaction, random PIN** (P = 0.0015%): the expected gain is at most 0.015 ETH (1000 ETH account) against a bond loss
+of 0.647 ETH or more; k* = 0, except one cheap first guess on a 1000 ETH account (the first guess always costs 0.001 ETH).
+**Escape within 1 h** (4 guesses): human PIN P = 2.6%, random PIN P = 0.0005%; the escape also cancels every pending op,
+so the realistic gain there is about zero whatever the bond.
+
+Reading: the default bond already makes guessing a losing bet against a random PIN at every size, and against a human
+PIN on small accounts. Against a human PIN on a large account the base bond has to be about 1% of the value to make
+every guess after the first unprofitable (k* = 1) — the rule the app suggests at setup (`suggestOwnerBaseBond`). The
+first guess stays at 0.001 ETH by design (score 0).
+
+## Sepolia [not run]
+
+Prepared, waiting for approval (N = 5): `SEP_RUN=f016 npx hardhat run scripts/sepolia/snapshot-f015.ts`, then
+`SEP_RUN=f016 F016_FEE_RECIPIENT=0x… npx hardhat run scripts/sepolia/f016-prepare.ts` (FeeConfig with the testnet table,
+the libraries, the implementation, the factory, two measurement accounts), then
+`SEP_RUN=f016 F09_N=5 npx hardhat run scripts/sepolia/f09-run.ts` (each PIN sample posts the bond; the bonds come back
+with one `claimRefund` at the end).
+
+## Limits and open questions
+
+- A third party (relayer, paymaster) cannot pay the K-track bond; a relayed, K-signed guess would cost account bytes,
+  and variant B has 177 bytes left.
+- Unclaimed refunds are not reserved: an escape sweeps the whole balance (for the K-track the money reaches the owner's
+  escape address either way).
+- The fee does not count against the spending limits, and generic calls (`openCall` with value) are not charged.
+- ERC-7984 transfers do not exist in the account yet; FeeConfig is keyed by asset address, ready for a confidential path.
+- Every transfer pays the 9.4k-gas quote at opening, K-only ones included (the price of closing the fee detour).
 
 # Hidden inheritance W1 — claim codes, payout rounds, exits (11 November 2026)
 

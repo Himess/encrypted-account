@@ -1,0 +1,62 @@
+{
+  "evidence": "[V] runtime bytecode bytes (npm run size; EIP-170 limit 24,576); F0.15 = commit 6fda10b (account contracts unchanged since F0.15)",
+  "generatedAtUtc": "2026-11-15T12:25:06.025Z",
+  "rows": [
+    {
+      "contract": "EncryptedAccount",
+      "bytesF015": 22505,
+      "bytesF016": 23187,
+      "delta": 682,
+      "headroom": 1389
+    },
+    {
+      "contract": "EncryptedAccountB",
+      "bytesF015": 23666,
+      "bytesF016": 24399,
+      "delta": 733,
+      "headroom": 177
+    },
+    {
+      "contract": "PinLib",
+      "bytesF015": 9391,
+      "bytesF016": 10742,
+      "delta": 1351,
+      "headroom": 13834
+    },
+    {
+      "contract": "PolicyLib",
+      "bytesF015": 9277,
+      "bytesF016": 9277,
+      "delta": 0,
+      "headroom": 15299
+    },
+    {
+      "contract": "OpsLib",
+      "bytesF015": 11039,
+      "bytesF016": 12307,
+      "delta": 1268,
+      "headroom": 12269
+    },
+    {
+      "contract": "OpenLib",
+      "bytesF015": 12756,
+      "bytesF016": 13229,
+      "delta": 473,
+      "headroom": 11347
+    },
+    {
+      "contract": "EncryptedAccountFactory",
+      "bytesF015": 1868,
+      "bytesF016": 1868,
+      "delta": 0,
+      "headroom": 22708
+    },
+    {
+      "contract": "FeeConfig",
+      "bytesF015": null,
+      "bytesF016": 2944,
+      "delta": null,
+      "headroom": 21632
+    }
+  ]
+}

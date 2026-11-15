@@ -100,6 +100,33 @@ library PolicyMath {
         return BASE_BOND << (s > 20 ? 20 : s);
     }
 
+    // ─────────────────────────────── F0.16: K-track bond ───────────────────────────────
+
+    /// @notice Upper bound of the K-track base bond: high enough for any account, low enough that a typo (a value meant
+    ///         in another unit) cannot price the owner out of the K-track for good.
+    uint256 internal constant MAX_OWNER_BOND = 100 ether;
+
+    /// @notice K-track bond at score `s` (counted at submission, before this guess's +1). The first guess always costs
+    ///         BASE_BOND, so the owner's everyday PIN stays cheap; after a wrong guess the bond starts at the base and
+    ///         doubles. With base = BASE_BOND this is bondFor(s), the recovery track's doubling.
+    function ownerBondFor(uint32 s, uint256 base) internal pure returns (uint256) {
+        if (s == 0) return BASE_BOND;
+        uint256 a = BASE_BOND << (s > 20 ? 20 : s);
+        uint256 b = base << (s > 21 ? 20 : s - 1);
+        return a > b ? a : b;
+    }
+
+    function ownerBaseBond(S.Layout storage l) internal view returns (uint256) {
+        uint32 u = l.ownerBondUnits;
+        return u == 0 ? BASE_BOND : uint256(u) * BASE_BOND;
+    }
+
+    /// @notice Validates a base bond (BASE_BOND .. MAX_OWNER_BOND, a multiple of BASE_BOND) and returns its stored units.
+    function ownerBondUnits(uint256 base) internal pure returns (uint32) {
+        if (base < BASE_BOND || base > MAX_OWNER_BOND || base % BASE_BOND != 0) revert Errors.InvalidParams();
+        return uint32(base / BASE_BOND);
+    }
+
     function hasCosigner(S.Layout storage l) internal view returns (bool) {
         return l.deviceSigner != address(0) || l.recoveryHelper != address(0);
     }
@@ -148,18 +175,26 @@ library PolicyMath {
 
     /// @notice Content hash of an op from the fields fixed when it was opened (F0.15: recomputed instead of stored).
     ///         The encrypted payload handles of admin / reset ops belong to it; an outflow's h0 does not (it later holds
-    ///         the evaluation result).
-    function opHash(uint256 opId, S.Kind kind, uint8 sub, address target, address cp, uint256 amount, bytes32 dataHash, bytes32[3] memory h)
-        internal
-        pure
-        returns (bytes32 oh)
-    {
+    ///         the evaluation result). F0.16: a transfer's non-zero fee belongs to it too, so the PIN approves amount and
+    ///         fee together (only outflows carry a fee, only other kinds carry handles: the two extensions never meet).
+    function opHash(
+        uint256 opId,
+        S.Kind kind,
+        uint8 sub,
+        address target,
+        address cp,
+        uint256 amount,
+        bytes32 dataHash,
+        bytes32[3] memory h,
+        uint256 fee
+    ) internal pure returns (bytes32 oh) {
         oh = keccak256(abi.encode(opId, kind, sub, target, cp, amount, dataHash));
         if (kind != S.Kind.Outflow && (h[0] != 0 || h[1] != 0 || h[2] != 0)) oh = keccak256(abi.encode(oh, h[0], h[1], h[2]));
+        if (fee != 0) oh = keccak256(abi.encode(oh, fee));
     }
 
     function opHashOf(uint256 opId, S.Op storage op) internal view returns (bytes32) {
-        return opHash(opId, op.kind, op.sub, op.target, op.counterparty, op.amount, keccak256(op.data), [op.h0, op.h1, op.h2]);
+        return opHash(opId, op.kind, op.sub, op.target, op.counterparty, op.amount, keccak256(op.data), [op.h0, op.h1, op.h2], op.fee);
     }
 
     /// @notice Challenge c of an op; the client encrypts (h + c) mod 2^64 (Section 13.2).

@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { ethers as E } from "ethers";
 import * as hre from "hardhat";
 import { Alert, Watchtower } from "../sdk/src/watchtower";
-import { ETH, ETH_UNIT, R, Stack, Status, createAccount, debugU64, deployStack, encGuess, ethers, requestTransfer, time } from "./helpers";
+import { ETH, ETH_UNIT, R, Stack, Status, createAccount, debugU64, deployStack, encGuess, ethers, requestTransfer, time, bondNow} from "./helpers";
 
 describe("F1.3 — Watchtower v0: auto-finalize, notifications, silent alarm on a tripwire → restricted mode", function () {
   let stack: Stack;
@@ -36,7 +36,7 @@ describe("F1.3 — Watchtower v0: auto-finalize, notifications, silent alarm on 
     // 2) wrong PIN → the watchtower finalizes and reports it
     const op2 = await requestTransfer(acct, owner, ETH, bob.address, E.parseEther("0.5"), true);
     const enc = await encGuess(acct, owner.address, stack.chainId, op2, "111999");
-    await (await acct.connect(owner).submitGuess(op2, enc.c, enc.handles[0], enc.inputProof)).wait();
+    await (await acct.connect(owner).submitGuess(op2, enc.c, enc.handles[0], enc.inputProof, { value: await bondNow(acct) })).wait();
     await wt.tick();
     expect(alerts.some((a) => a.kind === "wrong-pin" && a.opId === op2)).to.eq(true);
 

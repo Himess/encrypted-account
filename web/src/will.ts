@@ -181,6 +181,7 @@ export async function setHeirsWithPin(
   rows: HeirRow[],
   pin: string,
   cb: StepCb,
+  bondShown?: bigint, // F0.16: the PIN-try bond the user was shown (the call stops if it went up)
 ): Promise<{ hash: string; heirs: NewHeir[] }> {
   const used = rows.filter((r) => r.percent > 0 && (r.mode === "code" || ethers.isAddress(r.address))).slice(0, WILL_SLOTS);
   const heirs: NewHeir[] = used.map((r, slot) =>
@@ -202,7 +203,7 @@ export async function setHeirsWithPin(
   );
   const h = enc.handles;
   const data = WIFACE.encodeFunctionData("setHeirs", [h.slice(0, 4), h.slice(4, 8), h.slice(8, 12), enc.inputProof]);
-  const hash = await callWithPin(ctx, account, willAddr, data, pin, cb);
+  const hash = await callWithPin(ctx, account, willAddr, data, pin, cb, bondShown);
   return { hash, heirs };
 }
 

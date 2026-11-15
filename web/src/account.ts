@@ -1,13 +1,19 @@
 /**
- * Account flows of the demo: create + set up an Encrypted Account (8 transactions), and send ETH with the PIN
- * (open → encrypted guess → public decryption of the result bit → finalize → execute).
+ * Account flows of the demo: create + set up an Encrypted Account (8 transactions, 9 with a raised PIN-try bond), and
+ * send ETH with the PIN (open → encrypted guess → public decryption of the result bit → finalize → execute).
  * Same sequence as the Sepolia measurement scripts (scripts/sepolia/f09-lib.ts, f09-run.ts).
+ *
+ * F0.16: a PIN try on the key track carries a bond from the owner's wallet (msg.value of a direct call; refunded with
+ * claimRefund when the PIN is right, kept by the account when it is wrong), and a PIN-verified transfer pays a small
+ * fee on top of the amount, bound when the transfer opens. Accounts deployed before F0.16 have neither: every read
+ * here falls back to "no bond, no fee" for them.
  */
 import { ethers } from "ethers";
 import { ACCOUNT_ABI, FACTORY_ABI } from "./abi";
 import { CHAIN_ID, DEMO_DELAYS, ETH, ETH_UNIT, FACTORY, FACTORY_DEPLOY_BLOCK, LOG_RPC_URLS, N_RECIPIENTS, N_SPENDERS, TRACK_OWNER, ZERO32 } from "./chain";
 import { asBool, encrypt, publicDecrypt } from "./fhe";
 import { guessValue, pinFingerprint, randomUint64 } from "./pin";
+import { BASE_BOND } from "../../sdk/src/bondFee";
 import { Status, sendTx } from "./tx";
 import type { Wallet } from "./wallet";
 
@@ -18,6 +24,11 @@ const FIFACE = new ethers.Interface(FACTORY_ABI as any);
 const acct = (addr: string, runner: ethers.ContractRunner) => new ethers.Contract(addr, ACCOUNT_ABI as any, runner);
 const factory = (runner: ethers.ContractRunner) => new ethers.Contract(FACTORY, FACTORY_ABI as any, runner);
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const FEE_ABI = ["function quote(address asset, uint256 amount) view returns (uint256 fee, uint64 version)"];
+const UINT96_MAX = (1n << 96n) - 1n;
+
+/** A call the contract does not have (an account deployed before F0.16) reverts without data. */
+const missingFunction = (e: any) => e?.code === "CALL_EXCEPTION" || e?.code === "BAD_DATA";
 
 function eventOf(receipt: ethers.TransactionReceipt, account: string, name: string): ethers.LogDescription {
   for (const log of receipt.logs) {
@@ -131,6 +142,8 @@ export async function loadActivity(read: ethers.JsonRpcProvider, address: string
   return top;
 }
 
+export type OwnerBond = { required: bigint; base: bigint };
+
 export type AccountView = {
   address: string;
   exists: boolean;
@@ -141,13 +154,53 @@ export type AccountView = {
   nextAllowedAt: number;
   pendingOp: bigint;
   escapeReadyAt: number;
+  /** F0.16: the bond the next key-track PIN try needs (null: an account from before F0.16, no bond). */
+  bond: OwnerBond | null;
+  /** F0.16: bonds of correct PIN tries waiting for claimRefund (paid to the wallet that posted them). */
+  refund: bigint;
 };
 
-export async function readAccount(read: ethers.JsonRpcProvider, address: string): Promise<AccountView> {
+/** F0.16: the bond the next key-track PIN try needs and the account's base bond; null on an account without bonds. */
+export async function readOwnerBond(read: ethers.JsonRpcProvider, address: string): Promise<OwnerBond | null> {
+  try {
+    const r = await acct(address, read).ownerBond();
+    return { required: BigInt(r[0]), base: BigInt(r[1]) };
+  } catch (e) {
+    if (missingFunction(e)) return null;
+    throw e;
+  }
+}
+
+async function readRefund(read: ethers.JsonRpcProvider, address: string, payer: string): Promise<bigint> {
+  try {
+    return BigInt(await acct(address, read).refundOf(payer));
+  } catch (e) {
+    if (missingFunction(e)) return 0n;
+    throw e;
+  }
+}
+
+/**
+ * F0.16: the fee a PIN-verified transfer of `amount` would pay now (the account binds it when the transfer opens).
+ * 0 without a fee module; null if it cannot be read (the account then binds 0 as well when the module is down).
+ */
+export async function quoteFee(read: ethers.JsonRpcProvider, address: string, asset: string, amount: bigint): Promise<bigint | null> {
+  try {
+    const fc = String(await acct(address, read).feeConfig());
+    if (fc === ethers.ZeroAddress) return 0n;
+    const r = await new ethers.Contract(fc, FEE_ABI, read).quote(asset, amount);
+    const fee = BigInt(r[0]);
+    return fee > UINT96_MAX ? 0n : fee;
+  } catch (e) {
+    return missingFunction(e) ? 0n : null;
+  }
+}
+
+export async function readAccount(read: ethers.JsonRpcProvider, address: string, owner?: string): Promise<AccountView> {
   const [code, balance] = await Promise.all([read.getCode(address), read.getBalance(address)]);
-  if (code === "0x") return { address, exists: false, armed: false, balance, restricted: 0, score: 0, nextAllowedAt: 0, pendingOp: 0n, escapeReadyAt: 0 };
+  if (code === "0x") return { address, exists: false, armed: false, balance, restricted: 0, score: 0, nextAllowedAt: 0, pendingOp: 0n, escapeReadyAt: 0, bond: null, refund: 0n };
   const a = acct(address, read);
-  const [st, ts] = await Promise.all([a.status(), a.trackState(TRACK_OWNER)]);
+  const [st, ts, bond, refund] = await Promise.all([a.status(), a.trackState(TRACK_OWNER), readOwnerBond(read, address), owner ? readRefund(read, address, owner) : Promise.resolve(0n)]);
   return {
     address,
     exists: true,
@@ -158,12 +211,14 @@ export async function readAccount(read: ethers.JsonRpcProvider, address: string)
     score: Number(ts[0]),
     nextAllowedAt: Number(ts[1]),
     pendingOp: BigInt(ts[2]),
+    bond,
+    refund,
   };
 }
 
 // ───────────────────────────── creation and setup ─────────────────────────────
 
-export type Plan = { account: string; escape: string; salt: string; limitUnits: string; known: string | null };
+export type Plan = { account: string; escape: string; salt: string; limitUnits: string; known: string | null; bondBase?: string };
 const planKey = (owner: string) => `ea:plan:${owner.toLowerCase()}`;
 export const loadPlan = (owner: string): Plan | null => {
   try {
@@ -195,6 +250,7 @@ export const SETUP_STEPS = [
   "Encrypted address list 2/3",
   "Encrypted address list 3/3",
   "Encrypted spender list",
+  "Set the PIN-try bond",
   "Turn the account on",
 ] as const;
 
@@ -206,7 +262,7 @@ export type StepCb = (i: number, state: "run" | "done" | "skip" | "fail", text?:
  */
 export async function createAndSetup(
   ctx: Ctx,
-  opts: { pin: string; limitEth: string; known: string | null; escapeWallet: ethers.HDNodeWallet | ethers.Wallet },
+  opts: { pin: string; limitEth: string; known: string | null; escapeWallet: ethers.HDNodeWallet | ethers.Wallet; bondBase?: bigint },
   cb: StepCb,
 ): Promise<string> {
   const owner = ctx.w.address;
@@ -223,8 +279,9 @@ export async function createAndSetup(
     const salt = ethers.hexlify(crypto.getRandomValues(new Uint8Array(32)));
     const account: string = await factory(ctx.read).predictAddress(owner, opts.escapeWallet.address, ethers.ZeroAddress, DEMO_DELAYS, salt);
     plan = { account, escape: opts.escapeWallet.address, salt, limitUnits: limitUnits.toString(), known: opts.known };
-    savePlan(owner, plan);
   }
+  plan.bondBase = (opts.bondBase ?? BASE_BOND).toString(); // the latest choice wins until the account is armed
+  savePlan(owner, plan);
   const A = plan.account;
   const a = acct(A, ctx.read);
   // Right after a transaction, a load-balanced RPC backend can lag a block behind and answer a call to the just-created
@@ -323,9 +380,21 @@ export async function createAndSetup(
     },
   );
 
-  // 8. arm
+  // 8. F0.16: the base bond of key-track PIN tries (skipped at the default, which needs no transaction)
+  const bondBase = BigInt(plan.bondBase ?? BASE_BOND.toString());
   await run(
     7,
+    async () => {
+      if (Boolean((await a.status())[0])) return true; // armed: fixed from now on (a PIN-verified admin op changes it)
+      const b = await readOwnerBond(ctx.read, A);
+      return b === null || b.base === bondBase;
+    },
+    async (st) => sendTx(ctx.w, ctx.read, { to: A, data: IFACE.encodeFunctionData("setupOwnerBond", [bondBase]) }, st),
+  );
+
+  // 9. arm
+  await run(
+    8,
     async () => Boolean((await a.status())[0]),
     async (st) => sendTx(ctx.w, ctx.read, { to: A, data: IFACE.encodeFunctionData("arm", []) }, st),
   );
@@ -339,7 +408,7 @@ export async function createAndSetup(
 export const SEND_STEPS = [
   "Open the transfer",
   "Encrypt your PIN guess",
-  "Submit the encrypted guess",
+  "Submit the encrypted guess with its bond",
   "Zama decrypts only the yes/no result",
   "Record the result on-chain",
   "Send the ETH",
@@ -349,6 +418,40 @@ export class WrongPin extends Error {
   constructor(public nextAllowedAt: number, public score: number) {
     super("Wrong PIN");
   }
+}
+
+/** F0.16: the bond went up after it was shown (another try was counted meanwhile); nothing was submitted. */
+export class BondRaised extends Error {
+  constructor(public required: bigint) {
+    super(`The bond for this PIN try went up to ${ethers.formatEther(required)} ETH (another try was counted meanwhile). Nothing was submitted; check the amount and try again.`);
+  }
+}
+
+/**
+ * F0.16: the key-track guess, sent directly from the owner's wallet with the bond as msg.value (the account never pays
+ * it, and a UserOp cannot carry it). The bond is read again right before sending: if it is above what the user was
+ * shown (`bondShown`), stop instead of sending more.
+ */
+async function submitGuessTx(ctx: Ctx, account: string, opId: bigint, c: bigint, enc: { handles: string[]; inputProof: string }, bondShown: bigint | undefined, st: Status) {
+  const b = await readOwnerBond(ctx.read, account);
+  const value = b ? b.required : 0n;
+  if (bondShown !== undefined && value > bondShown) throw new BondRaised(value);
+  return sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("submitGuess", [opId, c, enc.handles[0], enc.inputProof]), value }, st);
+}
+
+/** F0.16: the fee bound to an open transfer (0 on an account from before F0.16). */
+export async function boundFee(read: ethers.JsonRpcProvider, account: string, opId: bigint): Promise<bigint> {
+  try {
+    return BigInt((await acct(account, read).getOp(opId)).fee ?? 0n);
+  } catch {
+    return 0n;
+  }
+}
+
+/** F0.16: pulls the bonds of correct PIN tries back to the wallet that posted them. */
+export async function claimRefund(ctx: Ctx, account: string, st: Status): Promise<string> {
+  const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("claimRefund", []) }, st);
+  return r.hash;
 }
 
 /** A guess that was submitted but never finalized (page closed) blocks the slot: finalize it first. */
@@ -363,7 +466,7 @@ async function finalizePending(ctx: Ctx, account: string, st: Status): Promise<v
   await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("finalizeGuess", [pending, dec.cleartexts, dec.proof]) }, st);
 }
 
-export async function sendWithPin(ctx: Ctx, account: string, to: string, amountWei: bigint, pin: string, cb: StepCb): Promise<string> {
+export async function sendWithPin(ctx: Ctx, account: string, to: string, amountWei: bigint, pin: string, cb: StepCb, bondShown?: bigint): Promise<string> {
   const owner = ctx.w.address;
   const step = async <T>(i: number, go: (st: Status) => Promise<T>): Promise<T> => {
     cb(i, "run");
@@ -383,8 +486,10 @@ export async function sendWithPin(ctx: Ctx, account: string, to: string, amountW
     await finalizePending(ctx, account, st);
     const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("requestTransfer", [ETH, to, amountWei, true]) }, st);
     const ev = eventOf(r, account, "OpOpened");
-    cb(0, "done", undefined, r.hash);
-    return { opId: BigInt(ev.args.opId), c: BigInt(ev.args.challenge) };
+    const opId = BigInt(ev.args.opId);
+    const fee = await boundFee(ctx.read, account, opId);
+    cb(0, "done", fee > 0n ? `Fee bound to this transfer: ${ethers.formatEther(fee)} ETH` : undefined, r.hash);
+    return { opId, c: BigInt(ev.args.challenge) };
   });
 
   const enc = await step(1, async (st) => {
@@ -397,7 +502,7 @@ export async function sendWithPin(ctx: Ctx, account: string, to: string, amountW
   });
 
   const handles = await step(2, async (st) => {
-    const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("submitGuess", [opened.opId, opened.c, enc.handles[0], enc.inputProof]) }, st);
+    const r = await submitGuessTx(ctx, account, opened.opId, opened.c, enc, bondShown, st);
     const ev = eventOf(r, account, "GuessSubmitted");
     cb(2, "done", undefined, r.hash);
     return ev.args.bigHandle === ZERO32 ? [String(ev.args.okHandle)] : [String(ev.args.okHandle), String(ev.args.bigHandle)];
@@ -465,12 +570,17 @@ function stepper(cb: StepCb): Step {
 }
 
 /** Opens a generic call and verifies the PIN for it (steps 0–4). A correct PIN updates the account's lastPinAt. */
-async function openCallWithPin(ctx: Ctx, account: string, target: string, data: string, pin: string, cb: StepCb, step: Step) {
+async function openCallWithPin(ctx: Ctx, account: string, target: string, data: string, pin: string, cb: StepCb, step: Step, bondShown?: bigint) {
+  return verifyWithPin(ctx, account, (st) => sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("openCall", [target, 0, data]) }, st), pin, cb, step, bondShown);
+}
+
+/** Opens an op with `open` and verifies the PIN for it (steps 0–4): encrypted guess with the bond, decryption, finalize. */
+async function verifyWithPin(ctx: Ctx, account: string, open: (st: Status) => Promise<ethers.TransactionReceipt>, pin: string, cb: StepCb, step: Step, bondShown?: bigint) {
   const owner = ctx.w.address;
   const fpP = pinFingerprint(pin, CHAIN_ID, account);
   const opened = await step(0, async (st) => {
     await finalizePending(ctx, account, st);
-    const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("openCall", [target, 0, data]) }, st);
+    const r = await open(st);
     const ev = eventOf(r, account, "OpOpened");
     cb(0, "done", undefined, r.hash);
     return { opId: BigInt(ev.args.opId), c: BigInt(ev.args.challenge) };
@@ -484,7 +594,7 @@ async function openCallWithPin(ctx: Ctx, account: string, target: string, data: 
     return e;
   });
   const handles = await step(2, async (st) => {
-    const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("submitGuess", [opened.opId, opened.c, enc.handles[0], enc.inputProof]) }, st);
+    const r = await submitGuessTx(ctx, account, opened.opId, opened.c, enc, bondShown, st);
     const ev = eventOf(r, account, "GuessSubmitted");
     cb(2, "done", undefined, r.hash);
     return ev.args.bigHandle === ZERO32 ? [String(ev.args.okHandle)] : [String(ev.args.okHandle), String(ev.args.bigHandle)];
@@ -511,11 +621,11 @@ async function openCallWithPin(ctx: Ctx, account: string, target: string, data: 
  * A call from the account to another contract (`openCall`): the PIN, then the generic-call delay, then `executeOp`.
  * The will's owner functions are reached this way only, so the key alone never touches a will.
  */
-export async function callWithPin(ctx: Ctx, account: string, target: string, data: string, pin: string, cb: StepCb): Promise<string> {
+export async function callWithPin(ctx: Ctx, account: string, target: string, data: string, pin: string, cb: StepCb, bondShown?: bigint): Promise<string> {
   const step = stepper(cb);
   let op: { opId: bigint; readyAt: number };
   try {
-    op = await openCallWithPin(ctx, account, target, data, pin, cb, step);
+    op = await openCallWithPin(ctx, account, target, data, pin, cb, step, bondShown);
   } catch (e) {
     if (e instanceof WrongPin) cb(5, "skip", "Not run: wrong PIN");
     throw e;
@@ -539,9 +649,55 @@ export async function callWithPin(ctx: Ctx, account: string, target: string, dat
  * the owner's own wallet and verifies the PIN; the correct PIN updates lastPinAt, which is what a will reads as
  * proof of life. The call itself is never run.
  */
-export async function proveAliveWithPin(ctx: Ctx, account: string, pin: string, cb: StepCb): Promise<string> {
-  const op = await openCallWithPin(ctx, account, ctx.w.address, "0x", pin, cb, stepper(cb));
+export async function proveAliveWithPin(ctx: Ctx, account: string, pin: string, cb: StepCb, bondShown?: bigint): Promise<string> {
+  const op = await openCallWithPin(ctx, account, ctx.w.address, "0x", pin, cb, stepper(cb), bondShown);
   return op.hash;
+}
+
+// ───────────────────────────── changing the PIN ─────────────────────────────
+
+export const PIN_CHANGE_STEPS = [
+  "Open the PIN change (the new PIN goes encrypted)",
+  "Encrypt your current PIN guess",
+  "Submit the encrypted guess with its bond",
+  "Zama decrypts only the yes/no result",
+  "Record the result on-chain",
+  "Wait the delay, then switch to the new PIN",
+] as const;
+
+/**
+ * PIN change (K + the current PIN): the new fingerprint is encrypted and stored with the op, the current PIN verifies
+ * it, and after the settings delay executeOp switches to the new PIN. The old PIN stays valid until then (I15); the
+ * wrong-guess score is kept (K43).
+ */
+export async function changePinWithPin(ctx: Ctx, account: string, currentPin: string, newPin: string, cb: StepCb, bondShown?: bigint): Promise<string> {
+  const step = stepper(cb);
+  const open = async (st: Status) => {
+    st("Deriving the new fingerprint (Argon2id)…");
+    const fp = await pinFingerprint(newPin, CHAIN_ID, account);
+    st("Encrypting…");
+    const enc = await encrypt(ctx.read, [{ type: "euint64", value: fp }], account, ctx.w.address);
+    return sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("openPinChange", [enc.handles[0], enc.inputProof]) }, st);
+  };
+  let op: { opId: bigint; readyAt: number };
+  try {
+    op = await verifyWithPin(ctx, account, open, currentPin, cb, step, bondShown);
+  } catch (e) {
+    if (e instanceof WrongPin) cb(5, "skip", "Not changed: wrong PIN");
+    throw e;
+  }
+  return await step(5, async (st) => {
+    for (;;) {
+      const now = (await ctx.read.getBlock("latest"))?.timestamp ?? 0;
+      if (now >= op.readyAt) break;
+      st(`Waiting period: ${op.readyAt - now} s`);
+      await sleep(4000);
+    }
+    const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("executeOp", [op.opId]) }, st);
+    eventOf(r, account, "OpExecuted");
+    cb(5, "done", undefined, r.hash);
+    return r.hash;
+  });
 }
 
 export async function deposit(ctx: Ctx, account: string, wei: bigint, st: Status): Promise<string> {

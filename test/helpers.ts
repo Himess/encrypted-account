@@ -38,8 +38,16 @@ export const A = {
   CANCEL: 1, UNRESTRICT: 2, FREEZE: 3, ROTATE_OWNER: 4, PIN_CHANGE: 5, SET_LIMITS: 6, RESET_TRIP: 7,
   ADD_KNOWN_R: 8, ADD_KNOWN_S: 9, SET_GUARDIAN: 10, SET_DEVICE: 11, SET_HELPER: 12, SET_ESCAPE: 13,
   SET_PULSE: 14, SET_RECOVERY: 15, SET_AUTOKNOWN: 16, APPROVE_HASH: 17, SET_INSTANT: 18, CANCEL_ESCAPE: 19,
-  SET_OPEN_LIMIT: 20,
+  SET_OPEN_LIMIT: 20, SET_OWNER_BOND: 21,
 } as const;
+/** F0.16: K-track bond at score s with base `base` (mirrors PolicyMath.ownerBondFor). */
+export const BASE_BOND = E.parseEther("0.001");
+export function ownerBondFor(s: number, base: bigint = BASE_BOND): bigint {
+  if (s === 0) return BASE_BOND;
+  const a = BASE_BOND << BigInt(Math.min(s, 20));
+  const b = base << BigInt(Math.min(s - 1, 20));
+  return a > b ? a : b;
+}
 export const TRACK = { OWNER: 0, RECOVERY: 1, LANE: 2 } as const;
 export const R = { STRIKES: 1, GUARDIAN: 2, OWNER: 4, PIN: 8 } as const;
 export const N_RECIPIENTS = 30;
@@ -55,11 +63,20 @@ export interface Stack {
   usdc: any;
   libs: Record<string, string>;
   chainId: bigint;
+  feeConfig: any;
+}
+
+/** F0.16: the initial fee table of a stack's FeeConfig (empty = no fee, the default for the older suites). */
+export interface FeeRow {
+  asset: string;
+  bps: number;
+  minFee: bigint;
+  maxFee: bigint;
 }
 
 let cachedLibs: Record<string, string> | undefined;
 
-export async function deployStack(): Promise<Stack> {
+export async function deployStack(fees: FeeRow[] = [], feeRecipient?: string): Promise<Stack> {
   const [deployer] = await ethers.getSigners();
   const chainId = (await ethers.provider.getNetwork()).chainId;
   const entryPoint: any = await (await ethers.getContractFactory("EntryPoint")).deploy();
@@ -78,8 +95,21 @@ export async function deployStack(): Promise<Stack> {
     OpsLib: await ops.getAddress(),
   };
   cachedLibs = libs;
+  const usdc: any = await (await ethers.getContractFactory("MockERC20")).deploy("USD Coin", "USDC", 6);
+  await usdc.waitForDeployment();
+  const rows = fees.map((f) => (f.asset === "USDC" ? { ...f, asset: "" } : f));
+  const usdcAddr = await usdc.getAddress();
+  const feeConfig: any = await (await ethers.getContractFactory("FeeConfig")).deploy(
+    deployer.address,
+    feeRecipient ?? deployer.address,
+    rows.map((f) => (f.asset === "" ? usdcAddr : f.asset)),
+    rows.map((f) => f.bps),
+    rows.map((f) => f.minFee),
+    rows.map((f) => f.maxFee),
+  );
+  await feeConfig.waitForDeployment();
   const Impl = await ethers.getContractFactory("EncryptedAccount", { libraries: libs });
-  const impl: any = await Impl.deploy(await entryPoint.getAddress());
+  const impl: any = await Impl.deploy(await entryPoint.getAddress(), await feeConfig.getAddress());
   await impl.waitForDeployment();
   const factory: any = await (await ethers.getContractFactory("EncryptedAccountFactory")).deploy(await impl.getAddress());
   await factory.waitForDeployment();
@@ -88,10 +118,7 @@ export async function deployStack(): Promise<Stack> {
   await paymaster.waitForDeployment();
   await (await paymaster.deposit({ value: E.parseEther("10") })).wait();
 
-  const usdc: any = await (await ethers.getContractFactory("MockERC20")).deploy("USD Coin", "USDC", 6);
-  await usdc.waitForDeployment();
-  void deployer;
-  return { entryPoint, paymaster, factory, impl, usdc, libs, chainId };
+  return { entryPoint, paymaster, factory, impl, usdc, libs, chainId, feeConfig };
 }
 
 export function accountAt(addr: string): Promise<any> {
@@ -132,6 +159,7 @@ export interface SetupOpts {
   pulse?: number;
   autoKnown?: boolean;
   delays?: any;
+  ownerBaseBond?: bigint; // F0.16: setupOwnerBond before arming (default: not called → BASE_BOND)
 }
 
 /** ETH: 1 unit = 1e12 wei (micro-ETH). USDC (6 dec): 1 unit = 1 base unit (1e-6 USDC). */
@@ -212,6 +240,7 @@ async function setupRolesAndArm(acct: any, owner: HardhatEthersSigner, opts: Set
       .connect(owner)
       .setupRoles(opts.device ?? E.ZeroAddress, opts.helper ?? E.ZeroAddress, opts.pulse ?? 90 * DAY, opts.autoKnown ?? true)
   ).wait();
+  if (opts.ownerBaseBond !== undefined) await (await acct.connect(owner).setupOwnerBond(opts.ownerBaseBond)).wait();
   await (await acct.connect(owner).arm()).wait();
 }
 
@@ -240,10 +269,10 @@ export interface StackB extends Stack {
 }
 
 /** A stack plus the B implementation and a factory cloning it (the policy mode is chosen by the factory used). */
-export async function deployStackB(): Promise<StackB> {
-  const stack = await deployStack();
+export async function deployStackB(fees: FeeRow[] = [], feeRecipient?: string): Promise<StackB> {
+  const stack = await deployStack(fees, feeRecipient);
   const ImplB = await ethers.getContractFactory("EncryptedAccountB", { libraries: stack.libs });
-  const implB: any = await ImplB.deploy(await stack.entryPoint.getAddress());
+  const implB: any = await ImplB.deploy(await stack.entryPoint.getAddress(), await stack.feeConfig.getAddress());
   await implB.waitForDeployment();
   const factoryB: any = await (await ethers.getContractFactory("EncryptedAccountFactory")).deploy(await implB.getAddress());
   await factoryB.waitForDeployment();
@@ -330,10 +359,17 @@ export async function encGuess(acct: any, user: string, chainId: bigint, opId: b
   return { handles: enc.handles, inputProof: enc.inputProof, c };
 }
 
-/** K-track guess from the owner EOA (user context = owner). */
+/** F0.16: the bond the next K-track guess must carry. */
+export async function bondNow(acct: any): Promise<bigint> {
+  const [required] = await acct.ownerBond();
+  return BigInt(required);
+}
+
+/** K-track guess from the owner EOA (user context = owner), with the required bond (F0.16). */
 export async function guess(acct: any, signer: HardhatEthersSigner, chainId: bigint, opId: bigint, pin: string) {
   const enc = await encGuess(acct, signer.address, chainId, opId, pin);
-  return await (await acct.connect(signer).submitGuess(opId, enc.c, enc.handles[0], enc.inputProof)).wait();
+  const value = await bondNow(acct);
+  return await (await acct.connect(signer).submitGuess(opId, enc.c, enc.handles[0], enc.inputProof, { value })).wait();
 }
 
 /** Authenticated lane: K (signer) + co-signature of D or the helper (cosigner). */

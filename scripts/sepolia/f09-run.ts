@@ -120,8 +120,16 @@ async function pinSample(ctx: LiveCtx, acct: any, acctW: any, acctAddr: string, 
   const tChal = now();
   const enc = await encryptTimed(ctx, [{ type: "euint64", value: guessValue(fp, c) }], acctAddr, user.address);
   const tEnc = now();
+  // F0.16 build: a K-track guess carries the bond (msg.value of the direct call from K; refunded on a correct PIN)
+  const bonded = Boolean(acct.interface.getFunction("ownerBond"));
+  const bond: bigint = bonded ? BigInt((await acct.ownerBond())[0]) : 0n;
+  if (bonded) out.bondWei = bond.toString();
   const sub = await send(user, `e1#${i} submitGuess`, () =>
-    k53 ? acct.submitGuess.populateTransaction(opId, c, enc.handles[0], enc.inputProof) : acct.submitGuess.populateTransaction(opId, enc.handles[0], enc.inputProof),
+    k53
+      ? bonded
+        ? acct.submitGuess.populateTransaction(opId, c, enc.handles[0], enc.inputProof, { value: bond })
+        : acct.submitGuess.populateTransaction(opId, c, enc.handles[0], enc.inputProof)
+      : acct.submitGuess.populateTransaction(opId, enc.handles[0], enc.inputProof),
   );
   const tSub = now();
   items.push(sub);
@@ -385,6 +393,16 @@ async function main() {
     }
   }
   flush();
+  // F0.16 build: the bonds of the correct guesses go back to the user's wallet (also measures claimRefund)
+  if (acctE1.interface.getFunction("claimRefund") && acctE1.interface.getFunction("ownerBond")) {
+    const owed = BigInt(await acctE1.refundOf(user.address));
+    if (owed > 0n) {
+      const r = await send(user, `e1 claimRefund (${eth(owed)} ETH)`, () => acctE1.claimRefund.populateTransaction());
+      e1.claimRefund = { refundedWei: owed.toString(), gasUsed: Number(r.tx.gasUsed), hash: r.tx.hash, atUtc: iso() };
+      writeJson(runFile("e1.json"), e1);
+      console.log(`claimRefund: ${eth(owed)} ETH back · gas ${r.tx.gasUsed}`);
+    }
+  }
   const s1 = e1.summary;
   const s2 = hot.summary;
   console.log(`\nE1 PIN flow: n=${s1.nOk} p50 ${s1.totalMs.p50} ms · p95 ${s1.totalMs.p95} ms · max ${s1.totalMs.max} ms → ${s1.goNoGo}`);

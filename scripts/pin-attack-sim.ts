@@ -16,10 +16,19 @@
  * Decay phase: the first calendar boundary comes φ ∈ (0, 7 days] after the start of the attack; φ is scanned on an hourly grid and
  * the worst case (most guesses) is reported.
  *
- *   npx ts-node scripts/pin-attack-sim.ts   → results/pin-attack-sim.json
+ * F0.16 — the thief's bond economics (section `f016` of the output): every K-track guess carries a bond
+ * (PolicyMath.ownerBondFor at the score counted on submission), lost on a wrong guess. For each ownerBaseBond
+ * (0.001 / 0.01 / 0.1 / 1 ETH), 30 days, the contract's final semantics (K43 + T2 + K44, stored wait), with no owner
+ * reaction and with an escape started within 1 h: the guesses the thief gets, the bonds it loses, the chance of finding
+ * the PIN, and its expected gain (P × account value) against its expected bond loss — for a human-chosen PIN (the curve
+ * below) and for a random PIN from the app's generator (uniform over the PINs randomPin can return).
+ *
+ *   npx ts-node scripts/pin-attack-sim.ts [--eth-usd=3000] [--values=1,10,100,1000]   → results/pin-attack-sim.json
  */
 import * as fs from "fs";
 import * as path from "path";
+import { ownerBondFor, humanPinSuccess } from "../sdk/src/bondFee";
+import { isRandomPinCandidate } from "../sdk/src/pinPolicy";
 
 const MIN = 60;
 const H = 3600;
@@ -43,25 +52,8 @@ const T2: Table = {
   backoff: (n) => (n <= 2 ? 0 : Math.min(7 * D, 15 * MIN * 4 ** (n - 3))),
 };
 
-/** v0.3 §13.8: human-chosen 6-digit PINs without a blacklist. */
-function pSuccess(n: number): number {
-  if (n <= 0) return 0;
-  const pts: [number, number][] = [
-    [10, 0.065],
-    [30, 0.089],
-    [100, 0.133],
-  ];
-  if (n <= 10) return (0.065 * n) / 10;
-  for (let i = 0; i < pts.length - 1; i++) {
-    const [x0, y0] = pts[i];
-    const [x1, y1] = pts[i + 1];
-    if (n <= x1) return y0 + ((y1 - y0) * (Math.log(n) - Math.log(x0))) / (Math.log(x1) - Math.log(x0));
-  }
-  const [x0, y0] = pts[1];
-  const [x1, y1] = pts[2];
-  const slope = (y1 - y0) / (Math.log(x1) - Math.log(x0));
-  return Math.min(1, y1 + slope * (Math.log(n) - Math.log(x1)));
-}
+/** v0.3 §13.8: human-chosen 6-digit PINs without a blacklist (Markert et al.); the SDK holds the one copy of the curve. */
+const pSuccess = humanPinSuccess;
 
 type Scenario = "none" | "rotate" | "escape" | "unrestrict";
 type Variant = { sem: "v03" | "K43"; table: Table; k44: boolean; k45: boolean; hasD: boolean; stored?: boolean };
@@ -131,6 +123,7 @@ export function simulate(c: Cfg, T: number) {
   let stopReason = "";
   let ownerPins = 0;
   let restricted = false;
+  const scores: number[] = []; // F0.16: the attacker's score as counted at each submission (prices its bond)
   const reactAt = c.reactS; // first wrong guess at t = 0; the owner reacts r after the first notification
   // pending owner action: time (earliest), on the K-track (no D) or on the lane
   let ownerAt = c.scenario === "rotate" ? reactAt : Infinity;
@@ -176,13 +169,106 @@ export function simulate(c: Cfg, T: number) {
     // the attacker's wrong guess
     t = ta;
     guesses++;
+    scores.push(s.eff(t));
     s.submit(t);
     if (s.eff(t) >= 3 && !restricted) {
       restricted = true;
       if (c.scenario === "unrestrict") ownerAt = t + c.reactS;
     }
   }
-  return { guesses, p: pSuccess(guesses), stopReason, ownerPins };
+  return { guesses, p: pSuccess(guesses), stopReason, ownerPins, scores };
+}
+
+// ─────────────────────────────── F0.16: the thief's bond cost and expected gain ───────────────────────────────
+
+const arg = (k: string, d: string) => (process.argv.find((a) => a.startsWith(`--${k}=`)) ?? `--${k}=${d}`).split("=")[1];
+const eth = (x: bigint) => Number(x) / 1e18;
+const weiOf = (x: string) => BigInt(Math.round(Number(x) * 1e6)) * 10n ** 12n;
+
+/** How many 6-digit PINs randomPin() can return (not on the short list, no warning). */
+export function randomPinSpace(): number {
+  let n = 0;
+  for (let i = 0; i < 1_000_000; i++) if (isRandomPinCandidate(String(i).padStart(6, "0"))) n++;
+  return n;
+}
+
+export function bondEconomics(ethUsd: number, valuesEth: number[]) {
+  const v: Variant = { sem: "K43", table: T2, k44: true, k45: false, hasD: false, stored: true }; // the contract
+  const phases = Array.from({ length: 168 }, (_, i) => (i + 1) * H);
+  const space = randomPinSpace();
+  const bases = ["0.001", "0.01", "0.1", "1"];
+  const scenarios = [
+    { key: "no reaction", scenario: "none" as Scenario, reactS: 0 },
+    { key: "escape within 1 h", scenario: "escape" as Scenario, reactS: H },
+  ];
+  const r2 = (x: number) => Math.round(x * 1e6) / 1e6;
+  const rows: any[] = [];
+  for (const sc of scenarios) {
+    const runs = phases.map((phaseS) => simulate({ ...v, scenario: sc.scenario, reactS: sc.reactS, phaseS }, 30 * D));
+    const n = Math.max(...runs.map((r) => r.guesses));
+    for (const b of bases) {
+      const base = weiOf(b);
+      // worst case for the owner: the most guesses and, among those decay phases, the cheapest bonds
+      let best: { scores: number[]; bonds: bigint[]; total: bigint } | null = null;
+      for (const r of runs) {
+        if (r.guesses !== n) continue;
+        const bonds = r.scores.map((x) => ownerBondFor(x, base));
+        const total = bonds.reduce((a, x) => a + x, 0n);
+        if (!best || total < best.total) best = { scores: r.scores, bonds, total };
+      }
+      for (const pin of ["human", "random"] as const) {
+        const P = (k: number) => (pin === "human" ? pSuccess(k) : Math.min(1, k / space));
+        // guess i is made only if the first i − 1 failed, and its bond is lost only if it is wrong too: P = 1 − P(i)
+        const loss = (k: number) => best!.bonds.slice(0, k).reduce((a, x, i) => a + (1 - P(i + 1)) * eth(x), 0);
+        const perValue = valuesEth.map((V) => {
+          let kStar = 0;
+          let bestProfit = 0;
+          for (let k = 1; k <= n; k++) {
+            const pr = P(k) * V - loss(k);
+            if (pr > bestProfit) [kStar, bestProfit] = [k, pr];
+          }
+          const gain = P(n) * V;
+          const lost = loss(n);
+          return {
+            valueEth: V,
+            expectedGainEth: r2(gain),
+            expectedBondLossEth: r2(lost),
+            expectedProfitEth: r2(gain - lost),
+            expectedGainUsd: Math.round(gain * ethUsd),
+            expectedBondLossUsd: Math.round(lost * ethUsd),
+            rationalThief: { guesses: kStar, pSuccess: r2(P(kStar)), expectedProfitEth: r2(bestProfit), expectedProfitUsd: Math.round(bestProfit * ethUsd) },
+          };
+        });
+        rows.push({
+          scenario: sc.key,
+          pin,
+          ownerBaseBondEth: Number(b),
+          guesses30d: n,
+          scoresAtSubmission: best!.scores,
+          bondsEth: best!.bonds.map(eth),
+          totalBondEth: r2(eth(best!.total)),
+          totalBondUsd: Math.round(eth(best!.total) * ethUsd),
+          pSuccess: r2(P(n)),
+          perValue,
+        });
+      }
+    }
+  }
+  return {
+    evidence: "[I] model (the same event-driven simulation; bond = PolicyMath.ownerBondFor at the score counted on submission)",
+    params: { ethUsd, valuesEth, bases: bases.map(Number), window: "30 days", variant: "K43/T2+K44+SW (no D): the contract" },
+    randomPinSpace: space,
+    assumptions: [
+      "Only K is stolen; the thief guesses at every allowed moment and pays each bond from its own funds (a direct call by K; the account's balance can never pay it). Every bond of a wrong guess stays in the account.",
+      "Worst case for the owner: the decay phase with the most guesses, and among those the cheapest bonds.",
+      "Human PIN: the Markert curve without a blocklist (P(10) = 6.5%, P(30) = 8.9%, P(100) = 13.3%; linear below 10). The app's short reject list only lowers it, so the curve overstates the thief's odds.",
+      "Random PIN: uniform over the PINs randomPin() can return (not on the list, no warning); the thief knows the generator and never repeats a guess: P(n) = n / space.",
+      "Expected gain = P(PIN found in the window) × account value: an upper bound. Finding the PIN is not yet moving the funds: a PIN transfer waits its delay (1 h; 48 h above L_big) and the owner can still escape. In the 'escape within 1 h' scenario the escape also cancels every pending op, so the realistic gain there is about zero.",
+      "Expected bond loss = Σ (1 − P(i)) · bond_i: guess i is made only if the earlier ones failed, and its bond is refunded if it is right.",
+      "rationalThief: the number of guesses k that maximizes P(k)·V − loss(k) (0 = guessing does not pay).",
+    ],
+    rows,
+  };
 }
 
 const fmt = (x: number) => (x >= D ? `${(x / D).toFixed(1)} d` : x >= H ? `${(x / H).toFixed(1)} h` : x >= MIN ? `${Math.round(x / MIN)} min` : `${x} s`);
@@ -256,6 +342,9 @@ function main() {
     ownerWaitBetweenKTrackPins: fmt(T2.backoff(s)),
     note: s >= 3 ? "on the K-track every PIN entry updates the last-attempt time; remedies: lane (D), rotation (score is reset), escape or decay" : "",
   }));
+  const ethUsd = Number(arg("eth-usd", "3000"));
+  const valuesEth = arg("values", "1,10,100,1000").split(",").map(Number);
+  const f016 = bondEconomics(ethUsd, valuesEth);
   const out = {
     evidence: "[I] model (event-driven simulation; an exact model of the contract semantics: F0.10 derived back-off, and F0.15 stored back-off in the +SW variants); success curve interpolated from v0.3 §13.8",
     generatedAtUtc: new Date().toISOString(),
@@ -273,6 +362,7 @@ function main() {
     rows,
     ownerTypos: typos,
     ownerLockout,
+    f016,
   };
   fs.writeFileSync(path.join(__dirname, "..", "results", "pin-attack-sim.json"), JSON.stringify(out, null, 2));
   for (const r of rows) {
@@ -280,6 +370,14 @@ function main() {
     console.log(
       `${r.variant.padEnd(26)} ${r.scenario.padEnd(10)} r=${String(r.react).padEnd(6)} 24h: ${String(r["24h"].guesses).padStart(4)} (${r["24h"].pSuccessPct}%)  7d: ${String(r["7d"].guesses).padStart(4)} (${r["7d"].pSuccessPct}%)  30d: ${String(r["30d"].guesses).padStart(4)} (${r["30d"].pSuccessPct}%) [${r["30d"].guessesMinMedianMax.join("/")}] ${r["30d"].stopReason ?? ""}`,
     );
+  }
+
+  console.log(`\nF0.16 — the thief's 30 days (ETH = $${ethUsd}; random-PIN space ${f016.randomPinSpace.toLocaleString("en-US")}):`);
+  for (const r of f016.rows) {
+    const vals = r.perValue
+      .map((x: any) => `${x.valueEth} ETH: gain ${x.expectedGainEth} / bond loss ${x.expectedBondLossEth} (rational k=${x.rationalThief.guesses})`)
+      .join(" · ");
+    console.log(`${r.scenario.padEnd(18)} ${r.pin.padEnd(6)} base ${String(r.ownerBaseBondEth).padEnd(5)} guesses ${String(r.guesses30d).padStart(2)} bonds ${r.totalBondEth} ETH ($${r.totalBondUsd}) P=${(r.pSuccess * 100).toFixed(4)}% │ ${vals}`);
   }
 }
 

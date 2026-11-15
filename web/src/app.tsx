@@ -13,22 +13,28 @@ import {
   AccountView,
   CALL_STEPS,
   Ctx,
+  OwnerBond,
+  PIN_CHANGE_STEPS,
   SEND_STEPS,
   SETUP_STEPS,
   StepCb,
   WrongPin,
+  changePinWithPin,
+  claimRefund,
   createAndSetup,
   deposit,
   findAccounts,
   loadActivity,
   loadPlan,
   proveAliveWithPin,
+  quoteFee,
   readAccount,
   readEscape,
   sendWithPin,
 } from "./account";
 import { fheClient } from "./fhe";
-import { checkPin, randomPin } from "./pin";
+import { PIN_NOTE, checkPin, randomPin } from "./pin";
+import { BASE_BOND, isValidOwnerBaseBond, ownerBondFor, suggestOwnerBaseBond } from "../../sdk/src/bondFee";
 import { explainError } from "./tx";
 import { connectWallet, hasWallet, watchWallet } from "./wallet";
 import {
@@ -388,6 +394,95 @@ function PinPad(props: {
   );
 }
 
+// ───────────────────────────── F0.16: choosing a PIN, and what a PIN try costs ─────────────────────────────
+
+/** PIN entry for a new PIN (setup, PIN change): the short note, warnings that never block, a large random suggestion. */
+function PinChooser(p: { pin: string; setPin: (v: string) => void; reveal: boolean; setReveal: (v: boolean) => void; suggested: string | null; onEnter: () => void }) {
+  const check = checkPin(p.pin);
+  let msg = { t: "", k: "" };
+  if (p.pin) {
+    if (p.pin.length < 6) msg = { t: `${6 - p.pin.length} more digit${6 - p.pin.length === 1 ? "" : "s"}`, k: "" };
+    else if (!check.ok) msg = { t: check.reason ?? "Choose another PIN", k: "bad" };
+    else if (check.warnings.length) msg = { t: `${check.warnings.join(" · ")}. You can still use it.`, k: "warn" };
+    else msg = { t: "Looks good", k: "ok" };
+  }
+  return (
+    <div class="flow-body">
+      {p.suggested && p.suggested === p.pin && (
+        <div class="suggested-big" aria-live="polite">
+          <span>Your random PIN · write it down now</span>
+          <b class="mono">{p.suggested}</b>
+          <span>Next you type it once more to confirm.</span>
+        </div>
+      )}
+      <PinPad value={p.pin} onChange={p.setPin} onEnter={(v) => checkPin(v).ok && p.onEnter()} reveal={p.reveal} onToggleReveal={() => p.setReveal(!p.reveal)} />
+      <p class={`pin-msg ${msg.k}`}>{msg.t || "Type on your keyboard or tap the keys"}</p>
+      <p class="pin-note">
+        <IconInfo />
+        <span>{PIN_NOTE}</span>
+      </p>
+    </div>
+  );
+}
+
+type TryInfo = { bond: OwnerBond | null; score: number };
+
+/** The bond the next key-track PIN try needs, read when a PIN screen opens (bond null: an account without bonds). */
+function useTryInfo(account: string): TryInfo | null {
+  const [info, setInfo] = useState<TryInfo | null>(null);
+  useEffect(() => {
+    let live = true;
+    retry(() => readAccount(read, account)).then(
+      (v) => live && setInfo({ bond: v.bond, score: v.score }),
+      () => live && setInfo({ bond: null, score: 0 }),
+    );
+    return () => {
+      live = false;
+    };
+  }, [account]);
+  return info;
+}
+
+/** Shown before the PIN pad: the refundable bond (from the wallet) and, for a transfer, the fee on top of the amount. */
+function TryCost(p: { info: TryInfo | null; fee?: bigint | null; amount?: bigint; walletBal?: bigint | null }) {
+  if (!p.info) return <div class="try-cost small faint">Reading the bond for this PIN try…</div>;
+  const b = p.info.bond;
+  const fee = p.fee ?? null;
+  if (!b && !(fee !== null && fee > 0n)) return null;
+  return (
+    <div class="try-cost">
+      {b && (
+        <div class="try-row">
+          <span>
+            PIN-try bond<small>From your wallet. It comes back when the PIN is right; a wrong PIN leaves it in your account.</small>
+          </span>
+          <b>{fmtEth(b.required)} ETH</b>
+        </div>
+      )}
+      {fee !== null && fee > 0n && (
+        <div class="try-row">
+          <span>
+            Fee<small>From the account, on top: the recipient gets exactly {p.amount !== undefined ? fmtEth(p.amount) : "the amount"} ETH.</small>
+          </span>
+          <b>{fmtEth(fee)} ETH</b>
+        </div>
+      )}
+      {b && p.info.score >= 1 && (
+        <p class="small faint" style={{ margin: "8px 0 0" }}>
+          The bond doubles with each wrong PIN still counted. The lane (your key plus a second device or a recovery helper) needs no bond; this demo account has neither.
+        </p>
+      )}
+      {b && p.walletBal != null && p.walletBal < b.required && (
+        <p class="field-err" style={{ margin: "8px 0 0" }}>
+          Your wallet needs {fmtEth(b.required)} ETH for the bond, plus gas.
+        </p>
+      )}
+    </div>
+  );
+}
+
+const lowWallet = (info: TryInfo | null, walletBal: bigint | null | undefined) => !!info?.bond && walletBal != null && walletBal < info.bond.required;
+
 // ───────────────────────────── top bar ─────────────────────────────
 
 type Fhe = "loading" | "ready" | "error";
@@ -508,6 +603,7 @@ const SETUP_LABELS = [
   "Encrypt your address book (2/3)",
   "Encrypt your address book (3/3)",
   "Encrypt your spender list",
+  "Set your PIN-try bond",
   "Turn protection on",
 ];
 const LIMIT_PRESETS = ["0.005", "0.01", "0.05", "0.1"];
@@ -543,6 +639,8 @@ function CreateFlow({ ctx, fhe, walletBal, onDone, onCancel }: { ctx: Ctx; fhe: 
   const [padState, setPadState] = useState<"" | "bad" | "ok">("");
   const [tick, setTick] = useState(0);
   const [limit, setLimit] = useState(plan ? ethers.formatEther(BigInt(plan.limitUnits) * ETH_UNIT) : "0.01");
+  const [bond, setBond] = useState(plan?.bondBase ? ethers.formatEther(BigInt(plan.bondBase)) : "0.001");
+  const [size, setSize] = useState("1");
   const [tasks, setTasks] = useState<TaskState[]>(() => freshTasks(SETUP_STEPS.length));
   const [runErr, setRunErr] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
@@ -560,15 +658,7 @@ function CreateFlow({ ctx, fhe, walletBal, onDone, onCancel }: { ctx: Ctx; fhe: 
     return () => window.removeEventListener("beforeunload", h);
   }, [running]);
 
-  // PIN feedback
   const check = checkPin(pin);
-  let pinMsg = { t: "", k: "" };
-  if (step === 0 && pin) {
-    if (pin.length < 6) pinMsg = { t: `${6 - pin.length} more digit${6 - pin.length === 1 ? "" : "s"}`, k: "" };
-    else if (!check.ok) pinMsg = { t: check.reason ?? "Choose another PIN", k: "bad" };
-    else if (check.warnings.length) pinMsg = { t: check.warnings.join(" · "), k: "warn" };
-    else pinMsg = { t: "Looks good", k: "ok" };
-  }
 
   // confirm: compare as soon as the length matches
   const [confirmMsg, setConfirmMsg] = useState({ t: "", k: "" });
@@ -595,6 +685,13 @@ function CreateFlow({ ctx, fhe, walletBal, onDone, onCancel }: { ctx: Ctx; fhe: 
 
   const limitWei = parseEth(limit);
   const limitOk = limitWei !== null && limitWei / ETH_UNIT >= 2n;
+  // F0.16: the base bond of key-track PIN tries, with a suggestion from the expected account size
+  const sizeWei = parseEth(size);
+  const usingRandom = suggested !== null && suggested === pin;
+  const bondSuggestion = sizeWei ? suggestOwnerBaseBond(sizeWei, { randomPin: usingRandom }) : BASE_BOND;
+  const bondWei = parseEth(bond);
+  const bondOk = bondWei !== null && isValidOwnerBaseBond(bondWei);
+  const txCount = bondOk && bondWei! > BASE_BOND ? 9 : 8;
 
   async function run() {
     setStep(4);
@@ -614,7 +711,7 @@ function CreateFlow({ ctx, fhe, walletBal, onDone, onCancel }: { ctx: Ctx; fhe: 
         ),
       );
     try {
-      const a = await createAndSetup(ctx, { pin, limitEth: limit, known: null, escapeWallet }, cb);
+      const a = await createAndSetup(ctx, { pin, limitEth: limit, known: null, escapeWallet, bondBase: bondOk ? bondWei! : BASE_BOND }, cb);
       setCreated(a);
       setStep(5);
     } catch (e) {
@@ -652,15 +749,7 @@ function CreateFlow({ ctx, fhe, walletBal, onDone, onCancel }: { ctx: Ctx; fhe: 
                 </span>
               </div>
             )}
-            <div class="flow-body">
-              <PinPad value={pin} onChange={(v) => setPin(v)} onEnter={(v) => checkPin(v).ok && setStep(1)} reveal={reveal} onToggleReveal={() => setReveal(!reveal)} />
-              <p class={`pin-msg ${pinMsg.k}`}>{pinMsg.t || "Type on your keyboard or tap the keys"}</p>
-              {suggested && suggested === pin && (
-                <div class="suggested">
-                  Suggested PIN <span class="mono">{suggested}</span> · write it down now
-                </div>
-              )}
-            </div>
+            <PinChooser pin={pin} setPin={setPin} reveal={reveal} setReveal={setReveal} suggested={suggested} onEnter={() => setStep(1)} />
             <div class="flow-actions">
               <button
                 type="button"
@@ -673,7 +762,7 @@ function CreateFlow({ ctx, fhe, walletBal, onDone, onCancel }: { ctx: Ctx; fhe: 
                 }}
               >
                 <IconShuffle />
-                Suggest one
+                Random PIN
               </button>
               <button type="button" class="btn btn-primary" disabled={!check.ok} onClick={() => setStep(1)}>
                 Continue
@@ -769,12 +858,51 @@ function CreateFlow({ ctx, fhe, walletBal, onDone, onCancel }: { ctx: Ctx; fhe: 
                   {escapeWallet.address}
                 </div>
               </div>
+              <div class="bond-box">
+                <div style={{ fontWeight: 600, fontSize: "14px" }}>PIN-try bond</div>
+                <div class="small faint" style={{ marginTop: "2px" }}>
+                  A thief holding your key locks this much for every PIN try after the first and loses it on a wrong one; your own correct tries get it back.
+                </div>
+                <div class="row wrap" style={{ gap: "10px", marginTop: "12px", alignItems: "flex-end" }}>
+                  <label class="field" style={{ flex: "1 1 150px" }}>
+                    <span>The account will hold about</span>
+                    <div class="input-wrap">
+                      <input class="input" inputMode="decimal" value={size} aria-label="Expected account size in ETH" onInput={(e) => setSize((e.target as HTMLInputElement).value)} style={{ paddingRight: "52px" }} />
+                      <div class="suffix">
+                        <span class="small faint">ETH</span>
+                      </div>
+                    </div>
+                  </label>
+                  <label class="field" style={{ flex: "1 1 150px" }}>
+                    <span>Bond from the 2nd try</span>
+                    <div class="input-wrap">
+                      <input class="input" inputMode="decimal" value={bond} aria-label="PIN-try bond in ETH" onInput={(e) => setBond((e.target as HTMLInputElement).value)} style={{ paddingRight: "52px" }} />
+                      <div class="suffix">
+                        <span class="small faint">ETH</span>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+                <div class="row between small" style={{ marginTop: "8px", gap: "10px" }}>
+                  <span class="faint">
+                    Suggested{usingRandom ? " for a random PIN" : ""}: <b>{fmtEth(bondSuggestion)} ETH</b>
+                  </span>
+                  <button type="button" class="link-btn" onClick={() => setBond(ethers.formatEther(bondSuggestion))}>
+                    Use it
+                  </button>
+                </div>
+                {!bondOk && (
+                  <p class="field-err" style={{ marginTop: "6px" }}>
+                    Between 0.001 and 100 ETH, in steps of 0.001.
+                  </p>
+                )}
+              </div>
             </div>
             <div class="flow-actions">
               <button type="button" class="btn btn-ghost" onClick={() => setStep(0)}>
                 Back
               </button>
-              <button type="button" class="btn btn-primary" disabled={!limitOk} onClick={() => setStep(3)}>
+              <button type="button" class="btn btn-primary" disabled={!limitOk || !bondOk} onClick={() => setStep(3)}>
                 Continue
               </button>
             </div>
@@ -822,11 +950,20 @@ function CreateFlow({ ctx, fhe, walletBal, onDone, onCancel }: { ctx: Ctx; fhe: 
                   <span class="k">Escape address</span>
                   <span class="v mono">{short(escapeWallet.address)}</span>
                 </div>
+                <div class="review-row">
+                  <span class="check">
+                    <IconCheck />
+                  </span>
+                  <span class="k">PIN-try bond</span>
+                  <span class="v">
+                    {bondOk ? fmtEth(bondWei!) : "0.001"} ETH<small>from the 2nd try in a row; back to you when the PIN is right</small>
+                  </span>
+                </div>
               </div>
               <div class="notice" style={{ marginTop: "14px" }}>
                 <IconInfo />
                 <span>
-                  Your wallet will ask you to confirm <b>8 transactions</b>. Keep this tab open; if anything stops, you can continue where it left off.
+                  Your wallet will ask you to confirm <b>{txCount} transactions</b>. Keep this tab open; if anything stops, you can continue where it left off.
                 </span>
               </div>
               {walletBal === 0n && (
@@ -932,8 +1069,9 @@ function CreateFlow({ ctx, fhe, walletBal, onDone, onCancel }: { ctx: Ctx; fhe: 
 const SEND_LABELS = ["Open the transfer on-chain", "Encrypt your PIN guess", "Submit the encrypted guess", "Decrypt only the yes / no result", "Record the result on-chain", "Send the ETH"];
 type SendResult = { kind: "ok"; hash: string } | { kind: "wrong"; score: number; next: number } | { kind: "err"; text: string };
 
-function SendSheet({ ctx, account, view, onClose, onSettled }: { ctx: Ctx; account: string; view: AccountView; onClose: () => void; onSettled: () => void }) {
+function SendSheet({ ctx, account, view, walletBal, onClose, onSettled }: { ctx: Ctx; account: string; view: AccountView; walletBal: bigint | null; onClose: () => void; onSettled: () => void }) {
   const [stage, setStage] = useState<"details" | "pin" | "run" | "result">("details");
+  const [fee, setFee] = useState<bigint | null>(null);
   const [to, setTo] = useState("");
   const [amt, setAmt] = useState("0.0001");
   const [pin, setPin] = useState("");
@@ -953,10 +1091,24 @@ function SendSheet({ ctx, account, view, onClose, onSettled }: { ctx: Ctx; accou
     return () => window.removeEventListener("beforeunload", h);
   }, [running]);
 
+  // F0.16: the fee a PIN-verified transfer of this amount would pay (bound to the transfer when it opens)
+  useEffect(() => {
+    let live = true;
+    setFee(null);
+    const w = parseEth(amt);
+    if (!w) return;
+    const id = setTimeout(() => quoteFee(read, account, ethers.ZeroAddress, w).then((f) => live && setFee(f), () => undefined), 300);
+    return () => {
+      live = false;
+      clearTimeout(id);
+    };
+  }, [amt, account]);
+
   const toTrim = to.trim();
   const toOk = ethers.isAddress(toTrim) && toTrim.toLowerCase() !== account.toLowerCase();
   const wei = parseEth(amt);
-  const enough = wei !== null && view.balance >= wei;
+  const enough = wei !== null && view.balance >= wei + (fee ?? 0n);
+  const tryInfo: TryInfo = { bond: view.bond, score: view.score };
   const nowS = Math.floor(now / 1000);
   const waitUntil = result?.kind === "wrong" ? result.next : view.nextAllowedAt;
   const locked = waitUntil > nowS;
@@ -977,7 +1129,7 @@ function SendSheet({ ctx, account, view, onClose, onSettled }: { ctx: Ctx; accou
         }),
       );
     try {
-      const h = await sendWithPin(ctx, account, ethers.getAddress(toTrim), wei, p, cb);
+      const h = await sendWithPin(ctx, account, ethers.getAddress(toTrim), wei, p, cb, view.bond?.required);
       setResult({ kind: "ok", hash: h });
     } catch (e) {
       if (e instanceof WrongPin) setResult({ kind: "wrong", score: e.score, next: e.nextAllowedAt });
@@ -1017,8 +1169,10 @@ function SendSheet({ ctx, account, view, onClose, onSettled }: { ctx: Ctx; accou
                 </button>
               </div>
             </div>
-            <span class="field-hint">Available: {fmtEth(view.balance)} ETH</span>
-            {wei !== null && !enough && <span class="field-err">The account holds less than that. Deposit first.</span>}
+            <span class="field-hint">
+              Available: {fmtEth(view.balance)} ETH{fee !== null && fee > 0n ? ` · fee on top: ${fmtEth(fee)} ETH` : ""}
+            </span>
+            {wei !== null && !enough && <span class="field-err">The account holds less than the amount{fee ? " plus the fee" : ""}. Deposit first.</span>}
           </label>
           <div class="notice info">
             <IconLock />
@@ -1045,16 +1199,17 @@ function SendSheet({ ctx, account, view, onClose, onSettled }: { ctx: Ctx; accou
             <span class="faint">→</span>
             <span class="mono">{short(toTrim)}</span>
           </div>
+          <TryCost info={tryInfo} fee={fee} amount={wei} walletBal={walletBal} />
           <p class="center muted" style={{ margin: "18px 0 6px", fontSize: "15px" }}>
             Enter your PIN
           </p>
-          <PinPad value={pin} onChange={setPin} onEnter={(v) => void go(v)} />
-          <p class="keys-hint center">Wrong PINs are counted on-chain and move nothing. Trying one is safe.</p>
+          <PinPad value={pin} onChange={setPin} onEnter={(v) => !lowWallet(tryInfo, walletBal) && void go(v)} />
+          <p class="keys-hint center">Wrong PINs are counted on-chain and send nothing out; the bond stays in your account.</p>
           <div class="flow-actions">
             <button type="button" class="btn btn-ghost" onClick={() => setStage("details")}>
               Back
             </button>
-            <button type="button" class="btn btn-primary" disabled={pin.length < 6} onClick={() => void go()}>
+            <button type="button" class="btn btn-primary" disabled={pin.length < 6 || lowWallet(tryInfo, walletBal)} onClick={() => void go()}>
               Send with PIN
             </button>
           </div>
@@ -1116,7 +1271,10 @@ function SendSheet({ ctx, account, view, onClose, onSettled }: { ctx: Ctx; accou
               {result.kind === "wrong" ? (
                 <>
                   <h3>Wrong PIN. Nothing moved.</h3>
-                  <p>The attempt was counted on-chain before its result was decrypted. Wrong guesses so far: {result.score}.</p>
+                  <p>
+                    The attempt was counted on-chain before its result was decrypted. Wrong guesses so far: {result.score}.
+                    {view.bond ? ` The bond stayed in your account; the next try needs ${fmtEth(ownerBondFor(result.score, view.bond.base))} ETH.` : ""}
+                  </p>
                   <div class="facts-row">
                     <span class={`badge ${locked ? "warn" : ""}`}>
                       <IconClock />
@@ -1144,6 +1302,210 @@ function SendSheet({ ctx, account, view, onClose, onSettled }: { ctx: Ctx; accou
               </div>
             </>
           )}
+        </div>
+      )}
+    </Sheet>
+  );
+}
+
+// ───────────────────────────── change the PIN ─────────────────────────────
+
+const PIN_CHANGE_LABELS = ["Open the PIN change on-chain", "Encrypt your current PIN guess", "Submit the guess with its bond", "Decrypt only the yes / no result", "Record the result on-chain", "Wait the delay, then switch PINs"];
+
+/** PIN change: the new PIN (note, warnings, random suggestion), typed twice, then verified with the current PIN. */
+function ChangePinSheet({ ctx, account, walletBal, onClose, onSettled }: { ctx: Ctx; account: string; walletBal: bigint | null; onClose: () => void; onSettled: () => void }) {
+  const [stage, setStage] = useState<"new" | "confirm" | "current" | "run" | "result">("new");
+  const [pinNew, setPinNew] = useState("");
+  const [pinNew2, setPinNew2] = useState("");
+  const [pinCur, setPinCur] = useState("");
+  const [reveal, setReveal] = useState(false);
+  const [suggested, setSuggested] = useState<string | null>(null);
+  const [padState, setPadState] = useState<"" | "bad" | "ok">("");
+  const [tick, setTick] = useState(0);
+  const [confirmMsg, setConfirmMsg] = useState({ t: "", k: "" });
+  const [tasks, setTasks] = useState<TaskState[]>(() => freshTasks(PIN_CHANGE_STEPS.length));
+  const [result, setResult] = useState<SendResult | null>(null);
+  const [t0, setT0] = useState(0);
+  const info = useTryInfo(account);
+  const now = useNow(1000);
+  const running = stage === "run";
+
+  useEffect(() => {
+    if (!running) return;
+    const h = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", h);
+    return () => window.removeEventListener("beforeunload", h);
+  }, [running]);
+
+  useEffect(() => {
+    if (stage !== "confirm" || pinNew2.length !== pinNew.length) return;
+    if (pinNew2 === pinNew) {
+      setPadState("ok");
+      setConfirmMsg({ t: "PINs match", k: "ok" });
+      const id = setTimeout(() => {
+        setStage("current");
+        setPadState("");
+      }, 420);
+      return () => clearTimeout(id);
+    }
+    setPadState("bad");
+    setTick((t) => t + 1);
+    setConfirmMsg({ t: "That doesn't match. Try again.", k: "bad" });
+    const id = setTimeout(() => {
+      setPinNew2("");
+      setPadState("");
+    }, 650);
+    return () => clearTimeout(id);
+  }, [pinNew2, stage]);
+
+  const same = pinCur.length >= 6 && pinCur === pinNew;
+  const blocked = pinCur.length < 6 || same || lowWallet(info, walletBal) || !info;
+
+  async function go(p = pinCur) {
+    if (p.length < 6 || p === pinNew || lowWallet(info, walletBal)) return;
+    setStage("run");
+    setT0(Date.now());
+    setResult(null);
+    setTasks(freshTasks(PIN_CHANGE_STEPS.length));
+    try {
+      setResult({ kind: "ok", hash: await changePinWithPin(ctx, account, p, pinNew, taskCb(setTasks, 5), info?.bond?.required) });
+    } catch (e) {
+      if (e instanceof WrongPin) setResult({ kind: "wrong", score: e.score, next: e.nextAllowedAt });
+      else setResult({ kind: "err", text: explainError(e) });
+    } finally {
+      setPinCur("");
+      setStage("result");
+      onSettled();
+    }
+  }
+
+  const done = tasks.filter((t) => t.s === "done" || t.s === "bad").length;
+  const current = tasks.findIndex((t) => t.s === "run");
+  return (
+    <Sheet title={stage === "result" ? "Result" : "Change your PIN"} onClose={onClose} locked={running}>
+      {stage === "new" && (
+        <div>
+          <p class="flow-kicker">Step 1 of 3</p>
+          <p class="center muted" style={{ margin: "0 0 10px", fontSize: "15px" }}>
+            Choose a new PIN
+          </p>
+          <PinChooser pin={pinNew} setPin={setPinNew} reveal={reveal} setReveal={setReveal} suggested={suggested} onEnter={() => setStage("confirm")} />
+          <div class="flow-actions">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onClick={() => {
+                const p = randomPin(6);
+                setPinNew(p);
+                setSuggested(p);
+                setReveal(true);
+              }}
+            >
+              <IconShuffle />
+              Random PIN
+            </button>
+            <button type="button" class="btn btn-primary" disabled={!checkPin(pinNew).ok} onClick={() => setStage("confirm")}>
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
+
+      {stage === "confirm" && (
+        <div>
+          <p class="flow-kicker">Step 2 of 3</p>
+          <p class="center muted" style={{ margin: "0 0 10px", fontSize: "15px" }}>
+            Enter the new PIN again
+          </p>
+          <PinPad value={pinNew2} onChange={setPinNew2} state={padState} tick={tick} max={pinNew.length} min={pinNew.length} />
+          <p class={`pin-msg ${confirmMsg.k}`}>{confirmMsg.t || `${pinNew.length} digits`}</p>
+          <div class="flow-actions">
+            <button
+              type="button"
+              class="btn btn-ghost"
+              onClick={() => {
+                setPinNew2("");
+                setConfirmMsg({ t: "", k: "" });
+                setStage("new");
+              }}
+            >
+              Back
+            </button>
+          </div>
+        </div>
+      )}
+
+      {stage === "current" && (
+        <div>
+          <p class="flow-kicker">Step 3 of 3</p>
+          <TryCost info={info} walletBal={walletBal} />
+          <p class="center muted" style={{ margin: "18px 0 6px", fontSize: "15px" }}>
+            Now your current PIN
+          </p>
+          <PinPad value={pinCur} onChange={setPinCur} onEnter={(v) => !blocked && void go(v)} />
+          <p class={`pin-msg ${same ? "bad" : ""}`}>{same ? "That is the new PIN; enter the current one." : "The current PIN keeps working until the change runs."}</p>
+          <div class="flow-actions">
+            <button
+              type="button"
+              class="btn btn-ghost"
+              onClick={() => {
+                setPinCur("");
+                setPinNew2("");
+                setConfirmMsg({ t: "", k: "" });
+                setStage("new");
+              }}
+            >
+              Back
+            </button>
+            <button type="button" class="btn btn-primary" disabled={blocked} onClick={() => void go()}>
+              Change PIN
+            </button>
+          </div>
+        </div>
+      )}
+
+      {stage === "run" && (
+        <div>
+          <div class="progress-head">
+            <Ring done={done} total={PIN_CHANGE_STEPS.length} />
+            <div>
+              <div class="progress-title">Changing your PIN</div>
+              <div class="progress-sub">{current >= 0 ? PIN_CHANGE_LABELS[current] : "Preparing…"}</div>
+              <div class="timer">{mmss(now - t0)}</div>
+            </div>
+          </div>
+          <ul class="tasks">
+            {tasks.map((t, i) => (
+              <Task label={PIN_CHANGE_LABELS[i]} t={t} extra={t.s === "run" && (i === 0 || i === 1 || i === 3) ? <Cipher n={12} /> : undefined} />
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {stage === "result" && result && (
+        <div class="result">
+          {result.kind === "ok" ? <OkIcon /> : <BadIcon />}
+          <h3>{result.kind === "ok" ? "PIN changed" : result.kind === "wrong" ? "Wrong PIN. Nothing changed." : "That didn't go through"}</h3>
+          <p>
+            {result.kind === "ok"
+              ? "From now on only the new PIN works. The wrong-guess count stays as it was."
+              : result.kind === "wrong"
+                ? `Your PIN is unchanged. Wrong guesses so far: ${result.score}.`
+                : result.text}
+          </p>
+          {result.kind === "ok" && (
+            <div class="facts-row">
+              <TxLink hash={result.hash} label="View transaction" />
+            </div>
+          )}
+          <div class="flow-actions">
+            <button type="button" class="btn btn-primary btn-lg" onClick={onClose}>
+              Done
+            </button>
+          </div>
         </div>
       )}
     </Sheet>
@@ -1292,13 +1654,14 @@ function Dashboard({ ctx, account, walletBal, notify, onNewAccount, onWalletBal 
   const [view, setView] = useState<AccountView | null>(null);
   const [escape, setEscape] = useState<string | null>(null);
   const [activity, setActivity] = useState<Activity[] | null>(null);
-  const [sheet, setSheet] = useState<null | "send" | "deposit">(null);
+  const [sheet, setSheet] = useState<null | "send" | "deposit" | "pin">(null);
+  const [claiming, setClaiming] = useState(false);
   const now = useNow(1000);
 
   const refresh = useCallback(
     async (withActivity: boolean) => {
       try {
-        setView(await readAccount(read, account));
+        setView(await readAccount(read, account, ctx.w.address));
       } catch {
         /* transient RPC error: keep the last view */
       }
@@ -1318,6 +1681,20 @@ function Dashboard({ ctx, account, walletBal, notify, onNewAccount, onWalletBal 
   const nowS = Math.floor(now / 1000);
   const score = view?.score ?? 0;
   const next = view && view.nextAllowedAt > nowS ? `Next try in ${fmtWait(view.nextAllowedAt - nowS)}` : "Next try: now";
+
+  /** F0.16: the bonds of correct PIN tries go back to this wallet. */
+  async function claim() {
+    setClaiming(true);
+    try {
+      await claimRefund(ctx, account, () => undefined);
+      notify("Bond refund sent to your wallet", "ok");
+    } catch (e) {
+      notify(explainError(e), "err");
+    } finally {
+      setClaiming(false);
+      void refresh(false);
+    }
+  }
   const badge = !view ? (
     <span class="badge">Loading…</span>
   ) : !view.armed ? (
@@ -1360,6 +1737,17 @@ function Dashboard({ ctx, account, walletBal, notify, onNewAccount, onWalletBal 
                 Deposit
               </button>
             </div>
+            {view && view.refund > 0n && (
+              <div class="notice info" style={{ marginTop: "14px", alignItems: "center" }}>
+                <IconInfo />
+                <span style={{ flex: 1 }}>
+                  Bonds of your correct PIN tries: <b>{fmtEth(view.refund)} ETH</b>, ready to go back to your wallet.
+                </span>
+                <button type="button" class="btn btn-secondary btn-sm" disabled={claiming} onClick={() => void claim()}>
+                  {claiming ? "Claiming…" : "Claim"}
+                </button>
+              </div>
+            )}
           </section>
 
           <section class="card card-pad">
@@ -1384,7 +1772,9 @@ function Dashboard({ ctx, account, walletBal, notify, onNewAccount, onWalletBal 
                 <span class="k">
                   PIN<small>Encrypted fingerprint, checked under FHE</small>
                 </span>
-                <span class="v">On</span>
+                <button type="button" class="link-btn v" onClick={() => setSheet("pin")} disabled={!view?.armed || !!view?.escapeReadyAt}>
+                  Change
+                </button>
               </li>
               <li>
                 <span class="check">
@@ -1438,6 +1828,12 @@ function Dashboard({ ctx, account, walletBal, notify, onNewAccount, onWalletBal 
               <span>Waits start at the 3rd</span>
               <span>15 min → 7 days</span>
             </div>
+            {view?.bond && (
+              <div class="row between small" style={{ marginTop: "12px" }}>
+                <span class="faint">Bond for the next PIN try</span>
+                <span>{fmtEth(view.bond.required)} ETH · refundable</span>
+              </div>
+            )}
           </section>
 
           <div class="tip">
@@ -1461,7 +1857,8 @@ function Dashboard({ ctx, account, walletBal, notify, onNewAccount, onWalletBal 
         </div>
       </div>
 
-      {sheet === "send" && view && <SendSheet ctx={ctx} account={account} view={view} onClose={() => setSheet(null)} onSettled={() => void refresh(true)} />}
+      {sheet === "send" && view && <SendSheet ctx={ctx} account={account} view={view} walletBal={walletBal} onClose={() => setSheet(null)} onSettled={() => void refresh(true)} />}
+      {sheet === "pin" && <ChangePinSheet ctx={ctx} account={account} walletBal={walletBal} onClose={() => setSheet(null)} onSettled={() => void refresh(true)} />}
       {sheet === "deposit" && <DepositSheet ctx={ctx} account={account} walletBal={walletBal} onClose={() => setSheet(null)} onSettled={() => void refresh(true)} />}
     </>
   );
@@ -1736,6 +2133,7 @@ function WillSheet({ ctx, account, willAddr, replacing, onClose, onSettled }: { 
   const [tasks, setTasks] = useState<TaskState[]>(() => freshTasks(CALL_STEPS.length));
   const [result, setResult] = useState<WillResult | null>(null);
   const [cards, setCards] = useState(false);
+  const info = useTryInfo(account);
   const [t0, setT0] = useState(0);
   const now = useNow(1000);
 
@@ -1764,7 +2162,7 @@ function WillSheet({ ctx, account, willAddr, replacing, onClose, onSettled }: { 
     setResult(null);
     setTasks(freshTasks(CALL_STEPS.length));
     try {
-      const r = await setHeirsWithPin(ctx, account, willAddr, heirRows, p, taskCb(setTasks, 5));
+      const r = await setHeirsWithPin(ctx, account, willAddr, heirRows, p, taskCb(setTasks, 5), info?.bond?.required);
       setResult({ kind: "ok", hash: r.hash, heirs: r.heirs });
     } catch (e) {
       if (e instanceof WrongPin) setResult({ kind: "wrong", score: e.score, next: e.nextAllowedAt });
@@ -1848,15 +2246,16 @@ function WillSheet({ ctx, account, willAddr, replacing, onClose, onSettled }: { 
               {heirRows.filter((h) => h.mode === "code").length} by code, {heirRows.filter((h) => h.mode === "address").length} by address
             </span>
           </div>
+          <TryCost info={info} />
           <p class="center muted" style={{ margin: "18px 0 6px", fontSize: "15px" }}>
             Enter your PIN
           </p>
-          <PinPad value={pin} onChange={setPin} onEnter={(x) => void go(x)} />
+          <PinPad value={pin} onChange={setPin} onEnter={(x) => !!info && void go(x)} />
           <div class="flow-actions">
             <button type="button" class="btn btn-ghost" onClick={() => setStage("heirs")}>
               Back
             </button>
-            <button type="button" class="btn btn-primary" disabled={pin.length < 6} onClick={() => void go()}>
+            <button type="button" class="btn btn-primary" disabled={pin.length < 6 || !info} onClick={() => void go()}>
               Set heirs
             </button>
           </div>
@@ -2039,6 +2438,7 @@ function HeirCards({ willAddr, heirs, onClose }: { willAddr: string; heirs: NewH
 
 function AliveSheet({ ctx, account, onClose, onSettled }: { ctx: Ctx; account: string; onClose: () => void; onSettled: () => void }) {
   const [stage, setStage] = useState<"pin" | "run" | "result">("pin");
+  const info = useTryInfo(account);
   const [pin, setPin] = useState("");
   const [tasks, setTasks] = useState<TaskState[]>(() => freshTasks(ALIVE_STEPS.length));
   const [result, setResult] = useState<WillResult | null>(null);
@@ -2052,7 +2452,7 @@ function AliveSheet({ ctx, account, onClose, onSettled }: { ctx: Ctx; account: s
     setResult(null);
     setTasks(freshTasks(ALIVE_STEPS.length));
     try {
-      setResult({ kind: "ok", hash: await proveAliveWithPin(ctx, account, p, taskCb(setTasks, -1)), heirs: [] });
+      setResult({ kind: "ok", hash: await proveAliveWithPin(ctx, account, p, taskCb(setTasks, -1), info?.bond?.required), heirs: [] });
     } catch (e) {
       if (e instanceof WrongPin) setResult({ kind: "wrong", score: e.score, next: e.nextAllowedAt });
       else setResult({ kind: "err", text: explainError(e) });
@@ -2072,12 +2472,13 @@ function AliveSheet({ ctx, account, onClose, onSettled }: { ctx: Ctx; account: s
           <p class="center muted" style={{ margin: "4px 0 6px", fontSize: "15px" }}>
             A correct PIN resets your will's clock. Nothing moves.
           </p>
-          <PinPad value={pin} onChange={setPin} onEnter={(x) => void go(x)} />
+          <TryCost info={info} />
+          <PinPad value={pin} onChange={setPin} onEnter={(x) => !!info && void go(x)} />
           <div class="flow-actions">
             <button type="button" class="btn btn-ghost" onClick={onClose}>
               Cancel
             </button>
-            <button type="button" class="btn btn-primary" disabled={pin.length < 6} onClick={() => void go()}>
+            <button type="button" class="btn btn-primary" disabled={pin.length < 6 || !info} onClick={() => void go()}>
               Confirm
             </button>
           </div>
@@ -2327,7 +2728,7 @@ function ClaimView({ ctx, willAddr, initialCode, notify }: { ctx: Ctx; willAddr:
               </div>
             )}
             {revealed !== null && (
-              <div class="reveal">
+              <div class="claim-reveal">
                 <span class="small faint">The tcUSD balance of {short(ctx.w.address)}, decrypted only for you</span>
                 <b>{fmtTc(revealed)}</b>
                 <span class="small muted">

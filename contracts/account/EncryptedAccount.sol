@@ -39,6 +39,8 @@ contract EncryptedAccount is IAccount, IERC1271, ReentrancyGuardTransient, IAcco
     IEntryPoint public immutable entryPoint;
     address public immutable aclAddress;
     address public immutable executorAddress;
+    /// @notice F0.16: the fee configuration every clone of this implementation reads (address(0) = no fee).
+    address public immutable feeConfig;
 
     // ─────────────────────────────── modifiers ───────────────────────────────
 
@@ -68,8 +70,9 @@ contract EncryptedAccount is IAccount, IERC1271, ReentrancyGuardTransient, IAcco
 
     // ─────────────────────────────── construction ───────────────────────────────
 
-    constructor(IEntryPoint ep) {
+    constructor(IEntryPoint ep, address feeConfig_) {
         entryPoint = ep;
+        feeConfig = feeConfig_;
         CoprocessorConfig memory cfg = ZamaConfig.getEthereumCoprocessorConfig();
         aclAddress = cfg.ACLAddress;
         executorAddress = cfg.CoprocessorAddress;
@@ -129,6 +132,12 @@ contract EncryptedAccount is IAccount, IERC1271, ReentrancyGuardTransient, IAcco
         PolicyLib.setupKnown(spenders, start, vals, proof);
     }
 
+    /// @notice F0.16: the K-track base bond (default and minimum BASE_BOND, at most 100 ETH, a multiple of BASE_BOND).
+    ///         After arming only a PIN-verified A_SET_OWNER_BOND op changes it.
+    function setupOwnerBond(uint256 base) external onlySetup {
+        PinLib.setupOwnerBond(base);
+    }
+
     function setupRoles(address device, address helper, uint32 pulse, bool autoKnown_) external onlySetup {
         S.Layout storage l = S.layout();
         l.deviceSigner = device;
@@ -168,7 +177,7 @@ contract EncryptedAccount is IAccount, IERC1271, ReentrancyGuardTransient, IAcco
 
     function _openOutflow(uint8 sub, address asset, address cp, uint256 amount, bool viaPin) internal returns (uint256 opId) {
         bool kOnly;
-        (opId, kOnly) = OpenLib.openOutflow(sub, asset, cp, amount, viaPin);
+        (opId, kOnly) = OpenLib.openOutflow(sub, asset, cp, amount, viaPin, feeConfig);
         if (kOnly) PolicyLib.evaluate(opId); // returns false (stays NeedsPin) if the sum leaves the 64-bit range
     }
 
@@ -245,11 +254,14 @@ contract EncryptedAccount is IAccount, IERC1271, ReentrancyGuardTransient, IAcco
         return OpenLib.challengeOfOp(opId);
     }
 
-    /// @notice K-track guess (K signed via EntryPoint, or K's EOA directly).
-    /// @dev The FHE input must be created for (this account, msg.sender) — i.e. user = EntryPoint for UserOps.
+    /// @notice K-track guess, bonded (F0.16): a direct call from K's EOA that sends at least `ownerBond().required`.
+    ///         A correct PIN credits the bond back to K (claimRefund); a wrong one leaves it in the account. Through the
+    ///         EntryPoint (value 0, and never the account's own money) it reverts with DirectBondRequired; the lane stays
+    ///         available there, unbonded.
+    /// @dev The FHE input must be created for (this account, msg.sender).
     /// @param c the challenge the guess was computed with; a different one reverts without counting (K53).
-    function submitGuess(uint256 opId, uint64 c, externalEuint64 guess, bytes calldata proof) external onlyK whenArmed nonReentrant aaHygiene {
-        PinLib.submitGuess(opId, c, guess, proof, S.TRACK_OWNER, address(0), 0);
+    function submitGuess(uint256 opId, uint64 c, externalEuint64 guess, bytes calldata proof) external payable onlyK whenArmed nonReentrant aaHygiene {
+        PinLib.submitGuess(opId, c, guess, proof, S.TRACK_OWNER, msg.sender == address(entryPoint) ? address(0) : msg.sender, msg.value);
     }
 
     /// @notice Authenticated lane: K + co-signature of D or the recovery helper. Own slot and score, outside
@@ -277,6 +289,11 @@ contract EncryptedAccount is IAccount, IERC1271, ReentrancyGuardTransient, IAcco
         return PolicyMath.bondFor(PolicyMath.score(S.layout().tracks[S.TRACK_RECOVERY]));
     }
 
+    /// @notice F0.16: bond required for the next K-track guess, and the account's public base bond.
+    function ownerBond() external view returns (uint256 required, uint256 base) {
+        return PinLib.ownerBond();
+    }
+
     /// @notice Permissionless phase 2 of a guess (the watchtower auto-finalizes; the user never clicks twice).
     function finalizeGuess(uint256 opId, bytes calldata cleartexts, bytes calldata decryptionProof) external nonReentrant {
         (bool ok, bool big, uint8 track) = PinLib.finalizeGuess(opId, cleartexts, decryptionProof);
@@ -287,7 +304,7 @@ contract EncryptedAccount is IAccount, IERC1271, ReentrancyGuardTransient, IAcco
 
     /// @notice Executes a verified op after its delay. Permissionless: the content is fixed and verified.
     function executeOp(uint256 opId) external nonReentrant aaHygiene {
-        OpsLib.executeOp(opId);
+        OpsLib.executeOp(opId, feeConfig);
     }
 
     /// @dev Self-call target so that auto-"known" can be wrapped in try/catch (best effort).
@@ -409,12 +426,10 @@ contract EncryptedAccount is IAccount, IERC1271, ReentrancyGuardTransient, IAcco
 
     // ─────────────────────────────── refunds ───────────────────────────────
 
+    /// @notice Pulls the bonds of the caller's correct guesses: the owner key's K-track bonds, and recovery-track bonds
+    ///         the caller posted (F0.16).
     function claimRefund() external nonReentrant {
-        S.Layout storage l = S.layout();
-        uint256 amt = l.refunds[msg.sender];
-        l.refunds[msg.sender] = 0;
-        (bool s, ) = payable(msg.sender).call{value: amt}("");
-        if (!s) revert Errors.TransferFailed();
+        PinLib.claimRefund();
     }
 
     // ─────────────────────────────── views ───────────────────────────────
@@ -530,7 +545,7 @@ contract EncryptedAccount is IAccount, IERC1271, ReentrancyGuardTransient, IAcco
     }
 
     function refundOf(address a) external view returns (uint256) {
-        return S.layout().refunds[a];
+        return PinLib.refundOf(a);
     }
 
     // ─────────────────────────────── internals ───────────────────────────────

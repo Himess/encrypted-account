@@ -28,8 +28,9 @@ holds the account key (K). The PIN is asked only for unusual operations.
    to that operation.
 3. **Checked under FHE.** The contract compares encrypted values and counts the attempt before its result exists.
 4. **Only yes or no is decrypted.** Zama's threshold network decrypts a single bit. Correct: the operation proceeds
-   after its delay. Wrong: nothing moves, and from the third wrong guess each new try waits longer (15 minutes up to 7
-   days), which leaves about 12 guesses in 30 days.
+   after its delay. Wrong: nothing leaves the account, and from the third wrong guess each new try waits longer (15
+   minutes up to 7 days), which leaves about 12 guesses in 30 days. Each guess made with the key alone also carries a
+   refundable bond, so a thief pays for every wrong one.
 
 If the key is stolen, the owner starts an **escape**: after a delay the funds can only go to a pre-set escape address,
 and that path needs no FHE. A signature made with the key alone cannot authorize anything (ERC-1271 accepts only hashes
@@ -48,6 +49,9 @@ Sepolia ETH, send with your PIN, or try a wrong one and watch it get counted on-
 | K-only attempt above the hidden tripwire τ | Nothing moves; sticky tripwire, silent alarm to the watchtower, restricted mode |
 | Unlimited approvals, unknown calls | Always PIN + delay (default deny) |
 | Wrong PIN | Every guess adds 1 to a wrong-guess score before its result is revealed; a correct PIN never lowers it; the 3rd wrong guess restricts the account; back-off 15 min · 4^(n−3), capped at 7 days; the score decays by 1 every 7 days |
+| PIN guess with the key (K-track) | Carries a bond paid by K in a direct transaction, never by the account: 0.001 ETH, doubling with each wrong guess still counted. Right PIN: the bond comes back (`claimRefund`); wrong PIN: it stays in the account. The lane (K + second device or helper) and the escape need no bond |
+| Large account | The owner sets a higher base bond at setup (0.001–100 ETH, public), so every guess after the first costs a thief at least that much; changing it later needs the PIN, K alone cannot |
+| Choosing a PIN | The user picks it. The app offers a random PIN (shown large, typed twice to confirm), a short note, and warnings that never block for dates, repeats, sequences and keypad patterns; only a short list of very common PINs is refused |
 | Key stolen (panic button) | Escape: K alone, immediately. Every pending op is cancelled and PIN guessing closes; after 30 days the funds can go only to the pre-set escape address. Only the second device or recovery helper + PIN can cancel it |
 | Key rotation in progress | With a second device or recovery helper, PIN guesses with the old key are closed until the rotation executes or is cancelled |
 | Phone lost | PIN from a new device + bond → 7 days → new key; K alone cannot cancel it |
@@ -72,6 +76,17 @@ Sepolia ETH, send with your PIN, or try a wrong one and watch it get counted on-
 - **Two variants of the open mode.** A (`EncryptedAccount`): encrypted policy, two-phase K-only path. B
   (`EncryptedAccountB`): public known lists and limit, one-transaction K-only path; the PIN path is unchanged. The mode
   is fixed by the implementation an account is cloned from.
+
+## Protocol fee
+
+PIN-verified ETH and ERC-20 transfers pay a small fee on top of the amount; the recipient always gets exactly the
+amount. Per asset, `fee = clamp(amount × feeBps / 10,000, minFee, maxFee)`, and never more than 1% of the amount. The
+account asks for the fee when the transfer opens and binds it to the operation, so the PIN approves amount and fee
+together and a later change never touches an open transfer. One shared `FeeConfig` contract
+(`contracts/fee/FeeConfig.sol`) holds the table: increases wait 7 days, decreases apply at once. Free: key-only
+transfers, approvals, admin, recovery, cancellation, the escape, will claims and deposits. A broken fee module never
+blocks a transfer (the fee reads as zero or is skipped). Testnet default: ETH 10 bps, min 0.00001 ETH, max 0.001 ETH;
+the fee recipient is a deploy parameter. Design and reasoning: [docs/F016-bond-fee.md](docs/F016-bond-fee.md).
 
 ## Hidden inheritance
 
@@ -130,6 +145,8 @@ are sent from the claimant's own wallet (no relayer yet); unaudited, testnet onl
 | Account setup gas | A: 17,048,629 · B: 3,259,034 | `results/sepolia/setup-f011.json` |
 | New storage slots per PIN-verified transfer (block access list), before → after F0.15 | 16 → 8; gas −22.6% on Sepolia, ≈ −3.5% on today's mainnet schedule | `results/sepolia/f015-slots.json` |
 | Attack simulation: key stolen, human-chosen 6-digit PIN, 30 days | ≈ 7% with no reaction · ≈ 3% if the owner escapes within an hour · negligible for a random PIN | `results/pin-attack-sim.json` |
+| The thief's bonds over 30 days (key stolen, no reaction, 12 guesses) | 0.647 ETH at the default base bond · 3.23 ETH at 0.01 · 32.3 ETH at 0.1 · 323 ETH at 1 ETH | `results/pin-attack-sim.json` (`f016`) |
+| Bond and fee cost (mock, F0.15 → F0.16) | transfer opening +9.4k gas (fee quote) · PIN-verified execution +15.5k (fee payment) · no new storage slot · HCU unchanged | `results/f016-cost-diff.json` |
 | Hidden-will claim: heir by code, heir by address or stranger | 2,939,136 HCU each (15 % of the per-transaction limit), ≈ 2.6M gas | `results/sepolia/will-w1.json` |
 
 Sepolia runs a newer gas schedule than mainnet (a new storage slot costs ≈ 111k gas), so the gas figures are pessimistic
@@ -154,6 +171,14 @@ for today's mainnet. Package codes such as F0.9, F0.10 and F0.11 name the measur
   ciphertext (`PolicyMath.requireProof`). `contracts/test/NaivePinVerifier.sol` and `test/Exploits.test.ts` show why.
 - **Governance.** Zama governance can deny-list an account in the ACL or pause the ACL; the escape path is not affected
   (tested).
+- **K-track guesses need a direct transaction.** The bond must come from K's own funds, so a K-track PIN guess cannot
+  go through a UserOp or a paymaster; a paymaster-only wallet sends that one transaction from K's address or uses the
+  lane. Nobody else can post the bond for K.
+- **Bond refunds are not reserved.** An escape sweeps the whole ETH balance, unclaimed refunds included (for the K-track
+  that money reaches the owner's escape address anyway).
+- **Fee admin.** The fee admin can raise a fee with 7 days' notice, up to 1%, and change the recipient at once; it cannot
+  change the fee of an open transfer or block a verified one. The fee does not count against the spending limits, and
+  generic calls with value are not charged.
 
 ## Roadmap
 
@@ -192,7 +217,9 @@ Live at [encrypted-account.vercel.app](https://encrypted-account.vercel.app).
 
 `web/` holds the site: a landing page (`index.html`, no wallet code) and the app at `/app` (Preact) on top of the
 deployed Sepolia contracts: connect a wallet, choose a PIN on a keypad and a hidden limit, create the account (8
-transactions), deposit, and send ETH with the PIN — or try a wrong one and watch it being counted. The PIN never leaves
+transactions), deposit, and send ETH with the PIN — or try a wrong one and watch it being counted. The F0.16 screens
+(the bond and fee before the PIN pad, refund claims, changing the PIN, the base bond at setup) are in the code and need
+the F0.16 contracts on Sepolia, which are not deployed yet; against the current deployment they show no bond and no fee. The PIN never leaves
 the page: the browser derives the Argon2id fingerprint and encrypts it with Zama's SDK. Accounts use short demo delays
 (for example, a 5-minute escape) instead of the production examples.
 

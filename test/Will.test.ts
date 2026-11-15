@@ -19,8 +19,7 @@ import {
   finalizeGuess,
   guessAndFinalize,
   opIdFromReceipt,
-  time,
-} from "./helpers";
+  time, bondNow} from "./helpers";
 
 const P = { inactivity: 30 * DAY, grace: 7 * DAY, window: 365 * DAY }; // demo factory: any period from 5 minutes
 const SLOTS = 4;
@@ -631,7 +630,7 @@ describe("EncryptedWill: hidden inheritance in ERC-7984 tokens (W1)", function (
       const rcOpen = await (await acct.connect(owner).openCall(alice.address, 0, "0x")).wait(); // a no-op target
       const opId = await opIdFromReceipt(acct, rcOpen);
       const enc = await encGuess(acct, owner.address, stack.chainId, opId, PIN);
-      const rcGuess = await (await acct.connect(owner).submitGuess(opId, enc.c, enc.handles[0], enc.inputProof)).wait();
+      const rcGuess = await (await acct.connect(owner).submitGuess(opId, enc.c, enc.handles[0], enc.inputProof, { value: await bondNow(acct) })).wait();
       const rcFin = await finalizeGuess(acct, opId);
       const after = (await acct.status()).lastPinAt;
       expect(after).to.be.gt(before);

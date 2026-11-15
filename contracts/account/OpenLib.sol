@@ -6,6 +6,7 @@ import {MessageHashUtils} from "@openzeppelin/contracts/utils/cryptography/Messa
 import {SignatureChecker} from "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import {AccountStorage as S, Errors, IAccountEvents} from "./AccountStorage.sol";
 import {PolicyMath} from "./PolicyMath.sol";
+import {IFeeConfig} from "../fee/IFeeConfig.sol";
 
 /// @title OpenLib — opening pending ops, admin-parameter validation, co-signature and escape-address checks.
 /// @notice External library executed via DELEGATECALL in the account's context.
@@ -24,12 +25,20 @@ library OpenLib {
 
     // ─────────────────────────────── outflows ───────────────────────────────
 
+    /// @param feeConfig F0.16: the shared fee configuration (address(0) = no fee). A transfer's fee is quoted and bound
+    ///        to the op now, whichever path the op takes; it is paid only if the op runs on the PIN path. Binding it for
+    ///        every transfer closes a detour around the fee (a K-only request that fails its evaluation and continues on
+    ///        the PIN path). Approvals carry no fee.
     /// @return opId new op id
     /// @return kOnly whether the K-only (encrypted evaluation) path applies
-    function openOutflow(uint8 sub, address asset, address cp, uint256 amount, bool viaPin) external returns (uint256 opId, bool kOnly) {
+    function openOutflow(uint8 sub, address asset, address cp, uint256 amount, bool viaPin, address feeConfig)
+        external
+        returns (uint256 opId, bool kOnly)
+    {
         if (cp == address(0) || cp == address(this) || amount == 0) revert Errors.InvalidParams();
         S.Layout storage l = S.layout();
-        opId = _newOp(l, S.Kind.Outflow, sub, asset, cp, amount, "", 0, 0, 0);
+        uint96 fee = sub == S.OUT_APPROVE ? 0 : _quote(feeConfig, asset, amount);
+        opId = _newOp(l, S.Kind.Outflow, sub, asset, cp, amount, "", 0, 0, 0, fee);
         kOnly =
             !viaPin &&
             l.restrictedReasons == 0 &&
@@ -47,7 +56,7 @@ library OpenLib {
             // token transfers / approvals must go through the parsed (counted) outflow path
             if (sel == IERC20.transfer.selector || sel == IERC20.approve.selector) revert Errors.ForbiddenTarget();
         }
-        return _newOp(S.layout(), S.Kind.Call, 0, target, address(0), value, data, 0, 0, 0);
+        return _newOp(S.layout(), S.Kind.Call, 0, target, address(0), value, data, 0, 0, 0, 0);
     }
 
     // ─────────────────────────────── admin ───────────────────────────────
@@ -92,26 +101,28 @@ library OpenLib {
         } else if (a == S.A_SET_OPEN_LIMIT && l.openMode) {
             (address asset, ) = abi.decode(p, (address, uint256));
             if (!l.assets[asset].configured) revert Errors.InvalidParams();
+        } else if (a == S.A_SET_OWNER_BOND) {
+            PolicyMath.ownerBondUnits(abi.decode(p, (uint256))); // F0.16: BASE_BOND .. MAX_OWNER_BOND, multiple of BASE_BOND
         } else {
             revert Errors.InvalidParams(); // CANCEL, FREEZE, PIN_CHANGE, SET_LIMITS, ADD_KNOWN have dedicated openers
         }
-        return _newOp(l, S.Kind.Admin, a, address(0), address(0), 0, data, 0, 0, 0);
+        return _newOp(l, S.Kind.Admin, a, address(0), address(0), 0, data, 0, 0, 0, 0);
     }
 
     function openCancel(uint256 targetId) external returns (uint256) {
         S.Layout storage l = S.layout();
         if (!PolicyMath.cancellable(PolicyMath.status(l, l.ops[targetId]))) revert Errors.BadStatus();
-        return _newOp(l, S.Kind.Admin, S.A_CANCEL, address(0), address(0), 0, abi.encode(targetId), 0, 0, 0);
+        return _newOp(l, S.Kind.Admin, S.A_CANCEL, address(0), address(0), 0, abi.encode(targetId), 0, 0, 0, 0);
     }
 
     /// @notice Admin op carrying encrypted payload handles (PIN change, set limits, add known).
     function openWithHandles(uint8 a, address target, bytes calldata data, bytes32 h0, bytes32 h1, bytes32 h2) external returns (uint256) {
-        return _newOp(S.layout(), S.Kind.Admin, a, target, address(0), 0, data, h0, h1, h2);
+        return _newOp(S.layout(), S.Kind.Admin, a, target, address(0), 0, data, h0, h1, h2, 0);
     }
 
     /// @notice "P alone may restrict": anyone may open; only a correct PIN on the bonded recovery track executes it.
     function openFreeze() external returns (uint256) {
-        return _newOp(S.layout(), S.Kind.Admin, S.A_FREEZE, address(0), address(0), 0, "", 0, 0, 0);
+        return _newOp(S.layout(), S.Kind.Admin, S.A_FREEZE, address(0), address(0), 0, "", 0, 0, 0, 0);
     }
 
     // ─────────────────────────────── recovery / reset ───────────────────────────────
@@ -128,7 +139,7 @@ library OpenLib {
         if (viaDevice && (l.deviceSigner == address(0) || !SignatureChecker.isValidSignatureNow(l.deviceSigner, digest, deviceSig))) {
             revert Errors.BadSignature();
         }
-        opId = _newOp(l, S.Kind.Recovery, 0, address(0), newOwner, 0, "", 0, 0, 0);
+        opId = _newOp(l, S.Kind.Recovery, 0, address(0), newOwner, 0, "", 0, 0, 0, 0);
         l.ops[opId].viaDevice = viaDevice;
     }
 
@@ -139,7 +150,7 @@ library OpenLib {
         if (l.usedInput[digest]) revert Errors.InputReplayed();
         if (!_isCosigner(l, digest, cosig)) revert Errors.BadSignature();
         l.usedInput[digest] = true;
-        opId = _newOp(l, S.Kind.PinReset, 0, address(0), address(0), 0, "", newFingerprintHandle, 0, 0);
+        opId = _newOp(l, S.Kind.PinReset, 0, address(0), address(0), 0, "", newFingerprintHandle, 0, 0, 0);
         S.Op storage op = l.ops[opId];
         op.status = S.Status.Delayed;
         op.readyAt = uint64(block.timestamp) + l.delays.pinReset;
@@ -201,7 +212,8 @@ library OpenLib {
         bytes memory data,
         bytes32 h0,
         bytes32 h1,
-        bytes32 h2
+        bytes32 h2,
+        uint96 fee
     ) private returns (uint256 opId) {
         if (l.escapeReadyAt != 0 && !(kind == S.Kind.Admin && sub == S.A_CANCEL_ESCAPE)) revert Errors.EscapeActive();
         opId = ++l.opCount;
@@ -210,6 +222,7 @@ library OpenLib {
         op.sub = sub;
         op.target = target;
         op.counterparty = cp;
+        if (fee != 0) op.fee = fee; // F0.16: same slot as `counterparty` (written just above: no new slot)
         op.amount = amount;
         op.data = data;
         op.ownerEpoch = l.ownerEpoch;
@@ -221,8 +234,19 @@ library OpenLib {
             op.h2 = h2;
         }
         // F0.15: the content hash is not stored; PolicyMath.opHashOf recomputes it from the same fields
-        bytes32 oh = PolicyMath.opHash(opId, kind, sub, target, cp, amount, keccak256(data), [h0, h1, h2]);
+        bytes32 oh = PolicyMath.opHash(opId, kind, sub, target, cp, amount, keccak256(data), [h0, h1, h2], fee);
         emit IAccountEvents.OpOpened(opId, uint8(kind), sub, target, cp, amount, PolicyMath.challengeOf(opId, oh));
+    }
+
+    /// @dev F0.16: the fee of a transfer, or 0 if there is no FeeConfig or it fails (a broken fee module never blocks an
+    ///      outflow). Gas-capped. A quote above uint96 cannot come from FeeConfig (its maxFee is a uint96); it reads as 0.
+    function _quote(address fc, address asset, uint256 amount) private view returns (uint96) {
+        if (fc == address(0)) return 0;
+        try IFeeConfig(fc).quote{gas: 50_000}(asset, amount) returns (uint256 fee, uint64) {
+            return fee > type(uint96).max ? 0 : uint96(fee);
+        } catch {
+            return 0;
+        }
     }
 
     function _isCosigner(S.Layout storage l, bytes32 digest, bytes calldata sig) private view returns (bool) {

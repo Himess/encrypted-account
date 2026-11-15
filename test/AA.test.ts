@@ -87,33 +87,8 @@ describe("F0.2 — end to end with ERC-4337 (EntryPoint v0.8)", function () {
     expect(bal0 - (await ethers.provider.getBalance(addr))).to.eq(E.parseEther("0.05")); // transfer only; no gas
   });
 
-  it("E3/M1: PIN guess from inside a UserOp — the encrypted input is generated for the (account, EntryPoint) context", async () => {
-    const acct = await freshAA();
-    const addr = await acct.getAddress();
-    const open = acct.interface.encodeFunctionData("requestTransfer", [ETH, bob.address, E.parseEther("0.2"), true]);
-    await handle([await userOp(acct, open)]);
-    const opId = await acct.opCount();
-    const fp = await fingerprint("482915", stack.chainId, addr);
-    const c = BigInt(await acct.challengeOf(opId));
-    const inp = hre.fhevm.createEncryptedInput(addr, await stack.entryPoint.getAddress()); // user = msg.sender = EntryPoint
-    inp.add64(guessValue(fp, c));
-    const enc = await inp.encrypt();
-    const g = acct.interface.encodeFunctionData("submitGuess", [opId, c, enc.handles[0], enc.inputProof]);
-    await handle([await userOp(acct, g)]);
-    await finalizeGuess(acct, opId);
-    expect((await acct.getOp(opId)).status).to.eq(Status.Delayed);
-
-    // an input generated for the wrong context (user = owner EOA) is rejected inside a UserOp
-    const op2Data = acct.interface.encodeFunctionData("requestTransfer", [ETH, bob.address, E.parseEther("0.2"), true]);
-    await handle([await userOp(acct, op2Data)]);
-    const op2 = await acct.opCount();
-    const wrong = hre.fhevm.createEncryptedInput(addr, ownerW.address);
-    const c2 = BigInt(await acct.challengeOf(op2));
-    wrong.add64(guessValue(fp, c2));
-    const encW = await wrong.encrypt();
-    const g2 = acct.interface.encodeFunctionData("submitGuess", [op2, c2, encW.handles[0], encW.inputProof]);
-    const rc = await handle([await userOp(acct, g2)]);
-    const failed = rc!.logs
+  function userOpSucceeded(rc: any): boolean {
+    const ev = rc!.logs
       .map((l: any) => {
         try {
           return stack.entryPoint.interface.parseLog(l);
@@ -122,7 +97,72 @@ describe("F0.2 — end to end with ERC-4337 (EntryPoint v0.8)", function () {
         }
       })
       .filter((x: any) => x && x.name === "UserOperationEvent");
-    expect(failed[0].args.success).to.eq(false); // execution reverted (context mismatch)
+    return ev[0].args.success;
+  }
+
+  async function encFor(acct: any, user: string, opId: bigint) {
+    const addr = await acct.getAddress();
+    const fp = await fingerprint("482915", stack.chainId, addr);
+    const c = BigInt(await acct.challengeOf(opId));
+    const inp = hre.fhevm.createEncryptedInput(addr, user);
+    inp.add64(guessValue(fp, c));
+    return { enc: await inp.encrypt(), c };
+  }
+
+  it("F0.16: a K-track guess inside a UserOp fails (a bond can never come from the account) and is not counted", async () => {
+    const acct = await freshAA();
+    const open = acct.interface.encodeFunctionData("requestTransfer", [ETH, bob.address, E.parseEther("0.2"), true]);
+    await handle([await userOp(acct, open)]);
+    const opId = await acct.opCount();
+    const { enc, c } = await encFor(acct, await stack.entryPoint.getAddress(), opId);
+    const g = acct.interface.encodeFunctionData("submitGuess", [opId, c, enc.handles[0], enc.inputProof]);
+    expect(userOpSucceeded(await handle([await userOp(acct, g)]))).to.eq(false); // DirectBondRequired
+    expect((await acct.getOp(opId)).status).to.eq(Status.NeedsPin);
+    expect((await acct.trackState(0)).score).to.eq(0n);
+
+    // the same op continues with a direct, bonded guess from K's EOA (input context: the owner EOA)
+    const direct = await encFor(acct, ownerW.address, opId);
+    const [required] = await acct.ownerBond();
+    await (await acct.connect(ownerW).submitGuess(opId, direct.c, direct.enc.handles[0], direct.enc.inputProof, { value: required })).wait();
+    await finalizeGuess(acct, opId);
+    expect((await acct.getOp(opId)).status).to.eq(Status.Delayed);
+    expect(await acct.refundOf(ownerW.address)).to.eq(required);
+  });
+
+  it("E3/M1 on the lane: a PIN guess inside a UserOp uses the (account, EntryPoint) input context; the lane stays unbonded", async () => {
+    const helperW = E.Wallet.createRandom();
+    const acct = await createAccount(stack, ownerW as any, escape.address, guardian.address, {
+      knownRecipients: [alice.address],
+      helper: helperW.address,
+    });
+    await bundler.sendTransaction({ to: await acct.getAddress(), value: E.parseEther("3") });
+    const addr = await acct.getAddress();
+    const laneSig = async (opId: bigint, handle: string) =>
+      helperW.signMessage(
+        E.getBytes(
+          E.keccak256(
+            E.AbiCoder.defaultAbiCoder().encode(
+              ["bytes32", "uint256", "address", "bytes32"],
+              [E.id("encrypted-account/lane/v1"), stack.chainId, addr, E.keccak256(E.AbiCoder.defaultAbiCoder().encode(["uint256", "bytes32"], [opId, handle]))],
+            ),
+          ),
+        ),
+      );
+    const open = acct.interface.encodeFunctionData("requestTransfer", [ETH, bob.address, E.parseEther("0.2"), true]);
+    await handle([await userOp(acct, open)]);
+    const opId = await acct.opCount();
+    const { enc, c } = await encFor(acct, await stack.entryPoint.getAddress(), opId); // user = msg.sender = EntryPoint
+    const g = acct.interface.encodeFunctionData("submitGuessWithCosign", [opId, c, enc.handles[0], enc.inputProof, await laneSig(opId, enc.handles[0])]);
+    expect(userOpSucceeded(await handle([await userOp(acct, g)]))).to.eq(true);
+    await finalizeGuess(acct, opId);
+    expect((await acct.getOp(opId)).status).to.eq(Status.Delayed);
+
+    // an input generated for the wrong context (user = owner EOA) is rejected inside a UserOp
+    await handle([await userOp(acct, open)]);
+    const op2 = await acct.opCount();
+    const w = await encFor(acct, ownerW.address, op2);
+    const g2 = acct.interface.encodeFunctionData("submitGuessWithCosign", [op2, w.c, w.enc.handles[0], w.enc.inputProof, await laneSig(op2, w.enc.handles[0])]);
+    expect(userOpSucceeded(await handle([await userOp(acct, g2)]))).to.eq(false); // execution reverted (context mismatch)
     expect((await acct.getOp(op2)).status).to.eq(Status.NeedsPin);
   });
 

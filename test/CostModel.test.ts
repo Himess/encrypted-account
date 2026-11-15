@@ -50,7 +50,8 @@ describe("E9/E19/E7 — cost model [Mock]", function () {
 
   before(async () => {
     [owner, escape, guardian, alice, bob, stranger] = await ethers.getSigners();
-    stack = await deployStack();
+    // F0.16: the testnet default fee table (ETH 10 bps, min 0.00001, max 0.001), as the deploy script sets it
+    stack = await deployStack([{ asset: ETH, bps: 10, minFee: E.parseEther("0.00001"), maxFee: E.parseEther("0.001") }]);
   });
 
   after(() => {
@@ -111,6 +112,7 @@ describe("E9/E19/E7 — cost model [Mock]", function () {
     enc = await inp.encrypt();
     await (await acct.connect(owner).setupKnown(true, 0, enc.handles, enc.inputProof)).wait();
     await (await acct.connect(owner).setupRoles(E.ZeroAddress, E.ZeroAddress, 90 * DAY, true)).wait();
+    rec("setupOwnerBond (F0.16, optional; packed into an existing slot)", await (await acct.connect(owner).setupOwnerBond(E.parseEther("0.01"))).wait());
     rec("arm", await (await acct.connect(owner).arm()).wait());
     await owner.sendTransaction({ to: addr, value: E.parseEther("10") });
 
@@ -128,6 +130,7 @@ describe("E9/E19/E7 — cost model [Mock]", function () {
     rec("finalizeGuess (2-handle KMS proof)", await finalizeGuess(acct, opId));
     await time.increase(HOUR);
     rec("executeOp transfer (+ auto-add to known list: isIn + select)", await (await acct.executeOp(opId)).wait());
+    rec("claimRefund (F0.16: the correct guess's bond back to K)", await (await acct.connect(owner).claimRefund()).wait());
 
     // admin op guess (no big)
     rc = await (await acct.connect(owner).openAdmin(A.RESET_TRIP, coder.encode(["address"], [ETH]))).wait();

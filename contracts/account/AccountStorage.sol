@@ -55,6 +55,7 @@ library AccountStorage {
     uint8 internal constant A_SET_INSTANT = 18;
     uint8 internal constant A_CANCEL_ESCAPE = 19;
     uint8 internal constant A_SET_OPEN_LIMIT = 20; // B variant (F0.11): raising the public K-only limit (K+P, loosen delay)
+    uint8 internal constant A_SET_OWNER_BOND = 21; // F0.16: the K-track base bond (K+P, settings delay)
 
     uint8 internal constant TRACK_OWNER = 0; // K-track: guesses from K (EOA or EntryPoint) — anonymous (anyone with K)
     uint8 internal constant TRACK_RECOVERY = 1; // anonymous track (relayer), bonded; only Recovery / Freeze ops
@@ -110,13 +111,13 @@ library AccountStorage {
         bytes32 bigH; // ebool, publicly decryptable: okAny AND (pinSpent + amount > L_big); valid only if hasBig
         bytes32 duressFlagH; // ebool, never public: okDuress AND NOT okReal (silent alarm → guardian)
         bytes32 inputH; // last input handle on this track: the same input twice in a row is rejected (I5)
-        address bondPayer;
-        uint96 bond;
         uint64 opId; // the op this record belongs to
+        uint96 bond; // F0.16: packed with opId and the flags — a slot every guess writes anyway, so a bond opens none
         uint8 track;
         bool pending;
         bool setStrikes; // this guess raised R_STRIKES provisionally (undone if it turns out correct)
         bool hasBig; // bigH belongs to this guess (outflows only)
+        address bondPayer; // recovery track only: a K-track bond is always K's and goes back to the owner key (F0.16)
     }
 
     struct AssetCfg {
@@ -155,6 +156,9 @@ library AccountStorage {
         uint8 guessTrack; // track of the latest guess (F0.15: guesses live in per-track records)
         address target; // asset / token / call target
         address counterparty; // recipient or spender
+        // F0.16: protocol fee bound when a transfer op opens (paid only if it runs on the PIN path). Packed with
+        // `counterparty`, never zero for a transfer — `target` is zero for ETH, and a fee there would open a new slot.
+        uint96 fee;
         uint256 amount; // outflow amount or ETH value of a call
         // F0.15: the content hash that binds the PIN challenge is recomputed from the fields above (PolicyMath.opHashOf)
         bytes32 h0; // evaluation `ok` handle, or stored encrypted payload
@@ -166,6 +170,9 @@ library AccountStorage {
     struct Layout {
         // roles
         address owner; // K
+        // F0.16: bonds of correct K-track guesses, owed to the owner key (after a rotation, the new key). Packed with
+        // `owner`, a slot that is never zero, so crediting it opens no new slot (a refunds[] entry would, once per payer).
+        uint96 ownerRefund;
         address guardian; // G — watchtower (restrict-only + silent alarm decryption)
         address deviceSigner; // D — second device / passkey wrapper (EOA or ERC-1271)
         address recoveryHelper; // recovery helper: co-signer for a forgotten-PIN reset / the authenticated lane
@@ -188,6 +195,7 @@ library AccountStorage {
         address escapeTo; // E_addr snapshot taken when the escape started
         uint32 escEpoch; // bumped by startEscape: every op opened before it counts as cancelled (O(1), lazily)
         uint32 rotationsPending; // PIN-verified ROTATE_OWNER ops of the current key waiting for their delay
+        uint32 ownerBondUnits; // F0.16: ownerBaseBond in BASE_BOND units (0 = default, one unit); packs into the escapeTo slot
         uint256 opCount;
         Delays delays;
         // secret factor
@@ -207,7 +215,7 @@ library AccountStorage {
         mapping(address => AssetEnc) assetEnc;
         // misc
         mapping(bytes32 => bool) approvedHashes; // ERC-1271, only via K+P
-        mapping(address => uint256) refunds; // recovery-track bonds of successful guesses
+        mapping(address => uint256) refunds; // recovery-track bonds of correct guesses, per payer; value + 1 once used (F0.16)
         // B variant (F0.11, EncryptedAccountB only): the known lists are public. Every entry, also one added by hand
         // and never used, is visible on-chain (OpenKnownChanged).
         mapping(address => uint64) openKnownR; // activation time; 0 = not on the list
@@ -252,6 +260,8 @@ library Errors {
     error NotTighter();
     error StaleChallenge(); // K53 / I23: the guess was made against another challenge — not evaluated, not counted
     error RotationLock(); // K45: K-track closed while a PIN-verified key rotation is pending (account has D / helper)
+    error DirectBondRequired(); // F0.16: a K-track bond comes from a direct call by K, never through the EntryPoint or the account
+    error InsufficientBalance(uint256 needed); // F0.16: amount + fee not covered; the op stays delayed
 }
 
 /// @notice Events shared by the account and its libraries (libraries emit them in the account's context).
@@ -283,4 +293,10 @@ interface IAccountEvents {
     /// @notice B variant: open-list change; activeAt = 0 means removed.
     event OpenKnownChanged(bool spenders, address indexed who, uint64 activeAt);
     event OpenLimitSet(address indexed asset, uint256 limit);
+    /// @notice F0.16: the K-track base bond (public: a guesser must know what to send).
+    event OwnerBondSet(uint256 base);
+    /// @notice F0.16: the fee bound to a PIN-verified transfer was paid, or skipped because FeeConfig or the transfer to
+    ///         its recipient failed (a broken fee module never blocks a verified transfer).
+    event FeePaid(uint256 indexed opId, address indexed recipient, uint256 fee);
+    event FeeSkipped(uint256 indexed opId, uint256 fee);
 }

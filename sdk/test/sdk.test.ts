@@ -8,6 +8,7 @@ import {
   bytesToHex,
   checkPin,
   guessValue,
+  isRandomPinCandidate,
   pinFingerprint,
   pinSalt,
   randomPin,
@@ -74,16 +75,29 @@ describe("SDK — PIN fingerprint (13.1) and PIN policy (13.8)", function () {
     expect(checkPin("correct horse battery").ok).to.eq(true);
   });
 
-  it("random PIN: 6 digits, not on the list, roughly uniform digit distribution", () => {
+  it("random PIN: 6 digits, not on the list, no warning; digits as uniform as the candidate set allows", () => {
+    // F0.16: randomPin skips PINs that would raise a warning, so the digit mix follows the candidate set, not 1/10 each
+    const expectedShare = new Array(10).fill(0);
+    let space = 0;
+    for (let i = 0; i < 1_000_000; i++) {
+      const p = String(i).padStart(6, "0");
+      if (!isRandomPinCandidate(p)) continue;
+      space++;
+      for (const ch of p) expectedShare[Number(ch)]++;
+    }
     const counts = new Array(10).fill(0);
-    for (let i = 0; i < 2000; i++) {
+    const N = 2000;
+    for (let i = 0; i < N; i++) {
       const p = randomPin();
       expect(p).to.match(/^\d{6}$/);
       expect(COMMON_SIX_DIGIT.has(p)).to.eq(false);
+      expect(checkPin(p).warnings, p).to.deep.eq([]);
       for (const ch of p) counts[Number(ch)]++;
     }
-    const expected = (2000 * 6) / 10;
-    for (const c of counts) expect(Math.abs(c - expected) / expected).to.be.lessThan(0.1);
+    for (let d = 0; d < 10; d++) {
+      const expected = (expectedShare[d] / (space * 6)) * N * 6;
+      expect(Math.abs(counts[d] - expected) / expected, `digit ${d}`).to.be.lessThan(0.1);
+    }
   });
 });
 

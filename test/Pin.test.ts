@@ -28,8 +28,7 @@ import {
   guessAndFinalize,
   requestTransfer,
   time,
-  userDecryptBool,
-} from "./helpers";
+  userDecryptBool, bondNow} from "./helpers";
 
 const ACL_ABI = [
   "function isAllowed(bytes32,address) view returns (bool)",
@@ -161,21 +160,21 @@ describe("F0.1 / F0.6 — PIN: two-phase verification, counters, restricted mode
     const acct = await fresh();
     const op1 = await requestTransfer(acct, owner, ETH, bob.address, E.parseEther("0.05"), true);
     const enc1 = await encGuess(acct, owner.address, stack.chainId, op1, PIN);
-    await (await acct.connect(owner).submitGuess(op1, enc1.c, enc1.handles[0], enc1.inputProof)).wait();
+    await (await acct.connect(owner).submitGuess(op1, enc1.c, enc1.handles[0], enc1.inputProof, { value: await bondNow(acct) })).wait();
     await finalizeGuess(acct, op1);
     expect((await acct.getOp(op1)).status).to.eq(Status.Delayed);
 
     const op2 = await requestTransfer(acct, owner, ETH, stranger.address, E.parseEther("1"), true);
     const c2 = BigInt(await acct.challengeOf(op2));
     // (a) exact copy: same ciphertext + same proof
-    await expect(acct.connect(owner).submitGuess(op2, c2, enc1.handles[0], enc1.inputProof)).to.be.revertedWithCustomError(ERR, "InputReplayed");
+    await expect(acct.connect(owner).submitGuess(op2, c2, enc1.handles[0], enc1.inputProof, { value: await bondNow(acct) })).to.be.revertedWithCustomError(ERR, "InputReplayed");
     // (b) the VALUE of the old guess in a fresh encrypted input (strongest assumption: even if the attacker knows h + c1)
     const fp = await fingerprint(PIN, stack.chainId, await acct.getAddress());
     const c1 = BigInt(await acct.challengeOf(op1));
     const inp = hre.fhevm.createEncryptedInput(await acct.getAddress(), owner.address);
     inp.add64((fp + c1) % (1n << 64n));
     const old = await inp.encrypt();
-    await (await acct.connect(owner).submitGuess(op2, c2, old.handles[0], old.inputProof)).wait();
+    await (await acct.connect(owner).submitGuess(op2, c2, old.handles[0], old.inputProof, { value: await bondNow(acct) })).wait();
     await finalizeGuess(acct, op2);
     expect((await acct.getOp(op2)).status).to.eq(Status.NeedsPin);
   });
@@ -184,14 +183,14 @@ describe("F0.1 / F0.6 — PIN: two-phase verification, counters, restricted mode
     const acct = await fresh();
     const op1 = await requestTransfer(acct, owner, ETH, bob.address, E.parseEther("0.05"), true);
     const enc1 = await encGuess(acct, owner.address, stack.chainId, op1, PIN);
-    await (await acct.connect(owner).submitGuess(op1, enc1.c, enc1.handles[0], enc1.inputProof)).wait();
+    await (await acct.connect(owner).submitGuess(op1, enc1.c, enc1.handles[0], enc1.inputProof, { value: await bondNow(acct) })).wait();
     await finalizeGuess(acct, op1);
     const op2 = await requestTransfer(acct, owner, ETH, bob.address, E.parseEther("0.05"), true);
     await guessAndFinalize(acct, owner, stack.chainId, op2, PIN); // another input in between
     const op3 = await requestTransfer(acct, owner, ETH, stranger.address, E.parseEther("1"), true);
     const c3 = BigInt(await acct.challengeOf(op3));
     const before = (await acct.trackState(TRACK.OWNER)).score;
-    await (await acct.connect(owner).submitGuess(op3, c3, enc1.handles[0], enc1.inputProof)).wait();
+    await (await acct.connect(owner).submitGuess(op3, c3, enc1.handles[0], enc1.inputProof, { value: await bondNow(acct) })).wait();
     await finalizeGuess(acct, op3);
     expect((await acct.getOp(op3)).status).to.eq(Status.NeedsPin); // it encrypts h + c1, not h + c3
     expect((await acct.trackState(TRACK.OWNER)).score).to.eq(before + 1n); // a wrong guess against the submitter
@@ -201,9 +200,9 @@ describe("F0.1 / F0.6 — PIN: two-phase verification, counters, restricted mode
     const acct = await fresh();
     const opId = await requestTransfer(acct, owner, ETH, bob.address, E.parseEther("0.05"), true);
     const enc = await encGuess(acct, owner.address, stack.chainId, opId, PIN);
-    await expect(acct.connect(owner).submitGuess(opId, enc.c, enc.handles[0], "0x")).to.be.revertedWithCustomError(ERR, "EmptyInputProof");
+    await expect(acct.connect(owner).submitGuess(opId, enc.c, enc.handles[0], "0x", { value: await bondNow(acct) })).to.be.revertedWithCustomError(ERR, "EmptyInputProof");
     const [pinH] = await acct.encryptedHandles(ETH);
-    await expect(acct.connect(owner).submitGuess(opId, enc.c, pinH, "0x")).to.be.revertedWithCustomError(ERR, "EmptyInputProof");
+    await expect(acct.connect(owner).submitGuess(opId, enc.c, pinH, "0x", { value: await bondNow(acct) })).to.be.revertedWithCustomError(ERR, "EmptyInputProof");
   });
 
   it("a forged decryption cleartext is rejected (checkSignatures)", async () => {

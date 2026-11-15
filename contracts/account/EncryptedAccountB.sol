@@ -29,7 +29,7 @@ import {EncryptedAccount} from "./EncryptedAccount.sol";
 contract EncryptedAccountB is EncryptedAccount {
     using SafeERC20 for IERC20;
 
-    constructor(IEntryPoint ep) EncryptedAccount(ep) {}
+    constructor(IEntryPoint ep, address feeConfig_) EncryptedAccount(ep, feeConfig_) {}
 
     function _openMode() internal pure override returns (bool) {
         return true;
@@ -112,7 +112,7 @@ contract EncryptedAccountB is EncryptedAccount {
             }
             return 0;
         }
-        (opId, ) = OpenLib.openOutflow(sub, asset, cp, amount, true); // the PIN path, unchanged (FHE)
+        (opId, ) = OpenLib.openOutflow(sub, asset, cp, amount, true, feeConfig); // the PIN path, unchanged (FHE); F0.16 fee bound
     }
 
     /// @dev Every condition is public: listed counterparty, within the epoch limit, not restricted, pulse valid, not an

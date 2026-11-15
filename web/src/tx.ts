@@ -22,6 +22,9 @@ const HINTS: Record<string, string> = {
   SetupIncomplete: "Setup is not finished yet.",
   EscapeActive: "An escape is running; transfers are closed.",
   TransferFailed: "The transfer failed (does the account hold enough ETH?).",
+  BondTooLow: "The PIN-try bond went up since it was shown; open the PIN screen again to see the new amount.",
+  DirectBondRequired: "A PIN try on the key track must come straight from the owner's wallet, with its bond.",
+  InsufficientBalance: "The account does not hold the amount plus the fee yet; deposit and run it again.",
 };
 
 function revertData(e: any): string | null {

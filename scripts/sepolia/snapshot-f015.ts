@@ -2,6 +2,7 @@
  * F0.15 — a copy of the build with the slot-saving storage layout (the F0.9 / F0.10 / F0.11 copies are not touched).
  *   npx hardhat run scripts/sepolia/snapshot-f015.ts                → results/sepolia/f015/build.json
  *   SEP_RUN=f015b npx hardhat run scripts/sepolia/snapshot-f015.ts  → results/sepolia/f015b/build.json (epoch counters)
+ *   SEP_RUN=f016 npx hardhat run scripts/sepolia/snapshot-f015.ts   → results/sepolia/f016/build.json (bond + fee, with FeeConfig)
  * Source hashes are recorded; if the sources have changed, the copy is refreshed.
  */
 import { createHash } from "crypto";
@@ -10,11 +11,12 @@ import * as hre from "hardhat";
 import * as path from "path";
 import { ROOT } from "../lib/env";
 
-const NAMES = ["PinLib", "PolicyLib", "OpenLib", "OpsLib", "EncryptedAccount", "EncryptedAccountB", "EncryptedAccountFactory"];
 const RUN = process.env.SEP_RUN ?? "f015";
+const NAMES = ["PinLib", "PolicyLib", "OpenLib", "OpsLib", "EncryptedAccount", "EncryptedAccountB", "EncryptedAccountFactory", ...(RUN === "f016" ? ["FeeConfig"] : [])];
 const EVIDENCE: Record<string, string> = {
   f015: "F0.15 build (per-track guess records, packed counters, op content hash recomputed, stored back-off)",
   f015b: "F0.15 build, step 2 (as f015; epoch counters restart at 1 instead of 0)",
+  f016: "F0.16 build (K-track bond, adjustable base bond, protocol fee via the shared FeeConfig)",
 };
 if (!EVIDENCE[RUN]) throw new Error(`SEP_RUN must be one of ${Object.keys(EVIDENCE).join(", ")}`);
 

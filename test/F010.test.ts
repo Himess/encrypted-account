@@ -32,6 +32,8 @@ import {
   personalSign,
   requestTransfer,
   time,
+  bondNow,
+  BASE_BOND,
 } from "./helpers";
 
 /**
@@ -261,7 +263,9 @@ describe("F0.10 — score, escape and rotation locks, challenge consistency, esc
       await time.increase(30 * DAY);
       const e0 = await ethers.provider.getBalance(escape.address);
       await (await acct.connect(stranger).executeEscape([])).wait();
-      expect((await ethers.provider.getBalance(escape.address)) - e0).to.eq(E.parseEther("10"));
+      // F0.16: the two K-track bonds (the delayed op's correct guess, credited but not claimed, and the cancelled
+      // in-flight guess) stay in the account, and the escape sweeps the whole balance
+      expect((await ethers.provider.getBalance(escape.address)) - e0).to.eq(E.parseEther("10") + 2n * BASE_BOND);
     });
 
     it("I22: an escape can be cancelled only via the lane (D or recovery helper); with neither it cannot be cancelled and executes after 30 days", async () => {
@@ -389,7 +393,7 @@ describe("F0.10 — score, escape and rotation locks, challenge consistency, esc
     expect((await acct.getOp(opId)).status).to.eq(Status.NeedsPin);
 
     const good = await encGuess(acct, owner.address, stack.chainId, opId, PIN, c);
-    await (await acct.connect(owner).submitGuess(opId, c, good.handles[0], good.inputProof)).wait();
+    await (await acct.connect(owner).submitGuess(opId, c, good.handles[0], good.inputProof, { value: await bondNow(acct) })).wait();
     await finalizeGuess(acct, opId);
     expect((await acct.getOp(opId)).status).to.eq(Status.Delayed);
     expect(await score(acct, TRACK.OWNER)).to.eq(0n);
@@ -466,7 +470,7 @@ describe("F0.10 — score, escape and rotation locks, challenge consistency, esc
       await (await acct.connect(owner).startEscape()).wait();
       await time.increase(30 * DAY);
       await (await acct.executeEscape([])).wait();
-      expect(await ethers.provider.getBalance(wAddr)).to.eq(E.parseEther("10"));
+      expect(await ethers.provider.getBalance(wAddr)).to.eq(E.parseEther("10") + 2n * BASE_BOND); // F0.16: + the two unclaimed bonds
     });
 
     it("signed escapePing: anyone can relay it; escapeVerifiedAt is updated; a replay, a future timestamp and a foreign signature are rejected; staleness blocks no operation", async () => {
@@ -719,7 +723,8 @@ describe("F0.10 — score, escape and rotation locks, challenge consistency, esc
       await time.increase(30 * DAY);
       const e0 = await ethers.provider.getBalance(escape.address);
       await (await acct.connect(stranger).executeEscape([])).wait();
-      expect((await ethers.provider.getBalance(escape.address)) - e0).to.eq(E.parseEther("10"));
+      // F0.16: the thief's bond (correct guess, credited but never claimed) goes with the sweep to E_addr
+      expect((await ethers.provider.getBalance(escape.address)) - e0).to.eq(E.parseEther("10") + BASE_BOND);
       expect(await ethers.provider.getBalance(thief.address)).to.eq(t0);
     });
 

@@ -1,0 +1,592 @@
+{
+  "evidence": "[Mock] Hardhat EDR (prague) gas; HCU host table (F0.9: the same on the live chain)",
+  "generatedAtUtc": "2026-11-15T12:28:07.281Z",
+  "runs": {
+    "f015": "2026-11-15T12:14:02.141Z",
+    "f016": "2026-11-15T12:18:54.505Z"
+  },
+  "setup": "F0.16 run: FeeConfig with ETH 10 bps, min 0.00001 ETH, max 0.001 ETH (the testnet default); the account's base bond set to 0.01 ETH at setup. Each PIN guess carries the required bond (0.001 ETH at score 0).",
+  "notes": [
+    "HCU: no FHE operation was added or removed (the bond, the fee and the base bond are plaintext).",
+    "New storage slots (≈111k gas each on Sepolia, F0.15 measurement): none on any transfer. op.fee is packed with op.counterparty (never zero for a transfer; op.target is zero for ETH, and an early layout that packed the fee there opened a new slot on every ETH transfer: +20.8k on the mock, caught in this measurement). The K-track refund is packed with the owner address (never zero); the guess record keeps the bond in the slot every guess writes anyway; ownerBondUnits shares an existing account slot.",
+    "requestTransfer (both paths, +9.4k): one external view call (FeeConfig.quote, cold account + two cold reads, ≤ 50k gas cap) and the fee written into a slot this transaction has already written.",
+    "finalizeGuess (+3.5k): a correct K-track guess credits the bond next to the owner address. executeOp (+15.5k): the balance check, the FeeConfig.feeRecipient read and the fee transfer. submitGuess (−1.0k/−1.3k): the K-track no longer writes a payer field.",
+    "startEscape (−17.1k) is an artefact of this run's setup: setupOwnerBond wrote the account slot that the escape snapshot shares, so the snapshot overwrites instead of opening it. With the default bond (no setupOwnerBond) startEscape costs what it did in F0.15.",
+    "Recovery-track bonds keep the per-payer refunds map as before F0.16 (a payer's first credit opens its entry once; it is stored as value + 1 afterwards, so it never returns to zero)."
+  ],
+  "changed": [
+    {
+      "flow": "factory.createAccount (clone + initialize + E_addr EIP-712 consent)",
+      "gasF015": 295399,
+      "gasF016": 295443,
+      "gasDelta": 44,
+      "hcuF015": 0,
+      "hcuF016": 0,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "setupPin (fingerprint + duress slot select/rand)",
+      "gasF015": 813509,
+      "gasF016": 813716,
+      "gasDelta": 207,
+      "hcuF015": 79000,
+      "hcuF016": 79000,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "setupAsset (L_min, L, L_big + τ draw)",
+      "gasF015": 1477449,
+      "gasF016": 1477551,
+      "gasDelta": 102,
+      "hcuF015": 1345064,
+      "hcuF016": 1345064,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "setupKnown (12 eaddress / proof)",
+      "gasF015": 2062894,
+      "gasF016": 2062936,
+      "gasDelta": 42,
+      "hcuF015": 0,
+      "hcuF016": 0,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "setupOwnerBond (F0.16, optional; packed into an existing slot)",
+      "gasF015": null,
+      "gasF016": 56003,
+      "gasDelta": null,
+      "hcuF015": null,
+      "hcuF016": 0,
+      "hcuDelta": null,
+      "isNew": true
+    },
+    {
+      "flow": "arm",
+      "gasF015": 65693,
+      "gasF016": 65715,
+      "gasDelta": 22,
+      "hcuF015": 0,
+      "hcuF016": 0,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "requestTransfer K-only (isIn N=30 + threshold + sticky tripwire)",
+      "gasF015": 1185220,
+      "gasF016": 1194640,
+      "gasDelta": 9420,
+      "hcuF015": 774036,
+      "hcuF016": 774036,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "finalizeEvaluation (KMS proof + transfer)",
+      "gasF015": 307403,
+      "gasF016": 307441,
+      "gasDelta": 38,
+      "hcuF015": 0,
+      "hcuF016": 0,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "requestTransfer PIN path (opens op)",
+      "gasF015": 117764,
+      "gasF016": 127198,
+      "gasDelta": 9434,
+      "hcuF015": 0,
+      "hcuF016": 0,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "submitGuess (transfer; okAny + isDuress + big)",
+      "gasF015": 1192174,
+      "gasF016": 1191173,
+      "gasDelta": -1001,
+      "hcuF015": 698002,
+      "hcuF016": 698002,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "finalizeGuess (2-handle KMS proof)",
+      "gasF015": 303235,
+      "gasF016": 306785,
+      "gasDelta": 3550,
+      "hcuF015": 0,
+      "hcuF016": 0,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "executeOp transfer (+ auto-add to known list: isIn + select)",
+      "gasF015": 737236,
+      "gasF016": 752773,
+      "gasDelta": 15537,
+      "hcuF015": 667032,
+      "hcuF016": 667032,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "claimRefund (F0.16: the correct guess's bond back to K)",
+      "gasF015": null,
+      "gasF016": 43194,
+      "gasDelta": null,
+      "hcuF015": null,
+      "hcuF016": 0,
+      "hcuDelta": null,
+      "isNew": true
+    },
+    {
+      "flow": "submitGuess (admin; okAny + isDuress)",
+      "gasF015": 949573,
+      "gasF016": 948317,
+      "gasDelta": -1256,
+      "hcuF015": 555002,
+      "hcuF016": 555002,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "finalizeGuess + resetTrip (τ redrawn)",
+      "gasF015": 959984,
+      "gasF016": 963529,
+      "gasDelta": 3545,
+      "hcuF015": 1127064,
+      "hcuF016": 1127064,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "tightenLimits (K-only; 4× min)",
+      "gasF015": 907374,
+      "gasF016": 907418,
+      "gasDelta": 44,
+      "hcuF015": 876000,
+      "hcuF016": 876000,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "removeKnown (K-only; select)",
+      "gasF015": 510105,
+      "gasF016": 510091,
+      "gasDelta": -14,
+      "hcuF015": 83032,
+      "hcuF016": 83032,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "startEscape (no FHE)",
+      "gasF015": 60040,
+      "gasF016": 42940,
+      "gasDelta": -17100,
+      "hcuF015": 0,
+      "hcuF016": 0,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "executeEscape (no FHE; ETH + 1 token)",
+      "gasF015": 50224,
+      "gasF016": 50246,
+      "gasDelta": 22,
+      "hcuF015": 0,
+      "hcuF016": 0,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "τ distribution: buckets 36/39/34/19/26/30/36/36",
+      "gasF015": null,
+      "gasF016": 0,
+      "gasDelta": null,
+      "hcuF015": null,
+      "hcuF016": 0,
+      "hcuDelta": null,
+      "isNew": true
+    }
+  ],
+  "unchangedRows": 17,
+  "all": [
+    {
+      "flow": "factory.createAccount (clone + initialize + E_addr EIP-712 consent)",
+      "gasF015": 295399,
+      "gasF016": 295443,
+      "gasDelta": 44,
+      "hcuF015": 0,
+      "hcuF016": 0,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "setupPin (fingerprint + duress slot select/rand)",
+      "gasF015": 813509,
+      "gasF016": 813716,
+      "gasDelta": 207,
+      "hcuF015": 79000,
+      "hcuF016": 79000,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "setupAsset (L_min, L, L_big + τ draw)",
+      "gasF015": 1477449,
+      "gasF016": 1477551,
+      "gasDelta": 102,
+      "hcuF015": 1345064,
+      "hcuF016": 1345064,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "setupKnown (12 eaddress / proof)",
+      "gasF015": 2062894,
+      "gasF016": 2062936,
+      "gasDelta": 42,
+      "hcuF015": 0,
+      "hcuF016": 0,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "setupOwnerBond (F0.16, optional; packed into an existing slot)",
+      "gasF015": null,
+      "gasF016": 56003,
+      "gasDelta": null,
+      "hcuF015": null,
+      "hcuF016": 0,
+      "hcuDelta": null,
+      "isNew": true
+    },
+    {
+      "flow": "arm",
+      "gasF015": 65693,
+      "gasF016": 65715,
+      "gasDelta": 22,
+      "hcuF015": 0,
+      "hcuF016": 0,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "requestTransfer K-only (isIn N=30 + threshold + sticky tripwire)",
+      "gasF015": 1185220,
+      "gasF016": 1194640,
+      "gasDelta": 9420,
+      "hcuF015": 774036,
+      "hcuF016": 774036,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "finalizeEvaluation (KMS proof + transfer)",
+      "gasF015": 307403,
+      "gasF016": 307441,
+      "gasDelta": 38,
+      "hcuF015": 0,
+      "hcuF016": 0,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "requestTransfer PIN path (opens op)",
+      "gasF015": 117764,
+      "gasF016": 127198,
+      "gasDelta": 9434,
+      "hcuF015": 0,
+      "hcuF016": 0,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "submitGuess (transfer; okAny + isDuress + big)",
+      "gasF015": 1192174,
+      "gasF016": 1191173,
+      "gasDelta": -1001,
+      "hcuF015": 698002,
+      "hcuF016": 698002,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "finalizeGuess (2-handle KMS proof)",
+      "gasF015": 303235,
+      "gasF016": 306785,
+      "gasDelta": 3550,
+      "hcuF015": 0,
+      "hcuF016": 0,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "executeOp transfer (+ auto-add to known list: isIn + select)",
+      "gasF015": 737236,
+      "gasF016": 752773,
+      "gasDelta": 15537,
+      "hcuF015": 667032,
+      "hcuF016": 667032,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "claimRefund (F0.16: the correct guess's bond back to K)",
+      "gasF015": null,
+      "gasF016": 43194,
+      "gasDelta": null,
+      "hcuF015": null,
+      "hcuF016": 0,
+      "hcuDelta": null,
+      "isNew": true
+    },
+    {
+      "flow": "submitGuess (admin; okAny + isDuress)",
+      "gasF015": 949573,
+      "gasF016": 948317,
+      "gasDelta": -1256,
+      "hcuF015": 555002,
+      "hcuF016": 555002,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "finalizeGuess + resetTrip (τ redrawn)",
+      "gasF015": 959984,
+      "gasF016": 963529,
+      "gasDelta": 3545,
+      "hcuF015": 1127064,
+      "hcuF016": 1127064,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "tightenLimits (K-only; 4× min)",
+      "gasF015": 907374,
+      "gasF016": 907418,
+      "gasDelta": 44,
+      "hcuF015": 876000,
+      "hcuF016": 876000,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "removeKnown (K-only; select)",
+      "gasF015": 510105,
+      "gasF016": 510091,
+      "gasDelta": -14,
+      "hcuF015": 83032,
+      "hcuF016": 83032,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "startEscape (no FHE)",
+      "gasF015": 60040,
+      "gasF016": 42940,
+      "gasDelta": -17100,
+      "hcuF015": 0,
+      "hcuF016": 0,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "executeEscape (no FHE; ETH + 1 token)",
+      "gasF015": 50224,
+      "gasF016": 50246,
+      "gasDelta": 22,
+      "hcuF015": 0,
+      "hcuF016": 0,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "isIn N=8",
+      "gasF015": 320025,
+      "gasF016": 320025,
+      "gasDelta": 0,
+      "hcuF015": 286032,
+      "hcuF016": 286032,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "eq+or linear N=8",
+      "gasF015": 945492,
+      "gasF016": 945492,
+      "gasDelta": 0,
+      "hcuF015": 1264032,
+      "hcuF016": 1264032,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "eq+or tree N=8",
+      "gasF015": 949812,
+      "gasF016": 949812,
+      "gasDelta": 0,
+      "hcuF015": 1264032,
+      "hcuF016": 1264032,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "isIn N=10",
+      "gasF015": 325858,
+      "gasF016": 325858,
+      "gasDelta": 0,
+      "hcuF015": 286032,
+      "hcuF016": 286032,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "eq+or linear N=10",
+      "gasF015": 1152280,
+      "gasF016": 1152280,
+      "gasDelta": 0,
+      "hcuF015": 1586032,
+      "hcuF016": 1586032,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "eq+or tree N=10",
+      "gasF015": 1158175,
+      "gasF016": 1158175,
+      "gasDelta": 0,
+      "hcuF015": 1586032,
+      "hcuF016": 1586032,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "isIn N=16",
+      "gasF015": 394684,
+      "gasF016": 394684,
+      "gasDelta": 0,
+      "hcuF015": 584032,
+      "hcuF016": 584032,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "eq+or linear N=16",
+      "gasF015": 1772645,
+      "gasF016": 1772645,
+      "gasDelta": 0,
+      "hcuF015": 2552032,
+      "hcuF016": 2552032,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "eq+or tree N=16",
+      "gasF015": 1780891,
+      "gasF016": 1780891,
+      "gasDelta": 0,
+      "hcuF015": 2552032,
+      "hcuF016": 2552032,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "isIn N=30",
+      "gasF015": 555239,
+      "gasF016": 555239,
+      "gasDelta": 0,
+      "hcuF015": 584032,
+      "hcuF016": 584032,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "eq+or linear N=30",
+      "gasF015": 3220167,
+      "gasF016": 3220167,
+      "gasDelta": 0,
+      "hcuF015": 4806032,
+      "hcuF016": 4806032,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "eq+or tree N=30",
+      "gasF015": 3235425,
+      "gasF016": 3235425,
+      "gasDelta": 0,
+      "hcuF015": 4806032,
+      "hcuF016": 4806032,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "isIn N=32",
+      "gasF015": 578176,
+      "gasF016": 578176,
+      "gasDelta": 0,
+      "hcuF015": 885032,
+      "hcuF016": 885032,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "eq+or linear N=32",
+      "gasF015": 3426956,
+      "gasF016": 3426956,
+      "gasDelta": 0,
+      "hcuF015": 5128032,
+      "hcuF016": 5128032,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "eq+or tree N=32",
+      "gasF015": 3442917,
+      "gasF016": 3442917,
+      "gasDelta": 0,
+      "hcuF015": 5128032,
+      "hcuF016": 5128032,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "isIn N=60",
+      "gasF015": 899365,
+      "gasF016": 899365,
+      "gasDelta": 0,
+      "hcuF015": 885032,
+      "hcuF016": 885032,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "τ draw ×16 (one tx)",
+      "gasF015": 5878501,
+      "gasF016": 5878501,
+      "gasDelta": 0,
+      "hcuF015": 15632512,
+      "hcuF016": 15632512,
+      "hcuDelta": 0,
+      "isNew": false
+    },
+    {
+      "flow": "τ distribution: buckets 36/39/34/19/26/30/36/36",
+      "gasF015": null,
+      "gasF016": 0,
+      "gasDelta": null,
+      "hcuF015": null,
+      "hcuF016": 0,
+      "hcuDelta": null,
+      "isNew": true
+    }
+  ]
+}

@@ -8,7 +8,7 @@
  * The PIN never leaves the page: only Enc(h) (setup) or Enc(h + c mod 2^64) (a guess) is sent to the chain.
  */
 import { argon2id } from "hash-wasm";
-export { checkPin, randomPin } from "../../sdk/src/pinPolicy";
+export { PIN_NOTE, checkPin, randomPin } from "../../sdk/src/pinPolicy";
 
 const SALT_DOMAIN = "encrypted-account/pin/v1";
 const UINT64_MOD = 1n << 64n;

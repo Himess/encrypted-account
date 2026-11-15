@@ -88,6 +88,14 @@ library PinLib {
         uint64 nowTs = uint64(block.timestamp);
         uint64 next = PolicyMath.nextAllowed(l, track);
         if (nowTs < next) revert Errors.Backoff(next);
+        if (track == S.TRACK_OWNER) {
+            // F0.16: the K-track bond comes from outside the account. The account passes bondPayer = 0 for an EntryPoint
+            // call (which always carries value 0 anyway); the account can never call itself. Priced at the score as
+            // counted now — one guess in flight per track, so no parallel guess sees an older, lower score.
+            if (bondPayer == address(0) || bondPayer == address(this)) revert Errors.DirectBondRequired();
+            uint256 req = PolicyMath.ownerBondFor(PolicyMath.score(t), PolicyMath.ownerBaseBond(l));
+            if (bond < req) revert Errors.BondTooLow(req);
+        }
 
         // Input hygiene: fresh proof (no handle injection) + no replay. The same input twice in a row on a track is
         // rejected (I5); an input can never count for another op either, because the challenge is bound to the op's
@@ -127,7 +135,7 @@ library PinLib {
         bool hasBig = op.kind == S.Kind.Outflow;
         if (hasBig) gs.bigH = ebool.unwrap(_bigClass(l, op, okAny)); // a stale bigH stays (no slot reset to zero)
         gs.hasBig = hasBig;
-        gs.bondPayer = bondPayer;
+        if (track == S.TRACK_RECOVERY) gs.bondPayer = bondPayer; // F0.16: a K-track payer is K itself (no extra slot)
         gs.bond = uint96(bond);
         gs.opId = uint64(opId);
         gs.track = track;
@@ -208,7 +216,13 @@ library PinLib {
                 l.restrictedReasons &= ~S.R_STRIKES;
                 emit IAccountEvents.RestrictionChanged(l.restrictedReasons);
             }
-            if (gs.bond > 0) l.refunds[gs.bondPayer] += gs.bond;
+            // Pulled with claimRefund. F0.16: a K-track bond was paid by K in a direct call, so it is owed to the owner key
+            // (after a rotation that ran in between, the new key) and kept next to `owner`; a recovery-track bond goes to
+            // the payer recorded with the guess, stored as value + 1 once used so the next refund opens no slot again.
+            if (gs.bond > 0) {
+                if (track == S.TRACK_OWNER) l.ownerRefund += gs.bond;
+                else l.refunds[gs.bondPayer] = PolicyMath.counterAdd(l.refunds[gs.bondPayer], gs.bond);
+            }
         } else if (
             track == S.TRACK_OWNER &&
             (l.restrictedReasons & S.R_STRIKES) == 0 &&
@@ -221,6 +235,42 @@ library PinLib {
             emit IAccountEvents.RestrictionChanged(l.restrictedReasons);
         }
         // On failure the +1 stays and the bond stays in the account (each wrong guess pays the owner).
+    }
+
+    // ─────────────────────────────── F0.16: K-track bond ───────────────────────────────
+
+    /// @notice Setup: the K-track base bond. Later only a PIN-verified A_SET_OWNER_BOND op changes it.
+    function setupOwnerBond(uint256 base) external {
+        S.layout().ownerBondUnits = PolicyMath.ownerBondUnits(base);
+        emit IAccountEvents.OwnerBondSet(base);
+    }
+
+    /// @notice Pays the caller the bonds of its correct guesses: recovery-track bonds it posted and, for the owner key,
+    ///         the K-track bonds. The account wraps this in nonReentrant; state is cleared before the transfer.
+    function claimRefund() external {
+        S.Layout storage l = S.layout();
+        uint256 amount = PolicyMath.counterOf(l.refunds[msg.sender]);
+        if (amount != 0) l.refunds[msg.sender] = 1;
+        if (msg.sender == l.owner && l.ownerRefund != 0) {
+            amount += l.ownerRefund;
+            l.ownerRefund = 0;
+        }
+        if (amount == 0) return;
+        (bool ok, ) = payable(msg.sender).call{value: amount}("");
+        if (!ok) revert Errors.TransferFailed();
+    }
+
+    function refundOf(address a) external view returns (uint256) {
+        S.Layout storage l = S.layout();
+        return PolicyMath.counterOf(l.refunds[a]) + (a == l.owner ? l.ownerRefund : 0);
+    }
+
+    /// @return required bond of the next K-track guess (send at least this much with submitGuess)
+    /// @return base the account's base bond (public setting)
+    function ownerBond() external view returns (uint256 required, uint256 base) {
+        S.Layout storage l = S.layout();
+        base = PolicyMath.ownerBaseBond(l);
+        required = PolicyMath.ownerBondFor(PolicyMath.score(l.tracks[S.TRACK_OWNER]), base);
     }
 
     /// @notice The guess record of `opId` while it is the latest guess on its track (records are reused per track).

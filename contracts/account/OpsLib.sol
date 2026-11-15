@@ -7,6 +7,7 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 import {AccountStorage as S, Errors, IAccountEvents} from "./AccountStorage.sol";
 import {PolicyMath} from "./PolicyMath.sol";
 import {PolicyLib} from "./PolicyLib.sol";
+import {IFeeConfig} from "../fee/IFeeConfig.sol";
 
 interface IAutoKnownHook {
     function autoKnownHook(bool spenders, address who) external;
@@ -87,13 +88,14 @@ library OpsLib {
         emit IAccountEvents.GuessFinalized(opId, track, true, readyAt);
         if (readyAt == block.timestamp && op.kind == S.Kind.Admin) {
             op.status = S.Status.Executed;
-            _execute(l, opId, op);
+            _execute(l, opId, op, address(0)); // admin ops carry no fee
         }
     }
 
     // ─────────────────────────────── execution ───────────────────────────────
 
-    function executeOp(uint256 opId) external {
+    /// @param feeConfig F0.16: where the fee bound to a PIN-verified transfer goes (its feeRecipient)
+    function executeOp(uint256 opId, address feeConfig) external {
         S.Layout storage l = S.layout();
         S.Op storage op = l.ops[opId];
         if (PolicyMath.status(l, op) != S.Status.Delayed) revert Errors.BadStatus(); // escape-cancelled → Cancelled
@@ -106,10 +108,10 @@ library OpsLib {
             revert Errors.StaleOp(); // ops of a rotated / recovered key die with it
         }
         op.status = S.Status.Executed;
-        _execute(l, opId, op);
+        _execute(l, opId, op, feeConfig);
     }
 
-    function _execute(S.Layout storage l, uint256 opId, S.Op storage op) private {
+    function _execute(S.Layout storage l, uint256 opId, S.Op storage op, address feeConfig) private {
         if (op.kind == S.Kind.Outflow) {
             S.AssetCfg storage cfg = l.assets[op.target];
             PolicyMath.sync(l, cfg);
@@ -117,7 +119,12 @@ library OpsLib {
             cfg.pinCommitted -= uint128(c);
             PolicyMath.rollEpoch(cfg);
             cfg.pinSpent = PolicyMath.counterAdd(cfg.pinSpent, c);
+            // F0.16: the fee approved with the PIN, on top of the amount. Not enough for both → revert, the op stays
+            // delayed and can run later. The payee always receives exactly `amount`.
+            uint256 fee = op.fee;
+            if (fee != 0) _requireFunds(op.sub, op.target, op.amount + fee);
             _performOutflow(op.sub, op.target, op.counterparty, op.amount);
+            if (fee != 0) _payFee(opId, op.sub, op.target, fee, feeConfig);
             if (l.autoKnown) {
                 if (l.openMode) {
                     // B (F0.11): "after the first PIN-verified send" — a plain list write, no FHE
@@ -221,6 +228,10 @@ library OpsLib {
             l.escapeReadyAt = 0;
             l.escapeTo = address(0);
             emit IAccountEvents.EscapeCancelled();
+        } else if (a == S.A_SET_OWNER_BOND) {
+            uint256 base = abi.decode(op.data, (uint256));
+            l.ownerBondUnits = PolicyMath.ownerBondUnits(base);
+            emit IAccountEvents.OwnerBondSet(base);
         }
         return true;
     }
@@ -235,7 +246,14 @@ library OpsLib {
         }
         uint8 a = op.sub;
         if (a == S.A_CANCEL || a == S.A_UNRESTRICT || a == S.A_FREEZE || a == S.A_CANCEL_ESCAPE || a == S.A_RESET_TRIP) return 0;
-        if (a == S.A_ROTATE_OWNER || a == S.A_PIN_CHANGE || a == S.A_SET_GUARDIAN || a == S.A_SET_DEVICE || a == S.A_SET_HELPER) {
+        if (
+            a == S.A_ROTATE_OWNER ||
+            a == S.A_PIN_CHANGE ||
+            a == S.A_SET_GUARDIAN ||
+            a == S.A_SET_DEVICE ||
+            a == S.A_SET_HELPER ||
+            a == S.A_SET_OWNER_BOND
+        ) {
             return d.settings;
         }
         if (a == S.A_ADD_KNOWN_R || a == S.A_ADD_KNOWN_S) return d.knownAdd;
@@ -317,6 +335,34 @@ library OpsLib {
         } else {
             IERC20(asset).forceApprove(cp, amount);
         }
+    }
+
+    /// @dev F0.16: amount + fee must be there before anything moves (ETH balance, or the token balance).
+    function _requireFunds(uint8 sub, address asset, uint256 needed) private view {
+        uint256 bal = sub == S.OUT_ETH ? address(this).balance : IERC20(asset).balanceOf(address(this));
+        if (bal < needed) revert Errors.InsufficientBalance(needed);
+    }
+
+    /// @dev F0.16: pays the bound fee to FeeConfig's recipient. If FeeConfig or the transfer to the recipient fails, the
+    ///      fee is skipped and the verified transfer still completes (the user is never blocked by the fee module).
+    function _payFee(uint256 opId, uint8 sub, address asset, uint256 fee, address fc) private {
+        address to;
+        if (fc != address(0)) {
+            try IFeeConfig(fc).feeRecipient{gas: 30_000}() returns (address r) {
+                to = r;
+            } catch {}
+        }
+        bool ok;
+        if (to != address(0) && to != address(this)) {
+            if (sub == S.OUT_ETH) {
+                (ok, ) = payable(to).call{value: fee, gas: 50_000}("");
+            } else {
+                (bool s, bytes memory ret) = asset.call(abi.encodeCall(IERC20.transfer, (to, fee)));
+                ok = s && (ret.length == 0 ? asset.code.length != 0 : (ret.length == 32 && abi.decode(ret, (bool))));
+            }
+        }
+        if (ok) emit IAccountEvents.FeePaid(opId, to, fee);
+        else emit IAccountEvents.FeeSkipped(opId, fee);
     }
 
     /// @notice Escape sweep. Deliberately contains no FHE / ACL call (works while Zama is down or the account
