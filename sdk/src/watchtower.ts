@@ -17,6 +17,11 @@
  *  - W1.7 (hidden inheritance): `WillWatcher` reminds the owner 30 and 7 days before the will's inactivity period
  *    ends (a correct PIN resets it), and alerts on WillStarted on every channel: unless a correct PIN comes within the
  *    grace period, the inheritance goes ahead.
+ *  - Private mode (optional): after every K-only private transfer (PrivateTransfer) it privately decrypts the token's
+ *    K-only counter, the one handle the account shares with it, and tells the owner what happened. The counter's change
+ *    is what really moved: zero means a silent zero (unknown recipient, the hidden limit, a fired tripwire, or too low a
+ *    balance); 2^64 − 1 means the tripwire fired, and the account is restricted as on the public path. K itself never
+ *    learns the outcome, so a key thief cannot probe the hidden limit.
  * The watchtower can only restrict; it cannot move funds or widen permissions (I9).
  */
 import { Contract as EthersContract } from "ethers";
@@ -49,7 +54,23 @@ export type Alert =
   | { kind: "will-reminder"; will: string; daysLeft: number; startableAt: bigint }
   | { kind: "will-started"; will: string; settleableAt: bigint }
   | { kind: "will-settled"; will: string }
+  | { kind: "private-delivered"; token: string; to: string; moved: bigint }
+  | { kind: "private-silent-zero"; token: string; to: string; tripped: boolean }
+  | { kind: "private-tripwire"; token: string }
   | { kind: "error"; message: string };
+
+/** Private mode: the value a K-only counter saturates to when the tripwire fires (PrivateStorage.TRIPPED). */
+export const PRIVATE_TRIPPED = (1n << 64n) - 1n;
+
+/**
+ * Private mode: what a K-only private transfer did, from the counter before (`prev`: the last value this watcher saw
+ * and its day) and after. A new day restarts the counter at zero, except after a fired tripwire. Pure.
+ */
+export function privateOutcome(prev: { epoch: bigint; value: bigint } | undefined, epoch: bigint, now: bigint): { moved: bigint; tripped: boolean; newlyTripped: boolean } {
+  const base = prev && prev.epoch === epoch ? prev.value : prev?.value === PRIVATE_TRIPPED ? PRIVATE_TRIPPED : 0n;
+  if (now === PRIVATE_TRIPPED) return { moved: 0n, tripped: true, newlyTripped: base !== PRIVATE_TRIPPED };
+  return { moved: now - base, tripped: false, newlyTripped: false };
+}
 
 /** K55: if control of the escape address has not been proven for longer than this, the owner is reminded (it blocks nothing). */
 export const ESCAPE_REMIND_AFTER_S = 90 * 24 * 3600;
@@ -58,6 +79,8 @@ export interface WatchtowerDeps {
   account: Contract; // EncryptedAccount, connected to the guardian signer
   publicDecrypt: (handles: string[]) => Promise<PublicDecryptResult>;
   userDecryptBool: (handle: string, contract: string) => Promise<boolean>; // with the watchtower key
+  /** Private mode: decrypts a K-only counter (euint64) with the watchtower key; without it private transfers are skipped. */
+  userDecryptU64?: (handle: string, contract: string) => Promise<bigint>;
   notify: (a: Alert) => void;
   assets: string[]; // assets whose tripwire flag is watched
   restrictOnTrip?: boolean; // default true
@@ -67,6 +90,8 @@ export class Watchtower {
   private lastBlock = -1;
   private readonly seenTrip = new Set<string>();
   private remindedFor = -1n;
+  /** Private mode: the last K-only counter seen per token, with its day. */
+  private readonly privateSpent = new Map<string, { epoch: bigint; value: bigint }>();
   /** (token, spender) pairs: from the account's approval ops and the Approval events of the watched tokens. */
   private readonly approvals = new Map<string, { token: string; spender: string }>();
 
@@ -158,6 +183,19 @@ export class Watchtower {
         } else if (name === "EscapeStarted") {
           this.d.notify({ kind: "escape-started", readyAt: args.readyAt, to: args.to });
           await this.reportOpenApprovals(addr);
+        } else if (name === "PrivateTransfer" && this.d.userDecryptU64) {
+          const key = String(args.token).toLowerCase();
+          const epoch = BigInt(args.epoch);
+          const now = await this.d.userDecryptU64(args.spent, addr);
+          const r = privateOutcome(this.privateSpent.get(key), epoch, now);
+          this.privateSpent.set(key, { epoch, value: now });
+          if (r.moved > 0n) this.d.notify({ kind: "private-delivered", token: args.token, to: args.to, moved: r.moved });
+          else this.d.notify({ kind: "private-silent-zero", token: args.token, to: args.to, tripped: r.tripped });
+          if (r.newlyTripped) {
+            this.d.notify({ kind: "private-tripwire", token: args.token });
+            const st = await acct.status();
+            if ((this.d.restrictOnTrip ?? true) && (Number(st.restrictedReasons) & 2) === 0) await (await acct.guardianRestrict()).wait();
+          }
         }
       } catch (e: any) {
         this.d.notify({ kind: "error", message: `${name}: ${e?.shortMessage ?? e?.message ?? String(e)}` });

@@ -1,22 +1,34 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {euint64, ebool} from "@fhevm/solidity/lib/FHE.sol";
+import {euint64} from "@fhevm/solidity/lib/FHE.sol";
 
-/// @title PrivateStorage — SPIKE: namespaced (ERC-7201) storage of the private-mode module
-/// @notice Lives next to AccountStorage in the account (the module runs through DELEGATECALL). The encrypted limits of a
-///         confidential token (L_min, L, tau, L_big, tripped) stay in AccountStorage.assetEnc[token], written by the
-///         account's own setupAsset(token, 1, ...); only what the private paths add is kept here.
+/// @title PrivateStorage — namespaced (ERC-7201) storage of the optional private mode
+/// @notice Lives next to AccountStorage in an EncryptedAccountP account (PrivateModule runs through DELEGATECALL). A private
+///         token's limits, tripwire and counters live here only: the public asset tables (AccountStorage.assets /
+///         assetEnc) never hold a private token, so the public outflow paths cannot evaluate it, trip it or reveal anything
+///         about its hidden threshold.
 library PrivateStorage {
+    /// @dev `spent` saturates to this value when a K-only transfer does not fit under tau: the tripwire. It stays set
+    ///      across day boundaries until a PIN-verified reset; a tripped `spent` leaves no room for any amount above zero.
+    uint64 internal constant TRIPPED = type(uint64).max;
+    /// @dev Upper bound of L_min / L after setup and tightening, so that tau (≤ L_min + 2^48) never reaches TRIPPED.
+    uint64 internal constant MAX_LIMIT = uint64(1) << 62;
+    /// @dev Design doc §17.1: in a private-mode account every PIN-verified outflow of a private token waits at least this
+    ///      long, and so does every public outflow in the long class (the account's bigTransfer delay). The rule is public
+    ///      and the same with or without a duress PIN, so it does not reveal whether one is set.
+    uint32 internal constant MIN_BIG_DELAY = 72 hours;
+
     struct Asset {
         bool configured;
         uint64 epoch; // day index of `spent`
-        euint64 spent; // K-only private outflows in this epoch (encrypted; invariant spent <= tau, guarded with max)
-        euint64 decoyCap; // duress view and spend cap, client-encrypted (any value when no duress PIN is set)
-        euint64 decoySpent; // what left the account under duress (encrypted)
+        euint64 spent; // K-only private outflows in this epoch; TRIPPED = the tripwire fired
+        euint64 lmin; // L_min (the owner knows it)
+        euint64 l; // L (the owner knows it), upper end of tau's range
+        euint64 tau; // hidden K-only threshold in [L_min, L), drawn with FHE randomness: nobody knows it
+        euint64 decoyCap; // duress view and spend cap (a random client value when no duress PIN is set)
+        euint64 decoySpent; // what left the account under the duress PIN
         euint64 lastView; // latest PIN-gated balance snapshot, allowed to K
-        ebool lastPass; // pass bit of the latest K-only private transfer (allowed to the guardian only)
-        euint64 lastMoved; // amount the token really moved in that transfer (allowed to the guardian only)
     }
 
     struct Layout {
@@ -32,4 +44,11 @@ library PrivateStorage {
             l.slot := s
         }
     }
+}
+
+/// @notice The module's hooks that only EncryptedAccountP itself may reach (its fallback refuses these selectors).
+interface IPrivateHooks {
+    function privateAfterGuess(uint256 opId, bool ok, uint8 track) external;
+
+    function privateExecuteOp(uint256 opId) external;
 }
