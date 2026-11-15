@@ -55,9 +55,32 @@ Total gas (without the cleartext layer) differs between pairs by at most 36 gas;
 −12 gas × the difference in zero bytes of the calldata (random ciphertext handles, proofs and challenges). The same
 spread appears between two runs of the same mode.
 
-## Sepolia
+## Sepolia (`scripts/spike/sepolia-private.ts`, evidence `results/spike/sepolia/`)
 
-See `results/spike/sepolia/private-mode-sepolia.json` (written by `scripts/spike/sepolia-private.ts`).
+A fresh EncryptedAccountP account holding Zama's official **cUSDC (Mock)** wrapper, looked up in the Wrappers Registry
+(`0x2f07…128e` → `0x7c5B…3639`, valid, rate 1). The F0.16 PinLib, PolicyLib and OpenLib deployments are reused; OpsLib,
+PrivateModule, EncryptedAccountP and a factory are new. The F0.16 factory, its accounts and the site are not touched.
+
+- **K alone, on the real KMS:** user decryption of the account's balance, through the token or through the account, is
+  refused ("not authorized to decrypt handle"); so is K's attempt to read the pass bit of a K-only transfer.
+- **T1 (N = 5):** one transaction, no decryption request; HCU 1,990,100 (exactly the mock's); gas 2,749,430 on the first
+  run, 2,447,556 after. Total p50 14.3 s, p95 16.0 s = input proof p50 4.7 s + inclusion p50 9.4 s; no decryption.
+  The guardian reads the pass bit p50 8.1 s after the transaction.
+- **T2 (N = 5):** every snapshot decrypted to the exact balance. Total p50 40.3 s, p95 46.0 s = Argon2id 0.2 s (in
+  parallel) + input proof p50 5.0 s + three inclusions p50 25.8 s + public decryption of the yes/no bit p50 4.8 s + user
+  decryption of the snapshot p50 2.9 s (p95 8.1 s). Gas (warm): open 281,149, guess 844,905, finalize with the view
+  957,052.
+- **T3 on the production executor:** the test account has a duress PIN (the product default is still none); every
+  real-PIN view of T2 is paired with a duress-PIN view. The account's first PIN-gated op (T2 #1) opens one-time slots
+  (3/8/4 new slots against 2/3/3 later; the gas gap is exactly 1, 5 and 1 × 97,920), so it is the warm-up. The four warm
+  pairs plus a cross-check (real #2 vs duress #1): **15 transaction pairs, 0 differences** in execution gas, HCU, depth,
+  calldata length, events and ACL grants; total gas differs by at most 48 gas, every time by −12 gas per calldata zero
+  byte. All five duress views showed the decoy (2,000), all real views the balance (9,950). The three pairs of PIN-gated
+  transfers were skipped: the burner was 0.0008 ETH short (code deposit on Sepolia costs ≈1,560 gas per byte, so the
+  four deployments alone took 72.8M gas).
+- **Mainnet equivalent** (`scripts/spike/sepolia-slots.ts`, new slots from the block access lists, 110,983 vs 22,445 gas
+  per new slot): T1 2,447,568 gas with 13 new slots → ≈1,296,600 on today's mainnet schedule; the PIN-gated view
+  ≈1,374,800 in total. For reference, A's two-phase K-only ETH path ≈1,150,300 and B's one-transaction path 59,820.
 
 ## Deniability budget (T5)
 

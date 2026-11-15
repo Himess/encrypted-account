@@ -1,0 +1,432 @@
+{
+  "generatedAt": "2026-11-15T20:24:38.726Z",
+  "evidence": "[M] Sepolia block access lists; mainnet equivalent [I]",
+  "slotGas": {
+    "sepolia": 110983,
+    "mainnet": 22445
+  },
+  "summary": {
+    "T1 private transfer (K only) · privateTransfer": {
+      "n": 5,
+      "gasMedian": 2447568,
+      "newSlotsMedian": 13,
+      "mainnetEqMedian": 1296574,
+      "firstSample": {
+        "gas": 2749430,
+        "newSlots": 16
+      }
+    },
+    "T2 view (real PIN) · open": {
+      "n": 5,
+      "gasMedian": 281149,
+      "newSlotsMedian": 2,
+      "mainnetEqMedian": 104073,
+      "firstSample": {
+        "gas": 379069,
+        "newSlots": 3
+      }
+    },
+    "T2 view (real PIN) · guess": {
+      "n": 5,
+      "gasMedian": 844905,
+      "newSlotsMedian": 3,
+      "mainnetEqMedian": 579291,
+      "firstSample": {
+        "gas": 1334497,
+        "newSlots": 8
+      }
+    },
+    "T2 view (real PIN) · finalize": {
+      "n": 5,
+      "gasMedian": 957052,
+      "newSlotsMedian": 3,
+      "mainnetEqMedian": 691438,
+      "firstSample": {
+        "gas": 1054996,
+        "newSlots": 4
+      }
+    },
+    "T3 view (duress PIN) · open": {
+      "n": 5,
+      "gasMedian": 281149,
+      "newSlotsMedian": 2,
+      "mainnetEqMedian": 104073,
+      "firstSample": {
+        "gas": 281149,
+        "newSlots": 2
+      }
+    },
+    "T3 view (duress PIN) · guess": {
+      "n": 5,
+      "gasMedian": 844905,
+      "newSlotsMedian": 3,
+      "mainnetEqMedian": 579291,
+      "firstSample": {
+        "gas": 844905,
+        "newSlots": 3
+      }
+    },
+    "T3 view (duress PIN) · finalize": {
+      "n": 5,
+      "gasMedian": 957076,
+      "newSlotsMedian": 3,
+      "mainnetEqMedian": 691462,
+      "firstSample": {
+        "gas": 957064,
+        "newSlots": 3
+      }
+    }
+  },
+  "rows": [
+    {
+      "flow": "T1 private transfer (K only)",
+      "i": 1,
+      "step": "privateTransfer",
+      "hash": "0x5d55753b7032bf9d08e63ff51e19e66724da4f7dd103679eeda1f10b0a596c01",
+      "gasUsed": 2749430,
+      "newSlots": 16,
+      "newAccounts": 0,
+      "mainnetEq": 1332822
+    },
+    {
+      "flow": "T1 private transfer (K only)",
+      "i": 2,
+      "step": "privateTransfer",
+      "hash": "0x7727894704772a846626f77d16a700326d5766cf7f10299b37b953a7d188104d",
+      "gasUsed": 2447556,
+      "newSlots": 13,
+      "newAccounts": 0,
+      "mainnetEq": 1296562
+    },
+    {
+      "flow": "T1 private transfer (K only)",
+      "i": 3,
+      "step": "privateTransfer",
+      "hash": "0x6a60d4dcc180db475dbcb7858f8b0c041af54272add938faf606814bd0e115d0",
+      "gasUsed": 2447556,
+      "newSlots": 13,
+      "newAccounts": 0,
+      "mainnetEq": 1296562
+    },
+    {
+      "flow": "T1 private transfer (K only)",
+      "i": 4,
+      "step": "privateTransfer",
+      "hash": "0x6565a4f4cbf542fa8aa0bc294bd110883013f7dc0349b1c1588fee902a445c70",
+      "gasUsed": 2447568,
+      "newSlots": 13,
+      "newAccounts": 0,
+      "mainnetEq": 1296574
+    },
+    {
+      "flow": "T1 private transfer (K only)",
+      "i": 5,
+      "step": "privateTransfer",
+      "hash": "0x155bb2c97ff7287fefd7ab17f2359484f33a35f39675b42f0bde704096c248d9",
+      "gasUsed": 2447568,
+      "newSlots": 13,
+      "newAccounts": 0,
+      "mainnetEq": 1296574
+    },
+    {
+      "flow": "T2 view (real PIN)",
+      "i": 1,
+      "step": "open",
+      "hash": "0xf56f3ac1305df0cd0065ce724c2fcc9b056fdee810db69a425b13880d5ad55d6",
+      "gasUsed": 379069,
+      "newSlots": 3,
+      "newAccounts": 0,
+      "mainnetEq": 113455
+    },
+    {
+      "flow": "T2 view (real PIN)",
+      "i": 1,
+      "step": "guess",
+      "hash": "0x8da8c65f9b04f0136aef06bffd7daaa8f183bbca38e3b1c4966f00b707a33e9f",
+      "gasUsed": 1334497,
+      "newSlots": 8,
+      "newAccounts": 0,
+      "mainnetEq": 626193
+    },
+    {
+      "flow": "T2 view (real PIN)",
+      "i": 1,
+      "step": "finalize",
+      "hash": "0x180fc1b0030af5e0f7d71f9a23ccac56b8fa3b444f645e109340d29424227ac3",
+      "gasUsed": 1054996,
+      "newSlots": 4,
+      "newAccounts": 0,
+      "mainnetEq": 700844
+    },
+    {
+      "flow": "T2 view (real PIN)",
+      "i": 2,
+      "step": "open",
+      "hash": "0xbe3afe00c474e2ad73e5b214e5f7e7f8e2906df234eb3b282e0a7e046414683d",
+      "gasUsed": 281149,
+      "newSlots": 2,
+      "newAccounts": 0,
+      "mainnetEq": 104073
+    },
+    {
+      "flow": "T2 view (real PIN)",
+      "i": 2,
+      "step": "guess",
+      "hash": "0xbd218c83962dde90965fbec101ab8d4f613a2ab047e1d6b7fb14cc709c42b94a",
+      "gasUsed": 844905,
+      "newSlots": 3,
+      "newAccounts": 0,
+      "mainnetEq": 579291
+    },
+    {
+      "flow": "T2 view (real PIN)",
+      "i": 2,
+      "step": "finalize",
+      "hash": "0xa5f85225d5313e5004928f526a6b37ca027d6b8b10650695bef7c451f872cb81",
+      "gasUsed": 957076,
+      "newSlots": 3,
+      "newAccounts": 0,
+      "mainnetEq": 691462
+    },
+    {
+      "flow": "T2 view (real PIN)",
+      "i": 3,
+      "step": "open",
+      "hash": "0x7e74a6e8f3bd6abcc9a0247cb8c0ec1327fdd93c8a6f71d0aeb84a579b5afc4a",
+      "gasUsed": 281149,
+      "newSlots": 2,
+      "newAccounts": 0,
+      "mainnetEq": 104073
+    },
+    {
+      "flow": "T2 view (real PIN)",
+      "i": 3,
+      "step": "guess",
+      "hash": "0x37fab573f721fcd0a11d9bed8c8afac4d722a11d282309907fb8ecad3bc0607c",
+      "gasUsed": 844905,
+      "newSlots": 3,
+      "newAccounts": 0,
+      "mainnetEq": 579291
+    },
+    {
+      "flow": "T2 view (real PIN)",
+      "i": 3,
+      "step": "finalize",
+      "hash": "0x851debe419a9619540a9b31a3432f6e1f86c262dff56c41c1fd23fb082b90a76",
+      "gasUsed": 957040,
+      "newSlots": 3,
+      "newAccounts": 0,
+      "mainnetEq": 691426
+    },
+    {
+      "flow": "T2 view (real PIN)",
+      "i": 4,
+      "step": "open",
+      "hash": "0xd9351f35573ec1885cd7a57361af1a06218fce2b479bd6fa4379657290cc5e82",
+      "gasUsed": 281149,
+      "newSlots": 2,
+      "newAccounts": 0,
+      "mainnetEq": 104073
+    },
+    {
+      "flow": "T2 view (real PIN)",
+      "i": 4,
+      "step": "guess",
+      "hash": "0x6361387abf661c1fe4f706ef370b9ffe06eb5ba9efe8d936c31d1ce03b732156",
+      "gasUsed": 844905,
+      "newSlots": 3,
+      "newAccounts": 0,
+      "mainnetEq": 579291
+    },
+    {
+      "flow": "T2 view (real PIN)",
+      "i": 4,
+      "step": "finalize",
+      "hash": "0xacc8164b74e7ee14b6eb18821d6930ad989828afa1f4f8980f28f35f96aaddc9",
+      "gasUsed": 957052,
+      "newSlots": 3,
+      "newAccounts": 0,
+      "mainnetEq": 691438
+    },
+    {
+      "flow": "T2 view (real PIN)",
+      "i": 5,
+      "step": "open",
+      "hash": "0x5e4bdb7b6dce3f8b663bb50a33a674074b47a4f58d117ab938ea1a601b06b628",
+      "gasUsed": 281149,
+      "newSlots": 2,
+      "newAccounts": 0,
+      "mainnetEq": 104073
+    },
+    {
+      "flow": "T2 view (real PIN)",
+      "i": 5,
+      "step": "guess",
+      "hash": "0xf04cc84dbf3bc29615194c023fa50fb7ab4078dc431b0f91dbc714a0cca0a903",
+      "gasUsed": 844905,
+      "newSlots": 3,
+      "newAccounts": 0,
+      "mainnetEq": 579291
+    },
+    {
+      "flow": "T2 view (real PIN)",
+      "i": 5,
+      "step": "finalize",
+      "hash": "0xe379a4932465c6c671b531ec8c09c81bb33ac356aa651a9bae82a6b857d91eb1",
+      "gasUsed": 957040,
+      "newSlots": 3,
+      "newAccounts": 0,
+      "mainnetEq": 691426
+    },
+    {
+      "flow": "T3 view (duress PIN)",
+      "i": 1,
+      "step": "open",
+      "hash": "0xf4df88d7c9e579d9c72987cc5b094d514d05ae0342cdd741de0b4c9fc3654066",
+      "gasUsed": 281149,
+      "newSlots": 2,
+      "newAccounts": 0,
+      "mainnetEq": 104073
+    },
+    {
+      "flow": "T3 view (duress PIN)",
+      "i": 1,
+      "step": "guess",
+      "hash": "0xe09a1fdfd2c0dc9128dcee22a403aa1ba8ecf7fb0e9cf21e5b6fbe8b6f040f66",
+      "gasUsed": 844905,
+      "newSlots": 3,
+      "newAccounts": 0,
+      "mainnetEq": 579291
+    },
+    {
+      "flow": "T3 view (duress PIN)",
+      "i": 1,
+      "step": "finalize",
+      "hash": "0xbe9426be22d5cdfe9e2bc88e6a893d7a25af6cc1b7d04ce09ffb4f09fe441941",
+      "gasUsed": 957064,
+      "newSlots": 3,
+      "newAccounts": 0,
+      "mainnetEq": 691450
+    },
+    {
+      "flow": "T3 view (duress PIN)",
+      "i": 2,
+      "step": "open",
+      "hash": "0x4377f26f656a4b8650da26dfa8da97c08c32e9dec0fdf0d50fdcbed8b3831b50",
+      "gasUsed": 281149,
+      "newSlots": 2,
+      "newAccounts": 0,
+      "mainnetEq": 104073
+    },
+    {
+      "flow": "T3 view (duress PIN)",
+      "i": 2,
+      "step": "guess",
+      "hash": "0x5643c4f4a978882530e4a22ddf55520a39740a773631e0bc36cae89b6b7b1902",
+      "gasUsed": 844893,
+      "newSlots": 3,
+      "newAccounts": 0,
+      "mainnetEq": 579279
+    },
+    {
+      "flow": "T3 view (duress PIN)",
+      "i": 2,
+      "step": "finalize",
+      "hash": "0x281494a880e4f50d2fec51d26e077dec988059b8faa4cab8553bd7aed059023a",
+      "gasUsed": 957076,
+      "newSlots": 3,
+      "newAccounts": 0,
+      "mainnetEq": 691462
+    },
+    {
+      "flow": "T3 view (duress PIN)",
+      "i": 3,
+      "step": "open",
+      "hash": "0x405d02275157ab7dd5b77eb71a2f8dcfdafa5941425e5fe806bbef99a3158563",
+      "gasUsed": 281149,
+      "newSlots": 2,
+      "newAccounts": 0,
+      "mainnetEq": 104073
+    },
+    {
+      "flow": "T3 view (duress PIN)",
+      "i": 3,
+      "step": "guess",
+      "hash": "0x228ff2c06f33dabb794bb525d96e385200efcc0c9182a2abe7174d10a8d1528d",
+      "gasUsed": 844905,
+      "newSlots": 3,
+      "newAccounts": 0,
+      "mainnetEq": 579291
+    },
+    {
+      "flow": "T3 view (duress PIN)",
+      "i": 3,
+      "step": "finalize",
+      "hash": "0x9c7ef0fe2d0b81edcd50d3c9756b8a36dfa9fe6c96bc184df2f17f1b839bb816",
+      "gasUsed": 957088,
+      "newSlots": 3,
+      "newAccounts": 0,
+      "mainnetEq": 691474
+    },
+    {
+      "flow": "T3 view (duress PIN)",
+      "i": 4,
+      "step": "open",
+      "hash": "0xb6c3550ac7164c2e9817aae4658858af8507106cc3d998fd3fd9e9a39a8e517e",
+      "gasUsed": 281149,
+      "newSlots": 2,
+      "newAccounts": 0,
+      "mainnetEq": 104073
+    },
+    {
+      "flow": "T3 view (duress PIN)",
+      "i": 4,
+      "step": "guess",
+      "hash": "0x008297b448773157f7be77c3a43ccd46329b19f4074223769847eaf3caac32c4",
+      "gasUsed": 844881,
+      "newSlots": 3,
+      "newAccounts": 0,
+      "mainnetEq": 579267
+    },
+    {
+      "flow": "T3 view (duress PIN)",
+      "i": 4,
+      "step": "finalize",
+      "hash": "0x4aa1e9b8e96e9a1725d689a4c8475d8831059f8b298041aeab5086cd8ea8ebfd",
+      "gasUsed": 957076,
+      "newSlots": 3,
+      "newAccounts": 0,
+      "mainnetEq": 691462
+    },
+    {
+      "flow": "T3 view (duress PIN)",
+      "i": 5,
+      "step": "open",
+      "hash": "0x35d1d8b9cf04605126f479ac093120e62f6c186c50d530a7763e8b92cbd40561",
+      "gasUsed": 281149,
+      "newSlots": 2,
+      "newAccounts": 0,
+      "mainnetEq": 104073
+    },
+    {
+      "flow": "T3 view (duress PIN)",
+      "i": 5,
+      "step": "guess",
+      "hash": "0xd14b365c8476e14d834f7fe8aa2355159c4562b8c65fa05acdcd52f6bd00b019",
+      "gasUsed": 844905,
+      "newSlots": 3,
+      "newAccounts": 0,
+      "mainnetEq": 579291
+    },
+    {
+      "flow": "T3 view (duress PIN)",
+      "i": 5,
+      "step": "finalize",
+      "hash": "0x294a116ae4461f79d48bb9b6733de7ce5d008c1adcd595e37591a040d24ff3e0",
+      "gasUsed": 957064,
+      "newSlots": 3,
+      "newAccounts": 0,
+      "mainnetEq": 691450
+    }
+  ]
+}

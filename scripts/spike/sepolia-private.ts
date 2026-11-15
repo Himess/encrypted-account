@@ -26,7 +26,7 @@ import { ROOT, hasWatchtowerKey, readEnvSepolia, sepoliaWatchtowerKey } from "..
 import { makeFhevmClient } from "../lib/fhevm";
 import { LiveCtx, encryptTimed, patchFetch, publicDecryptWhenReady, withFetchLabel } from "../lib/live";
 import { ENTRYPOINT_V08, ManagedWallet, eth, gwei, makeProvider, makeSigner, probeRpcs, sleep } from "../lib/net";
-import { TEST_DELAYS, TEST_PIN, escapeConsentSig, hcuOf, pct, requireBalance, send } from "../sepolia/f09-lib";
+import { TEST_DELAYS, TEST_PIN, escapeConsentSig, hcuOf, pct, readAt, requireBalance, send } from "../sepolia/f09-lib";
 
 const OUT = path.join(ROOT, "results", "spike", "sepolia");
 const STATE = path.join(OUT, "state.json");
@@ -178,16 +178,32 @@ async function main() {
   if (!reg.valid || !reg.matches) throw new Error("the registry does not list this wrapper as valid");
   st.registry = reg;
 
-  // gas plan: deployments ~11M, account + setup ~16M, funding ~1M, T1 5 × ~2M, T2 5 × ~2M, T3 5 views + 6 transfers
-  // (~25M), refunds, margin → 80M
-  const GAS_PLAN = 80_000_000n;
+  // Gas still needed, from what the state file says is done. Sepolia prices code deposit at ≈1,560 gas per byte: the four
+  // deployments cost ≈73M, the account setup ≈18M (measured in the first part of this run).
   const BOND = ethers.parseEther("0.001");
-  log(`estimate: ${GAS_PLAN} gas ≈ ${eth(GAS_PLAN * fee.gasPrice!)} ETH + one refundable bond ${eth(BOND)} ETH`);
+  const PER = { t1: 2_200_000n, view: 2_400_000n, transfer: 3_300_000n, refund: 60_000n };
+  const left = (n: number) => BigInt(Math.max(0, n));
+  const setupGas = st.account?.setup?.wrapToAccount ? 0n : 95_000_000n;
+  const coreGas =
+    setupGas + left(N - (st.t1?.length ?? 0)) * PER.t1 + left(N - (st.t2?.length ?? 0)) * (PER.view + PER.refund) + left(N - (st.t3views?.length ?? 0)) * (PER.view + PER.refund);
+  const transferGas = left(2 * T3_TRANSFERS.length - (st.t3transfers?.length ?? 0)) * (PER.transfer + PER.refund);
+  log(`still needed: core (setup, T1, T2, T3 views) ${coreGas} gas ≈ ${eth(coreGas * fee.gasPrice!)} ETH · T3 transfers ${transferGas} gas ≈ ${eth(transferGas * fee.gasPrice!)} ETH · plus one refundable bond ${eth(BOND)} ETH`);
   if (STEP === "check") {
     save(st);
     return;
   }
-  await requireBalance(provider, user, GAS_PLAN, "spike private mode (deploy, account, T1, T2)", BOND);
+  // a bond still credited in the account (a refund that did not go through) comes back first
+  if (st.account?.address) {
+    const a0 = contractAt(build, "AccountP", st.account.address, user);
+    const owed: bigint = await a0.refundOf(user.address);
+    if (owed > 0n) {
+      await send(user, "claimRefund (pending)", () => a0.claimRefund.populateTransaction(), { gasLimit: 150_000n });
+      st.refunded = String(BigInt(st.refunded ?? "0") + owed);
+      save(st);
+      log(`  pending refund claimed: ${eth(owed)} ETH`);
+    }
+  }
+  await requireBalance(provider, user, coreGas, "spike private mode (setup, T1, T2, T3 views)", BOND);
 
   // ── deploy
   st.contracts ??= {};
@@ -277,7 +293,9 @@ async function main() {
 
   // ── negative checks on the real KMS: K alone cannot read the balance
   if (!st.kAloneBalance) {
-    const balH = await wrapper.confidentialBalanceOf(addr);
+    // pinned to the wrap's block: a lagging backend would return the empty handle of the state before it
+    const balH: string = await readAt((o) => wrapper.confidentialBalanceOf(addr, o), Number(st.account.setup.wrapToAccount.blockNumber));
+    if (balH === ethers.ZeroHash) throw new Error("the account holds no cUSDC handle after the wrap");
     const viaToken = await userDecryptTimed(ctx, user, balH, CUSDC, true);
     const viaAccount = await userDecryptTimed(ctx, user, balH, addr, true);
     st.kAloneBalance = { handle: balH, viaToken: { denied: viaToken.denied, error: viaToken.error }, viaAccount: { denied: viaAccount.denied, error: viaAccount.error } };
@@ -294,7 +312,7 @@ async function main() {
     const r = await send(user, `T1 #${i}`, () => acct.privateTransfer.populateTransaction(CUSDC, user.address, e.handles[0], e.inputProof));
     const totalMs = Math.round(performance.now() - t0);
     const decryptRequests = r.receipt.logs.filter((l) => l.topics[0] === ethers.id("AllowedForDecryption(address,bytes32[])")).length;
-    const ps = await acct.privateState(CUSDC);
+    const ps = await readAt<any>((o) => acct.privateState(CUSDC, o), r.receipt.blockNumber);
     // T4: the guardian (watchtower) learns whether it passed; K cannot
     const g = await userDecryptTimed(ctx, guardian, ps.lastPass, addr);
     const kTry = i === 1 ? await userDecryptTimed(ctx, user, ps.lastPass, addr, true) : null;
@@ -334,9 +352,9 @@ async function main() {
     const c: bigint = BigInt(ev!.args.challenge);
     const fp = await fpP;
     const e = await encryptTimed(ctx, [{ type: "euint64", value: guessValue(fp.v, c) }], addr, user.address);
-    const [required] = await acct.ownerBond();
+    const [required] = await readAt<any>((x) => acct.ownerBond(x), o.receipt.blockNumber);
     const g = await send(user, `${label} submitGuess`, () => acct.submitGuess.populateTransaction(opId, c, e.handles[0], e.inputProof, { value: required }));
-    const gs = await acct.getGuess(opId);
+    const gs = await readAt<any>((x) => acct.getGuess(opId, x), g.receipt.blockNumber);
     const d = await publicDecryptWhenReady(ctx, [gs.okH]);
     const f = await send(user, `${label} finalizeGuess`, () => acct.finalizeGuess.populateTransaction(opId, d.abiEncodedClearValues, d.decryptionProof));
     const ex = parse(f.receipt, "PrivateOpExecuted");
@@ -346,6 +364,7 @@ async function main() {
     const txData = async (h: string) => (await provider.getTransaction(h))!.data;
     return {
       opId,
+      block: f.receipt.blockNumber,
       result: String(ex.args.result),
       doneMs,
       fingerprintMs: fp.ms,
@@ -356,10 +375,11 @@ async function main() {
       finalize: { hash: f.tx.hash, gasUsed: f.tx.gasUsed, wallMs: f.tx.wallMs, hcu: hf, shape: shapeOf(f.receipt, await txData(f.tx.hash), hf, roles) },
     };
   };
-  const refundNow = async () => {
-    const r = await acct.refundOf(user.address);
+  const refundNow = async (block?: number) => {
+    const r: bigint = block ? await readAt((x) => acct.refundOf(user.address, x), block) : await acct.refundOf(user.address);
     if (r === 0n) return 0n;
-    await send(user, "claimRefund", () => acct.claimRefund.populateTransaction());
+    // fixed gas: an estimate from a lagging backend sees no refund yet and is too low for the ETH transfer
+    await send(user, "claimRefund", () => acct.claimRefund.populateTransaction(), { gasLimit: 150_000n });
     return r;
   };
   st.refunded ??= "0";
@@ -378,7 +398,7 @@ async function main() {
       const r = await pinFlow(`T2 #${i}`, TEST_PIN, () => acct.openPrivateView.populateTransaction(CUSDC));
       const u = await userDecryptTimed(ctx, user, r.result, addr);
       st.t2.push({ i, ...r, userDecrypt: { ms: u.ms, permitMs: u.permitMs, attempts: u.attempts }, seen: u.value, expected: balAfterT1, correct: u.value === balAfterT1, totalMs: Math.round(performance.now() - t0) });
-      addRefund(await refundNow());
+      addRefund(await refundNow(r.block));
       save(st);
       log(`  T2 #${i}: ${st.t2[i - 1].totalMs} ms · saw ${u.value} (expected ${balAfterT1}) · decrypt ${r.publicDecrypt.waitedMs} ms · user decrypt ${u.ms} ms`);
     }
@@ -387,17 +407,30 @@ async function main() {
       const u = await userDecryptTimed(ctx, user, r.result, addr);
       const exp = balAfterT1 < DECOY ? balAfterT1 : DECOY;
       st.t3views.push({ i, ...r, seen: u.value, expected: exp, correct: u.value === exp });
-      addRefund(await refundNow());
+      addRefund(await refundNow(r.block));
       save(st);
       log(`  T3 view #${i} (duress): saw ${u.value} (decoy expected ${exp})`);
     }
   }
 
-  // ── T3 transfers: 3 pairs of PIN-gated private transfers to the owner's wallet, real PIN then duress PIN
+  // ── T3 transfers: 3 pairs of PIN-gated private transfers to the owner's wallet, real PIN then duress PIN. Only if the
+  //    balance covers them (they were added to the brief's T1/T2 to check T3 on the production executor).
   st.t3transfers ??= [];
   let decoyLeft = DECOY;
   for (const r0 of st.t3transfers as any[]) if (r0.mode === "duress") decoyLeft -= BigInt(r0.moved ?? 0);
-  while (st.t3transfers.length < 2 * T3_TRANSFERS.length) {
+  {
+    const pairsLeft = left(2 * T3_TRANSFERS.length - st.t3transfers.length);
+    const need = (pairsLeft * (PER.transfer + PER.refund) * (await provider.getFeeData()).gasPrice! * 125n) / 100n + (pairsLeft > 0n ? BOND : 0n);
+    const have = await provider.getBalance(user.address);
+    if (have < need) {
+      st.t3transfersSkipped = { balanceWei: String(have), neededWei: String(need), shortByWei: String(need - have) };
+      save(st);
+      log(`  T3 transfers skipped: balance ${eth(have)} ETH, needed ${eth(need)} ETH (short by ${eth(need - have)} ETH)`);
+    } else {
+      delete st.t3transfersSkipped;
+    }
+  }
+  while (!st.t3transfersSkipped && st.t3transfers.length < 2 * T3_TRANSFERS.length) {
     const k = st.t3transfers.length;
     const amount = T3_TRANSFERS[Math.floor(k / 2)];
     const mode = k % 2 === 0 ? "real" : "duress";
@@ -408,7 +441,7 @@ async function main() {
     const exp = mode === "real" ? amount : amount <= decoyLeft ? amount : 0n;
     if (mode === "duress") decoyLeft -= moved ?? 0n;
     st.t3transfers.push({ k: k + 1, mode, amount, ...r, moved, expected: exp, correct: moved === exp });
-    addRefund(await refundNow());
+    addRefund(await refundNow(r.block));
     save(st);
     log(`  T3 transfer ${k + 1} (${mode}): ${amount} → moved ${moved} (expected ${exp})`);
   }
@@ -423,8 +456,10 @@ async function main() {
     }
   };
   for (let i = 0; i < N; i++) cmp(`view ${i + 1}`, st.t2[i], st.t3views[i]);
-  for (let k = 0; k < st.t3transfers.length; k += 2) cmp(`transfer ${k / 2 + 1}`, st.t3transfers[k], st.t3transfers[k + 1]);
-  st.t3compare = { pairs: N + T3_TRANSFERS.length, txCompared: 3 * (N + T3_TRANSFERS.length), differences: t3diff.length, list: t3diff.slice(0, 30) };
+  let transferPairs = 0;
+  for (let k = 0; k + 1 < st.t3transfers.length; k += 2, transferPairs++) cmp(`transfer ${k / 2 + 1}`, st.t3transfers[k], st.t3transfers[k + 1]);
+  const viewPairs = Math.min(st.t2.length, st.t3views.length);
+  st.t3compare = { viewPairs, transferPairs, txCompared: 3 * (viewPairs + transferPairs), differences: t3diff.length, list: t3diff.slice(0, 30), transfersSkipped: st.t3transfersSkipped ?? null };
   save(st);
   log(`  T3 on Sepolia: ${t3diff.length} differences in ${st.t3compare.txCompared} transaction pairs`);
 
@@ -478,7 +513,9 @@ async function main() {
       transfersCorrect: (st.t3transfers as any[]).every((r) => r.correct),
       totalGasPairs: [
         ...(st.t2 as any[]).map((r, i) => ({ pair: `view ${i + 1}`, real: [r.open.gasUsed, r.guess.gasUsed, r.finalize.gasUsed].map(Number), duress: [st.t3views[i].open.gasUsed, st.t3views[i].guess.gasUsed, st.t3views[i].finalize.gasUsed].map(Number) })),
-        ...[0, 2, 4].map((k) => ({ pair: `transfer ${k / 2 + 1}`, real: [st.t3transfers[k].open.gasUsed, st.t3transfers[k].guess.gasUsed, st.t3transfers[k].finalize.gasUsed].map(Number), duress: [st.t3transfers[k + 1].open.gasUsed, st.t3transfers[k + 1].guess.gasUsed, st.t3transfers[k + 1].finalize.gasUsed].map(Number) })),
+        ...[0, 2, 4]
+          .filter((k) => st.t3transfers[k + 1])
+          .map((k) => ({ pair: `transfer ${k / 2 + 1}`, real: [st.t3transfers[k].open.gasUsed, st.t3transfers[k].guess.gasUsed, st.t3transfers[k].finalize.gasUsed].map(Number), duress: [st.t3transfers[k + 1].open.gasUsed, st.t3transfers[k + 1].guess.gasUsed, st.t3transfers[k + 1].finalize.gasUsed].map(Number) })),
       ],
     },
     refund: st.refund,

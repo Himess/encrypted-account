@@ -1,0 +1,1932 @@
+{
+  "registry": {
+    "registry": "0x2f0750Bbb0A246059d80e94c454586a7F27a128e",
+    "underlying": "0x9b5Cd13b8eFbB58Dc25A05CF411D8056058aDFfF",
+    "wrapper": "0x7c5BF43B851c1dff1a4feE8dB225b87f2C223639",
+    "valid": true,
+    "matches": true,
+    "rate": "1",
+    "wrapperDecimals": 6,
+    "underlyingDecimals": 6
+  },
+  "contracts": {
+    "OpsLib": "0x5AEb569457E2a85c6e178bc1871a108BcB97cCd7",
+    "PrivateModule": "0x3FB0dBC7De88AE145c7c8Cb0c2673b5b44332d42",
+    "EncryptedAccountP": "0x067019950675c0E37ac12b62aeE49a9Cc338355D",
+    "EncryptedAccountFactory": "0x6396147C923DE9f02379E7F556Df0D7d4A9f451C"
+  },
+  "deploys": {
+    "OpsLib": {
+      "label": "deploy OpsLib",
+      "hash": "0x4c7d569f12053d8328fb70418a8e658fbcd26a308f48398bd454cb0359eb8c9c",
+      "nonce": 501,
+      "blockNumber": 12142466,
+      "blockTimestamp": 1794773016,
+      "sentAtUtc": "2026-11-15T20:03:30.779Z",
+      "minedSeenAtUtc": "2026-11-15T20:03:37.239Z",
+      "inclusionMs": 6346,
+      "gasUsed": "20364874",
+      "effectiveGasPriceWei": "50000018",
+      "costWei": "1018244066567732",
+      "replacements": 0,
+      "runtimeBytes": 13035
+    },
+    "PrivateModule": {
+      "label": "deploy PrivateModule",
+      "hash": "0x9a5400b5b74e69900bf0b4a1cc0222097b3a6bd5bee5f51a3914860285ce5015",
+      "nonce": 502,
+      "blockNumber": 12142467,
+      "blockTimestamp": 1794773028,
+      "sentAtUtc": "2026-11-15T20:03:37.243Z",
+      "minedSeenAtUtc": "2026-11-15T20:03:49.973Z",
+      "inclusionMs": 12624,
+      "gasUsed": "12437059",
+      "effectiveGasPriceWei": "50000018",
+      "costWei": "621853173867062",
+      "replacements": 0,
+      "runtimeBytes": 7908
+    },
+    "EncryptedAccountP": {
+      "label": "deploy EncryptedAccountP",
+      "hash": "0x1aaf533d08c60ddc7250072ed588c069fa5853e65bccca19d486377c73f2c183",
+      "nonce": 503,
+      "blockNumber": 12142468,
+      "blockTimestamp": 1794773040,
+      "sentAtUtc": "2026-11-15T20:03:49.983Z",
+      "minedSeenAtUtc": "2026-11-15T20:04:03.838Z",
+      "inclusionMs": 13752,
+      "gasUsed": "36880954",
+      "effectiveGasPriceWei": "50000018",
+      "costWei": "1844048363857172",
+      "replacements": 0,
+      "runtimeBytes": 23643
+    },
+    "EncryptedAccountFactory": {
+      "label": "deploy EncryptedAccountFactory",
+      "hash": "0x6724f5c7b7c69acd8c955463e5e7746fa5a0579ab1232f8014ca33176e7e16ba",
+      "nonce": 504,
+      "blockNumber": 12142469,
+      "blockTimestamp": 1794773064,
+      "sentAtUtc": "2026-11-15T20:04:03.840Z",
+      "minedSeenAtUtc": "2026-11-15T20:04:26.229Z",
+      "inclusionMs": 22272,
+      "gasUsed": "3097426",
+      "effectiveGasPriceWei": "50000018",
+      "costWei": "154871355753668",
+      "replacements": 0,
+      "runtimeBytes": 1868
+    }
+  },
+  "account": {
+    "address": "0xB25b6BF9ee23f074a3D381caD3357439bfAbd468",
+    "salt": "0x1490c74b709e28ab660900929e86b17991c5c054dab03e0e068a522c13d35f4e",
+    "escape": "0x1671ea852Af70CAA56735e2Ed3FE2DD60fB423b6",
+    "guardian": "0x8e98d5e45822b81Ac7dB853480c405E8Ea769B7A",
+    "delays": {
+      "pinTransfer": 0,
+      "bigTransfer": 60,
+      "genericCall": 60,
+      "settings": 60,
+      "loosen": 60,
+      "knownAdd": 60,
+      "recovery": 120,
+      "recoveryNoDevice": 300,
+      "pinReset": 300,
+      "escape": 300,
+      "escapeChange": 300
+    },
+    "setup": {
+      "createAccount": {
+        "label": "createAccount",
+        "hash": "0x239b98ecbf929d4b619ffd848dcd8e764ec14ef115de3f1efc7206ca2470db79",
+        "nonce": 505,
+        "blockNumber": 12142470,
+        "blockTimestamp": 1794773076,
+        "sentAtUtc": "2026-11-15T20:04:26.556Z",
+        "minedSeenAtUtc": "2026-11-15T20:04:38.275Z",
+        "inclusionMs": 11611,
+        "gasUsed": "1308597",
+        "effectiveGasPriceWei": "50000019",
+        "costWei": "65429874863343",
+        "replacements": 0,
+        "sentBlock": 12142469,
+        "blocksToInclusion": 1,
+        "wallMs": 11926,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        }
+      },
+      "setupPin": {
+        "label": "setupPin",
+        "hash": "0x725b79c329dd34ddd49577ff988feea54bc4426cc62a815d99bc489a6976901c",
+        "nonce": 506,
+        "blockNumber": 12142473,
+        "blockTimestamp": 1794773112,
+        "sentAtUtc": "2026-11-15T20:05:04.514Z",
+        "minedSeenAtUtc": "2026-11-15T20:05:13.779Z",
+        "inclusionMs": 9156,
+        "gasUsed": "842423",
+        "effectiveGasPriceWei": "50000019",
+        "costWei": "42121166006037",
+        "replacements": 0,
+        "sentBlock": 12142472,
+        "blocksToInclusion": 1,
+        "wallMs": 9460,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 79000,
+          "depth": 79000,
+          "fheOps": 5,
+          "blockMeter": 1251128,
+          "blockFheTxs": 2,
+          "blockComputed": 1251128,
+          "meterCheck": "equal"
+        },
+        "encrypt": {
+          "totalMs": 16603,
+          "relayerHttpMs": 10246,
+          "localMs": 6357,
+          "httpCalls": 2
+        }
+      },
+      "setupAsset": {
+        "label": "setupAsset cUSDC",
+        "hash": "0xd39e087389088eb53644ce7f84d542c1514b9dab3fc0e939d53c8660542c73e1",
+        "nonce": 507,
+        "blockNumber": 12142475,
+        "blockTimestamp": 1794773136,
+        "sentAtUtc": "2026-11-15T20:05:19.921Z",
+        "minedSeenAtUtc": "2026-11-15T20:05:39.322Z",
+        "inclusionMs": 19296,
+        "gasUsed": "1959805",
+        "effectiveGasPriceWei": "50000019",
+        "costWei": "97990287236295",
+        "replacements": 0,
+        "sentBlock": 12142473,
+        "blocksToInclusion": 2,
+        "wallMs": 19761,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 1345064,
+          "depth": 1322000,
+          "fheOps": 12,
+          "blockMeter": 1345064,
+          "blockFheTxs": 1,
+          "blockComputed": 1345064,
+          "meterCheck": "equal"
+        },
+        "encrypt": {
+          "totalMs": 5560,
+          "relayerHttpMs": 552,
+          "localMs": 5008,
+          "httpCalls": 2
+        }
+      },
+      "privateSetupAsset": {
+        "label": "privateSetupAsset",
+        "hash": "0xd1ce33748067c943333770bcb87cf33ac873b649ebe3e24d8499f9f1f42c86ac",
+        "nonce": 508,
+        "blockNumber": 12142476,
+        "blockTimestamp": 1794773148,
+        "sentAtUtc": "2026-11-15T20:05:45.312Z",
+        "minedSeenAtUtc": "2026-11-15T20:05:49.566Z",
+        "inclusionMs": 4145,
+        "gasUsed": "949317",
+        "effectiveGasPriceWei": "50000019",
+        "costWei": "47465868037023",
+        "replacements": 0,
+        "sentBlock": 12142475,
+        "blocksToInclusion": 1,
+        "wallMs": 4617,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 32,
+          "depth": 32,
+          "fheOps": 2,
+          "blockMeter": 32,
+          "blockFheTxs": 1,
+          "blockComputed": 32,
+          "meterCheck": "equal"
+        },
+        "encrypt": {
+          "totalMs": 5412,
+          "relayerHttpMs": 557,
+          "localMs": 4855,
+          "httpCalls": 2
+        }
+      },
+      "setupKnownR0": {
+        "label": "setupKnown R0",
+        "hash": "0xc6f66c0590e80eeeb3aa65014314e351fe6eb3c92183bb4742f2a0ffea9c54cd",
+        "nonce": 509,
+        "blockNumber": 12142477,
+        "blockTimestamp": 1794773160,
+        "sentAtUtc": "2026-11-15T20:05:55.869Z",
+        "minedSeenAtUtc": "2026-11-15T20:06:02.071Z",
+        "inclusionMs": 6064,
+        "gasUsed": "3787560",
+        "effectiveGasPriceWei": "50000019",
+        "costWei": "189378071963640",
+        "replacements": 0,
+        "sentBlock": 12142476,
+        "blocksToInclusion": 1,
+        "wallMs": 6584,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 12,
+          "blockMeter": 0,
+          "blockFheTxs": 1,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "encrypt": {
+          "totalMs": 5734,
+          "relayerHttpMs": 600,
+          "localMs": 5134,
+          "httpCalls": 2
+        }
+      },
+      "setupKnownR12": {
+        "label": "setupKnown R12",
+        "hash": "0xc1f4f9f407a89cd7dc78c25d7fd7c64135e6a6220f9a33fdaebdb1e4fd423de1",
+        "nonce": 510,
+        "blockNumber": 12142478,
+        "blockTimestamp": 1794773172,
+        "sentAtUtc": "2026-11-15T20:06:08.465Z",
+        "minedSeenAtUtc": "2026-11-15T20:06:14.715Z",
+        "inclusionMs": 6146,
+        "gasUsed": "3787620",
+        "effectiveGasPriceWei": "50000019",
+        "costWei": "189381071964780",
+        "replacements": 0,
+        "sentBlock": 12142477,
+        "blocksToInclusion": 1,
+        "wallMs": 6622,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 12,
+          "blockMeter": 162032,
+          "blockFheTxs": 2,
+          "blockComputed": 162032,
+          "meterCheck": "equal"
+        },
+        "encrypt": {
+          "totalMs": 5797,
+          "relayerHttpMs": 603,
+          "localMs": 5194,
+          "httpCalls": 2
+        }
+      },
+      "setupKnownR24": {
+        "label": "setupKnown R24",
+        "hash": "0x75a8c1263d57c913088901b56071aac2f6ed3472e1b344f59c95c266299a2da7",
+        "nonce": 511,
+        "blockNumber": 12142480,
+        "blockTimestamp": 1794773196,
+        "sentAtUtc": "2026-11-15T20:06:22.182Z",
+        "minedSeenAtUtc": "2026-11-15T20:06:35.735Z",
+        "inclusionMs": 13416,
+        "gasUsed": "2033696",
+        "effectiveGasPriceWei": "50000019",
+        "costWei": "101684838640224",
+        "replacements": 0,
+        "sentBlock": 12142478,
+        "blocksToInclusion": 2,
+        "wallMs": 13954,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 6,
+          "blockMeter": 0,
+          "blockFheTxs": null,
+          "blockComputed": null,
+          "meterCheck": "unreadable"
+        },
+        "encrypt": {
+          "totalMs": 6838,
+          "relayerHttpMs": 1660,
+          "localMs": 5178,
+          "httpCalls": 2
+        }
+      },
+      "setupKnownS0": {
+        "label": "setupKnown S0",
+        "hash": "0xa3f604174a63a5934852769c20da49a8b28fb65cd5b7e320ab9c4cda066b9a07",
+        "nonce": 512,
+        "blockNumber": 12142481,
+        "blockTimestamp": 1794773208,
+        "sentAtUtc": "2026-11-15T20:06:43.174Z",
+        "minedSeenAtUtc": "2026-11-15T20:06:47.980Z",
+        "inclusionMs": 4710,
+        "gasUsed": "3235320",
+        "effectiveGasPriceWei": "50000019",
+        "costWei": "161766061471080",
+        "replacements": 0,
+        "sentBlock": 12142480,
+        "blocksToInclusion": 1,
+        "wallMs": 5202,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 10,
+          "blockMeter": 0,
+          "blockFheTxs": 1,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "encrypt": {
+          "totalMs": 6817,
+          "relayerHttpMs": 736,
+          "localMs": 6081,
+          "httpCalls": 3
+        }
+      },
+      "setupRoles": {
+        "label": "setupRoles",
+        "hash": "0xee1016395d84c7e442a11e018ac9e175a71cddf1bcf889accb810d71e12fd556",
+        "nonce": 513,
+        "blockNumber": 12142482,
+        "blockTimestamp": 1794773220,
+        "sentAtUtc": "2026-11-15T20:06:48.393Z",
+        "minedSeenAtUtc": "2026-11-15T20:06:59.147Z",
+        "inclusionMs": 10654,
+        "gasUsed": "29710",
+        "effectiveGasPriceWei": "50000019",
+        "costWei": "1485500564490",
+        "replacements": 0,
+        "sentBlock": 12142481,
+        "blocksToInclusion": 1,
+        "wallMs": 10957,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": null,
+          "blockComputed": null,
+          "meterCheck": "unreadable"
+        }
+      },
+      "arm": {
+        "label": "arm",
+        "hash": "0x5d51e942e8be24be37142c5db90456c860ff1182c320de5d9b9de9f98128e057",
+        "nonce": 514,
+        "blockNumber": 12142483,
+        "blockTimestamp": 1794773232,
+        "sentAtUtc": "2026-11-15T20:06:59.547Z",
+        "minedSeenAtUtc": "2026-11-15T20:07:11.952Z",
+        "inclusionMs": 12310,
+        "gasUsed": "69385",
+        "effectiveGasPriceWei": "50000019",
+        "costWei": "3469251318315",
+        "replacements": 0,
+        "sentBlock": 12142482,
+        "blocksToInclusion": 1,
+        "wallMs": 12598,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": null,
+          "blockComputed": null,
+          "meterCheck": "unreadable"
+        }
+      },
+      "mintUsdc": {
+        "label": "USDC mock mint",
+        "hash": "0x35f10384a5a997ea67480b70dbfb0a3a085984f10471a3076dd643c39f737b63",
+        "nonce": 515,
+        "blockNumber": 12142484,
+        "blockTimestamp": 1794773244,
+        "sentAtUtc": "2026-11-15T20:07:12.349Z",
+        "minedSeenAtUtc": "2026-11-15T20:07:23.426Z",
+        "inclusionMs": 10977,
+        "gasUsed": "140988",
+        "effectiveGasPriceWei": "50000019",
+        "costWei": "7049402678772",
+        "replacements": 0,
+        "sentBlock": 12142483,
+        "blocksToInclusion": 1,
+        "wallMs": 11268,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        }
+      },
+      "approveUsdc": {
+        "label": "USDC approve",
+        "hash": "0x913f6ed2b8f71704c15f9bfa692cc4045b9bf6bdf33a93565ac9a2cd7d08a386",
+        "nonce": 516,
+        "blockNumber": 12142485,
+        "blockTimestamp": 1794773256,
+        "sentAtUtc": "2026-11-15T20:07:23.851Z",
+        "minedSeenAtUtc": "2026-11-15T20:07:35.217Z",
+        "inclusionMs": 11252,
+        "gasUsed": "128285",
+        "effectiveGasPriceWei": "50000019",
+        "costWei": "6414252437415",
+        "replacements": 0,
+        "sentBlock": 12142484,
+        "blocksToInclusion": 1,
+        "wallMs": 11572,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": null,
+          "blockComputed": null,
+          "meterCheck": "unreadable"
+        }
+      },
+      "wrapToAccount": {
+        "label": "cUSDC wrap → account",
+        "hash": "0x692acb313826b91b411002fc64b8c4df14a4f1b22f73ceac11d1e4c224daaf07",
+        "nonce": 517,
+        "blockNumber": 12142486,
+        "blockTimestamp": 1794773268,
+        "sentAtUtc": "2026-11-15T20:07:37.331Z",
+        "minedSeenAtUtc": "2026-11-15T20:07:47.474Z",
+        "inclusionMs": 10016,
+        "gasUsed": "921515",
+        "effectiveGasPriceWei": "50000019",
+        "costWei": "46075767508785",
+        "replacements": 0,
+        "sentBlock": 12142485,
+        "blocksToInclusion": 1,
+        "wallMs": 12033,
+        "status": 1,
+        "estimateRetries": 1,
+        "hcu": {
+          "total": 586096,
+          "depth": 531032,
+          "fheOps": 8,
+          "blockMeter": 586096,
+          "blockFheTxs": 1,
+          "blockComputed": 586096,
+          "meterCheck": "equal"
+        }
+      }
+    }
+  },
+  "kAloneBalance": {
+    "handle": "0xf262fe871b9484ae6bc47e292f87c4d0d4b8cc907dff0000000000aa36a70500",
+    "viaToken": {
+      "denied": true,
+      "error": "User 0xcBdaED7D91644c771Aa84C5AbE5afFBB42a4d502 is not authorized to decrypt handle 0xf262fe871b9484ae6bc47e292f87c4d0d4b8cc907dff0000000000aa36a70500!\nVersion: @fhevm/sdk@0.13.7"
+    },
+    "viaAccount": {
+      "denied": true,
+      "error": "User 0xcBdaED7D91644c771Aa84C5AbE5afFBB42a4d502 is not authorized to decrypt handle 0xf262fe871b9484ae6bc47e292f87c4d0d4b8cc907dff0000000000aa36a70500!\nVersion: @fhevm/sdk@0.13.7"
+    }
+  },
+  "t1": [
+    {
+      "i": 1,
+      "encrypt": {
+        "totalMs": 5081,
+        "relayerHttpMs": 353,
+        "localMs": 4728,
+        "httpCalls": 2
+      },
+      "tx": {
+        "hash": "0x5d55753b7032bf9d08e63ff51e19e66724da4f7dd103679eeda1f10b0a596c01",
+        "gasUsed": "2749430",
+        "wallMs": 8359,
+        "inclusionMs": 8025,
+        "blocks": 1
+      },
+      "hcu": {
+        "total": 1990132,
+        "depth": 1058032,
+        "fheOps": 21,
+        "blockMeter": 1990132,
+        "blockFheTxs": 1,
+        "blockComputed": 1990132,
+        "meterCheck": "equal"
+      },
+      "decryptRequests": 0,
+      "totalMs": 13440,
+      "guardianPass": {
+        "value": "1",
+        "ms": 7300,
+        "attempts": 1
+      },
+      "kReadsPass": {
+        "denied": true,
+        "error": "User 0xcBdaED7D91644c771Aa84C5AbE5afFBB42a4d502 is not authorized to decrypt handle 0xf4caaee75a514cef0d37e575b2967e69e6d63ebd9cff0000000000aa36a70000!\nVersion: @fhevm/sdk@0.13.7"
+      }
+    },
+    {
+      "i": 2,
+      "encrypt": {
+        "totalMs": 4855,
+        "relayerHttpMs": 362,
+        "localMs": 4493,
+        "httpCalls": 2
+      },
+      "tx": {
+        "hash": "0x7727894704772a846626f77d16a700326d5766cf7f10299b37b953a7d188104d",
+        "gasUsed": "2447556",
+        "wallMs": 9415,
+        "inclusionMs": 9127,
+        "blocks": 2
+      },
+      "hcu": {
+        "total": 1990100,
+        "depth": 1058032,
+        "fheOps": 20,
+        "blockMeter": 1990100,
+        "blockFheTxs": 1,
+        "blockComputed": 1990100,
+        "meterCheck": "equal"
+      },
+      "decryptRequests": 0,
+      "totalMs": 14270,
+      "guardianPass": {
+        "value": "1",
+        "ms": 8148,
+        "attempts": 2
+      }
+    },
+    {
+      "i": 3,
+      "encrypt": {
+        "totalMs": 4674,
+        "relayerHttpMs": 369,
+        "localMs": 4305,
+        "httpCalls": 2
+      },
+      "tx": {
+        "hash": "0x6a60d4dcc180db475dbcb7858f8b0c041af54272add938faf606814bd0e115d0",
+        "gasUsed": "2447556",
+        "wallMs": 11303,
+        "inclusionMs": 10975,
+        "blocks": 1
+      },
+      "hcu": {
+        "total": 1990100,
+        "depth": 1058032,
+        "fheOps": 20,
+        "blockMeter": 1990100,
+        "blockFheTxs": 1,
+        "blockComputed": 1990100,
+        "meterCheck": "equal"
+      },
+      "decryptRequests": 0,
+      "totalMs": 15976,
+      "guardianPass": {
+        "value": "1",
+        "ms": 8132,
+        "attempts": 2
+      }
+    },
+    {
+      "i": 4,
+      "encrypt": {
+        "totalMs": 4668,
+        "relayerHttpMs": 334,
+        "localMs": 4334,
+        "httpCalls": 2
+      },
+      "tx": {
+        "hash": "0x6565a4f4cbf542fa8aa0bc294bd110883013f7dc0349b1c1588fee902a445c70",
+        "gasUsed": "2447568",
+        "wallMs": 10757,
+        "inclusionMs": 10455,
+        "blocks": 1
+      },
+      "hcu": {
+        "total": 1990100,
+        "depth": 1058032,
+        "fheOps": 20,
+        "blockMeter": 1990100,
+        "blockFheTxs": 1,
+        "blockComputed": 1990100,
+        "meterCheck": "equal"
+      },
+      "decryptRequests": 0,
+      "totalMs": 15425,
+      "guardianPass": {
+        "value": "1",
+        "ms": 10184,
+        "attempts": 2
+      }
+    },
+    {
+      "i": 5,
+      "encrypt": {
+        "totalMs": 4708,
+        "relayerHttpMs": 365,
+        "localMs": 4343,
+        "httpCalls": 2
+      },
+      "tx": {
+        "hash": "0x155bb2c97ff7287fefd7ab17f2359484f33a35f39675b42f0bde704096c248d9",
+        "gasUsed": "2447568",
+        "wallMs": 9063,
+        "inclusionMs": 8728,
+        "blocks": 1
+      },
+      "hcu": {
+        "total": 1990100,
+        "depth": 1058032,
+        "fheOps": 20,
+        "blockMeter": 1990100,
+        "blockFheTxs": 1,
+        "blockComputed": 1990100,
+        "meterCheck": "equal"
+      },
+      "decryptRequests": 0,
+      "totalMs": 13771,
+      "guardianPass": {
+        "value": "1",
+        "ms": 10159,
+        "attempts": 1
+      }
+    }
+  ],
+  "refunded": "11000000000000000",
+  "t2": [
+    {
+      "i": 1,
+      "opId": "1",
+      "block": 12142516,
+      "result": "0xe407c1fd0214055df4fe24dcd6368ac99a170d816aff0000000000aa36a70500",
+      "doneMs": 36855,
+      "fingerprintMs": 214,
+      "encrypt": {
+        "totalMs": 4952,
+        "relayerHttpMs": 630,
+        "localMs": 4322,
+        "httpCalls": 2
+      },
+      "open": {
+        "hash": "0xf56f3ac1305df0cd0065ce724c2fcc9b056fdee810db69a425b13880d5ad55d6",
+        "gasUsed": "379069",
+        "wallMs": 13187,
+        "shape": {
+          "gasUsed": 379069,
+          "calldataLen": 36,
+          "zeroBytes": 12,
+          "exec": 357637,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "guess": {
+        "hash": "0x8da8c65f9b04f0136aef06bffd7daaa8f183bbca38e3b1c4966f00b707a33e9f",
+        "gasUsed": "1334497",
+        "wallMs": 7839,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 1334497,
+          "calldataLen": 420,
+          "zeroBytes": 159,
+          "exec": 1308685,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 4876,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0x180fc1b0030af5e0f7d71f9a23ccac56b8fa3b444f645e109340d29424227ac3",
+        "gasUsed": "1054996",
+        "wallMs": 5797,
+        "hcu": {
+          "total": 654000,
+          "depth": 654000,
+          "fheOps": 4,
+          "blockMeter": 654000,
+          "blockFheTxs": 1,
+          "blockComputed": 654000,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 1054996,
+          "calldataLen": 708,
+          "zeroBytes": 239,
+          "exec": 1025536,
+          "hcu": 654000,
+          "hcuDepth": 654000,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xfd7c9208f956bf0c6ab76a667f04361245ad3e0a2d0eff92eb827acfcca68ea9|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xeb6d37bd271abe1395b21d6d78f3487d6584862872c29ffd3f90736ee99b7393|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xc11d62b13c360a83082487064be1ec0878b2f0be4f012bf59f89e128063d47ff|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x60be9d61aad849facc28c38b048cb5c4be3420b8fa2233e08cfa06be1b6d1c3e|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|K",
+            "ACCOUNT|0x9c214811238ea2e5bc966c30d48dcaf4eb8a985e7ccabae45467380fdd8d11d9|2|64|x",
+            "ACCOUNT|0xb4056c5382359a2546a355e166162cca01173326e30c2e562bd82b48eede9ca1|2|0|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "K"
+          ]
+        }
+      },
+      "userDecrypt": {
+        "ms": 8142,
+        "permitMs": 6,
+        "attempts": 2
+      },
+      "seen": "9950000000",
+      "expected": "9950000000",
+      "correct": true,
+      "totalMs": 46022
+    },
+    {
+      "i": 2,
+      "opId": "4",
+      "block": 12142534,
+      "result": "0xc1860010b1d764671b1f9dfd454000da7d6785b27bff0000000000aa36a70500",
+      "doneMs": 28185,
+      "fingerprintMs": 224,
+      "encrypt": {
+        "totalMs": 5110,
+        "relayerHttpMs": 548,
+        "localMs": 4562,
+        "httpCalls": 2
+      },
+      "open": {
+        "hash": "0xbe3afe00c474e2ad73e5b214e5f7e7f8e2906df234eb3b282e0a7e046414683d",
+        "gasUsed": "281149",
+        "wallMs": 3978,
+        "shape": {
+          "gasUsed": 281149,
+          "calldataLen": 36,
+          "zeroBytes": 12,
+          "exec": 259717,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "guess": {
+        "hash": "0xbd218c83962dde90965fbec101ab8d4f613a2ab047e1d6b7fb14cc709c42b94a",
+        "gasUsed": "844905",
+        "wallMs": 6790,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 844905,
+          "calldataLen": 420,
+          "zeroBytes": 158,
+          "exec": 819081,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 2970,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0xa5f85225d5313e5004928f526a6b37ca027d6b8b10650695bef7c451f872cb81",
+        "gasUsed": "957076",
+        "wallMs": 7938,
+        "hcu": {
+          "total": 654000,
+          "depth": 654000,
+          "fheOps": 4,
+          "blockMeter": 654000,
+          "blockFheTxs": 1,
+          "blockComputed": 654000,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 957076,
+          "calldataLen": 708,
+          "zeroBytes": 239,
+          "exec": 927616,
+          "hcu": 654000,
+          "hcuDepth": 654000,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xfd7c9208f956bf0c6ab76a667f04361245ad3e0a2d0eff92eb827acfcca68ea9|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xeb6d37bd271abe1395b21d6d78f3487d6584862872c29ffd3f90736ee99b7393|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xc11d62b13c360a83082487064be1ec0878b2f0be4f012bf59f89e128063d47ff|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x60be9d61aad849facc28c38b048cb5c4be3420b8fa2233e08cfa06be1b6d1c3e|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|K",
+            "ACCOUNT|0x9c214811238ea2e5bc966c30d48dcaf4eb8a985e7ccabae45467380fdd8d11d9|2|64|x",
+            "ACCOUNT|0xb4056c5382359a2546a355e166162cca01173326e30c2e562bd82b48eede9ca1|2|0|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "K"
+          ]
+        }
+      },
+      "userDecrypt": {
+        "ms": 2855,
+        "permitMs": 10,
+        "attempts": 1
+      },
+      "seen": "9950000000",
+      "expected": "9950000000",
+      "correct": true,
+      "totalMs": 32258
+    },
+    {
+      "i": 3,
+      "opId": "6",
+      "block": 12142542,
+      "result": "0x1dbb67972e10d0da3de6afe643305ac940ebdf7ce2ff0000000000aa36a70500",
+      "doneMs": 36511,
+      "fingerprintMs": 180,
+      "encrypt": {
+        "totalMs": 4936,
+        "relayerHttpMs": 667,
+        "localMs": 4269,
+        "httpCalls": 2
+      },
+      "open": {
+        "hash": "0x7e74a6e8f3bd6abcc9a0247cb8c0ec1327fdd93c8a6f71d0aeb84a579b5afc4a",
+        "gasUsed": "281149",
+        "wallMs": 11652,
+        "shape": {
+          "gasUsed": 281149,
+          "calldataLen": 36,
+          "zeroBytes": 12,
+          "exec": 259717,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "guess": {
+        "hash": "0x37fab573f721fcd0a11d9bed8c8afac4d722a11d282309907fb8ecad3bc0607c",
+        "gasUsed": "844905",
+        "wallMs": 7772,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 844905,
+          "calldataLen": 420,
+          "zeroBytes": 158,
+          "exec": 819081,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 2807,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0x851debe419a9619540a9b31a3432f6e1f86c262dff56c41c1fd23fb082b90a76",
+        "gasUsed": "957040",
+        "wallMs": 9131,
+        "hcu": {
+          "total": 654000,
+          "depth": 654000,
+          "fheOps": 4,
+          "blockMeter": 654000,
+          "blockFheTxs": null,
+          "blockComputed": null,
+          "meterCheck": "unreadable"
+        },
+        "shape": {
+          "gasUsed": 957040,
+          "calldataLen": 708,
+          "zeroBytes": 242,
+          "exec": 927616,
+          "hcu": 654000,
+          "hcuDepth": 654000,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xfd7c9208f956bf0c6ab76a667f04361245ad3e0a2d0eff92eb827acfcca68ea9|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xeb6d37bd271abe1395b21d6d78f3487d6584862872c29ffd3f90736ee99b7393|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xc11d62b13c360a83082487064be1ec0878b2f0be4f012bf59f89e128063d47ff|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x60be9d61aad849facc28c38b048cb5c4be3420b8fa2233e08cfa06be1b6d1c3e|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|K",
+            "ACCOUNT|0x9c214811238ea2e5bc966c30d48dcaf4eb8a985e7ccabae45467380fdd8d11d9|2|64|x",
+            "ACCOUNT|0xb4056c5382359a2546a355e166162cca01173326e30c2e562bd82b48eede9ca1|2|0|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "K"
+          ]
+        }
+      },
+      "userDecrypt": {
+        "ms": 8129,
+        "permitMs": 6,
+        "attempts": 2
+      },
+      "seen": "9950000000",
+      "expected": "9950000000",
+      "correct": true,
+      "totalMs": 45669
+    },
+    {
+      "i": 4,
+      "opId": "8",
+      "block": 12142550,
+      "result": "0x3f698f18f3b7962ab55fa2bab92a91de95de505dc1ff0000000000aa36a70500",
+      "doneMs": 34955,
+      "fingerprintMs": 189,
+      "encrypt": {
+        "totalMs": 4967,
+        "relayerHttpMs": 628,
+        "localMs": 4339,
+        "httpCalls": 2
+      },
+      "open": {
+        "hash": "0xd9351f35573ec1885cd7a57361af1a06218fce2b479bd6fa4379657290cc5e82",
+        "gasUsed": "281149",
+        "wallMs": 10430,
+        "shape": {
+          "gasUsed": 281149,
+          "calldataLen": 36,
+          "zeroBytes": 12,
+          "exec": 259717,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "guess": {
+        "hash": "0x6361387abf661c1fe4f706ef370b9ffe06eb5ba9efe8d936c31d1ce03b732156",
+        "gasUsed": "844905",
+        "wallMs": 7137,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 844905,
+          "calldataLen": 420,
+          "zeroBytes": 158,
+          "exec": 819081,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 4847,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0xacc8164b74e7ee14b6eb18821d6930ad989828afa1f4f8980f28f35f96aaddc9",
+        "gasUsed": "957052",
+        "wallMs": 7361,
+        "hcu": {
+          "total": 654000,
+          "depth": 654000,
+          "fheOps": 4,
+          "blockMeter": 654000,
+          "blockFheTxs": 1,
+          "blockComputed": 654000,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 957052,
+          "calldataLen": 708,
+          "zeroBytes": 241,
+          "exec": 927616,
+          "hcu": 654000,
+          "hcuDepth": 654000,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xfd7c9208f956bf0c6ab76a667f04361245ad3e0a2d0eff92eb827acfcca68ea9|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xeb6d37bd271abe1395b21d6d78f3487d6584862872c29ffd3f90736ee99b7393|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xc11d62b13c360a83082487064be1ec0878b2f0be4f012bf59f89e128063d47ff|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x60be9d61aad849facc28c38b048cb5c4be3420b8fa2233e08cfa06be1b6d1c3e|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|K",
+            "ACCOUNT|0x9c214811238ea2e5bc966c30d48dcaf4eb8a985e7ccabae45467380fdd8d11d9|2|64|x",
+            "ACCOUNT|0xb4056c5382359a2546a355e166162cca01173326e30c2e562bd82b48eede9ca1|2|0|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "K"
+          ]
+        }
+      },
+      "userDecrypt": {
+        "ms": 2821,
+        "permitMs": 6,
+        "attempts": 1
+      },
+      "seen": "9950000000",
+      "expected": "9950000000",
+      "correct": true,
+      "totalMs": 38825
+    },
+    {
+      "i": 5,
+      "opId": "10",
+      "block": 12142558,
+      "result": "0x30cf46ffc84eeba04fc54b2e5d60f2f15b6fe9dc9bff0000000000aa36a70500",
+      "doneMs": 36442,
+      "fingerprintMs": 196,
+      "encrypt": {
+        "totalMs": 5080,
+        "relayerHttpMs": 639,
+        "localMs": 4441,
+        "httpCalls": 2
+      },
+      "open": {
+        "hash": "0x5e4bdb7b6dce3f8b663bb50a33a674074b47a4f58d117ab938ea1a601b06b628",
+        "gasUsed": "281149",
+        "wallMs": 12528,
+        "shape": {
+          "gasUsed": 281149,
+          "calldataLen": 36,
+          "zeroBytes": 12,
+          "exec": 259717,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "guess": {
+        "hash": "0xf04cc84dbf3bc29615194c023fa50fb7ab4078dc431b0f91dbc714a0cca0a903",
+        "gasUsed": "844905",
+        "wallMs": 7724,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 844905,
+          "calldataLen": 420,
+          "zeroBytes": 158,
+          "exec": 819081,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 5120,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0xe379a4932465c6c671b531ec8c09c81bb33ac356aa651a9bae82a6b857d91eb1",
+        "gasUsed": "957040",
+        "wallMs": 5519,
+        "hcu": {
+          "total": 654000,
+          "depth": 654000,
+          "fheOps": 4,
+          "blockMeter": 654000,
+          "blockFheTxs": 1,
+          "blockComputed": 654000,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 957040,
+          "calldataLen": 708,
+          "zeroBytes": 242,
+          "exec": 927616,
+          "hcu": 654000,
+          "hcuDepth": 654000,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xfd7c9208f956bf0c6ab76a667f04361245ad3e0a2d0eff92eb827acfcca68ea9|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xeb6d37bd271abe1395b21d6d78f3487d6584862872c29ffd3f90736ee99b7393|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xc11d62b13c360a83082487064be1ec0878b2f0be4f012bf59f89e128063d47ff|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x60be9d61aad849facc28c38b048cb5c4be3420b8fa2233e08cfa06be1b6d1c3e|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|K",
+            "ACCOUNT|0x9c214811238ea2e5bc966c30d48dcaf4eb8a985e7ccabae45467380fdd8d11d9|2|64|x",
+            "ACCOUNT|0xb4056c5382359a2546a355e166162cca01173326e30c2e562bd82b48eede9ca1|2|0|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "K"
+          ]
+        }
+      },
+      "userDecrypt": {
+        "ms": 2817,
+        "permitMs": 6,
+        "attempts": 1
+      },
+      "seen": "9950000000",
+      "expected": "9950000000",
+      "correct": true,
+      "totalMs": 40296
+    }
+  ],
+  "t3views": [
+    {
+      "i": 1,
+      "opId": "2",
+      "block": 12142520,
+      "result": "0xafe1399972ace6616136adb1c70f90a5f3a465879bff0000000000aa36a70500",
+      "doneMs": 36287,
+      "fingerprintMs": 183,
+      "encrypt": {
+        "totalMs": 4711,
+        "relayerHttpMs": 439,
+        "localMs": 4272,
+        "httpCalls": 2
+      },
+      "open": {
+        "hash": "0xf4df88d7c9e579d9c72987cc5b094d514d05ae0342cdd741de0b4c9fc3654066",
+        "gasUsed": "281149",
+        "wallMs": 11962,
+        "shape": {
+          "gasUsed": 281149,
+          "calldataLen": 36,
+          "zeroBytes": 12,
+          "exec": 259717,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "guess": {
+        "hash": "0xe09a1fdfd2c0dc9128dcee22a403aa1ba8ecf7fb0e9cf21e5b6fbe8b6f040f66",
+        "gasUsed": "844905",
+        "wallMs": 8224,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 844905,
+          "calldataLen": 420,
+          "zeroBytes": 158,
+          "exec": 819081,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 4812,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0xbe9426be22d5cdfe9e2bc88e6a893d7a25af6cc1b7d04ce09ffb4f09fe441941",
+        "gasUsed": "957064",
+        "wallMs": 6333,
+        "hcu": {
+          "total": 654000,
+          "depth": 654000,
+          "fheOps": 4,
+          "blockMeter": 654000,
+          "blockFheTxs": 1,
+          "blockComputed": 654000,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 957064,
+          "calldataLen": 708,
+          "zeroBytes": 240,
+          "exec": 927616,
+          "hcu": 654000,
+          "hcuDepth": 654000,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xfd7c9208f956bf0c6ab76a667f04361245ad3e0a2d0eff92eb827acfcca68ea9|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xeb6d37bd271abe1395b21d6d78f3487d6584862872c29ffd3f90736ee99b7393|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xc11d62b13c360a83082487064be1ec0878b2f0be4f012bf59f89e128063d47ff|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x60be9d61aad849facc28c38b048cb5c4be3420b8fa2233e08cfa06be1b6d1c3e|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|K",
+            "ACCOUNT|0x9c214811238ea2e5bc966c30d48dcaf4eb8a985e7ccabae45467380fdd8d11d9|2|64|x",
+            "ACCOUNT|0xb4056c5382359a2546a355e166162cca01173326e30c2e562bd82b48eede9ca1|2|0|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "K"
+          ]
+        }
+      },
+      "seen": "2000000000",
+      "expected": "2000000000",
+      "correct": true
+    },
+    {
+      "i": 2,
+      "opId": "5",
+      "block": 12142538,
+      "result": "0x19f9685a3cc350dbdd4aec54c3a0811b12065836beff0000000000aa36a70500",
+      "doneMs": 36264,
+      "fingerprintMs": 187,
+      "encrypt": {
+        "totalMs": 4819,
+        "relayerHttpMs": 590,
+        "localMs": 4229,
+        "httpCalls": 2
+      },
+      "open": {
+        "hash": "0x4377f26f656a4b8650da26dfa8da97c08c32e9dec0fdf0d50fdcbed8b3831b50",
+        "gasUsed": "281149",
+        "wallMs": 12806,
+        "shape": {
+          "gasUsed": 281149,
+          "calldataLen": 36,
+          "zeroBytes": 12,
+          "exec": 259717,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "guess": {
+        "hash": "0x5643c4f4a978882530e4a22ddf55520a39740a773631e0bc36cae89b6b7b1902",
+        "gasUsed": "844893",
+        "wallMs": 7080,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 844893,
+          "calldataLen": 420,
+          "zeroBytes": 159,
+          "exec": 819081,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 4817,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0x281494a880e4f50d2fec51d26e077dec988059b8faa4cab8553bd7aed059023a",
+        "gasUsed": "957076",
+        "wallMs": 6521,
+        "hcu": {
+          "total": 654000,
+          "depth": 654000,
+          "fheOps": 4,
+          "blockMeter": 654000,
+          "blockFheTxs": null,
+          "blockComputed": null,
+          "meterCheck": "unreadable"
+        },
+        "shape": {
+          "gasUsed": 957076,
+          "calldataLen": 708,
+          "zeroBytes": 239,
+          "exec": 927616,
+          "hcu": 654000,
+          "hcuDepth": 654000,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xfd7c9208f956bf0c6ab76a667f04361245ad3e0a2d0eff92eb827acfcca68ea9|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xeb6d37bd271abe1395b21d6d78f3487d6584862872c29ffd3f90736ee99b7393|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xc11d62b13c360a83082487064be1ec0878b2f0be4f012bf59f89e128063d47ff|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x60be9d61aad849facc28c38b048cb5c4be3420b8fa2233e08cfa06be1b6d1c3e|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|K",
+            "ACCOUNT|0x9c214811238ea2e5bc966c30d48dcaf4eb8a985e7ccabae45467380fdd8d11d9|2|64|x",
+            "ACCOUNT|0xb4056c5382359a2546a355e166162cca01173326e30c2e562bd82b48eede9ca1|2|0|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "K"
+          ]
+        }
+      },
+      "seen": "2000000000",
+      "expected": "2000000000",
+      "correct": true
+    },
+    {
+      "i": 3,
+      "opId": "7",
+      "block": 12142546,
+      "result": "0x8757a25e4a732d4b1dda84a6936532f26cf8287619ff0000000000aa36a70500",
+      "doneMs": 36292,
+      "fingerprintMs": 195,
+      "encrypt": {
+        "totalMs": 4833,
+        "relayerHttpMs": 629,
+        "localMs": 4204,
+        "httpCalls": 2
+      },
+      "open": {
+        "hash": "0x405d02275157ab7dd5b77eb71a2f8dcfdafa5941425e5fe806bbef99a3158563",
+        "gasUsed": "281149",
+        "wallMs": 12812,
+        "shape": {
+          "gasUsed": 281149,
+          "calldataLen": 36,
+          "zeroBytes": 12,
+          "exec": 259717,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "guess": {
+        "hash": "0x228ff2c06f33dabb794bb525d96e385200efcc0c9182a2abe7174d10a8d1528d",
+        "gasUsed": "844905",
+        "wallMs": 6866,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 844905,
+          "calldataLen": 420,
+          "zeroBytes": 158,
+          "exec": 819081,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 4862,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0x9c7ef0fe2d0b81edcd50d3c9756b8a36dfa9fe6c96bc184df2f17f1b839bb816",
+        "gasUsed": "957088",
+        "wallMs": 6683,
+        "hcu": {
+          "total": 654000,
+          "depth": 654000,
+          "fheOps": 4,
+          "blockMeter": 654000,
+          "blockFheTxs": 1,
+          "blockComputed": 654000,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 957088,
+          "calldataLen": 708,
+          "zeroBytes": 238,
+          "exec": 927616,
+          "hcu": 654000,
+          "hcuDepth": 654000,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xfd7c9208f956bf0c6ab76a667f04361245ad3e0a2d0eff92eb827acfcca68ea9|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xeb6d37bd271abe1395b21d6d78f3487d6584862872c29ffd3f90736ee99b7393|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xc11d62b13c360a83082487064be1ec0878b2f0be4f012bf59f89e128063d47ff|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x60be9d61aad849facc28c38b048cb5c4be3420b8fa2233e08cfa06be1b6d1c3e|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|K",
+            "ACCOUNT|0x9c214811238ea2e5bc966c30d48dcaf4eb8a985e7ccabae45467380fdd8d11d9|2|64|x",
+            "ACCOUNT|0xb4056c5382359a2546a355e166162cca01173326e30c2e562bd82b48eede9ca1|2|0|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "K"
+          ]
+        }
+      },
+      "seen": "2000000000",
+      "expected": "2000000000",
+      "correct": true
+    },
+    {
+      "i": 4,
+      "opId": "9",
+      "block": 12142554,
+      "result": "0x07151b3e9e591467afa9ea94d9d0228974ae754445ff0000000000aa36a70500",
+      "doneMs": 35287,
+      "fingerprintMs": 178,
+      "encrypt": {
+        "totalMs": 5674,
+        "relayerHttpMs": 1405,
+        "localMs": 4269,
+        "httpCalls": 2
+      },
+      "open": {
+        "hash": "0xb6c3550ac7164c2e9817aae4658858af8507106cc3d998fd3fd9e9a39a8e517e",
+        "gasUsed": "281149",
+        "wallMs": 12696,
+        "shape": {
+          "gasUsed": 281149,
+          "calldataLen": 36,
+          "zeroBytes": 12,
+          "exec": 259717,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "guess": {
+        "hash": "0x008297b448773157f7be77c3a43ccd46329b19f4074223769847eaf3caac32c4",
+        "gasUsed": "844881",
+        "wallMs": 4123,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 844881,
+          "calldataLen": 420,
+          "zeroBytes": 160,
+          "exec": 819081,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 5043,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0x4aa1e9b8e96e9a1725d689a4c8475d8831059f8b298041aeab5086cd8ea8ebfd",
+        "gasUsed": "957076",
+        "wallMs": 7298,
+        "hcu": {
+          "total": 654000,
+          "depth": 654000,
+          "fheOps": 4,
+          "blockMeter": 816032,
+          "blockFheTxs": null,
+          "blockComputed": null,
+          "meterCheck": "unreadable"
+        },
+        "shape": {
+          "gasUsed": 957076,
+          "calldataLen": 708,
+          "zeroBytes": 239,
+          "exec": 927616,
+          "hcu": 654000,
+          "hcuDepth": 654000,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xfd7c9208f956bf0c6ab76a667f04361245ad3e0a2d0eff92eb827acfcca68ea9|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xeb6d37bd271abe1395b21d6d78f3487d6584862872c29ffd3f90736ee99b7393|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xc11d62b13c360a83082487064be1ec0878b2f0be4f012bf59f89e128063d47ff|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x60be9d61aad849facc28c38b048cb5c4be3420b8fa2233e08cfa06be1b6d1c3e|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|K",
+            "ACCOUNT|0x9c214811238ea2e5bc966c30d48dcaf4eb8a985e7ccabae45467380fdd8d11d9|2|64|x",
+            "ACCOUNT|0xb4056c5382359a2546a355e166162cca01173326e30c2e562bd82b48eede9ca1|2|0|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "K"
+          ]
+        }
+      },
+      "seen": "2000000000",
+      "expected": "2000000000",
+      "correct": true
+    },
+    {
+      "i": 5,
+      "opId": "11",
+      "block": 12142562,
+      "result": "0x5ad488d6c45e7047d4aa14dbeb4b392e3f6096dd13ff0000000000aa36a70500",
+      "doneMs": 35858,
+      "fingerprintMs": 191,
+      "encrypt": {
+        "totalMs": 5172,
+        "relayerHttpMs": 904,
+        "localMs": 4268,
+        "httpCalls": 2
+      },
+      "open": {
+        "hash": "0x35d1d8b9cf04605126f479ac093120e62f6c186c50d530a7763e8b92cbd40561",
+        "gasUsed": "281149",
+        "wallMs": 11765,
+        "shape": {
+          "gasUsed": 281149,
+          "calldataLen": 36,
+          "zeroBytes": 12,
+          "exec": 259717,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "guess": {
+        "hash": "0xd14b365c8476e14d834f7fe8aa2355159c4562b8c65fa05acdcd52f6bd00b019",
+        "gasUsed": "844905",
+        "wallMs": 6183,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 844905,
+          "calldataLen": 420,
+          "zeroBytes": 158,
+          "exec": 819081,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 4832,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0x294a116ae4461f79d48bb9b6733de7ce5d008c1adcd595e37591a040d24ff3e0",
+        "gasUsed": "957064",
+        "wallMs": 7207,
+        "hcu": {
+          "total": 654000,
+          "depth": 654000,
+          "fheOps": 4,
+          "blockMeter": 654000,
+          "blockFheTxs": 1,
+          "blockComputed": 654000,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 957064,
+          "calldataLen": 708,
+          "zeroBytes": 240,
+          "exec": 927616,
+          "hcu": 654000,
+          "hcuDepth": 654000,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xfd7c9208f956bf0c6ab76a667f04361245ad3e0a2d0eff92eb827acfcca68ea9|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xeb6d37bd271abe1395b21d6d78f3487d6584862872c29ffd3f90736ee99b7393|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xc11d62b13c360a83082487064be1ec0878b2f0be4f012bf59f89e128063d47ff|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x60be9d61aad849facc28c38b048cb5c4be3420b8fa2233e08cfa06be1b6d1c3e|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|K",
+            "ACCOUNT|0x9c214811238ea2e5bc966c30d48dcaf4eb8a985e7ccabae45467380fdd8d11d9|2|64|x",
+            "ACCOUNT|0xb4056c5382359a2546a355e166162cca01173326e30c2e562bd82b48eede9ca1|2|0|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "K"
+          ]
+        }
+      },
+      "seen": "2000000000",
+      "expected": "2000000000",
+      "correct": true
+    }
+  ],
+  "t3transfers": [],
+  "t3transfersSkipped": {
+    "balanceWei": "1455723619506065",
+    "neededWei": "2260000428400000",
+    "shortByWei": "804276808893935"
+  },
+  "t3compare": {
+    "viewPairs": 5,
+    "transferPairs": 0,
+    "txCompared": 15,
+    "differences": 3,
+    "list": [
+      {
+        "pair": "view 1",
+        "tx": "open",
+        "metric": "exec",
+        "real": 357637,
+        "duress": 259717
+      },
+      {
+        "pair": "view 1",
+        "tx": "guess",
+        "metric": "exec",
+        "real": 1308685,
+        "duress": 819081
+      },
+      {
+        "pair": "view 1",
+        "tx": "finalize",
+        "metric": "exec",
+        "real": 1025536,
+        "duress": 927616
+      }
+    ],
+    "transfersSkipped": {
+      "balanceWei": "1455723619506065",
+      "neededWei": "2260000428400000",
+      "shortByWei": "804276808893935"
+    }
+  },
+  "refund": {
+    "totalRefunded": "11000000000000000"
+  }
+}
