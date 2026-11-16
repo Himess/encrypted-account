@@ -197,6 +197,9 @@ No dates; the order may change.
 - **Private mode (optional):** encrypted balances and amounts with ERC-7984 tokens, viewing with the PIN, an optional
   duress PIN; chosen at account creation, standard accounts unchanged. On the `feature/private-mode` branch, not merged:
   [docs/private-mode.md](docs/private-mode.md).
+- **Watchtower service:** an off-chain notifier: a wrong PIN and a key-only private send that moved zero go to the
+  owner; the duress PIN raises a silent alarm to a trusted contact only, with nothing done on-chain. Telegram and e-mail,
+  local for now ([watchtower/](watchtower/README.md)); on the `feature/private-mode` branch.
 - **Hidden inheritance:** on Sepolia, with claim codes, payout rounds and escape withdrawal: see
   [Hidden inheritance](#hidden-inheritance). Next: ETH and ERC-20 through an ERC-7984 wrapper, and an optional relayer
   for claims.
@@ -307,6 +310,7 @@ contracts/inheritance/
 contracts/vendor/             OpenZeppelin's ERC-7984 (unchanged, MIT; see its README)
 contracts/test/               test and benchmark contracts, including a deliberately vulnerable PIN verifier
 sdk/src/                      Argon2id fingerprint, PIN policy, watchtower v0
+watchtower/                   the watchtower service: notices to the owner, the silent duress alarm to trusted contacts
 web/                          the site: landing page and the Sepolia app (create an account, send with the PIN)
 test/                         mock-stack tests (PIN, policy, recovery, ERC-4337, watchtower, exploits, cost, F0.10, F0.11, will)
 scripts/                      Sepolia measurement scripts, simulations and reports

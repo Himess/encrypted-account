@@ -97,6 +97,11 @@ export async function readEscape(read: ethers.JsonRpcProvider, address: string):
   return String((await acct(address, read).escapeState())[0]);
 }
 
+/** The account's guardian: the watchtower that may read what the account shares with it and restrict it (zero: none). */
+export async function readGuardian(read: ethers.JsonRpcProvider, address: string): Promise<string> {
+  return String((await acct(address, read).roles())[1]);
+}
+
 export type Activity = {
   kind: "sent" | "wrong" | "pending" | "approved" | "cancelled" | "armed" | "private-k";
   amount?: bigint;

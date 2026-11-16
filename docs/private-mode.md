@@ -87,7 +87,9 @@ recipient). The key learns nothing; that is what makes probing the limit useless
 - **Watchtower.** The account's guardian (the watchtower) is allowed the key-only counter after each send, nothing else.
   From its change the watchtower tells: delivered (the counter rose by the amount), silent zero (it did not move), or the
   tripwire fired (it saturated to 2⁶⁴ − 1). The SDK watchtower emits `private-delivered`, `private-silent-zero` and
-  `private-tripwire`, and on a new tripwire can restrict the account (`restrictOnTrip`). Tested.
+  `private-tripwire`, and on a new tripwire can restrict the account (`restrictOnTrip`). The service in
+  [`watchtower/`](../watchtower/README.md) sends these to the owner's channel (Telegram or e-mail), with no amount in
+  the text. Tested, and run on Sepolia.
 - **Routing.** The app sends with the key alone only what is sure to pass: a known recipient and an amount within L_min
   minus what this device already sent with the key today (L_min ≤ τ always, so the owner's own sends never trip the
   wire). Everything else, a restricted account, or a device without the local record, takes the PIN path
@@ -108,9 +110,11 @@ How: the tripwire is folded into the key-only counter (it saturates to 2⁶⁴ �
 and the guardian is allowed only the new counter instead of the pass bit, the moved amount and the flag. The 7 token
 grants are inside the ERC-7984 token's own transfer and are not the account's to remove.
 
-On Sepolia a new slot costs about 110,983 gas on the current schedule (22,445 on mainnet's). The measured 2,447,568 gas
-of the spike's transfer (13 new slots) therefore becomes about 1.93M with 9 (projected, not yet measured: the burner
-lacks the funds), or about 1.13M on mainnet's schedule (1.30M before).
+On Sepolia a new slot costs about 110,983 gas on the current schedule (22,445 on mainnet's). The spike's transfer
+measured 2,447,568 gas there (13 new slots); the projection for 9 was about 1.93M. Measured on Sepolia with these
+contracts (2026-11-16, steady state): **1,909,842 gas** (−22.0 %); with mainnet's slot price that is about 1.11M
+(9 × 88,538 gas less; the spike's 2,447,568 is about 1.30M the same way).
+Evidence: [results/private-mode/sepolia/summary.json](../results/private-mode/sepolia/summary.json).
 Evidence: [results/private-mode/cost-before-after.json](../results/private-mode/cost-before-after.json).
 
 ## 6. Indistinguishability test on every run
@@ -129,6 +133,12 @@ calldata length, events, ACL grants, decryption requests, storage writes, transi
 Total gas differs by at most 36 gas between pairs, and every such difference is explained by the zero bytes of random
 handles and proofs in the calldata. The mock leaks values through gas (its cleartext layer stores plaintext results);
 the production executor has no such layer.
+
+On Sepolia (production executor, 2026-11-16, these contracts): 6 PIN-gated transfer pairs (their execution is due
+72 hours later) and 5 view pairs, 33 transaction pairs compared. HCU, HCU depth, events, ACL grants and calldata length
+are identical in every pair. The 5 execution-gas differences are either the first use of a storage slot (the account's
+first op, first guess and first view; the real-PIN half ran first) or within the ±4 gas spread seen among transactions
+with the same PIN. Evidence: [results/private-mode/sepolia/summary.json](../results/private-mode/sepolia/summary.json).
 
 ## 7. Long delay
 
@@ -162,6 +172,27 @@ encrypted values differ:
 
 The watchtower can read the duress flag of a PIN check (as in the standard account); it is the owner's chosen helper.
 
+**Silent alarm.** The watchtower service ([`watchtower/`](../watchtower/README.md)) decrypts the duress flag of every
+guess off-chain, through Zama's relayer and KMS, real PIN or not, so its requests look the same either way. When the flag
+is set it sends a silent alarm to the trusted contacts the owner chose in advance (family, a lawyer, a security
+company), and to nobody else:
+
+- never to the owner's own device or channel (the config check rejects a trusted contact that is also an owner channel,
+  the same mailbox written another way included, and the router drops it again at runtime);
+- nothing on-chain: the service sends no transaction around a PIN entry (it never finalizes; no restriction, no
+  freeze), and the contracts emit the same events as for the real PIN;
+- the alarm says which account, when, that the duress PIN was used, and the owner's optional short note; never a
+  balance or the decoy amount (no message of the service carries an amount);
+- the owner's own notices are the same for a real and a duress PIN;
+- the trusted contacts and channels live in the service's config file, never on-chain.
+
+It does not call anyone by itself: it sends a message, and what happens next is up to the person who gets it.
+
+On Sepolia (fake channel, 2026-11-16) the alarm was written 11 times out of 11 duress guesses, p50 5.7 s / p95 8.2 s
+after the client saw the guess transaction; no alarm for a real PIN, nothing about it to the owner, and the watchtower's
+nonce did not change during the run. Wrong PINs reached the owner 4.3–6.8 s after the guess (one of them 103 s before it
+was finalized), a silent zero 7.4 s after the transfer.
+
 ## 10. What the app keeps on the device
 
 For a private-mode account the web app stores: L_min and the known recipient (to route sends), today's key-only send
@@ -176,20 +207,28 @@ who forces the owner to open the app should not find the real figures there.
   guards; the three escape cases (both escapes, a scheduled transfer cancelled by an escape, the executor down); the SDK
   watchtower.
 - `test/PrivateIndistinguishability.test.ts` (3): the pairs above.
+- `test/WatchtowerService.test.ts` (5): the service against the contracts on the mock FHEVM: a wrong PIN reported at
+  submit (also when nobody finalizes it) and not again at finalize; a silent zero and a delivery reported without the
+  amount; the duress alarm to the trusted contact only, with no transaction and no new block while it is handled, five
+  lines and no amount, and the owner's notices identical to a real-PIN run; a duress PIN private transfer.
+- `watchtower/test/watchtower.test.ts` (13): routing, texts without amounts, the config check (a trusted contact equal
+  to an owner channel is rejected), the Telegram, e-mail and fake channels.
 - `sdk/test/privateMode.test.ts`: routing (including a restricted account), today's sends, the credibility model.
 - Web: type check, build, and a read-only browser check of the three screens (standard account, private-mode account,
   setup with private mode on).
 
 ## 12. Open questions
 
-1. The 72-hour wait for every PIN-verified private send is strict. A shorter wait for small sends would need a public
-   "big" bit per send (one bit about the amount). Keep it strict?
-2. Watchtower service: nobody runs one yet. The web reads its notices from `WATCHTOWER.noticesUrl` and makes it the
-   guardian of new private-mode accounts; who runs it, and its notice format, are open.
-3. Sepolia: the feature contracts are not deployed yet (funds); the transfer and view timings of this design are still
-   the spike's.
-4. Several devices: key-only routing works from the device that did the setup; another device routes everything to the
+Decided since the first version: the 72-hour wait stays strict (a shorter wait for small sends would publish a bit about
+each amount); the watchtower service exists ([`watchtower/`](../watchtower/README.md)), runs locally for now, and was run
+on Sepolia with the fake channel; when `EncryptedAccountP` needs room for new private features, the module is split.
+
+1. Where the watchtower runs, and who runs it (the owner, a family member, a security company). It needs the account to
+   name its address as guardian at creation, the trusted contacts' channels, and a little ETH only if it should restrict
+   on a key-only tripwire.
+2. The trusted contact has to know in advance what an alarm means and what to do: the service only sends the message.
+3. Several devices: key-only routing works from the device that did the setup; another device routes everything to the
    PIN path. The app's L_min is the setup value: tightening the limits with another tool (the app has no such screen)
    would leave it stale.
-5. `EncryptedAccountP` is 24,153 bytes (423 left): more private features need another module split.
-6. The migration send of ETH pays the F0.16 fee like any PIN-verified ETH send.
+4. `EncryptedAccountP` is 24,153 bytes (423 left): more private features need another module split.
+5. The migration send of ETH pays the F0.16 fee like any PIN-verified ETH send.

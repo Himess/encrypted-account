@@ -1,0 +1,29 @@
+{
+  "network": {
+    "chainId": 11155111,
+    "rpcUrls": ["https://sepolia.gateway.tenderly.co", "https://1rpc.io/sepolia", "https://ethereum-sepolia-rpc.publicnode.com"],
+    "fhevm": "sepolia"
+  },
+  "guardianKey": { "envFile": ".env.sepolia", "var": "SEPOLIA_WATCHTOWER_KEY" },
+  "pollSeconds": 3,
+  "maxLogRange": 2000,
+  "stateFile": "results/private-mode/sepolia/watchtower-state.json",
+  "deliveryLog": "results/private-mode/sepolia/watchtower-deliveries.jsonl",
+  "restrictOnTripwire": true,
+  "channels": {
+    "telegram": { "envFile": "watchtower/.env" },
+    "email": { "envFile": "watchtower/.env", "from": "watchtower@example.invalid" },
+    "fake": { "file": "results/private-mode/sepolia/watchtower-notices.jsonl", "console": true }
+  },
+  "accounts": [
+    {
+      "label": "Sepolia test account",
+      "address": "0x957D4b94eec400bFcC2E02820D9Ac36F7b8b2AE7",
+      "fromBlock": 12143706,
+      "assets": ["0x0000000000000000000000000000000000000000"],
+      "owner": [{ "channel": "telegram", "to": "owner-chat" }],
+      "trusted": [{ "channel": "email", "to": "trusted-contact@example.invalid", "name": "trusted contact" }],
+      "duressNote": "Please call me on the landline."
+    }
+  ]
+}

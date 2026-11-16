@@ -51,6 +51,7 @@ import {
   readAccount,
   readEthFee,
   readEscape,
+  readGuardian,
   readPrivate,
   readRefund,
   refreshPending,
@@ -1749,7 +1750,8 @@ function Dashboard({
   const [view, setView] = useState<AccountView | null>(null);
   const [escape, setEscape] = useState<string | null>(null);
   const [activity, setActivity] = useState<Activity[] | null>(null);
-  const [sheet, setSheet] = useState<null | "send" | "deposit" | "pin" | "accounts" | PrivSheet>(null);
+  const [sheet, setSheet] = useState<null | "send" | "deposit" | "pin" | "accounts" | "alerts" | PrivSheet>(null);
+  const [guardian, setGuardian] = useState<string | null>(null);
   // private mode: whether this account has it (its own implementation), the last PIN view of this page session, and
   // what the key alone sent since (memory only: nothing about balances is ever stored)
   const [priv, setPriv] = useState<boolean | null>(null);
@@ -1786,6 +1788,7 @@ function Dashboard({
   useEffect(() => {
     void refresh(true);
     retry(() => readEscape(read, account)).then(setEscape, () => undefined);
+    retry(() => readGuardian(read, account)).then(setGuardian, () => undefined);
     const id = setInterval(() => void refresh(false), 15000);
     return () => clearInterval(id);
   }, [account]);
@@ -1862,7 +1865,7 @@ function Dashboard({
             )}
           </section>
 
-          {priv && view && <PrivateCard ctx={ctx} account={account} view={view} pv={pv} notify={notify} onSheet={setSheet} bump={privBump} />}
+          {priv && view && <PrivateCard ctx={ctx} account={account} view={view} pv={pv} notify={notify} onSheet={setSheet} bump={privBump} guardian={guardian} />}
 
           <section class="card card-pad">
             <h3 class="card-title">
@@ -1916,6 +1919,16 @@ function Dashboard({
                   Escape address<small class="mono">{escape ? short(escape) : "…"}</small>
                 </span>
                 <span class="v">Set</span>
+              </li>
+              <li>
+                <span class="check">{guardian && guardian !== ethers.ZeroAddress ? <IconCheck /> : <IconInfo />}</span>
+                <span class="k">
+                  Alerts
+                  <small>{guardian === null ? "…" : guardian !== ethers.ZeroAddress ? `Watchtower ${short(guardian)}: wrong PINs${priv ? ", private sends, the duress alarm" : ""}` : "No watchtower for this account"}</small>
+                </span>
+                <button type="button" class="link-btn v" onClick={() => setSheet("alerts")}>
+                  How it works
+                </button>
               </li>
               {priv && (
                 <>
@@ -2018,6 +2031,7 @@ function Dashboard({
           }}
         />
       )}
+      {sheet === "alerts" && <AlertsSheet guardian={guardian} priv={!!priv} onClose={() => setSheet(null)} />}
       {sheet === "pview" && <PrivateViewSheet ctx={ctx} account={account} walletBal={walletBal} onClose={() => setSheet(null)} onViewed={onViewed} />}
       {sheet === "psend" && view && (
         <PrivateSendSheet
@@ -2060,6 +2074,85 @@ const PSEND_LABELS = ["Open the private transfer (amount encrypted)", "Encrypt y
 const PVIEW_LABELS = ["Open the balance view on-chain", "Encrypt your PIN guess", "Submit the guess with its bond", "Decrypt only the yes / no result", "Record the result: a snapshot for you", "Decrypt the snapshot in this page"];
 const DURESS_LABELS = ["Open the change (encrypted)", "Encrypt your PIN guess", "Submit the guess with its bond", "Decrypt only the yes / no result", "Record the result on-chain", "Wait the delay, then apply it"];
 const RESET_LABELS = ["Open the tripwire reset", "Encrypt your PIN guess", "Submit the guess with its bond", "Decrypt only the yes / no result", "Record the result: the counter restarts"];
+
+/** Alerts: what the watchtower tells whom, and when. Its settings live in its own config file, never on-chain. */
+function AlertsSheet({ guardian, priv, onClose }: { guardian: string | null; priv: boolean; onClose: () => void }) {
+  const has = !!guardian && guardian !== ethers.ZeroAddress;
+  return (
+    <Sheet title="Alerts" onClose={onClose}>
+      <p class="small muted" style={{ marginTop: 0 }}>
+        A watchtower is a small service that watches the account on-chain and sends quiet messages. Who gets them is set in the watchtower&apos;s own settings, not
+        on-chain, so this page can neither see nor change them.
+      </p>
+      <div class="notice" style={{ marginBottom: "14px" }}>
+        <span>
+          {has ? (
+            <>
+              This account&apos;s watchtower: <span class="mono">{short(guardian!)}</span>. It may restrict the account (when a key-only tripwire fires) and read
+              what the account shares with it; it can never move funds.
+            </>
+          ) : (
+            <>No watchtower was chosen when this account was created, so no alerts are sent for it.</>
+          )}
+        </span>
+      </div>
+      <ul class="prot">
+        <li>
+          <span class="check">
+            <IconInfo />
+          </span>
+          <span class="k">
+            Wrong PIN → you
+            <small>Every wrong PIN tried with your key: a message to your own channel (Telegram or e-mail) seconds after the try is recorded on-chain.</small>
+          </span>
+        </li>
+        {priv && (
+          <li>
+            <span class="check">
+              <IconInfo />
+            </span>
+            <span class="k">
+              Private send moved zero → you
+              <small>
+                A private send made with your key alone that moved nothing (an unknown recipient, more than the key alone may send, or a fired tripwire). Your key
+                never learns this itself; the watchtower reads the one encrypted counter your account shares with it.
+              </small>
+            </span>
+          </li>
+        )}
+        {priv && (
+          <li>
+            <span class="check">
+              <IconLock />
+            </span>
+            <span class="k">
+              Duress PIN → the person you chose
+              <small>
+                To limit the loss if someone forces you to open the account: the account looks normal and shows only the decoy, and the watchtower sends a silent alarm
+                to the person you chose in advance (family, a lawyer or a security company). Never to your own phone or channel, which may be in the attacker&apos;s
+                hands. Nothing happens on-chain: no restriction, no freeze, no event. The alarm says which account, when, and that the duress PIN was used, plus your
+                optional short note; never a balance or the decoy amount.
+              </small>
+            </span>
+          </li>
+        )}
+        <li>
+          <span class="check">
+            <IconInfo />
+          </span>
+          <span class="k">
+            Also to you
+            <small>A PIN-approved operation (the same message for either PIN), a restriction, an escape that started, a recovery that was opened.</small>
+          </span>
+        </li>
+      </ul>
+      <p class="small faint" style={{ marginBottom: 0 }}>
+        The watchtower only sends messages: it does not call the police or anyone else by itself; what happens next is up to the person who gets the alarm. It works
+        only while the service runs and its channels are set up.
+      </p>
+    </Sheet>
+  );
+}
 
 type PrivSheet = "pview" | "psend" | "duress" | "faucet" | "preset";
 /** The last PIN view in this page session (memory only; never stored) and whether the key-only sends since the one
@@ -2366,7 +2459,7 @@ function asPinFailure(e: unknown): { kind: "wrong"; score: number; next: number 
 
 // ── the private card (private-mode accounts) ──
 
-function PrivateCard(p: { ctx: Ctx; account: string; view: AccountView; pv: PrivView | null; notify: Notify; onSheet: (s: PrivSheet) => void; bump: number }) {
+function PrivateCard(p: { ctx: Ctx; account: string; view: AccountView; pv: PrivView | null; notify: Notify; onSheet: (s: PrivSheet) => void; bump: number; guardian: string | null }) {
   const { ctx, account, view, pv, notify } = p;
   const [info, setInfo] = useState<PrivateInfo | null>(null);
   const [pending, setPending] = useState<PendingPrivate[]>(() => loadPrivLocal(account).pending);
@@ -2514,7 +2607,9 @@ function PrivateCard(p: { ctx: Ctx; account: string; view: AccountView; pv: Priv
         <div class="priv-sub">Key-only sends: did they move?</div>
         {notices === null ? (
           <p class="small faint" style={{ margin: 0 }}>
-            No watchtower in this demo. Your key never learns whether a key-only send moved: if a hidden rule stops one, it moves zero (a silent zero) and only a watchtower sees it. This page sends with the key alone only what is sure to pass and routes the rest the PIN way. To check, view the balance with your PIN: the comparison shows up here.
+            {p.guardian && p.guardian !== ethers.ZeroAddress
+              ? "Your key never learns whether a key-only send moved: if a hidden rule stops one, it moves zero (a silent zero). This account's watchtower sees it and tells you on your own channel; this page cannot see its messages. It sends with the key alone only what is sure to pass and routes the rest the PIN way. To check here, view the balance with your PIN: the comparison shows up here."
+              : "No watchtower for this account. Your key never learns whether a key-only send moved: if a hidden rule stops one, it moves zero (a silent zero) and only a watchtower sees it. This page sends with the key alone only what is sure to pass and routes the rest the PIN way. To check, view the balance with your PIN: the comparison shows up here."}
           </p>
         ) : notices === "err" ? (
           <p class="small faint" style={{ margin: 0 }}>

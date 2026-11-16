@@ -23,6 +23,12 @@
  *    balance); 2^64 − 1 means the tripwire fired, and the account is restricted as on the public path. K itself never
  *    learns the outcome, so a key thief cannot probe the hidden limit.
  * The watchtower can only restrict; it cannot move funds or widen permissions (I9).
+ *
+ * Service options (watchtower/): `finalize: false` makes it a pure notifier that sends no transaction except a tripwire
+ * restriction; `wrongPinAtSubmit` reports a wrong PIN from the public result when the guess is submitted (off-chain), so
+ * a guess nobody finalizes is still reported; `fromBlock` / `maxLogRange` bound the log queries on a public RPC; every
+ * alert comes with the transaction that caused it (`AlertRef`); `exportState` / `importState` let a service restart
+ * where it stopped.
  */
 import { Contract as EthersContract } from "ethers";
 import type { Contract } from "ethers";
@@ -59,6 +65,16 @@ export type Alert =
   | { kind: "private-tripwire"; token: string }
   | { kind: "error"; message: string };
 
+const ZERO_HANDLE = "0x" + "0".repeat(64);
+const KIND_ADMIN = 3; // AccountStorage.Kind.Admin
+const clearBool = (v: unknown) => v === true || v === 1 || v === 1n || v === "true" || v === "1";
+/** The clear value of `handle` in a public decryption result (keys compared without case); missing is an error, never "false". */
+function clearOf(r: PublicDecryptResult, handle: string): unknown {
+  const k = Object.keys(r.clearValues ?? {}).find((x) => x.toLowerCase() === handle.toLowerCase());
+  if (k === undefined) throw new Error(`no public result for ${handle}`);
+  return r.clearValues[k];
+}
+
 /** Private mode: the value a K-only counter saturates to when the tripwire fires (PrivateStorage.TRIPPED). */
 export const PRIVATE_TRIPPED = (1n << 64n) - 1n;
 
@@ -75,15 +91,39 @@ export function privateOutcome(prev: { epoch: bigint; value: bigint } | undefine
 /** K55: if control of the escape address has not been proven for longer than this, the owner is reminded (it blocks nothing). */
 export const ESCAPE_REMIND_AFTER_S = 90 * 24 * 3600;
 
+/** The transaction behind an alert (for logs and latency measurements; never part of a message). */
+export interface AlertRef {
+  txHash: string;
+  blockNumber: number;
+}
+
+/** What a watcher remembers between runs. */
+export interface WatchtowerState {
+  lastBlock: number;
+  seenTrip: string[];
+  remindedFor: string;
+  privateSpent: [string, { epoch: string; value: string }][];
+  approvals: [string, { token: string; spender: string }][];
+  wrongAtSubmit?: string[];
+}
+
 export interface WatchtowerDeps {
   account: Contract; // EncryptedAccount, connected to the guardian signer
   publicDecrypt: (handles: string[]) => Promise<PublicDecryptResult>;
   userDecryptBool: (handle: string, contract: string) => Promise<boolean>; // with the watchtower key
   /** Private mode: decrypts a K-only counter (euint64) with the watchtower key; without it private transfers are skipped. */
   userDecryptU64?: (handle: string, contract: string) => Promise<bigint>;
-  notify: (a: Alert) => void;
+  notify: (a: Alert, ref?: AlertRef) => void;
   assets: string[]; // assets whose tripwire flag is watched
   restrictOnTrip?: boolean; // default true
+  /** Push pending public decryption results on-chain (finalizeEvaluation / finalizeGuess). Default true. */
+  finalize?: boolean;
+  /** First block to scan (default 0). */
+  fromBlock?: number;
+  /** The widest block range of one log query (default: no limit); public RPCs cap eth_getLogs ranges. */
+  maxLogRange?: number;
+  /** Report a wrong PIN when the guess is submitted (public yes / no result, decrypted off-chain), not at finalize. */
+  wrongPinAtSubmit?: boolean;
 }
 
 export class Watchtower {
@@ -94,6 +134,8 @@ export class Watchtower {
   private readonly privateSpent = new Map<string, { epoch: bigint; value: bigint }>();
   /** (token, spender) pairs: from the account's approval ops and the Approval events of the watched tokens. */
   private readonly approvals = new Map<string, { token: string; spender: string }>();
+  /** Ops whose wrong guess was already reported at submit (not again at finalize). */
+  private readonly wrongAtSubmit = new Set<string>();
 
   private noteApproval(token: string, spender: string) {
     this.approvals.set(`${token.toLowerCase()}|${spender.toLowerCase()}`, { token, spender });
@@ -115,7 +157,33 @@ export class Watchtower {
       }
     }
   }
-  constructor(private readonly d: WatchtowerDeps) {}
+  constructor(private readonly d: WatchtowerDeps) {
+    this.lastBlock = (d.fromBlock ?? 0) - 1;
+  }
+
+  exportState(): WatchtowerState {
+    return {
+      lastBlock: this.lastBlock,
+      seenTrip: [...this.seenTrip],
+      remindedFor: this.remindedFor.toString(),
+      privateSpent: [...this.privateSpent].map(([k, v]) => [k, { epoch: v.epoch.toString(), value: v.value.toString() }]),
+      approvals: [...this.approvals],
+      wrongAtSubmit: [...this.wrongAtSubmit],
+    };
+  }
+
+  importState(s: WatchtowerState): void {
+    this.lastBlock = s.lastBlock;
+    this.seenTrip.clear();
+    for (const h of s.seenTrip) this.seenTrip.add(h);
+    this.remindedFor = BigInt(s.remindedFor);
+    this.privateSpent.clear();
+    for (const [k, v] of s.privateSpent) this.privateSpent.set(k, { epoch: BigInt(v.epoch), value: BigInt(v.value) });
+    this.approvals.clear();
+    for (const [k, v] of s.approvals) this.approvals.set(k, v);
+    this.wrongAtSubmit.clear();
+    for (const k of s.wrongAtSubmit ?? []) this.wrongAtSubmit.add(k);
+  }
 
   /** Scans until it has caught up with the chain (including events produced by the watchtower's own finalize transactions). */
   async tick(maxRounds = 5): Promise<void> {
@@ -132,9 +200,10 @@ export class Watchtower {
     const acct = this.d.account;
     const provider = acct.runner?.provider;
     if (!provider) throw new Error("account must be connected to a provider");
-    const latest = await provider.getBlockNumber();
+    const head = await provider.getBlockNumber();
     const from = this.lastBlock + 1;
-    if (from > latest) return;
+    if (from > head) return;
+    const latest = this.d.maxLogRange ? Math.min(head, from + this.d.maxLogRange - 1) : head;
     const logs = await acct.queryFilter("*" as any, from, latest);
     this.lastBlock = latest;
     const addr = await acct.getAddress();
@@ -152,36 +221,56 @@ export class Watchtower {
     for (const log of logs as any[]) {
       const name: string | undefined = log.fragment?.name ?? log.eventName;
       const args = log.args;
+      const ref: AlertRef = { txHash: log.transactionHash, blockNumber: log.blockNumber };
+      const notify = (a: Alert) => this.d.notify(a, ref);
       try {
         if (name === "Evaluating") {
+          if (this.d.finalize === false) continue;
           if (Number((await acct.getOp(args.opId)).status) !== 1) continue; // cancelled in the meantime (e.g. escape, K54)
           const r = await this.d.publicDecrypt([args.okHandle]);
           await (await acct.finalizeEvaluation(args.opId, r.abiEncodedClearValues, r.decryptionProof)).wait();
         } else if (name === "EvaluationFinalized" && args.ok === false) {
-          this.d.notify({ kind: "policy-said-no", opId: args.opId });
+          notify({ kind: "policy-said-no", opId: args.opId });
         } else if (name === "GuessSubmitted") {
           const hs = args.bigHandle === "0x" + "0".repeat(64) ? [args.okHandle] : [args.okHandle, args.bigHandle];
-          const g = await acct.getGuess(args.opId);
-          if (await this.d.userDecryptBool(g.duressFlagH, addr)) this.d.notify({ kind: "duress", opId: args.opId });
-          const r = await this.d.publicDecrypt(hs);
-          await (await acct.finalizeGuess(args.opId, r.abiEncodedClearValues, r.decryptionProof)).wait();
+          // the record as it was in the guess's block: the per-track record is reused by the next guess on that track
+          const g = await acct.getGuess(args.opId, { blockTag: log.blockNumber }).catch(() => acct.getGuess(args.opId));
+          let flag: string = g.duressFlagH;
+          if (BigInt(g.opId) !== BigInt(args.opId) || flag === ZERO_HANDLE) {
+            // overwritten already: a private-mode op keeps the flag of its correct PIN in op.h2 (sub 22–25)
+            const op = await acct.getOp(args.opId);
+            flag = Number(op.kind) === KIND_ADMIN && Number(op.sub) >= 22 && Number(op.sub) <= 25 ? op.h2 : ZERO_HANDLE;
+          }
+          if (!flag || flag === ZERO_HANDLE) throw new Error(`no duress flag readable for op ${args.opId}`);
+          // both checked for every guess, so the decryptions look the same whatever the PIN was: the duress flag (allowed
+          // to the watchtower only) and, with wrongPinAtSubmit, the public yes / no result, off-chain (a wrong guess is
+          // then reported even if nobody ever finalizes it)
+          const atSubmit = this.d.wrongPinAtSubmit === true || this.d.finalize !== false;
+          const [duress, pub] = await Promise.all([this.d.userDecryptBool(flag, addr), atSubmit ? this.d.publicDecrypt(hs) : Promise.resolve(null)]);
+          if (duress) notify({ kind: "duress", opId: args.opId });
+          if (pub && this.d.wrongPinAtSubmit && !clearBool(clearOf(pub, args.okHandle))) {
+            this.wrongAtSubmit.add(String(args.opId));
+            notify({ kind: "wrong-pin", opId: args.opId, track: Number(args.track) });
+          }
+          if (this.d.finalize === false || !pub) continue;
+          await (await acct.finalizeGuess(args.opId, pub.abiEncodedClearValues, pub.decryptionProof)).wait();
         } else if (name === "GuessFinalized") {
-          if (args.ok) this.d.notify({ kind: "pin-ok", opId: args.opId, readyAt: args.readyAt });
-          else this.d.notify({ kind: "wrong-pin", opId: args.opId, track: Number(args.track) });
+          if (args.ok) notify({ kind: "pin-ok", opId: args.opId, readyAt: args.readyAt });
+          else if (!this.wrongAtSubmit.delete(String(args.opId))) notify({ kind: "wrong-pin", opId: args.opId, track: Number(args.track) });
         } else if (name === "RestrictionChanged") {
-          this.d.notify({ kind: "restriction", reasons: Number(args.reasons) });
+          notify({ kind: "restriction", reasons: Number(args.reasons) });
         } else if (name === "OpOpened" && Number(args.kind) === 4) {
-          this.d.notify({ kind: "recovery-opened", opId: args.opId });
+          notify({ kind: "recovery-opened", opId: args.opId });
         } else if (name === "OpOpened" && Number(args.kind) === 1 && Number(args.sub) === 2) {
           this.noteApproval(args.target, args.counterparty); // approval op (whether it executed is read via allowance at escape)
         } else if (name === "OpenOutflow") {
           // B: a K-only outflow executed in this transaction (nothing for the watchtower to do; it only notifies)
           if (Number(args.sub) === 2) this.noteApproval(args.asset, args.counterparty);
-          this.d.notify({ kind: "open-outflow", sub: Number(args.sub), asset: args.asset, to: args.counterparty, amount: args.amount, spent: args.spent });
+          notify({ kind: "open-outflow", sub: Number(args.sub), asset: args.asset, to: args.counterparty, amount: args.amount, spent: args.spent });
         } else if (name === "OpenKnownChanged") {
-          this.d.notify({ kind: "known-changed", spenders: Boolean(args.spenders), who: args.who, added: BigInt(args.activeAt) !== 0n });
+          notify({ kind: "known-changed", spenders: Boolean(args.spenders), who: args.who, added: BigInt(args.activeAt) !== 0n });
         } else if (name === "EscapeStarted") {
-          this.d.notify({ kind: "escape-started", readyAt: args.readyAt, to: args.to });
+          notify({ kind: "escape-started", readyAt: args.readyAt, to: args.to });
           await this.reportOpenApprovals(addr);
         } else if (name === "PrivateTransfer" && this.d.userDecryptU64) {
           const key = String(args.token).toLowerCase();
@@ -189,16 +278,16 @@ export class Watchtower {
           const now = await this.d.userDecryptU64(args.spent, addr);
           const r = privateOutcome(this.privateSpent.get(key), epoch, now);
           this.privateSpent.set(key, { epoch, value: now });
-          if (r.moved > 0n) this.d.notify({ kind: "private-delivered", token: args.token, to: args.to, moved: r.moved });
-          else this.d.notify({ kind: "private-silent-zero", token: args.token, to: args.to, tripped: r.tripped });
+          if (r.moved > 0n) notify({ kind: "private-delivered", token: args.token, to: args.to, moved: r.moved });
+          else notify({ kind: "private-silent-zero", token: args.token, to: args.to, tripped: r.tripped });
           if (r.newlyTripped) {
-            this.d.notify({ kind: "private-tripwire", token: args.token });
+            notify({ kind: "private-tripwire", token: args.token });
             const st = await acct.status();
             if ((this.d.restrictOnTrip ?? true) && (Number(st.restrictedReasons) & 2) === 0) await (await acct.guardianRestrict()).wait();
           }
         }
       } catch (e: any) {
-        this.d.notify({ kind: "error", message: `${name}: ${e?.shortMessage ?? e?.message ?? String(e)}` });
+        this.d.notify({ kind: "error", message: `${name}: ${e?.shortMessage ?? e?.message ?? String(e)}` }, ref);
       }
     }
 
