@@ -22,6 +22,8 @@ const TRANSIENT =
 export function isTransient(e: any): boolean {
   if (!e) return false;
   if (e.code === "TIMEOUT" || e.code === "SERVER_ERROR" || e.code === "NETWORK_ERROR") return true;
+  // a rate-limited public RPC may answer with a non-JSON-RPC body that ethers reports as BAD_DATA ("missing response")
+  if (e.code === "BAD_DATA" && /missing response|limit exceeded|too fast|too many/i.test(String(e.message ?? ""))) return true;
   const msg = String(e.shortMessage ?? e.message ?? e);
   if (/execution reverted|revert|insufficient funds|nonce too low|invalid argument/i.test(msg)) return false;
   return TRANSIENT.test(msg);

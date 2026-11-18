@@ -20,5 +20,10 @@ bench/argon2id.html
 bench/dist/
 bench/proof/dist/
 
+# Watchtower service: its saved state and the fake channel's messages (watchtower/.env is covered by .env above)
+watchtower/data/
+watchtower/config.json
+results/private-mode/sepolia/watchtower-state.json
+
 # Resumable run state of the Sepolia scripts
 results/sepolia/state-*.json

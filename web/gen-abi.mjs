@@ -15,10 +15,26 @@ const factory = art("EncryptedAccountFactory");
 const will = art("EncryptedWill", "inheritance");
 const willFactory = art("EncryptedWillDemoFactory", "inheritance", "EncryptedWillFactory"); // the demo factory (testnets)
 const ctoken = art("TestConfidentialToken", "test");
+// Private mode: the account as callers see it (EncryptedAccountP plus PrivateModule's functions and events)
+const accountP = (() => {
+  const seen = new Set();
+  const out = [];
+  for (const [name, dir] of [["EncryptedAccountP", "private"], ["PrivateModule", "private"]]) {
+    for (const f of art(name, dir)) {
+      if (f.type === "constructor" || f.type === "fallback" || f.type === "receive") continue;
+      const k = `${f.type}:${f.name}(${(f.inputs ?? []).map((i) => i.type).join(",")})`;
+      if (!seen.has(k)) {
+        seen.add(k);
+        out.push(f);
+      }
+    }
+  }
+  return out;
+})();
 const seen = new Set();
 const errors = [];
-for (const name of ["EncryptedAccount", "PinLib", "PolicyLib", "OpsLib", "OpenLib"]) {
-  for (const f of art(name)) {
+for (const [name, dir] of [["EncryptedAccount", "account"], ["PinLib", "account"], ["PolicyLib", "account"], ["OpsLib", "account"], ["OpenLib", "account"], ["PrivateModule", "private"]]) {
+  for (const f of art(name, dir)) {
     if (f.type !== "error") continue;
     const sig = `${f.name}(${f.inputs.map((i) => i.type).join(",")})`;
     if (!seen.has(sig)) {
@@ -34,6 +50,7 @@ export const ERRORS_ABI = ${JSON.stringify(errors)} as const;
 export const WILL_ABI = ${JSON.stringify(will)} as const;
 export const WILL_FACTORY_ABI = ${JSON.stringify(willFactory)} as const;
 export const CTOKEN_ABI = ${JSON.stringify(ctoken)} as const;
+export const ACCOUNT_P_ABI = ${JSON.stringify(accountP)} as const;
 `;
 fs.writeFileSync(path.join(HERE, "src", "abi.ts"), out);
-console.log(`abi.ts: account ${account.length} entries, factory ${factory.length}, errors ${errors.length}, will ${will.length}, will factory ${willFactory.length}, token ${ctoken.length}`);
+console.log(`abi.ts: account ${account.length} entries, factory ${factory.length}, errors ${errors.length}, will ${will.length}, will factory ${willFactory.length}, token ${ctoken.length}, private account ${accountP.length}`);

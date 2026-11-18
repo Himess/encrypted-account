@@ -12,7 +12,9 @@
     "test": "node scripts/run-tests.mjs",
     "test:record": "node scripts/run-tests.mjs --record",
     "test:sdk": "mocha -r ts-node/register sdk/test/**/*.test.ts --timeout 120000",
-    "test:all": "npm run test:sdk && npm test",
+    "test:watchtower": "mocha -r ts-node/register watchtower/test/**/*.test.ts --timeout 60000",
+    "test:all": "npm run test:sdk && npm run test:watchtower && npm test",
+    "watchtower": "ts-node watchtower/src/main.ts",
     "size": "hardhat run scripts/contract-sizes.ts",
     "cost-model": "hardhat test test/CostModel.test.ts",
     "e1:sepolia": "hardhat run scripts/sepolia-e1.ts --network sepolia",
@@ -34,7 +36,8 @@
     "@fhevm/solidity": "0.13.4",
     "@openzeppelin/contracts": "5.6.1",
     "encrypted-types": "0.0.4",
-    "hash-wasm": "4.13.0"
+    "hash-wasm": "4.13.0",
+    "nodemailer": "10.3.1"
   },
   "devDependencies": {
     "@fhevm/hardhat-plugin": "0.13.0-1",

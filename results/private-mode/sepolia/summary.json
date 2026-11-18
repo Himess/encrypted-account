@@ -1,0 +1,578 @@
+{
+  "generatedAt": "2026-11-16T00:52:47.199Z",
+  "evidence": "[M] Sepolia, feature/private-mode contracts, official cUSDC (Mock) wrapper from the Zama Wrappers Registry",
+  "contracts": {
+    "PrivateModule": "0x95c6c6D4678363D60a7dcDF81F2803D21fA965bd",
+    "EncryptedAccountP": "0x8986339Af3b49c1506B064a90C8BCFD74814e19b",
+    "EncryptedAccountFactory": "0xE93F23487c9aa1ab5acE4401d7FF957aF85FC92E"
+  },
+  "reusedF016Libraries": {
+    "addresses": {
+      "PinLib": "0xe9eFae2f9C11cF7319a7eca23847ff5C99E197FB",
+      "PolicyLib": "0x8029e4f3bdD913b0Ab35e8DBF6B7b8c7B16dDA75",
+      "OpenLib": "0xA72C37Ee7305A2c79b57e3d5456b9C3804366c15",
+      "OpsLib": "0x537EC15E00fdf6e9Cb8d3BF5d0F46A06A09A7fA2"
+    },
+    "sameCode": {
+      "PinLib": true,
+      "PolicyLib": true,
+      "OpenLib": true,
+      "OpsLib": true
+    }
+  },
+  "account": "0x957D4b94eec400bFcC2E02820D9Ac36F7b8b2AE7",
+  "guardian": "0x8e98d5e45822b81Ac7dB853480c405E8Ea769B7A",
+  "deployGas": {
+    "PrivateModule": 19930893,
+    "EncryptedAccountP": 37669273,
+    "EncryptedAccountFactory": 3097426
+  },
+  "setupGas": {
+    "createAccount": 1308633,
+    "setupPin": 842459,
+    "setupAssetEth": 1959589,
+    "setupKnownR0": 3787620,
+    "setupKnownR12": 3787668,
+    "setupKnownR24": 2033684,
+    "setupKnownS0": 3235308,
+    "privateSetupAsset": 1876104,
+    "arm": 69385,
+    "mintUsdc": 140988,
+    "approveUsdc": 128285,
+    "wrapToAccount": 921503
+  },
+  "T1": {
+    "totalMs": {
+      "n": 5,
+      "p50": 11929,
+      "p95": 12363,
+      "min": 10489,
+      "max": 12363
+    },
+    "inputProofMs": {
+      "n": 5,
+      "p50": 4737,
+      "p95": 4809,
+      "min": 4647,
+      "max": 4809
+    },
+    "txMs": {
+      "n": 5,
+      "p50": 7222,
+      "p95": 7716,
+      "min": 5680,
+      "max": 7716
+    },
+    "gas": {
+      "n": 5,
+      "p50": 1909842,
+      "p95": 2015876,
+      "min": 1909830,
+      "max": 2015876
+    },
+    "gasSteady": {
+      "n": 4,
+      "p50": 1909838,
+      "p95": 1909842,
+      "min": 1909830,
+      "max": 1909842
+    },
+    "hcu": {
+      "n": 5,
+      "p50": 1996128,
+      "p95": 1996160,
+      "min": 1996128,
+      "max": 1996160
+    },
+    "decryptRequests": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "unknownRecipient": {
+      "gas": 1909854,
+      "hcu": 1996128
+    },
+    "spike": {
+      "totalMs": {
+        "n": 5,
+        "p50": 14270,
+        "p95": 15976,
+        "min": 13440,
+        "max": 15976
+      },
+      "gas": {
+        "n": 5,
+        "p50": 2447568,
+        "p95": 2749430,
+        "min": 2447556,
+        "max": 2749430
+      },
+      "hcu": {
+        "n": 5,
+        "p50": 1990100,
+        "p95": 1990132,
+        "min": 1990100,
+        "max": 1990132
+      }
+    }
+  },
+  "T2": {
+    "totalMs": {
+      "n": 5,
+      "p50": 42066,
+      "p95": 46637,
+      "min": 39312,
+      "max": 46637
+    },
+    "fingerprintMs": {
+      "n": 5,
+      "p50": 184,
+      "p95": 201,
+      "min": 181,
+      "max": 201
+    },
+    "inputProofMs": {
+      "n": 5,
+      "p50": 4769,
+      "p95": 4825,
+      "min": 4709,
+      "max": 4825
+    },
+    "txMs": {
+      "n": 5,
+      "p50": 25713,
+      "p95": 26444,
+      "min": 24729,
+      "max": 26444
+    },
+    "publicDecryptMs": {
+      "n": 5,
+      "p50": 4820,
+      "p95": 5922,
+      "min": 2727,
+      "max": 5922
+    },
+    "userDecryptMs": {
+      "n": 5,
+      "p50": 4832,
+      "p95": 8621,
+      "min": 2737,
+      "max": 8621
+    },
+    "gasTotal": {
+      "n": 5,
+      "p50": 2075787,
+      "p95": 2173695,
+      "min": 2075755,
+      "max": 2173695
+    },
+    "hcuTotal": {
+      "n": 5,
+      "p50": 1209002,
+      "p95": 1209002,
+      "min": 1209002,
+      "max": 1209002
+    },
+    "allCorrect": true,
+    "spike": {
+      "totalMs": {
+        "n": 5,
+        "p50": 40296,
+        "p95": 46022,
+        "min": 32258,
+        "max": 46022
+      },
+      "gasTotal": {
+        "n": 5,
+        "p50": 2083106,
+        "p95": 2768562,
+        "min": 2083094,
+        "max": 2768562
+      }
+    }
+  },
+  "T3": {
+    "note": "production executor: real-PIN vs duress-PIN transactions compared pair by pair (execution gas = gas minus calldata gas)",
+    "transferPairsScheduled": 6,
+    "transferPairsExecuted": 0,
+    "viewPairs": 5,
+    "txCompared": 33,
+    "differences": 5,
+    "unexplained": 0,
+    "sameModeExecSpread": {
+      "transfer|real|open": 0,
+      "transfer|real|guess": 0,
+      "transfer|real|finalize": 0,
+      "transfer|duress|open": 0,
+      "transfer|duress|guess": 0,
+      "transfer|duress|finalize": 0,
+      "view|real|open": 0,
+      "view|real|guess": 4,
+      "view|real|finalize": 4,
+      "view|duress|open": 0,
+      "view|duress|guess": 0,
+      "view|duress|finalize": 0
+    },
+    "list": [
+      {
+        "pair": "transfer 1",
+        "tx": "open",
+        "metric": "exec",
+        "real": 1016055,
+        "duress": 918135,
+        "class": "first use of a storage slot (order, not PIN)"
+      },
+      {
+        "pair": "transfer 1",
+        "tx": "guess",
+        "metric": "exec",
+        "real": 1311183,
+        "duress": 821579,
+        "class": "first use of a storage slot (order, not PIN)"
+      },
+      {
+        "pair": "view 1",
+        "tx": "finalize",
+        "metric": "exec",
+        "real": 1018043,
+        "duress": 920127,
+        "class": "first use of a storage slot (order, not PIN)"
+      },
+      {
+        "pair": "view 4",
+        "tx": "finalize",
+        "metric": "exec",
+        "real": 920123,
+        "duress": 920127,
+        "class": "within the same-mode spread (4 gas)"
+      },
+      {
+        "pair": "view 5",
+        "tx": "guess",
+        "metric": "exec",
+        "real": 819077,
+        "duress": 819081,
+        "class": "within the same-mode spread (4 gas)"
+      }
+    ],
+    "viewsCorrect": true,
+    "transfersCorrect": true,
+    "scheduleMs": {
+      "n": 10,
+      "p50": 31219,
+      "p95": 33988,
+      "min": 28656,
+      "max": 33988
+    },
+    "recovered": [
+      2,
+      11
+    ],
+    "scheduleGas": {
+      "n": 12,
+      "p50": 2350599,
+      "p95": 2938147,
+      "min": 2350587,
+      "max": 2938147
+    },
+    "scheduleHcu": {
+      "n": 12,
+      "p50": 555002,
+      "p95": 555002,
+      "min": 555002,
+      "max": 555002
+    },
+    "executeGas": null,
+    "executeHcu": null,
+    "gasPairs": [
+      {
+        "pair": 1,
+        "amount": "100000000",
+        "real": [
+          1042251,
+          1337007,
+          558889,
+          null
+        ],
+        "duress": [
+          944319,
+          847391,
+          558889,
+          null
+        ]
+      },
+      {
+        "pair": 2,
+        "amount": "500000000",
+        "real": [
+          944283,
+          847403,
+          558901,
+          null
+        ],
+        "duress": [
+          944331,
+          847391,
+          558889,
+          null
+        ]
+      },
+      {
+        "pair": 3,
+        "amount": "1500000000",
+        "real": [
+          944331,
+          847403,
+          558865,
+          null
+        ],
+        "duress": [
+          944319,
+          847391,
+          558889,
+          null
+        ]
+      },
+      {
+        "pair": 4,
+        "amount": "3000000000",
+        "real": [
+          944331,
+          847391,
+          558889,
+          null
+        ],
+        "duress": [
+          944319,
+          847391,
+          558889,
+          null
+        ]
+      },
+      {
+        "pair": 5,
+        "amount": "50000000",
+        "real": [
+          944319,
+          847379,
+          558901,
+          null
+        ],
+        "duress": [
+          944331,
+          847379,
+          558889,
+          null
+        ]
+      },
+      {
+        "pair": 6,
+        "amount": "1350000000",
+        "real": [
+          944319,
+          847367,
+          558901,
+          null
+        ],
+        "duress": [
+          944319,
+          847379,
+          558913,
+          null
+        ]
+      }
+    ],
+    "readyAt": [
+      {
+        "k": 1,
+        "mode": "real",
+        "readyAt": "2026-11-19T00:22:24.000Z"
+      },
+      {
+        "k": 2,
+        "mode": "duress",
+        "readyAt": "2026-11-19T00:23:12.000Z"
+      },
+      {
+        "k": 3,
+        "mode": "real",
+        "readyAt": "2026-11-19T00:26:36.000Z"
+      },
+      {
+        "k": 4,
+        "mode": "duress",
+        "readyAt": "2026-11-19T00:27:24.000Z"
+      },
+      {
+        "k": 5,
+        "mode": "real",
+        "readyAt": "2026-11-19T00:28:12.000Z"
+      },
+      {
+        "k": 6,
+        "mode": "duress",
+        "readyAt": "2026-11-19T00:29:00.000Z"
+      },
+      {
+        "k": 7,
+        "mode": "real",
+        "readyAt": "2026-11-19T00:29:48.000Z"
+      },
+      {
+        "k": 8,
+        "mode": "duress",
+        "readyAt": "2026-11-19T00:30:36.000Z"
+      },
+      {
+        "k": 9,
+        "mode": "real",
+        "readyAt": "2026-11-19T00:31:24.000Z"
+      },
+      {
+        "k": 10,
+        "mode": "duress",
+        "readyAt": "2026-11-19T00:32:12.000Z"
+      },
+      {
+        "k": 11,
+        "mode": "real",
+        "readyAt": "2026-11-19T00:33:12.000Z"
+      },
+      {
+        "k": 12,
+        "mode": "duress",
+        "readyAt": "2026-11-19T00:37:12.000Z"
+      }
+    ]
+  },
+  "wrongPin": [
+    {
+      "i": 1,
+      "doneMs": 35332,
+      "gas": [
+        281311,
+        844905,
+        416877
+      ]
+    },
+    {
+      "i": 2,
+      "doneMs": 35748,
+      "gas": [
+        281311,
+        845031,
+        416865
+      ]
+    }
+  ],
+  "watchtower": {
+    "file": "results/private-mode/sepolia/watchtower-notices.jsonl",
+    "notices": 43,
+    "duplicatesRemoved": 3,
+    "duressAlarm": {
+      "events": 11,
+      "notified": 11,
+      "msAfterClientSawTx": {
+        "n": 10,
+        "p50": 5700,
+        "p95": 8248,
+        "min": 2746,
+        "max": 8248
+      },
+      "msAfterBlockTimestamp": {
+        "n": 11,
+        "p50": 4798,
+        "p95": 6544,
+        "min": 2590,
+        "max": 6544
+      }
+    },
+    "duressAlarmOnRealPin": 0,
+    "duressToOwner": 0,
+    "wrongPin": {
+      "events": 2,
+      "notified": 2,
+      "msAfterClientSawTx": {
+        "n": 2,
+        "p50": 5549,
+        "p95": 6756,
+        "min": 5549,
+        "max": 6756
+      },
+      "msAfterBlockTimestamp": {
+        "n": 2,
+        "p50": 4191,
+        "p95": 4762,
+        "min": 4191,
+        "max": 4762
+      }
+    },
+    "wrongPinReportedAtFinalize": {
+      "events": 2,
+      "notified": 0,
+      "msAfterClientSawTx": null,
+      "msAfterBlockTimestamp": null
+    },
+    "wrongPinAtSubmit": {
+      "events": 1,
+      "notified": 1,
+      "msAfterClientSawTx": {
+        "n": 1,
+        "p50": 4317,
+        "p95": 4317,
+        "min": 4317,
+        "max": 4317
+      },
+      "msAfterBlockTimestamp": {
+        "n": 1,
+        "p50": 5545,
+        "p95": 5545,
+        "min": 5545,
+        "max": 5545
+      }
+    },
+    "wrongPinLateFinalizedAfterNoticeMs": 103144,
+    "restrictionNotices": 1,
+    "silentZero": {
+      "events": 1,
+      "notified": 1,
+      "msAfterClientSawTx": {
+        "n": 1,
+        "p50": 7425,
+        "p95": 7425,
+        "min": 7425,
+        "max": 7425
+      },
+      "msAfterBlockTimestamp": {
+        "n": 1,
+        "p50": 6718,
+        "p95": 6718,
+        "min": 6718,
+        "max": 6718
+      }
+    },
+    "delivered": {
+      "events": 5,
+      "notified": 5,
+      "msAfterClientSawTx": {
+        "n": 5,
+        "p50": 8412,
+        "p95": 9014,
+        "min": 7517,
+        "max": 9014
+      },
+      "msAfterBlockTimestamp": {
+        "n": 5,
+        "p50": 7541,
+        "p95": 8174,
+        "min": 7060,
+        "max": 8174
+      }
+    },
+    "noticeWithDigits": 0
+  },
+  "refunded": "22000000000000000"
+}

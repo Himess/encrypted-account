@@ -52,6 +52,30 @@ export const DEMO_DELAYS = {
 };
 
 /**
+ * Private mode (optional): accounts created on FACTORY_P (EncryptedAccountP + PrivateModule) hold an ERC-7984 token with
+ * hidden balances, a PIN-gated view, a one-transaction K-only private send and an optional duress PIN. Empty until the
+ * private-mode contracts are deployed on this network; the setup option stays visible but off and disabled until then.
+ */
+export const FACTORY_P = "";
+export const FACTORY_P_DEPLOY_BLOCK = 0;
+/** Zama's Wrappers Registry and its official cUSDC (Mock) wrapper on Sepolia (docs.zama.org, addresses/testnet/sepolia). */
+export const WRAPPER_REGISTRY = "0x2f0750Bbb0A246059d80e94c454586a7F27a128e";
+export const CUSDC = "0x7c5BF43B851c1dff1a4feE8dB225b87f2C223639";
+/** The wrapper's underlying test USDC: anyone may mint it (at most 1,000,000 per call). 6 decimals, wrapper rate 1. */
+export const USDC_MOCK = "0x9b5Cd13b8eFbB58Dc25A05CF411D8056058aDFfF";
+export const CUSDC_UNIT = 10n ** 6n;
+/**
+ * Optional watchtower for private-mode accounts: its address becomes the account's guardian (it may read the K-only
+ * counter and restrict, never move funds), and the app reads its notices (silent zero, delivery, tripwire) from the URL.
+ * Empty: no guardian, and a K-only private send is confirmed only by a PIN-gated view.
+ */
+export const WATCHTOWER = { address: "", noticesUrl: "" };
+/** Private mode: every PIN-verified private send waits at least this long (design doc §17.1; PrivateStorage.MIN_BIG_DELAY). */
+export const PRIVATE_MIN_BIG_DELAY = 72 * 3600;
+/** Demo delays of a private-mode account: as DEMO_DELAYS, with the long class at the 72-hour minimum. */
+export const DEMO_DELAYS_P = { ...DEMO_DELAYS, bigTransfer: PRIVATE_MIN_BIG_DELAY };
+
+/**
  * Hidden inheritance (contracts/inheritance), deployed by scripts/sepolia/will-run.ts. The token is the worthless
  * test ERC-7984 token (tcUSD, 6 decimals) that anyone may mint. WILL_FACTORY is the DEMO factory (testnets only):
  * 5-minute absence and grace, a 1-day claim window. The production factory allows 90 days–5 years, 30 days–1 year and

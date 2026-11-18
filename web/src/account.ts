@@ -7,13 +7,18 @@
  * claimRefund when the PIN is right, kept by the account when it is wrong), and a PIN-verified transfer pays a small
  * fee on top of the amount, bound when the transfer opens. Accounts deployed before F0.16 have neither: every read
  * here falls back to "no bond, no fee" for them.
+ *
+ * Private mode (optional, chosen at creation): the account is an EncryptedAccountP from its own factory and holds an
+ * ERC-7984 token (cUSDC) with a hidden balance, a PIN-gated view, a one-transaction key-only send and an optional duress
+ * PIN. A standard account never runs that code: it keeps its own factory, flow and gas.
  */
 import { ethers } from "ethers";
-import { ACCOUNT_ABI, FACTORY_ABI } from "./abi";
-import { CHAIN_ID, DEMO_DELAYS, ETH, ETH_UNIT, FACTORY, FEE_CONFIG, LEGACY_FACTORIES, LOGS_FROM_BLOCK, LOG_RPC_URLS, N_RECIPIENTS, N_SPENDERS, TRACK_OWNER, ZERO32 } from "./chain";
+import { ACCOUNT_ABI, ACCOUNT_P_ABI, FACTORY_ABI } from "./abi";
+import { CHAIN_ID, CUSDC, DEMO_DELAYS, DEMO_DELAYS_P, ETH, ETH_UNIT, FACTORY, FACTORY_P, FACTORY_P_DEPLOY_BLOCK, FEE_CONFIG, LEGACY_FACTORIES, LOGS_FROM_BLOCK, LOG_RPC_URLS, N_RECIPIENTS, N_SPENDERS, TRACK_OWNER, USDC_MOCK, WATCHTOWER, ZERO32 } from "./chain";
 import { asBool, encrypt, publicDecrypt } from "./fhe";
 import { guessValue, pinFingerprint, randomUint64 } from "./pin";
 import { BASE_BOND } from "../../sdk/src/bondFee";
+import { PrivateHistoryEvent, SendRecord, utcDay } from "../../sdk/src/privateMode";
 import { Status, sendTx } from "./tx";
 import type { Wallet } from "./wallet";
 
@@ -22,7 +27,8 @@ export type Ctx = { w: Wallet; read: ethers.JsonRpcProvider };
 const IFACE = new ethers.Interface(ACCOUNT_ABI as any);
 const FIFACE = new ethers.Interface(FACTORY_ABI as any);
 const acct = (addr: string, runner: ethers.ContractRunner) => new ethers.Contract(addr, ACCOUNT_ABI as any, runner);
-const factory = (runner: ethers.ContractRunner) => new ethers.Contract(FACTORY, FACTORY_ABI as any, runner);
+const factory = (runner: ethers.ContractRunner, priv = false) => new ethers.Contract(priv ? FACTORY_P : FACTORY, FACTORY_ABI as any, runner);
+const PIFACE = new ethers.Interface(ACCOUNT_P_ABI as any);
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const FEE_ABI = ["function quote(address asset, uint256 amount) view returns (uint256 fee, uint64 version)"];
 const UINT96_MAX = (1n << 96n) - 1n;
@@ -82,7 +88,8 @@ async function getLogsAny(read: ethers.JsonRpcProvider, filter: ethers.Filter): 
 export async function findAccounts(read: ethers.JsonRpcProvider, owner: string): Promise<string[]> {
   const topics = (await factory(read).filters.AccountCreated(null, owner).getTopicFilter()) as (string | null)[];
   // the current factory and the pre-F0.16 one (same event): older demo accounts stay reachable
-  const logs = await getLogsChunked(read, { address: [FACTORY, ...LEGACY_FACTORIES], topics }, LOGS_FROM_BLOCK, await read.getBlockNumber());
+  // private-mode accounts come from their own factory (when it is deployed on this network)
+  const logs = await getLogsChunked(read, { address: [FACTORY, ...LEGACY_FACTORIES, ...(FACTORY_P ? [FACTORY_P] : [])], topics }, LOGS_FROM_BLOCK, await read.getBlockNumber());
   return logs.map((l) => String(FIFACE.parseLog(l)!.args.account));
 }
 
@@ -90,20 +97,28 @@ export async function readEscape(read: ethers.JsonRpcProvider, address: string):
   return String((await acct(address, read).escapeState())[0]);
 }
 
+/** The account's guardian: the watchtower that may read what the account shares with it and restrict it (zero: none). */
+export async function readGuardian(read: ethers.JsonRpcProvider, address: string): Promise<string> {
+  return String((await acct(address, read).roles())[1]);
+}
+
 export type Activity = {
-  kind: "sent" | "wrong" | "pending" | "approved" | "cancelled" | "armed";
+  kind: "sent" | "wrong" | "pending" | "approved" | "cancelled" | "armed" | "private-k";
   amount?: bigint;
   to?: string;
   block: number;
   hash: string;
   time?: number;
+  /** The op's kind and sub-type (OpOpened); private ops (sub 22-25) carry no public amount or recipient. */
+  opKind?: number;
+  sub?: number;
 };
 
 /** The account's history from its own events: PIN transfers (sent, wrong PIN, pending) and activation. */
 export async function loadActivity(read: ethers.JsonRpcProvider, address: string, limit = 12): Promise<Activity[]> {
   const latest = await read.getBlockNumber();
   const logs = await getLogsChunked(read, { address }, LOGS_FROM_BLOCK, latest);
-  type OpRec = { amount: bigint; to: string; block: number; hash: string; ok?: boolean; fin?: [number, string]; exec?: [number, string]; cancel?: [number, string] };
+  type OpRec = { amount: bigint; to: string; block: number; hash: string; opKind: number; sub: number; ok?: boolean; fin?: [number, string]; exec?: [number, string]; cancel?: [number, string] };
   const ops = new Map<string, OpRec>();
   const items: Activity[] = [];
   for (const log of logs) {
@@ -111,12 +126,21 @@ export async function loadActivity(read: ethers.JsonRpcProvider, address: string
     try {
       ev = IFACE.parseLog(log);
     } catch {
+      /* not an account event */
+    }
+    if (!ev) {
+      // private mode: a key-only private send (the module's event, emitted by the account)
+      try {
+        const pe = PIFACE.parseLog(log);
+        if (pe?.name === "PrivateTransfer") items.push({ kind: "private-k", to: String(pe.args.to), block: log.blockNumber, hash: log.transactionHash });
+      } catch {
+        /* another event */
+      }
       continue;
     }
-    if (!ev) continue;
     const id = ev.args.opId !== undefined ? String(ev.args.opId) : "";
     const at: [number, string] = [log.blockNumber, log.transactionHash];
-    if (ev.name === "OpOpened") ops.set(id, { amount: BigInt(ev.args.amount), to: String(ev.args.counterparty), block: at[0], hash: at[1] });
+    if (ev.name === "OpOpened") ops.set(id, { amount: BigInt(ev.args.amount), to: String(ev.args.counterparty), block: at[0], hash: at[1], opKind: Number(ev.args.kind), sub: Number(ev.args.sub) });
     else if (ev.name === "GuessFinalized" && ops.has(id)) Object.assign(ops.get(id)!, { ok: Boolean(ev.args.ok), fin: at });
     else if (ev.name === "OpExecuted" && ops.has(id)) ops.get(id)!.exec = at;
     else if (ev.name === "OpCancelled" && ops.has(id)) ops.get(id)!.cancel = at;
@@ -132,7 +156,7 @@ export async function loadActivity(read: ethers.JsonRpcProvider, address: string
           : o.ok === true
             ? ["approved", o.fin!]
             : ["pending", [o.block, o.hash]];
-    items.push({ kind, amount: o.amount, to: o.to, block, hash });
+    items.push({ kind, amount: o.amount, to: o.to, block, hash, opKind: o.opKind, sub: o.sub });
   }
   items.sort((a, b) => b.block - a.block);
   const top = items.slice(0, limit);
@@ -230,7 +254,10 @@ export async function readAccount(read: ethers.JsonRpcProvider, address: string,
 
 // ───────────────────────────── creation and setup ─────────────────────────────
 
-export type Plan = { account: string; escape: string; salt: string; limitUnits: string; known: string | null; bondBase?: string };
+/** Private mode in a resumable plan: only the private token's daily limit (token units). Whether a duress PIN is set,
+ *  and the decoy, are never stored on this device. */
+export type PrivatePlan = { limitUnits: string };
+export type Plan = { account: string; escape: string; salt: string; limitUnits: string; known: string | null; bondBase?: string; private?: PrivatePlan };
 const planKey = (owner: string) => `ea:plan:${owner.toLowerCase()}`;
 export const loadPlan = (owner: string): Plan | null => {
   try {
@@ -266,6 +293,13 @@ export const SETUP_STEPS = [
   "Turn the account on",
 ] as const;
 
+/** Private mode adds one step before the bond: the private token's encrypted limits and decoy cap. */
+export const PRIVATE_SETUP_STEP = 7;
+export const setupStepCount = (priv: boolean) => SETUP_STEPS.length + (priv ? 1 : 0);
+
+/** Private mode at setup. The duress PIN and the decoy are passed on every run and never stored. */
+export type PrivateSetup = { limitUnits: bigint; duressPin: string | null; decoyUnits: bigint | null };
+
 export type StepCb = (i: number, state: "run" | "done" | "skip" | "fail", text?: string, hash?: string) => void;
 
 /**
@@ -274,24 +308,35 @@ export type StepCb = (i: number, state: "run" | "done" | "skip" | "fail", text?:
  */
 export async function createAndSetup(
   ctx: Ctx,
-  opts: { pin: string; limitEth: string; known: string | null; escapeWallet: ethers.HDNodeWallet | ethers.Wallet; bondBase?: bigint },
+  opts: { pin: string; limitEth: string; known: string | null; escapeWallet: ethers.HDNodeWallet | ethers.Wallet; bondBase?: bigint; priv?: PrivateSetup },
   cb: StepCb,
 ): Promise<string> {
   const owner = ctx.w.address;
   const limitUnits = ethers.parseEther(opts.limitEth) / ETH_UNIT;
   if (limitUnits < 2n) throw new Error("The limit must be at least 0.000002 ETH.");
+  if (opts.priv && !FACTORY_P) throw new Error("Private mode is not deployed on this network yet.");
+  if (opts.priv && opts.priv.limitUnits < 2n) throw new Error("The private limit is too small.");
 
   let plan = loadPlan(owner);
   if (plan) {
     const created = (await ctx.read.getCode(plan.account)) !== "0x";
-    // Not created yet and the escape key of that attempt is gone: start a fresh plan (nothing is on-chain).
-    if (!created && plan.escape.toLowerCase() !== opts.escapeWallet.address.toLowerCase()) plan = null;
+    // Not created yet and the escape key of that attempt is gone, or the mode changed: start a fresh plan (nothing is on-chain).
+    if (!created && (plan.escape.toLowerCase() !== opts.escapeWallet.address.toLowerCase() || !!plan.private !== !!opts.priv)) plan = null;
+    else if (created && !!plan.private !== !!opts.priv) {
+      throw new Error(`An unfinished ${plan.private ? "private-mode" : "standard"} account was found: turn private mode ${plan.private ? "on" : "off"} to finish it.`);
+    }
   }
   if (!plan) {
     const salt = ethers.hexlify(crypto.getRandomValues(new Uint8Array(32)));
-    const account: string = await factory(ctx.read).predictAddress(owner, opts.escapeWallet.address, ethers.ZeroAddress, DEMO_DELAYS, salt);
+    const p = !!opts.priv;
+    // a private-mode account: its own factory, the 72-hour long class, and the watchtower (if any) as its guardian
+    const account: string = await factory(ctx.read, p).predictAddress(owner, opts.escapeWallet.address, p ? guardianP() : ethers.ZeroAddress, p ? DEMO_DELAYS_P : DEMO_DELAYS, salt);
     plan = { account, escape: opts.escapeWallet.address, salt, limitUnits: limitUnits.toString(), known: opts.known };
+    if (opts.priv) plan.private = { limitUnits: opts.priv.limitUnits.toString() };
   }
+  const priv = !!plan.private;
+  const iBond = priv ? PRIVATE_SETUP_STEP + 1 : PRIVATE_SETUP_STEP;
+  const iArm = iBond + 1;
   plan.bondBase = (opts.bondBase ?? BASE_BOND).toString(); // the latest choice wins until the account is armed
   savePlan(owner, plan);
   const A = plan.account;
@@ -331,20 +376,25 @@ export async function createAndSetup(
         { EscapeAddress: [{ name: "escape", type: "address" }, { name: "nonce", type: "uint32" }] },
         { escape: plan!.escape, nonce: 0 },
       );
-      const data = FIFACE.encodeFunctionData("createAccountWithDelays", [owner, plan!.escape, ethers.ZeroAddress, DEMO_DELAYS, plan!.salt, sig]);
-      return sendTx(ctx.w, ctx.read, { to: FACTORY, data }, st);
+      const data = priv
+        ? FIFACE.encodeFunctionData("createAccountWithDelays", [owner, plan!.escape, guardianP(), DEMO_DELAYS_P, plan!.salt, sig])
+        : FIFACE.encodeFunctionData("createAccountWithDelays", [owner, plan!.escape, ethers.ZeroAddress, DEMO_DELAYS, plan!.salt, sig]);
+      return sendTx(ctx.w, ctx.read, { to: priv ? FACTORY_P : FACTORY, data }, st);
     },
   );
 
-  // 2. PIN: Enc(h), a random duress candidate (never selected) and useDuress = false
+  // 2. PIN: Enc(h), a random duress candidate (never selected) and useDuress = false. Private mode with a duress PIN:
+  //    the duress fingerprint and useDuress = true (both encrypted: the transaction looks the same either way).
+  const duressPin = priv ? (opts.priv?.duressPin ?? null) : null;
   await run(
     1,
     async () => (await a.encryptedHandles(ETH))[0] !== ZERO32,
     async (st) => {
       st("Deriving the fingerprint (Argon2id)…");
       const fp = await pinFingerprint(opts.pin, CHAIN_ID, A);
+      const dfp = duressPin ? await pinFingerprint(duressPin, CHAIN_ID, A) : randomUint64();
       st("Encrypting…");
-      const enc = await encrypt(ctx.read, [{ type: "euint64", value: fp }, { type: "euint64", value: randomUint64() }, { type: "ebool", value: false }], A, owner);
+      const enc = await encrypt(ctx.read, [{ type: "euint64", value: fp }, { type: "euint64", value: dfp }, { type: "ebool", value: duressPin !== null }], A, owner);
       const data = IFACE.encodeFunctionData("setupPin", [enc.handles[0], enc.handles[1], enc.handles[2], enc.inputProof]);
       return sendTx(ctx.w, ctx.read, { to: A, data }, st);
     },
@@ -392,10 +442,28 @@ export async function createAndSetup(
     },
   );
 
-  // 8. F0.16: the base bond of key-track PIN tries (skipped at the default, which needs no transaction)
+  // 8 (private mode only). The private token: L_min = L/2 and L of its own hidden limit (token units), and the decoy cap.
+  //    The cap is always encrypted, so the setup looks the same either way. Without a duress PIN in this run it is 0: if
+  //    an earlier, interrupted run already stored a duress PIN, the duress PIN then shows and moves nothing (fail closed).
+  if (priv) {
+    await run(
+      PRIVATE_SETUP_STEP,
+      async () => Boolean((await pacct(A, ctx.read).privateState(CUSDC)).configured),
+      async (st) => {
+        const l = BigInt(plan!.private!.limitUnits);
+        const decoy = duressPin && opts.priv?.decoyUnits != null ? opts.priv.decoyUnits : 0n;
+        st("Encrypting…");
+        const enc = await encrypt(ctx.read, [{ type: "euint64", value: l / 2n }, { type: "euint64", value: l }, { type: "euint64", value: decoy }], A, owner);
+        const data = PIFACE.encodeFunctionData("privateSetupAsset", [CUSDC, enc.handles[0], enc.handles[1], enc.handles[2], enc.inputProof]);
+        return sendTx(ctx.w, ctx.read, { to: A, data }, st);
+      },
+    );
+  }
+
+  // 9. F0.16: the base bond of key-track PIN tries (skipped at the default, which needs no transaction)
   const bondBase = BigInt(plan.bondBase ?? BASE_BOND.toString());
   await run(
-    7,
+    iBond,
     async () => {
       if (Boolean((await a.status())[0])) return true; // armed: fixed from now on (a PIN-verified admin op changes it)
       const b = await readOwnerBond(ctx.read, A);
@@ -404,13 +472,15 @@ export async function createAndSetup(
     async (st) => sendTx(ctx.w, ctx.read, { to: A, data: IFACE.encodeFunctionData("setupOwnerBond", [bondBase]) }, st),
   );
 
-  // 9. arm
+  // 10. arm
   await run(
-    8,
+    iArm,
     async () => Boolean((await a.status())[0]),
     async (st) => sendTx(ctx.w, ctx.read, { to: A, data: IFACE.encodeFunctionData("arm", []) }, st),
   );
 
+  // private mode: what this device needs to route sends (L_min and the known recipient; never the duress setting)
+  if (priv) savePrivLocal(A, { ...loadPrivLocal(A), lmin: (BigInt(plan.private!.limitUnits) / 2n).toString(), known: plan.known ? [plan.known] : [] });
   clearPlan(owner);
   return A;
 }
@@ -624,13 +694,13 @@ async function verifyWithPin(ctx: Ctx, account: string, open: (st: Status) => Pr
     const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("finalizeGuess", [opened.opId, dec.cleartexts, dec.proof]) }, st);
     const ev = eventOf(r, account, "GuessFinalized");
     cb(4, "done", undefined, r.hash);
-    return { ok: Boolean(ev.args.ok), readyAt: Number(ev.args.readyAt), hash: r.hash };
+    return { ok: Boolean(ev.args.ok), readyAt: Number(ev.args.readyAt), hash: r.hash, receipt: r };
   });
   if (!fin.ok) {
     const ts = await acct(account, ctx.read).trackState(TRACK_OWNER);
     throw new WrongPin(Number(ts[1]), Number(ts[0]));
   }
-  return { opId: opened.opId, readyAt: fin.readyAt, hash: fin.hash };
+  return { opId: opened.opId, readyAt: fin.readyAt, hash: fin.hash, receipt: fin.receipt };
 }
 
 /**
@@ -719,4 +789,364 @@ export async function changePinWithPin(ctx: Ctx, account: string, currentPin: st
 export async function deposit(ctx: Ctx, account: string, wei: bigint, st: Status): Promise<string> {
   const r = await sendTx(ctx.w, ctx.read, { to: account, value: wei }, st);
   return r.hash;
+}
+
+// ───────────────────────────── private mode (optional) ─────────────────────────────
+
+const pacct = (addr: string, runner: ethers.ContractRunner) => new ethers.Contract(addr, ACCOUNT_P_ABI as any, runner);
+const CTOKEN_ABI = [
+  "function confidentialBalanceOf(address) view returns (bytes32)",
+  "function wrap(address to, uint256 amount)",
+  "function rate() view returns (uint256)",
+  "event ConfidentialTransfer(address indexed from, address indexed to, bytes32 indexed amount)",
+];
+const ERC20_ABI = ["function mint(address to, uint256 amount)", "function approve(address spender, uint256 amount) returns (bool)", "event Transfer(address indexed from, address indexed to, uint256 value)"];
+const CIFACE = new ethers.Interface(CTOKEN_ABI);
+const EIFACE = new ethers.Interface(ERC20_ABI);
+
+/** The private op sub-types (AccountStorage.A_PRIVATE_*) and the account's PIN change, which private mode makes duress-aware. */
+export const PRIVATE_SUB = { transfer: 22, view: 23, reset: 24, setDuress: 25 } as const;
+export const SUB_PIN_CHANGE = 5;
+export const isPrivateSub = (sub?: number) => sub !== undefined && sub >= PRIVATE_SUB.transfer && sub <= PRIVATE_SUB.setDuress;
+
+/** The guardian of a new private-mode account: the watchtower, when one is configured (it may read the key-only counter
+ *  and restrict the account, never move funds). */
+function guardianP(): string {
+  return WATCHTOWER.address && ethers.isAddress(WATCHTOWER.address) ? ethers.getAddress(WATCHTOWER.address) : ethers.ZeroAddress;
+}
+
+/** Only a private-mode account (EncryptedAccountP) answers privateModule(); a standard account has no such function. */
+export async function isPrivateAccount(read: ethers.JsonRpcProvider, address: string): Promise<boolean> {
+  try {
+    return String(await new ethers.Contract(address, ["function privateModule() view returns (address)"], read).privateModule()) !== ethers.ZeroAddress;
+  } catch (e) {
+    if (missingFunction(e)) return false;
+    throw e;
+  }
+}
+
+export type PrivateInfo = {
+  configured: boolean;
+  /** The account's cUSDC balance handle (zero: it never held any). The value needs a PIN view. */
+  balanceHandle: string;
+  /** Seconds a PIN-verified private send waits (at least 72 hours) and a duress change waits. */
+  transferDelay: number;
+  settingsDelay: number;
+};
+
+export async function readPrivate(read: ethers.JsonRpcProvider, account: string): Promise<PrivateInfo> {
+  const a = pacct(account, read);
+  const [ps, bal, dT, dS] = await Promise.all([
+    a.privateState(CUSDC),
+    new ethers.Contract(CUSDC, CTOKEN_ABI, read).confidentialBalanceOf(account),
+    a.privateDelay(PRIVATE_SUB.transfer),
+    a.privateDelay(PRIVATE_SUB.setDuress),
+  ]);
+  return { configured: Boolean(ps[0]), balanceHandle: String(bal), transferDelay: Number(dT), settingsDelay: Number(dS) };
+}
+
+/**
+ * What this device keeps for a private-mode account: L_min and the known recipient (to route sends), today's key-only
+ * sends (amounts within L_min), and scheduled PIN sends WITHOUT their amounts. Never the duress setting, the decoy or a
+ * balance: someone who forces the owner to open this app must not find the real figures here.
+ */
+export type PendingPrivate = { opId: string; to: string; readyAt: number; hash: string };
+export type KSend = SendRecord & { to: string; hash: string };
+export type PrivLocal = { lmin: string | null; known: string[]; sends: KSend[]; pending: PendingPrivate[] };
+const privKey = (account: string) => "ea:private:" + account.toLowerCase();
+
+export function loadPrivLocal(account: string): PrivLocal {
+  let p: Partial<PrivLocal> = {};
+  try {
+    p = JSON.parse(localStorage.getItem(privKey(account)) ?? "{}") ?? {};
+  } catch {
+    /* no storage */
+  }
+  const today = utcDay(Date.now());
+  return {
+    lmin: typeof p.lmin === "string" ? p.lmin : null,
+    known: Array.isArray(p.known) ? p.known.filter((k) => ethers.isAddress(k)) : [],
+    sends: Array.isArray(p.sends) ? p.sends.filter((r) => r && r.day === today) : [], // only today's are needed (and kept)
+    pending: Array.isArray(p.pending) ? p.pending : [],
+  };
+}
+
+function savePrivLocal(account: string, p: PrivLocal) {
+  try {
+    localStorage.setItem(privKey(account), JSON.stringify(p));
+  } catch {
+    /* private window: every send takes the PIN path */
+  }
+}
+
+/** Ops of the pending list that already ran or were cancelled are dropped (status read on-chain). */
+export async function refreshPending(read: ethers.JsonRpcProvider, account: string): Promise<PendingPrivate[]> {
+  const p = loadPrivLocal(account);
+  const keep: PendingPrivate[] = [];
+  for (const x of p.pending) {
+    try {
+      const st = Number((await acct(account, read).getOp(BigInt(x.opId))).status);
+      if (st === 4) keep.push(x); // Delayed: verified, waiting for its time
+    } catch {
+      keep.push(x); // unreadable now: keep it
+    }
+  }
+  savePrivLocal(account, { ...loadPrivLocal(account), pending: keep });
+  return keep;
+}
+
+/** User decryption of a handle the account allowed to the owner (Zama's KMS client, loaded on demand). */
+async function decryptForOwner(ctx: Ctx, handle: string, account: string, st: Status): Promise<bigint> {
+  st("Loading the decryption code…");
+  const url = (window as any).__EA_DECRYPT_URL as string | undefined;
+  if (!url) throw new Error("The decryption module is not available in this build.");
+  const mod: any = await import(/* @vite-ignore */ url);
+  st("Sign the decryption permit in your wallet…");
+  return BigInt(await mod.userDecrypt(ctx.read, ctx.w.signer, ctx.w.address, handle, account, (t: string) => st(t)));
+}
+
+export const PRIVATE_VIEW_STEPS = [
+  "Open the balance view",
+  "Encrypt your PIN guess",
+  "Submit the encrypted guess with its bond",
+  "Zama decrypts only the yes/no result",
+  "Record the result: a balance snapshot is made for you",
+  "Decrypt the snapshot in this page",
+] as const;
+
+/**
+ * PIN-gated balance view: the correct PIN makes a fresh encrypted snapshot that only the owner may decrypt (no delay).
+ * Under the duress PIN the snapshot shows at most the decoy, with the same transactions and events.
+ */
+export async function privateViewWithPin(ctx: Ctx, account: string, pin: string, cb: StepCb, bondShown?: bigint): Promise<bigint> {
+  const step = stepper(cb);
+  const open = (st: Status) => sendTx(ctx.w, ctx.read, { to: account, data: PIFACE.encodeFunctionData("openPrivateView", [CUSDC]) }, st);
+  let op: Awaited<ReturnType<typeof verifyWithPin>>;
+  try {
+    op = await verifyWithPin(ctx, account, open, pin, cb, step, bondShown);
+  } catch (e) {
+    if (e instanceof WrongPin) cb(5, "skip", "Not shown: wrong PIN");
+    throw e;
+  }
+  return await step(5, async (st) => {
+    const h = privateResult(op.receipt, account, op.opId);
+    if (!h || h === ZERO32) throw new Error("The snapshot was not made (the view did not run).");
+    const v = await decryptForOwner(ctx, h, account, st);
+    cb(5, "done");
+    return v;
+  });
+}
+
+/** The result handle of a private op (PrivateOpExecuted) in a receipt. */
+function privateResult(r: ethers.TransactionReceipt, account: string, opId: bigint): string | null {
+  for (const log of r.logs) {
+    if (log.address.toLowerCase() !== account.toLowerCase()) continue;
+    try {
+      const ev = PIFACE.parseLog(log);
+      if (ev?.name === "PrivateOpExecuted" && BigInt(ev.args.opId) === opId) return String(ev.args.result);
+    } catch {
+      /* another event */
+    }
+  }
+  return null;
+}
+
+/**
+ * Key-only private send: one transaction, nothing decrypted. The hidden limit, the tripwire and the known list are applied
+ * under encryption; a send that breaks one moves an encrypted zero. The key learns nothing; the watchtower does.
+ */
+export async function privateSendKOnly(ctx: Ctx, account: string, to: string, units: bigint, st: Status): Promise<string> {
+  st("Encrypting the amount…");
+  const enc = await encrypt(ctx.read, [{ type: "euint64", value: units }], account, ctx.w.address);
+  const r = await sendTx(ctx.w, ctx.read, { to: account, data: PIFACE.encodeFunctionData("privateTransfer", [CUSDC, to, enc.handles[0], enc.inputProof]) }, st);
+  const p = loadPrivLocal(account);
+  savePrivLocal(account, { ...p, sends: [...p.sends, { day: utcDay(Date.now()), amount: units.toString(), to, hash: r.hash }] });
+  return r.hash;
+}
+
+export const PRIVATE_SEND_STEPS = [
+  "Open the private transfer (the amount goes encrypted)",
+  "Encrypt your PIN guess",
+  "Submit the encrypted guess with its bond",
+  "Zama decrypts only the yes/no result",
+  "Record the result on-chain",
+  "Scheduled: it waits at least 72 hours",
+] as const;
+
+/** PIN-verified private send: after the PIN it waits at least 72 hours (the long class), then executePrivate sends it. */
+export async function privateSendWithPin(ctx: Ctx, account: string, to: string, units: bigint, pin: string, cb: StepCb, bondShown?: bigint): Promise<PendingPrivate> {
+  const step = stepper(cb);
+  const open = async (st: Status) => {
+    st("Encrypting the amount…");
+    const enc = await encrypt(ctx.read, [{ type: "euint64", value: units }], account, ctx.w.address);
+    return sendTx(ctx.w, ctx.read, { to: account, data: PIFACE.encodeFunctionData("openPrivateTransfer", [CUSDC, to, enc.handles[0], enc.inputProof]) }, st);
+  };
+  let op: Awaited<ReturnType<typeof verifyWithPin>>;
+  try {
+    op = await verifyWithPin(ctx, account, open, pin, cb, step, bondShown);
+  } catch (e) {
+    if (e instanceof WrongPin) cb(5, "skip", "Not scheduled: wrong PIN");
+    throw e;
+  }
+  const pend: PendingPrivate = { opId: op.opId.toString(), to, readyAt: op.readyAt, hash: op.hash };
+  const p = loadPrivLocal(account);
+  savePrivLocal(account, { ...p, pending: [...p.pending.filter((x) => x.opId !== pend.opId), pend] });
+  cb(5, "done", "Can be sent from " + new Date(op.readyAt * 1000).toLocaleString());
+  return pend;
+}
+
+/** Sends a verified private transfer once its time has come (executeOp is permissionless). */
+export async function executePrivate(ctx: Ctx, account: string, opId: bigint, st: Status): Promise<string> {
+  const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("executeOp", [opId]) }, st);
+  eventOf(r, account, "OpExecuted");
+  const p = loadPrivLocal(account);
+  savePrivLocal(account, { ...p, pending: p.pending.filter((x) => BigInt(x.opId) !== opId) });
+  return r.hash;
+}
+
+export const DURESS_STEPS = [
+  "Open the change (it goes encrypted)",
+  "Encrypt your PIN guess",
+  "Submit the encrypted guess with its bond",
+  "Zama decrypts only the yes/no result",
+  "Record the result on-chain",
+  "Wait the delay, then apply it",
+] as const;
+
+/**
+ * Sets (with a decoy cap) or removes the duress PIN: the current PIN, then the settings delay. Both look the same on-chain
+ * (without a duress PIN the slot takes on-chain randomness). Run under the duress PIN, it changes nothing.
+ */
+export async function setDuressWithPin(ctx: Ctx, account: string, pin: string, duress: { pin: string; decoyUnits: bigint } | null, cb: StepCb, bondShown?: bigint): Promise<string> {
+  const step = stepper(cb);
+  const open = async (st: Status) => {
+    st(duress ? "Deriving the duress fingerprint (Argon2id)…" : "Preparing…");
+    const cand = duress ? await pinFingerprint(duress.pin, CHAIN_ID, account) : randomUint64();
+    st("Encrypting…");
+    const enc = await encrypt(
+      ctx.read,
+      [
+        { type: "euint64", value: cand },
+        { type: "ebool", value: duress !== null },
+        { type: "euint64", value: duress ? duress.decoyUnits : 0n }, // removed: the cap no longer matters (0, fail closed)
+      ],
+      account,
+      ctx.w.address,
+    );
+    return sendTx(ctx.w, ctx.read, { to: account, data: PIFACE.encodeFunctionData("openSetDuress", [CUSDC, enc.handles[0], enc.handles[1], enc.handles[2], enc.inputProof]) }, st);
+  };
+  let op: Awaited<ReturnType<typeof verifyWithPin>>;
+  try {
+    op = await verifyWithPin(ctx, account, open, pin, cb, step, bondShown);
+  } catch (e) {
+    if (e instanceof WrongPin) cb(5, "skip", "Not changed: wrong PIN");
+    throw e;
+  }
+  return await waitAndExecute(ctx, account, op, cb, step);
+}
+
+export const RESET_STEPS = ["Open the tripwire reset", "Encrypt your PIN guess", "Submit the encrypted guess with its bond", "Zama decrypts only the yes/no result", "Record the result: the counter restarts"] as const;
+
+/** PIN-gated reset of the private tripwire (no delay): the key-only counter restarts and a new tripwire is drawn. */
+export async function privateResetWithPin(ctx: Ctx, account: string, pin: string, cb: StepCb, bondShown?: bigint): Promise<string> {
+  const open = (st: Status) => sendTx(ctx.w, ctx.read, { to: account, data: PIFACE.encodeFunctionData("openPrivateReset", [CUSDC]) }, st);
+  const op = await verifyWithPin(ctx, account, open, pin, cb, stepper(cb), bondShown);
+  return op.hash;
+}
+
+async function waitAndExecute(ctx: Ctx, account: string, op: { opId: bigint; readyAt: number }, cb: StepCb, step: Step): Promise<string> {
+  return await step(5, async (st) => {
+    for (;;) {
+      const now = (await ctx.read.getBlock("latest"))?.timestamp ?? 0;
+      if (now >= op.readyAt) break;
+      st("Waiting period: " + (op.readyAt - now) + " s");
+      await sleep(4000);
+    }
+    const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("executeOp", [op.opId]) }, st);
+    eventOf(r, account, "OpExecuted");
+    cb(5, "done", undefined, r.hash);
+    return r.hash;
+  });
+}
+
+/**
+ * After the escape delay, moves the whole private balance to the escape address: no PIN, anyone may send it. It needs
+ * Zama's FHE contracts on-chain; the ETH escape (executeEscape) does not.
+ */
+export async function sweepPrivateToEscape(ctx: Ctx, account: string, st: Status): Promise<string> {
+  const r = await sendTx(ctx.w, ctx.read, { to: account, data: PIFACE.encodeFunctionData("executeEscapeConfidential", [[CUSDC]]) }, st);
+  return r.hash;
+}
+
+/**
+ * Test cUSDC for a private-mode account: mint the wrapper's test USDC to the wallet, approve, and wrap it straight to the
+ * account (3 transactions). The wrapped amount is public: it is a "shield" in the account's public history.
+ */
+export async function getTestCusdc(ctx: Ctx, account: string, units: bigint, st: Status): Promise<string> {
+  st("1/3 · Minting test USDC to your wallet…");
+  await sendTx(ctx.w, ctx.read, { to: USDC_MOCK, data: EIFACE.encodeFunctionData("mint", [ctx.w.address, units]) }, st);
+  st("2/3 · Approving the cUSDC wrapper…");
+  await sendTx(ctx.w, ctx.read, { to: USDC_MOCK, data: EIFACE.encodeFunctionData("approve", [CUSDC, units]) }, st);
+  st("3/3 · Wrapping it into the account…");
+  const r = await sendTx(ctx.w, ctx.read, { to: CUSDC, data: CIFACE.encodeFunctionData("wrap", [account, units]) }, st);
+  return r.hash;
+}
+
+/**
+ * The account's public cUSDC history, from the token's events: shields (wraps into the account, public amounts) and
+ * private transfers out and in (amounts hidden). This is what a coercer can read; the decoy is judged against it.
+ */
+export async function privateHistory(read: ethers.JsonRpcProvider, account: string): Promise<PrivateHistoryEvent[]> {
+  const topic = CIFACE.getEvent("ConfidentialTransfer")!.topicHash;
+  const pad = ethers.zeroPadValue(account, 32);
+  const from = FACTORY_P_DEPLOY_BLOCK || LOGS_FROM_BLOCK;
+  const latest = await read.getBlockNumber();
+  const [ins, outs] = await Promise.all([
+    getLogsChunked(read, { address: CUSDC, topics: [topic, null, pad] }, from, latest),
+    getLogsChunked(read, { address: CUSDC, topics: [topic, pad] }, from, latest),
+  ]);
+  let rate = 1n;
+  try {
+    rate = BigInt(await new ethers.Contract(CUSDC, CTOKEN_ABI, read).rate()) || 1n;
+  } catch {
+    /* the official wrapper's rate is 1 (6 decimals on both sides) */
+  }
+  const out: PrivateHistoryEvent[] = [];
+  for (const l of ins) {
+    const fromAddr = ethers.getAddress(ethers.dataSlice(l.topics[1], 12));
+    if (fromAddr !== ethers.ZeroAddress) {
+      out.push({ kind: "in", block: l.blockNumber });
+      continue;
+    }
+    // a wrap: its public amount is the underlying USDC moved to the wrapper in the same transaction
+    const rc = await read.getTransactionReceipt(l.transactionHash);
+    let amt = 0n;
+    for (const x of rc?.logs ?? []) {
+      if (x.address.toLowerCase() !== USDC_MOCK.toLowerCase()) continue;
+      try {
+        const ev = EIFACE.parseLog(x);
+        if (ev?.name === "Transfer" && String(ev.args.to).toLowerCase() === CUSDC.toLowerCase()) amt += BigInt(ev.args.value);
+      } catch {
+        /* another event */
+      }
+    }
+    out.push({ kind: "shield", amount: amt / rate, block: l.blockNumber });
+  }
+  for (const l of outs) out.push({ kind: "out", block: l.blockNumber });
+  return out;
+}
+
+/** A watchtower notice about a key-only private send (the SDK watchtower's private-* alerts, published as JSON). */
+export type PrivateNotice = { kind: "private-delivered" | "private-silent-zero" | "private-tripwire"; to?: string; moved?: string; tripped?: boolean; txHash?: string; at?: number };
+
+/**
+ * The watchtower's notices for this account, when one is configured (WATCHTOWER.noticesUrl, with {account} in it);
+ * null when none is: then a key-only send is confirmed only by a PIN view.
+ */
+export async function loadWatchtowerNotices(account: string): Promise<PrivateNotice[] | null> {
+  if (!WATCHTOWER.noticesUrl) return null;
+  const r = await fetch(WATCHTOWER.noticesUrl.replace("{account}", account.toLowerCase()), { cache: "no-store" });
+  if (!r.ok) throw new Error("The watchtower answered " + r.status);
+  const j = await r.json();
+  return (Array.isArray(j) ? j : []).filter((n: any) => n && typeof n.kind === "string" && n.kind.startsWith("private-"));
 }

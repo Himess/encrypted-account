@@ -1,0 +1,3973 @@
+{
+  "libraries": {
+    "addresses": {
+      "PinLib": "0xe9eFae2f9C11cF7319a7eca23847ff5C99E197FB",
+      "PolicyLib": "0x8029e4f3bdD913b0Ab35e8DBF6B7b8c7B16dDA75",
+      "OpenLib": "0xA72C37Ee7305A2c79b57e3d5456b9C3804366c15",
+      "OpsLib": "0x537EC15E00fdf6e9Cb8d3BF5d0F46A06A09A7fA2"
+    },
+    "sameCode": {
+      "PinLib": true,
+      "PolicyLib": true,
+      "OpenLib": true,
+      "OpsLib": true
+    }
+  },
+  "registry": {
+    "registry": "0x2f0750Bbb0A246059d80e94c454586a7F27a128e",
+    "underlying": "0x9b5Cd13b8eFbB58Dc25A05CF411D8056058aDFfF",
+    "wrapper": "0x7c5BF43B851c1dff1a4feE8dB225b87f2C223639",
+    "valid": true
+  },
+  "contracts": {
+    "PrivateModule": "0x95c6c6D4678363D60a7dcDF81F2803D21fA965bd",
+    "EncryptedAccountP": "0x8986339Af3b49c1506B064a90C8BCFD74814e19b",
+    "EncryptedAccountFactory": "0xE93F23487c9aa1ab5acE4401d7FF957aF85FC92E"
+  },
+  "deploys": {
+    "PrivateModule": {
+      "label": "deploy PrivateModule",
+      "hash": "0xff85d0a318939b62b3973d8cf49bdd7190d101ca435ad49993251ba72c776c75",
+      "nonce": 568,
+      "blockNumber": 12143703,
+      "blockTimestamp": 1794788064,
+      "sentAtUtc": "2026-11-16T00:14:11.019Z",
+      "minedSeenAtUtc": "2026-11-16T00:14:25.922Z",
+      "inclusionMs": 14784,
+      "gasUsed": "19930893",
+      "effectiveGasPriceWei": "50000017",
+      "costWei": "996544988825181",
+      "replacements": 0,
+      "runtimeBytes": 12755
+    },
+    "EncryptedAccountP": {
+      "label": "deploy EncryptedAccountP",
+      "hash": "0x61edafa7f03d96666a22b703f494e4f2434a08aa5d221fae4961222e9588face",
+      "nonce": 569,
+      "blockNumber": 12143704,
+      "blockTimestamp": 1794788076,
+      "sentAtUtc": "2026-11-16T00:14:25.930Z",
+      "minedSeenAtUtc": "2026-11-16T00:14:36.470Z",
+      "inclusionMs": 10435,
+      "gasUsed": "37669273",
+      "effectiveGasPriceWei": "50000017",
+      "costWei": "1883464290377641",
+      "replacements": 0,
+      "runtimeBytes": 24153
+    },
+    "EncryptedAccountFactory": {
+      "label": "deploy EncryptedAccountFactory",
+      "hash": "0x8278b6cc1dcd3e6bb3b0e4adb8a280affca15949d667a5bbfb3cf1d9550ca063",
+      "nonce": 570,
+      "blockNumber": 12143705,
+      "blockTimestamp": 1794788088,
+      "sentAtUtc": "2026-11-16T00:14:36.473Z",
+      "minedSeenAtUtc": "2026-11-16T00:14:48.922Z",
+      "inclusionMs": 12353,
+      "gasUsed": "3097426",
+      "effectiveGasPriceWei": "50000017",
+      "costWei": "154871352656242",
+      "replacements": 0,
+      "runtimeBytes": 1868
+    }
+  },
+  "account": {
+    "address": "0x957D4b94eec400bFcC2E02820D9Ac36F7b8b2AE7",
+    "salt": "0x09e896edfeb6838d5168da92b1b5913f5f536cad917d29d5331a6baf0ba4ebe2",
+    "escape": "0x68c24F8B81ce1bd67f2E274dA1036101593b4e38",
+    "guardian": "0x8e98d5e45822b81Ac7dB853480c405E8Ea769B7A",
+    "friend": "0x4710A2D0f5d97F30147f8c35f7969f62Bcce5193",
+    "delays": {
+      "pinTransfer": 0,
+      "bigTransfer": 259200,
+      "genericCall": 60,
+      "settings": 60,
+      "loosen": 60,
+      "knownAdd": 60,
+      "recovery": 120,
+      "recoveryNoDevice": 300,
+      "pinReset": 300,
+      "escape": 300,
+      "escapeChange": 300
+    },
+    "setup": {
+      "createAccount": {
+        "label": "createAccount",
+        "hash": "0x2d50b820cb5712c139b7e2ebb34465e56074332bbe540714ccde45debca16fdc",
+        "nonce": 571,
+        "blockNumber": 12143706,
+        "blockTimestamp": 1794788100,
+        "sentAtUtc": "2026-11-16T00:14:49.214Z",
+        "minedSeenAtUtc": "2026-11-16T00:14:58.445Z",
+        "inclusionMs": 9108,
+        "gasUsed": "1308633",
+        "effectiveGasPriceWei": "50000017",
+        "costWei": "65431672246761",
+        "replacements": 0,
+        "sentBlock": 12143705,
+        "blocksToInclusion": 1,
+        "wallMs": 9402,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        }
+      },
+      "setupPin": {
+        "label": "setupPin",
+        "hash": "0xa5c5d02e8d20e6aa40b2551e6ba0253fc905ea60f3c7e60c9f2c509dd1571e5e",
+        "nonce": 572,
+        "blockNumber": 12143708,
+        "blockTimestamp": 1794788124,
+        "sentAtUtc": "2026-11-16T00:15:11.057Z",
+        "minedSeenAtUtc": "2026-11-16T00:15:22.567Z",
+        "inclusionMs": 11396,
+        "gasUsed": "842459",
+        "effectiveGasPriceWei": "50000017",
+        "costWei": "42122964321803",
+        "replacements": 0,
+        "sentBlock": 12143706,
+        "blocksToInclusion": 2,
+        "wallMs": 11709,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 79000,
+          "depth": 79000,
+          "fheOps": 5,
+          "blockMeter": 79000,
+          "blockFheTxs": 1,
+          "blockComputed": 79000,
+          "meterCheck": "equal"
+        },
+        "encrypt": {
+          "totalMs": 5105,
+          "relayerHttpMs": 418,
+          "localMs": 4687,
+          "httpCalls": 2
+        }
+      },
+      "setupAssetEth": {
+        "label": "setupAsset ETH",
+        "hash": "0x2915eb0625a23911fbcb90326a300ed8c8a00046234a342e16ee67fb8f0bab57",
+        "nonce": 573,
+        "blockNumber": 12143709,
+        "blockTimestamp": 1794788136,
+        "sentAtUtc": "2026-11-16T00:15:27.769Z",
+        "minedSeenAtUtc": "2026-11-16T00:15:37.025Z",
+        "inclusionMs": 9150,
+        "gasUsed": "1959589",
+        "effectiveGasPriceWei": "50000017",
+        "costWei": "97979483313013",
+        "replacements": 0,
+        "sentBlock": 12143708,
+        "blocksToInclusion": 1,
+        "wallMs": 9476,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 1345064,
+          "depth": 1322000,
+          "fheOps": 12,
+          "blockMeter": 1345064,
+          "blockFheTxs": 1,
+          "blockComputed": 1345064,
+          "meterCheck": "equal"
+        },
+        "encrypt": {
+          "totalMs": 4753,
+          "relayerHttpMs": 569,
+          "localMs": 4184,
+          "httpCalls": 2
+        }
+      },
+      "setupKnownR0": {
+        "label": "setupKnown R0",
+        "hash": "0x637308db8f15c592e298732d3c643ecb065744e8b5fea2f17112fec115cb7b4b",
+        "nonce": 574,
+        "blockNumber": 12143710,
+        "blockTimestamp": 1794788148,
+        "sentAtUtc": "2026-11-16T00:15:42.749Z",
+        "minedSeenAtUtc": "2026-11-16T00:15:49.474Z",
+        "inclusionMs": 6602,
+        "gasUsed": "3787620",
+        "effectiveGasPriceWei": "50000017",
+        "costWei": "189381064389540",
+        "replacements": 0,
+        "sentBlock": 12143709,
+        "blocksToInclusion": 1,
+        "wallMs": 7107,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 12,
+          "blockMeter": 0,
+          "blockFheTxs": 1,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "encrypt": {
+          "totalMs": 5129,
+          "relayerHttpMs": 804,
+          "localMs": 4325,
+          "httpCalls": 2
+        }
+      },
+      "setupKnownR12": {
+        "label": "setupKnown R12",
+        "hash": "0xd3f6b08885b7c92ebdcbd4503089b7dcb629c5e1aff88635bb56934a6ee8027b",
+        "nonce": 575,
+        "blockNumber": 12143711,
+        "blockTimestamp": 1794788160,
+        "sentAtUtc": "2026-11-16T00:15:54.802Z",
+        "minedSeenAtUtc": "2026-11-16T00:15:57.994Z",
+        "inclusionMs": 3076,
+        "gasUsed": "3787668",
+        "effectiveGasPriceWei": "50000017",
+        "costWei": "189383464390356",
+        "replacements": 0,
+        "sentBlock": 12143710,
+        "blocksToInclusion": 1,
+        "wallMs": 3387,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 12,
+          "blockMeter": 0,
+          "blockFheTxs": 1,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "encrypt": {
+          "totalMs": 4872,
+          "relayerHttpMs": 558,
+          "localMs": 4314,
+          "httpCalls": 2
+        }
+      },
+      "setupKnownR24": {
+        "label": "setupKnown R24",
+        "hash": "0x4186e10f27294ffe1f196f13f6c4c05c0a151ad3051c2e7452578141fe677e83",
+        "nonce": 576,
+        "blockNumber": 12143712,
+        "blockTimestamp": 1794788172,
+        "sentAtUtc": "2026-11-16T00:16:02.884Z",
+        "minedSeenAtUtc": "2026-11-16T00:16:10.104Z",
+        "inclusionMs": 7122,
+        "gasUsed": "2033684",
+        "effectiveGasPriceWei": "50000017",
+        "costWei": "101684234572628",
+        "replacements": 0,
+        "sentBlock": 12143711,
+        "blocksToInclusion": 1,
+        "wallMs": 7404,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 6,
+          "blockMeter": 162032,
+          "blockFheTxs": 2,
+          "blockComputed": 162032,
+          "meterCheck": "equal"
+        },
+        "encrypt": {
+          "totalMs": 4491,
+          "relayerHttpMs": 223,
+          "localMs": 4268,
+          "httpCalls": 2
+        }
+      },
+      "setupKnownS0": {
+        "label": "setupKnown S0",
+        "hash": "0x28441ed58dde8a5d04d02ba44a28dad0c8c0b6aa0976abe9d882cc1e84cc07ed",
+        "nonce": 577,
+        "blockNumber": 12143713,
+        "blockTimestamp": 1794788184,
+        "sentAtUtc": "2026-11-16T00:16:15.710Z",
+        "minedSeenAtUtc": "2026-11-16T00:16:25.419Z",
+        "inclusionMs": 9612,
+        "gasUsed": "3235308",
+        "effectiveGasPriceWei": "50000017",
+        "costWei": "161765455000236",
+        "replacements": 0,
+        "sentBlock": 12143712,
+        "blocksToInclusion": 1,
+        "wallMs": 10066,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 10,
+          "blockMeter": 0,
+          "blockFheTxs": 1,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "encrypt": {
+          "totalMs": 4997,
+          "relayerHttpMs": 611,
+          "localMs": 4386,
+          "httpCalls": 2
+        }
+      },
+      "privateSetupAsset": {
+        "label": "privateSetupAsset cUSDC",
+        "hash": "0x629a963f05dfc869dba594996bb8e68a95f7f4af856f51643886051084a26bf8",
+        "nonce": 578,
+        "blockNumber": 12143714,
+        "blockTimestamp": 1794788196,
+        "sentAtUtc": "2026-11-16T00:16:30.672Z",
+        "minedSeenAtUtc": "2026-11-16T00:16:35.362Z",
+        "inclusionMs": 4592,
+        "gasUsed": "1876104",
+        "effectiveGasPriceWei": "50000017",
+        "costWei": "93805231893768",
+        "replacements": 0,
+        "sentBlock": 12143713,
+        "blocksToInclusion": 1,
+        "wallMs": 4901,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 1645064,
+          "depth": 1472000,
+          "fheOps": 14,
+          "blockMeter": 1645064,
+          "blockFheTxs": 1,
+          "blockComputed": 1645064,
+          "meterCheck": "equal"
+        },
+        "encrypt": {
+          "totalMs": 4829,
+          "relayerHttpMs": 601,
+          "localMs": 4228,
+          "httpCalls": 2
+        }
+      },
+      "arm": {
+        "label": "arm",
+        "hash": "0x1e9174ac63758d7a0517248d94941d001bdd02fa5be7f2d2e0ab36661c612ea3",
+        "nonce": 579,
+        "blockNumber": 12143715,
+        "blockTimestamp": 1794788208,
+        "sentAtUtc": "2026-11-16T00:16:35.771Z",
+        "minedSeenAtUtc": "2026-11-16T00:16:48.451Z",
+        "inclusionMs": 12575,
+        "gasUsed": "69385",
+        "effectiveGasPriceWei": "50000017",
+        "costWei": "3469251179545",
+        "replacements": 0,
+        "sentBlock": 12143714,
+        "blocksToInclusion": 1,
+        "wallMs": 12864,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        }
+      },
+      "mintUsdc": {
+        "label": "USDC mock mint",
+        "hash": "0x595fbc9a732b1b790ffe11d996b595d2ae179ce362f2970b12dbe81924a9bd09",
+        "nonce": 580,
+        "blockNumber": 12143716,
+        "blockTimestamp": 1794788220,
+        "sentAtUtc": "2026-11-16T00:16:48.878Z",
+        "minedSeenAtUtc": "2026-11-16T00:16:58.736Z",
+        "inclusionMs": 9748,
+        "gasUsed": "140988",
+        "effectiveGasPriceWei": "50000017",
+        "costWei": "7049402396796",
+        "replacements": 0,
+        "sentBlock": 12143715,
+        "blocksToInclusion": 1,
+        "wallMs": 10056,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        }
+      },
+      "approveUsdc": {
+        "label": "USDC approve",
+        "hash": "0x2fbaa40b1574b7c87379fa06b10037c60a7ccd7da3e70ec022f809fd9bbf69ea",
+        "nonce": 581,
+        "blockNumber": 12143717,
+        "blockTimestamp": 1794788232,
+        "sentAtUtc": "2026-11-16T00:16:59.100Z",
+        "minedSeenAtUtc": "2026-11-16T00:17:12.273Z",
+        "inclusionMs": 13073,
+        "gasUsed": "128285",
+        "effectiveGasPriceWei": "50000017",
+        "costWei": "6414252180845",
+        "replacements": 0,
+        "sentBlock": 12143716,
+        "blocksToInclusion": 1,
+        "wallMs": 13356,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        }
+      },
+      "wrapToAccount": {
+        "label": "cUSDC wrap → account",
+        "hash": "0xaba7a8d0819debbb146d8f09e83b872796d3541890fe1f45cba9795b26c0f313",
+        "nonce": 582,
+        "blockNumber": 12143718,
+        "blockTimestamp": 1794788244,
+        "sentAtUtc": "2026-11-16T00:17:12.647Z",
+        "minedSeenAtUtc": "2026-11-16T00:17:22.245Z",
+        "inclusionMs": 9498,
+        "gasUsed": "921503",
+        "effectiveGasPriceWei": "50000017",
+        "costWei": "46075165665551",
+        "replacements": 0,
+        "sentBlock": 12143717,
+        "blocksToInclusion": 1,
+        "wallMs": 9782,
+        "status": 1,
+        "estimateRetries": 0,
+        "hcu": {
+          "total": 586096,
+          "depth": 531032,
+          "fheOps": 8,
+          "blockMeter": 586096,
+          "blockFheTxs": 1,
+          "blockComputed": 586096,
+          "meterCheck": "equal"
+        }
+      }
+    }
+  },
+  "refunded": "22000000000000000",
+  "t3": [
+    {
+      "k": 1,
+      "mode": "real",
+      "amount": "100000000",
+      "opId": "1",
+      "block": 12143743,
+      "readyAt": "1795047744",
+      "result": null,
+      "doneMs": 33988,
+      "fingerprintMs": 205,
+      "encrypt": {
+        "totalMs": 4681,
+        "relayerHttpMs": 472,
+        "localMs": 4209,
+        "httpCalls": 2
+      },
+      "bond": "1000000000000000",
+      "guessSeen": {
+        "hash": "0x4b70deae8d8abc725676a0450023f3f9c2f4d9e13cf9c6018a6dff677d3f3360",
+        "block": 12143742,
+        "seenAt": 1794788530569,
+        "blockTs": 1794788532
+      },
+      "finSeen": {
+        "hash": "0x049787c41f932239101bae986eb4a30bce70e7bd2ff18dfdd40232f8abe9af39",
+        "block": 12143743,
+        "seenAt": 1794788542696,
+        "blockTs": 1794788544
+      },
+      "open": {
+        "hash": "0x8f7631f97f8050378360edbb40ad9bca36309b2fd14204949ffc3f22b4db25f1",
+        "gasUsed": "1042251",
+        "wallMs": 10743,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 1,
+          "blockMeter": 0,
+          "blockFheTxs": 1,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 1042251,
+          "calldataLen": 420,
+          "zeroBytes": 127,
+          "exec": 1016055,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT"
+          ]
+        }
+      },
+      "guess": {
+        "hash": "0x4b70deae8d8abc725676a0450023f3f9c2f4d9e13cf9c6018a6dff677d3f3360",
+        "gasUsed": "1337007",
+        "wallMs": 6317,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 1377194,
+          "blockFheTxs": 2,
+          "blockComputed": 1377194,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 1337007,
+          "calldataLen": 420,
+          "zeroBytes": 158,
+          "exec": 1311183,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 5043,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0x049787c41f932239101bae986eb4a30bce70e7bd2ff18dfdd40232f8abe9af39",
+        "gasUsed": "558889",
+        "wallMs": 6980,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 558889,
+          "calldataLen": 708,
+          "zeroBytes": 240,
+          "exec": 529441,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "exec": null
+    },
+    {
+      "k": 2,
+      "mode": "duress",
+      "amount": "100000000",
+      "opId": "2",
+      "block": 12143747,
+      "readyAt": "1795047792",
+      "result": null,
+      "doneMs": null,
+      "recovered": "an RPC error stopped the run after this op reached the chain; recorded from its transactions (no client-side times)",
+      "guessSeen": {
+        "hash": "0x671a31f9fb92889d12755186c7c7330837c15bd0098a1c96552607f0e4dcf0da",
+        "block": 12143746,
+        "seenAt": null,
+        "blockTs": 1794788580
+      },
+      "finSeen": {
+        "hash": "0x65d2571008e83f1bd017861f3d9fa16e612ff6591eba409453ae48e6363885ab",
+        "block": 12143747,
+        "seenAt": null,
+        "blockTs": 1794788592
+      },
+      "open": {
+        "hash": "0x8934dfce5d4d8cdfe3332af06afacbfdce9d486c6ab7217ca9610c0942d13ac0",
+        "gasUsed": "944319",
+        "wallMs": null,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 1,
+          "blockMeter": 0,
+          "blockFheTxs": 1,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 944319,
+          "calldataLen": 420,
+          "zeroBytes": 128,
+          "exec": 918135,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT"
+          ]
+        }
+      },
+      "guess": {
+        "hash": "0x671a31f9fb92889d12755186c7c7330837c15bd0098a1c96552607f0e4dcf0da",
+        "gasUsed": "847391",
+        "wallMs": null,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 847391,
+          "calldataLen": 420,
+          "zeroBytes": 159,
+          "exec": 821579,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "finalize": {
+        "hash": "0x65d2571008e83f1bd017861f3d9fa16e612ff6591eba409453ae48e6363885ab",
+        "gasUsed": "558889",
+        "wallMs": null,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 558889,
+          "calldataLen": 708,
+          "zeroBytes": 240,
+          "exec": 529441,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "exec": null
+    },
+    {
+      "k": 3,
+      "mode": "real",
+      "amount": "500000000",
+      "opId": "3",
+      "block": 12143763,
+      "readyAt": "1795047996",
+      "result": null,
+      "doneMs": 31376,
+      "fingerprintMs": 209,
+      "encrypt": {
+        "totalMs": 4787,
+        "relayerHttpMs": 592,
+        "localMs": 4195,
+        "httpCalls": 2
+      },
+      "bond": "1000000000000000",
+      "guessSeen": {
+        "hash": "0x41e1789ab41843deee50cca7f7462ea8491d3810fb55e747d7bdb5ef77b09599",
+        "block": 12143762,
+        "seenAt": 1794788784688,
+        "blockTs": 1794788784
+      },
+      "finSeen": {
+        "hash": "0x70f6bf033919d9dbd158e7266ec57ecd8f42018d0f4b620ea9144062d7cb64b4",
+        "block": 12143763,
+        "seenAt": 1794788795140,
+        "blockTs": 1794788796
+      },
+      "open": {
+        "hash": "0x28546891dfee209798207372c60ed538de096de94c20048193f414c153e30586",
+        "gasUsed": "944283",
+        "wallMs": 10879,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 1,
+          "blockMeter": 0,
+          "blockFheTxs": 1,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 944283,
+          "calldataLen": 420,
+          "zeroBytes": 131,
+          "exec": 918135,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT"
+          ]
+        }
+      },
+      "guess": {
+        "hash": "0x41e1789ab41843deee50cca7f7462ea8491d3810fb55e747d7bdb5ef77b09599",
+        "gasUsed": "847403",
+        "wallMs": 5158,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 847403,
+          "calldataLen": 420,
+          "zeroBytes": 158,
+          "exec": 821579,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 2866,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0x70f6bf033919d9dbd158e7266ec57ecd8f42018d0f4b620ea9144062d7cb64b4",
+        "gasUsed": "558901",
+        "wallMs": 7467,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 558901,
+          "calldataLen": 708,
+          "zeroBytes": 239,
+          "exec": 529441,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "exec": null
+    },
+    {
+      "k": 4,
+      "mode": "duress",
+      "amount": "500000000",
+      "opId": "4",
+      "block": 12143767,
+      "readyAt": "1795048044",
+      "result": null,
+      "doneMs": 29271,
+      "fingerprintMs": 189,
+      "encrypt": {
+        "totalMs": 4619,
+        "relayerHttpMs": 423,
+        "localMs": 4196,
+        "httpCalls": 2
+      },
+      "bond": "1000000000000000",
+      "guessSeen": {
+        "hash": "0x51ed886fbfbf44710233d717e3b1b7140c436c95773d088fbdd459513cf6ff32",
+        "block": 12143766,
+        "seenAt": 1794788830662,
+        "blockTs": 1794788832
+      },
+      "finSeen": {
+        "hash": "0x004385b0c870823ad577e20f7f6c41b47051de9b520062f9311d3fb8f3269e14",
+        "block": 12143767,
+        "seenAt": 1794788844339,
+        "blockTs": 1794788844
+      },
+      "open": {
+        "hash": "0x3ad5e4cdc1099ee8e3e82f4f502e860afe386784899d6c868bb49d8736de6b8a",
+        "gasUsed": "944331",
+        "wallMs": 7496,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 1,
+          "blockMeter": 0,
+          "blockFheTxs": 1,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 944331,
+          "calldataLen": 420,
+          "zeroBytes": 127,
+          "exec": 918135,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT"
+          ]
+        }
+      },
+      "guess": {
+        "hash": "0x51ed886fbfbf44710233d717e3b1b7140c436c95773d088fbdd459513cf6ff32",
+        "gasUsed": "847391",
+        "wallMs": 3379,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 847391,
+          "calldataLen": 420,
+          "zeroBytes": 159,
+          "exec": 821579,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 4551,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0x004385b0c870823ad577e20f7f6c41b47051de9b520062f9311d3fb8f3269e14",
+        "gasUsed": "558889",
+        "wallMs": 9029,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 558889,
+          "calldataLen": 708,
+          "zeroBytes": 240,
+          "exec": 529441,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "exec": null
+    },
+    {
+      "k": 5,
+      "mode": "real",
+      "amount": "1500000000",
+      "opId": "5",
+      "block": 12143771,
+      "readyAt": "1795048092",
+      "result": null,
+      "doneMs": 32733,
+      "fingerprintMs": 187,
+      "encrypt": {
+        "totalMs": 4766,
+        "relayerHttpMs": 506,
+        "localMs": 4260,
+        "httpCalls": 2
+      },
+      "bond": "1000000000000000",
+      "guessSeen": {
+        "hash": "0x6d6914995f8efbd259e339c580c40c34ebea3b8906575877125e6429c04c2fac",
+        "block": 12143770,
+        "seenAt": 1794788877975,
+        "blockTs": 1794788880
+      },
+      "finSeen": {
+        "hash": "0x5512a2528bca519d58cf9a7f0cb96086f4998e339bc07906c54784a6f0445b82",
+        "block": 12143771,
+        "seenAt": 1794788892229,
+        "blockTs": 1794788892
+      },
+      "open": {
+        "hash": "0xe308e35c8a2e51c94e46613366ef626cf302920c2d0f2ea50c75ed49b0ef7c2f",
+        "gasUsed": "944331",
+        "wallMs": 7070,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 1,
+          "blockMeter": 0,
+          "blockFheTxs": 1,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 944331,
+          "calldataLen": 420,
+          "zeroBytes": 127,
+          "exec": 918135,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT"
+          ]
+        }
+      },
+      "guess": {
+        "hash": "0x6d6914995f8efbd259e339c580c40c34ebea3b8906575877125e6429c04c2fac",
+        "gasUsed": "847403",
+        "wallMs": 6536,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 847403,
+          "calldataLen": 420,
+          "zeroBytes": 158,
+          "exec": 821579,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 4809,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0x5512a2528bca519d58cf9a7f0cb96086f4998e339bc07906c54784a6f0445b82",
+        "gasUsed": "558865",
+        "wallMs": 9355,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 558865,
+          "calldataLen": 708,
+          "zeroBytes": 242,
+          "exec": 529441,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "exec": null
+    },
+    {
+      "k": 6,
+      "mode": "duress",
+      "amount": "1500000000",
+      "opId": "6",
+      "block": 12143775,
+      "readyAt": "1795048140",
+      "result": null,
+      "doneMs": 31566,
+      "fingerprintMs": 186,
+      "encrypt": {
+        "totalMs": 4806,
+        "relayerHttpMs": 593,
+        "localMs": 4213,
+        "httpCalls": 2
+      },
+      "bond": "1000000000000000",
+      "guessSeen": {
+        "hash": "0xf95fa5313a7303b68aaf5117d98d31a21aed5f24703e124e3919a09e64b5bd59",
+        "block": 12143774,
+        "seenAt": 1794788928373,
+        "blockTs": 1794788928
+      },
+      "finSeen": {
+        "hash": "0x24e89517e5e507dc30e834928a738ff77fa2f3b3ad6df1158248486a0a092fef",
+        "block": 12143775,
+        "seenAt": 1794788940573,
+        "blockTs": 1794788940
+      },
+      "open": {
+        "hash": "0x407dbb855906075aedb99cd4c42656407f83096a4dfa02f30f685d576c064cc3",
+        "gasUsed": "944319",
+        "wallMs": 9184,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 1,
+          "blockMeter": 0,
+          "blockFheTxs": 1,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 944319,
+          "calldataLen": 420,
+          "zeroBytes": 128,
+          "exec": 918135,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT"
+          ]
+        }
+      },
+      "guess": {
+        "hash": "0xf95fa5313a7303b68aaf5117d98d31a21aed5f24703e124e3919a09e64b5bd59",
+        "gasUsed": "847391",
+        "wallMs": 5280,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 847391,
+          "calldataLen": 420,
+          "zeroBytes": 159,
+          "exec": 821579,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 2623,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0x24e89517e5e507dc30e834928a738ff77fa2f3b3ad6df1158248486a0a092fef",
+        "gasUsed": "558889",
+        "wallMs": 9441,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 558889,
+          "calldataLen": 708,
+          "zeroBytes": 240,
+          "exec": 529441,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "exec": null
+    },
+    {
+      "k": 7,
+      "mode": "real",
+      "amount": "3000000000",
+      "opId": "7",
+      "block": 12143779,
+      "readyAt": "1795048188",
+      "result": null,
+      "doneMs": 28656,
+      "fingerprintMs": 183,
+      "encrypt": {
+        "totalMs": 4641,
+        "relayerHttpMs": 421,
+        "localMs": 4220,
+        "httpCalls": 2
+      },
+      "bond": "1000000000000000",
+      "guessSeen": {
+        "hash": "0x2848b0525d2be4b1115b3a303b7286a5dafb2872249f57fa87614cd40231e63b",
+        "block": 12143778,
+        "seenAt": 1794788974228,
+        "blockTs": 1794788976
+      },
+      "finSeen": {
+        "hash": "0x9a2d1cc0481d2c76842635c710df39144dc52a20a4ddac406aa61f64c39eb579",
+        "block": 12143779,
+        "seenAt": 1794788986919,
+        "blockTs": 1794788988
+      },
+      "open": {
+        "hash": "0xdd78e57374b118d05ac8570dca1025fd6d1b59727127b6d74d6d6011fd5ea1f1",
+        "gasUsed": "944331",
+        "wallMs": 6103,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 1,
+          "blockMeter": 0,
+          "blockFheTxs": 1,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 944331,
+          "calldataLen": 420,
+          "zeroBytes": 127,
+          "exec": 918135,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT"
+          ]
+        }
+      },
+      "guess": {
+        "hash": "0x2848b0525d2be4b1115b3a303b7286a5dafb2872249f57fa87614cd40231e63b",
+        "gasUsed": "847391",
+        "wallMs": 5103,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 847391,
+          "calldataLen": 420,
+          "zeroBytes": 159,
+          "exec": 821579,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 4888,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0x9a2d1cc0481d2c76842635c710df39144dc52a20a4ddac406aa61f64c39eb579",
+        "gasUsed": "558889",
+        "wallMs": 7697,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 558889,
+          "calldataLen": 708,
+          "zeroBytes": 240,
+          "exec": 529441,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "exec": null
+    },
+    {
+      "k": 8,
+      "mode": "duress",
+      "amount": "3000000000",
+      "opId": "8",
+      "block": 12143783,
+      "readyAt": "1795048236",
+      "result": null,
+      "doneMs": 32127,
+      "fingerprintMs": 183,
+      "encrypt": {
+        "totalMs": 4705,
+        "relayerHttpMs": 505,
+        "localMs": 4200,
+        "httpCalls": 2
+      },
+      "bond": "1000000000000000",
+      "guessSeen": {
+        "hash": "0xf917ab4edfd42cce4429c3e64d80b39bdfe189168165e2022a1a45eb0460bcc6",
+        "block": 12143782,
+        "seenAt": 1794789024087,
+        "blockTs": 1794789024
+      },
+      "finSeen": {
+        "hash": "0xedef26163c5c6a6a2413dd14f75a35783db3a18f0e4156bc9bf6a8339b8e93eb",
+        "block": 12143783,
+        "seenAt": 1794789037011,
+        "blockTs": 1794789036
+      },
+      "open": {
+        "hash": "0x0ddcdae0a93450957bd33d7a39c4e0233bbc4afdd410751fdc5174ebd37aeb56",
+        "gasUsed": "944319",
+        "wallMs": 7250,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 1,
+          "blockMeter": 0,
+          "blockFheTxs": 1,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 944319,
+          "calldataLen": 420,
+          "zeroBytes": 128,
+          "exec": 918135,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT"
+          ]
+        }
+      },
+      "guess": {
+        "hash": "0xf917ab4edfd42cce4429c3e64d80b39bdfe189168165e2022a1a45eb0460bcc6",
+        "gasUsed": "847391",
+        "wallMs": 7145,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 847391,
+          "calldataLen": 420,
+          "zeroBytes": 159,
+          "exec": 821579,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 2649,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0xedef26163c5c6a6a2413dd14f75a35783db3a18f0e4156bc9bf6a8339b8e93eb",
+        "gasUsed": "558889",
+        "wallMs": 10162,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 558889,
+          "calldataLen": 708,
+          "zeroBytes": 240,
+          "exec": 529441,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "exec": null
+    },
+    {
+      "k": 9,
+      "mode": "real",
+      "amount": "50000000",
+      "opId": "9",
+      "block": 12143787,
+      "readyAt": "1795048284",
+      "result": null,
+      "doneMs": 31219,
+      "fingerprintMs": 182,
+      "encrypt": {
+        "totalMs": 4714,
+        "relayerHttpMs": 497,
+        "localMs": 4217,
+        "httpCalls": 2
+      },
+      "bond": "1000000000000000",
+      "guessSeen": {
+        "hash": "0xba4acc4fff18c47febc10777bd58bc3c6b0db2159d64f5df27eee5d31eeecf5a",
+        "block": 12143786,
+        "seenAt": 1794789070887,
+        "blockTs": 1794789072
+      },
+      "finSeen": {
+        "hash": "0xc9f97b32b3c67bf631d9104d10d78b0c4ba0ce690b73cd75f36c508f52739c0e",
+        "block": 12143787,
+        "seenAt": 1794789082814,
+        "blockTs": 1794789084
+      },
+      "open": {
+        "hash": "0xdfff4d88a8e23890d6fdafbcc0275459bc4c9e64c3a554fd66bc613288f852d7",
+        "gasUsed": "944319",
+        "wallMs": 9181,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 1,
+          "blockMeter": 0,
+          "blockFheTxs": 1,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 944319,
+          "calldataLen": 420,
+          "zeroBytes": 128,
+          "exec": 918135,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT"
+          ]
+        }
+      },
+      "guess": {
+        "hash": "0xba4acc4fff18c47febc10777bd58bc3c6b0db2159d64f5df27eee5d31eeecf5a",
+        "gasUsed": "847379",
+        "wallMs": 5284,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 847379,
+          "calldataLen": 420,
+          "zeroBytes": 160,
+          "exec": 821579,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 4812,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0xc9f97b32b3c67bf631d9104d10d78b0c4ba0ce690b73cd75f36c508f52739c0e",
+        "gasUsed": "558901",
+        "wallMs": 7011,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 162032,
+          "blockFheTxs": 1,
+          "blockComputed": 162032,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 558901,
+          "calldataLen": 708,
+          "zeroBytes": 239,
+          "exec": 529441,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "exec": null
+    },
+    {
+      "k": 10,
+      "mode": "duress",
+      "amount": "50000000",
+      "opId": "10",
+      "block": 12143791,
+      "readyAt": "1795048332",
+      "result": null,
+      "doneMs": 29180,
+      "fingerprintMs": 190,
+      "encrypt": {
+        "totalMs": 4747,
+        "relayerHttpMs": 519,
+        "localMs": 4228,
+        "httpCalls": 2
+      },
+      "bond": "1000000000000000",
+      "guessSeen": {
+        "hash": "0x3056dda19412fb818055a165e1f0796b4a21f6a15cd19b8e5c313825185ff743",
+        "block": 12143790,
+        "seenAt": 1794789118706,
+        "blockTs": 1794789120
+      },
+      "finSeen": {
+        "hash": "0x171811394b837b11c5dec72c8a94f4e6273813eb43f05a2573e064716f590f34",
+        "block": 12143791,
+        "seenAt": 1794789130452,
+        "blockTs": 1794789132
+      },
+      "open": {
+        "hash": "0x9dd49a06f2ef80f8a7e40ce11060f53d0649092b8617899c9bf77c4b44d56a4f",
+        "gasUsed": "944331",
+        "wallMs": 5526,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 1,
+          "blockMeter": 0,
+          "blockFheTxs": 1,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 944331,
+          "calldataLen": 420,
+          "zeroBytes": 127,
+          "exec": 918135,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT"
+          ]
+        }
+      },
+      "guess": {
+        "hash": "0x3056dda19412fb818055a165e1f0796b4a21f6a15cd19b8e5c313825185ff743",
+        "gasUsed": "847379",
+        "wallMs": 7045,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 847379,
+          "calldataLen": 420,
+          "zeroBytes": 160,
+          "exec": 821579,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 4768,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0x171811394b837b11c5dec72c8a94f4e6273813eb43f05a2573e064716f590f34",
+        "gasUsed": "558889",
+        "wallMs": 6879,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 558889,
+          "calldataLen": 708,
+          "zeroBytes": 240,
+          "exec": 529441,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "exec": null
+    },
+    {
+      "k": 11,
+      "mode": "real",
+      "amount": "1350000000",
+      "opId": "11",
+      "block": 12143796,
+      "readyAt": "1795048392",
+      "result": null,
+      "doneMs": null,
+      "recovered": "an RPC error stopped the run after this op reached the chain; recorded from its transactions (no client-side times)",
+      "guessSeen": {
+        "hash": "0x9926d081be5dc7dac1490e20dfbae78ba644fdae346c1ba13b058cfdfd9e6687",
+        "block": 12143794,
+        "seenAt": null,
+        "blockTs": 1794789168
+      },
+      "finSeen": {
+        "hash": "0xd628914c224c22e4c32c8b6cd3f85c8dda6f278ce86dbf69037a1a7bf2e7030d",
+        "block": 12143796,
+        "seenAt": null,
+        "blockTs": 1794789192
+      },
+      "open": {
+        "hash": "0x7a84df7acb684d78b92910e3c9267558d47fafd49eff144f35e779f8807589b2",
+        "gasUsed": "944319",
+        "wallMs": null,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 1,
+          "blockMeter": 0,
+          "blockFheTxs": 1,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 944319,
+          "calldataLen": 420,
+          "zeroBytes": 128,
+          "exec": 918135,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT"
+          ]
+        }
+      },
+      "guess": {
+        "hash": "0x9926d081be5dc7dac1490e20dfbae78ba644fdae346c1ba13b058cfdfd9e6687",
+        "gasUsed": "847367",
+        "wallMs": null,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 847367,
+          "calldataLen": 420,
+          "zeroBytes": 161,
+          "exec": 821579,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "finalize": {
+        "hash": "0xd628914c224c22e4c32c8b6cd3f85c8dda6f278ce86dbf69037a1a7bf2e7030d",
+        "gasUsed": "558901",
+        "wallMs": null,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 558901,
+          "calldataLen": 708,
+          "zeroBytes": 239,
+          "exec": 529441,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "exec": null
+    },
+    {
+      "k": 12,
+      "mode": "duress",
+      "amount": "1350000000",
+      "opId": "12",
+      "block": 12143816,
+      "readyAt": "1795048632",
+      "result": null,
+      "doneMs": 30681,
+      "fingerprintMs": 211,
+      "encrypt": {
+        "totalMs": 4828,
+        "relayerHttpMs": 630,
+        "localMs": 4198,
+        "httpCalls": 2
+      },
+      "bond": "1000000000000000",
+      "guessSeen": {
+        "hash": "0x4f53fc6c02beaa97c57166e478453e266871ce18795ac9b0f44e52ee8216bf26",
+        "block": 12143815,
+        "seenAt": 1794789419378,
+        "blockTs": 1794789420
+      },
+      "finSeen": {
+        "hash": "0x60f6b0b308d04c833fb1ba57306556e2d698bb9ad67a4bebfee60ebb15db6c41",
+        "block": 12143816,
+        "seenAt": 1794789431038,
+        "blockTs": 1794789432
+      },
+      "open": {
+        "hash": "0xdeaf2b63424e7b151308f013d1e047523e0ba73f6410fd810a781dbbadb81239",
+        "gasUsed": "944319",
+        "wallMs": 6776,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 1,
+          "blockMeter": 0,
+          "blockFheTxs": 1,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 944319,
+          "calldataLen": 420,
+          "zeroBytes": 128,
+          "exec": 918135,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT"
+          ]
+        }
+      },
+      "guess": {
+        "hash": "0x4f53fc6c02beaa97c57166e478453e266871ce18795ac9b0f44e52ee8216bf26",
+        "gasUsed": "847379",
+        "wallMs": 7322,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 5243514,
+          "blockFheTxs": 3,
+          "blockComputed": 5243514,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 847379,
+          "calldataLen": 420,
+          "zeroBytes": 160,
+          "exec": 821579,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 4583,
+        "attempts": 2
+      },
+      "finalize": {
+        "hash": "0x60f6b0b308d04c833fb1ba57306556e2d698bb9ad67a4bebfee60ebb15db6c41",
+        "gasUsed": "558913",
+        "wallMs": 6930,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 558913,
+          "calldataLen": 708,
+          "zeroBytes": 238,
+          "exec": 529441,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "exec": null
+    }
+  ],
+  "t1": [
+    {
+      "i": 1,
+      "silent": false,
+      "to": "known",
+      "encrypt": {
+        "totalMs": 4707,
+        "relayerHttpMs": 497,
+        "localMs": 4210,
+        "httpCalls": 2
+      },
+      "tx": {
+        "hash": "0xe7e6d0bac2605087c2c50dd43a91461db881542edd6f5c047361ad46aaef08a9",
+        "gasUsed": "2015876",
+        "wallMs": 7222,
+        "inclusionMs": 6889,
+        "blocks": 1
+      },
+      "hcu": {
+        "total": 1996160,
+        "depth": 1088032,
+        "fheOps": 19,
+        "blockMeter": 1996160,
+        "blockFheTxs": null,
+        "blockComputed": null,
+        "meterCheck": "unreadable"
+      },
+      "decryptRequests": 0,
+      "totalMs": 11929,
+      "seen": {
+        "hash": "0xe7e6d0bac2605087c2c50dd43a91461db881542edd6f5c047361ad46aaef08a9",
+        "block": 12143818,
+        "seenAt": 1794789455160,
+        "blockTs": 1794789456
+      }
+    },
+    {
+      "i": 2,
+      "silent": false,
+      "to": "known",
+      "encrypt": {
+        "totalMs": 4737,
+        "relayerHttpMs": 483,
+        "localMs": 4254,
+        "httpCalls": 2
+      },
+      "tx": {
+        "hash": "0x860f141b06ed64a1064b261852b3b18ca0e797ab3efdf704908f79d26966d006",
+        "gasUsed": "1909842",
+        "wallMs": 6395,
+        "inclusionMs": 5987,
+        "blocks": 1
+      },
+      "hcu": {
+        "total": 1996128,
+        "depth": 1088032,
+        "fheOps": 18,
+        "blockMeter": 1996128,
+        "blockFheTxs": 2,
+        "blockComputed": 1996128,
+        "meterCheck": "equal"
+      },
+      "decryptRequests": 0,
+      "totalMs": 11132,
+      "seen": {
+        "hash": "0x860f141b06ed64a1064b261852b3b18ca0e797ab3efdf704908f79d26966d006",
+        "block": 12143819,
+        "seenAt": 1794789466682,
+        "blockTs": 1794789468
+      }
+    },
+    {
+      "i": 3,
+      "silent": false,
+      "to": "known",
+      "encrypt": {
+        "totalMs": 4647,
+        "relayerHttpMs": 422,
+        "localMs": 4225,
+        "httpCalls": 2
+      },
+      "tx": {
+        "hash": "0x62b3bcea75033750ce1e14a83dd683ee1d7b0d56225c132cfa89deccb38196d3",
+        "gasUsed": "1909830",
+        "wallMs": 7716,
+        "inclusionMs": 7341,
+        "blocks": 1
+      },
+      "hcu": {
+        "total": 1996128,
+        "depth": 1088032,
+        "fheOps": 18,
+        "blockMeter": 1996128,
+        "blockFheTxs": 1,
+        "blockComputed": 1996128,
+        "meterCheck": "equal"
+      },
+      "decryptRequests": 0,
+      "totalMs": 12363,
+      "seen": {
+        "hash": "0x62b3bcea75033750ce1e14a83dd683ee1d7b0d56225c132cfa89deccb38196d3",
+        "block": 12143820,
+        "seenAt": 1794789479415,
+        "blockTs": 1794789480
+      }
+    },
+    {
+      "i": 4,
+      "silent": false,
+      "to": "known",
+      "encrypt": {
+        "totalMs": 4774,
+        "relayerHttpMs": 555,
+        "localMs": 4219,
+        "httpCalls": 2
+      },
+      "tx": {
+        "hash": "0x899424c0c8163412717e02c36b3bf661285312c00689cdea3083461ad73738a9",
+        "gasUsed": "1909842",
+        "wallMs": 7513,
+        "inclusionMs": 7183,
+        "blocks": 1
+      },
+      "hcu": {
+        "total": 1996128,
+        "depth": 1088032,
+        "fheOps": 18,
+        "blockMeter": 1996128,
+        "blockFheTxs": 2,
+        "blockComputed": 1996128,
+        "meterCheck": "equal"
+      },
+      "decryptRequests": 0,
+      "totalMs": 12288,
+      "seen": {
+        "hash": "0x899424c0c8163412717e02c36b3bf661285312c00689cdea3083461ad73738a9",
+        "block": 12143821,
+        "seenAt": 1794789492024,
+        "blockTs": 1794789492
+      }
+    },
+    {
+      "i": 5,
+      "silent": false,
+      "to": "known",
+      "encrypt": {
+        "totalMs": 4809,
+        "relayerHttpMs": 593,
+        "localMs": 4216,
+        "httpCalls": 2
+      },
+      "tx": {
+        "hash": "0x8434a553666749386c3449f0d14fd295ccb4171adf3f78df14a6c15b6e2f3fc5",
+        "gasUsed": "1909838",
+        "wallMs": 5680,
+        "inclusionMs": 5347,
+        "blocks": 1
+      },
+      "hcu": {
+        "total": 1996128,
+        "depth": 1088032,
+        "fheOps": 18,
+        "blockMeter": 11646448,
+        "blockFheTxs": 2,
+        "blockComputed": 11646448,
+        "meterCheck": "equal"
+      },
+      "decryptRequests": 0,
+      "totalMs": 10489,
+      "seen": {
+        "hash": "0x8434a553666749386c3449f0d14fd295ccb4171adf3f78df14a6c15b6e2f3fc5",
+        "block": 12143822,
+        "seenAt": 1794789502880,
+        "blockTs": 1794789504
+      }
+    },
+    {
+      "i": 6,
+      "silent": true,
+      "to": "unknown",
+      "encrypt": {
+        "totalMs": 4653,
+        "relayerHttpMs": 428,
+        "localMs": 4225,
+        "httpCalls": 2
+      },
+      "tx": {
+        "hash": "0xc49858814ee947f9f823fdb537100d7118c0b9d04d0bdba7de8c80148b580823",
+        "gasUsed": "1909854",
+        "wallMs": 7438,
+        "inclusionMs": 7143,
+        "blocks": 1
+      },
+      "hcu": {
+        "total": 1996128,
+        "depth": 1088032,
+        "fheOps": 18,
+        "blockMeter": 1996128,
+        "blockFheTxs": 1,
+        "blockComputed": 1996128,
+        "meterCheck": "equal"
+      },
+      "decryptRequests": 0,
+      "totalMs": 12090,
+      "seen": {
+        "hash": "0xc49858814ee947f9f823fdb537100d7118c0b9d04d0bdba7de8c80148b580823",
+        "block": 12143823,
+        "seenAt": 1794789515293,
+        "blockTs": 1794789516
+      }
+    }
+  ],
+  "t2": [
+    {
+      "i": 1,
+      "opId": "13",
+      "block": 12143826,
+      "readyAt": "1794789552",
+      "result": "0x23546b69b3c54c377dbefdf44b0b71d10b71a03138ff0000000000aa36a70500",
+      "doneMs": 37313,
+      "fingerprintMs": 186,
+      "encrypt": {
+        "totalMs": 4769,
+        "relayerHttpMs": 564,
+        "localMs": 4205,
+        "httpCalls": 2
+      },
+      "bond": "1000000000000000",
+      "guessSeen": {
+        "hash": "0x55f79feef3eec0767b9a74de62276e24286bd94a2499c78a2ca169e21e04634f",
+        "block": 12143825,
+        "seenAt": 1794789538802,
+        "blockTs": 1794789540
+      },
+      "finSeen": {
+        "hash": "0x1077d19d19db5dd6947443cc93e313bad1ae16e4936e14ec662049c7c446127a",
+        "block": 12143826,
+        "seenAt": 1794789551058,
+        "blockTs": 1794789552
+      },
+      "open": {
+        "hash": "0x1e6f78a79a690ee604743ca2a917a75ee2f0fc17183a19cf7b429e478b5c1d03",
+        "gasUsed": "281311",
+        "wallMs": 11318,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 281311,
+          "calldataLen": 36,
+          "zeroBytes": 12,
+          "exec": 259879,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "guess": {
+        "hash": "0x55f79feef3eec0767b9a74de62276e24286bd94a2499c78a2ca169e21e04634f",
+        "gasUsed": "844905",
+        "wallMs": 7234,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 844905,
+          "calldataLen": 420,
+          "zeroBytes": 158,
+          "exec": 819081,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 4312,
+        "attempts": 2
+      },
+      "finalize": {
+        "hash": "0x1077d19d19db5dd6947443cc93e313bad1ae16e4936e14ec662049c7c446127a",
+        "gasUsed": "1047479",
+        "wallMs": 7746,
+        "hcu": {
+          "total": 654000,
+          "depth": 654000,
+          "fheOps": 4,
+          "blockMeter": 10031024,
+          "blockFheTxs": 3,
+          "blockComputed": 10031024,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 1047479,
+          "calldataLen": 708,
+          "zeroBytes": 241,
+          "exec": 1018043,
+          "hcu": 654000,
+          "hcuDepth": 654000,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xfd7c9208f956bf0c6ab76a667f04361245ad3e0a2d0eff92eb827acfcca68ea9|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xeb6d37bd271abe1395b21d6d78f3487d6584862872c29ffd3f90736ee99b7393|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xc11d62b13c360a83082487064be1ec0878b2f0be4f012bf59f89e128063d47ff|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x60be9d61aad849facc28c38b048cb5c4be3420b8fa2233e08cfa06be1b6d1c3e|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|K",
+            "ACCOUNT|0x9c214811238ea2e5bc966c30d48dcaf4eb8a985e7ccabae45467380fdd8d11d9|2|64|x",
+            "ACCOUNT|0xb4056c5382359a2546a355e166162cca01173326e30c2e562bd82b48eede9ca1|2|0|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "K"
+          ]
+        }
+      },
+      "userDecrypt": {
+        "ms": 8245,
+        "permitMs": 11,
+        "attempts": 2
+      },
+      "seenValue": "9950000000",
+      "expected": "9950000000",
+      "correct": true,
+      "totalMs": 46637
+    },
+    {
+      "i": 2,
+      "opId": "15",
+      "block": 12143837,
+      "readyAt": "1794789684",
+      "result": "0x18cea80069c8d9f8e9a9c7d53c50c925a8d95f14ddff0000000000aa36a70500",
+      "doneMs": 35022,
+      "fingerprintMs": 201,
+      "encrypt": {
+        "totalMs": 4825,
+        "relayerHttpMs": 599,
+        "localMs": 4226,
+        "httpCalls": 2
+      },
+      "bond": "1000000000000000",
+      "guessSeen": {
+        "hash": "0xa07a74bba1aa8ee3bb1d345f5b3cfd8b7f4473e22ac2b41442e254f4fc1b7285",
+        "block": 12143836,
+        "seenAt": 1794789671016,
+        "blockTs": 1794789672
+      },
+      "finSeen": {
+        "hash": "0x8c048964ef7158583567c3a96ca8a2a8cda20657cec0ed9f8a0a9507c87e17c2",
+        "block": 12143837,
+        "seenAt": 1794789682385,
+        "blockTs": 1794789684
+      },
+      "open": {
+        "hash": "0xef3b910db16ae46be2cc258b22cb7ea8d43e48b2b05742414a27bee4325c61aa",
+        "gasUsed": "281311",
+        "wallMs": 11311,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 9539056,
+          "blockFheTxs": 3,
+          "blockComputed": 9539056,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 281311,
+          "calldataLen": 36,
+          "zeroBytes": 12,
+          "exec": 259879,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "guess": {
+        "hash": "0xa07a74bba1aa8ee3bb1d345f5b3cfd8b7f4473e22ac2b41442e254f4fc1b7285",
+        "gasUsed": "844905",
+        "wallMs": 7384,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555162,
+          "blockFheTxs": 3,
+          "blockComputed": 555162,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 844905,
+          "calldataLen": 420,
+          "zeroBytes": 158,
+          "exec": 819081,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 2727,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0x8c048964ef7158583567c3a96ca8a2a8cda20657cec0ed9f8a0a9507c87e17c2",
+        "gasUsed": "949539",
+        "wallMs": 6915,
+        "hcu": {
+          "total": 654000,
+          "depth": 654000,
+          "fheOps": 4,
+          "blockMeter": 654000,
+          "blockFheTxs": null,
+          "blockComputed": null,
+          "meterCheck": "unreadable"
+        },
+        "shape": {
+          "gasUsed": 949539,
+          "calldataLen": 708,
+          "zeroBytes": 243,
+          "exec": 920127,
+          "hcu": 654000,
+          "hcuDepth": 654000,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xfd7c9208f956bf0c6ab76a667f04361245ad3e0a2d0eff92eb827acfcca68ea9|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xeb6d37bd271abe1395b21d6d78f3487d6584862872c29ffd3f90736ee99b7393|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xc11d62b13c360a83082487064be1ec0878b2f0be4f012bf59f89e128063d47ff|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x60be9d61aad849facc28c38b048cb5c4be3420b8fa2233e08cfa06be1b6d1c3e|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|K",
+            "ACCOUNT|0x9c214811238ea2e5bc966c30d48dcaf4eb8a985e7ccabae45467380fdd8d11d9|2|64|x",
+            "ACCOUNT|0xb4056c5382359a2546a355e166162cca01173326e30c2e562bd82b48eede9ca1|2|0|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "K"
+          ]
+        }
+      },
+      "userDecrypt": {
+        "ms": 4703,
+        "permitMs": 6,
+        "attempts": 1
+      },
+      "seenValue": "9950000000",
+      "expected": "9950000000",
+      "correct": true,
+      "totalMs": 40821
+    },
+    {
+      "i": 3,
+      "opId": "17",
+      "block": 12143845,
+      "readyAt": "1794789780",
+      "result": "0xe4898d59341f923b5b323402c30eea8b4c8773c8c8ff0000000000aa36a70500",
+      "doneMs": 35493,
+      "fingerprintMs": 181,
+      "encrypt": {
+        "totalMs": 4711,
+        "relayerHttpMs": 504,
+        "localMs": 4207,
+        "httpCalls": 2
+      },
+      "bond": "1000000000000000",
+      "guessSeen": {
+        "hash": "0x86f5fdb018df404d6b3e52ec13024b0fb9692c827ed5b23641c457a9a81a464f",
+        "block": 12143844,
+        "seenAt": 1794789766465,
+        "blockTs": 1794789768
+      },
+      "finSeen": {
+        "hash": "0x679fab16a98125ecf817d593bd68b714e068aaa6b8e560cd37f299dd4378a1ac",
+        "block": 12143845,
+        "seenAt": 1794789777928,
+        "blockTs": 1794789780
+      },
+      "open": {
+        "hash": "0xc5412a448897e1e02ca98d39db37058952d2da7131d1754c991319544f5dbb53",
+        "gasUsed": "281311",
+        "wallMs": 12083,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 281311,
+          "calldataLen": 36,
+          "zeroBytes": 12,
+          "exec": 259879,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "guess": {
+        "hash": "0x86f5fdb018df404d6b3e52ec13024b0fb9692c827ed5b23641c457a9a81a464f",
+        "gasUsed": "844905",
+        "wallMs": 7114,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 844905,
+          "calldataLen": 420,
+          "zeroBytes": 158,
+          "exec": 819081,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 4820,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0x679fab16a98125ecf817d593bd68b714e068aaa6b8e560cd37f299dd4378a1ac",
+        "gasUsed": "949587",
+        "wallMs": 6516,
+        "hcu": {
+          "total": 654000,
+          "depth": 654000,
+          "fheOps": 4,
+          "blockMeter": 5342512,
+          "blockFheTxs": 2,
+          "blockComputed": 5342512,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 949587,
+          "calldataLen": 708,
+          "zeroBytes": 239,
+          "exec": 920127,
+          "hcu": 654000,
+          "hcuDepth": 654000,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xfd7c9208f956bf0c6ab76a667f04361245ad3e0a2d0eff92eb827acfcca68ea9|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xeb6d37bd271abe1395b21d6d78f3487d6584862872c29ffd3f90736ee99b7393|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xc11d62b13c360a83082487064be1ec0878b2f0be4f012bf59f89e128063d47ff|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x60be9d61aad849facc28c38b048cb5c4be3420b8fa2233e08cfa06be1b6d1c3e|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|K",
+            "ACCOUNT|0x9c214811238ea2e5bc966c30d48dcaf4eb8a985e7ccabae45467380fdd8d11d9|2|64|x",
+            "ACCOUNT|0xb4056c5382359a2546a355e166162cca01173326e30c2e562bd82b48eede9ca1|2|0|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "K"
+          ]
+        }
+      },
+      "userDecrypt": {
+        "ms": 8621,
+        "permitMs": 6,
+        "attempts": 2
+      },
+      "seenValue": "9950000000",
+      "expected": "9950000000",
+      "correct": true,
+      "totalMs": 45214
+    },
+    {
+      "i": 4,
+      "opId": "19",
+      "block": 12143853,
+      "readyAt": "1794789876",
+      "result": "0xd61f6fa88065cc1a2a5c2cd2537fe6501f65ee1b98ff0000000000aa36a70500",
+      "doneMs": 35665,
+      "fingerprintMs": 184,
+      "encrypt": {
+        "totalMs": 4801,
+        "relayerHttpMs": 595,
+        "localMs": 4206,
+        "httpCalls": 2
+      },
+      "bond": "1000000000000000",
+      "guessSeen": {
+        "hash": "0x634ce76c4e6665ef90acaec85f78c9f9bc7b941b88ad6350fb375bfb558e0005",
+        "block": 12143852,
+        "seenAt": 1794789862880,
+        "blockTs": 1794789864
+      },
+      "finSeen": {
+        "hash": "0xb47a9f717b026fc4ca643ff203ac4cfcd9f2e8490dbfef5eb066f019c8245bd3",
+        "block": 12143853,
+        "seenAt": 1794789874425,
+        "blockTs": 1794789876
+      },
+      "open": {
+        "hash": "0xeef8e654cc30630698b2ff9f53608c6828ab62bba8f08a832b94e93b54527140",
+        "gasUsed": "281311",
+        "wallMs": 11489,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 281311,
+          "calldataLen": 36,
+          "zeroBytes": 12,
+          "exec": 259879,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "guess": {
+        "hash": "0x634ce76c4e6665ef90acaec85f78c9f9bc7b941b88ad6350fb375bfb558e0005",
+        "gasUsed": "844893",
+        "wallMs": 7733,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 1141098,
+          "blockFheTxs": null,
+          "blockComputed": null,
+          "meterCheck": "unreadable"
+        },
+        "shape": {
+          "gasUsed": 844893,
+          "calldataLen": 420,
+          "zeroBytes": 159,
+          "exec": 819081,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 5922,
+        "attempts": 3
+      },
+      "finalize": {
+        "hash": "0xb47a9f717b026fc4ca643ff203ac4cfcd9f2e8490dbfef5eb066f019c8245bd3",
+        "gasUsed": "949583",
+        "wallMs": 5507,
+        "hcu": {
+          "total": 654000,
+          "depth": 654000,
+          "fheOps": 4,
+          "blockMeter": 1240096,
+          "blockFheTxs": 2,
+          "blockComputed": 1240096,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 949583,
+          "calldataLen": 708,
+          "zeroBytes": 239,
+          "exec": 920123,
+          "hcu": 654000,
+          "hcuDepth": 654000,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xfd7c9208f956bf0c6ab76a667f04361245ad3e0a2d0eff92eb827acfcca68ea9|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xeb6d37bd271abe1395b21d6d78f3487d6584862872c29ffd3f90736ee99b7393|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xc11d62b13c360a83082487064be1ec0878b2f0be4f012bf59f89e128063d47ff|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x60be9d61aad849facc28c38b048cb5c4be3420b8fa2233e08cfa06be1b6d1c3e|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|K",
+            "ACCOUNT|0x9c214811238ea2e5bc966c30d48dcaf4eb8a985e7ccabae45467380fdd8d11d9|2|64|x",
+            "ACCOUNT|0xb4056c5382359a2546a355e166162cca01173326e30c2e562bd82b48eede9ca1|2|0|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "K"
+          ]
+        }
+      },
+      "userDecrypt": {
+        "ms": 2737,
+        "permitMs": 6,
+        "attempts": 1
+      },
+      "seenValue": "9950000000",
+      "expected": "9950000000",
+      "correct": true,
+      "totalMs": 39312
+    },
+    {
+      "i": 5,
+      "opId": "21",
+      "block": 12143861,
+      "readyAt": "1794789972",
+      "result": "0xf025a4f75df7d41fc3f8227e3006128f0bdeea217bff0000000000aa36a70500",
+      "doneMs": 36232,
+      "fingerprintMs": 183,
+      "encrypt": {
+        "totalMs": 4709,
+        "relayerHttpMs": 447,
+        "localMs": 4262,
+        "httpCalls": 2
+      },
+      "bond": "1000000000000000",
+      "guessSeen": {
+        "hash": "0xbcd8f4f14368b72dcd7b9d1bb7381320f8200fbb33e200441d11050b578b29de",
+        "block": 12143860,
+        "seenAt": 1794789959588,
+        "blockTs": 1794789960
+      },
+      "finSeen": {
+        "hash": "0xe9cf40cc707c8973251e5ff9654e2b0580a84eed687fcf00602c21a7db48031c",
+        "block": 12143861,
+        "seenAt": 1794789970819,
+        "blockTs": 1794789972
+      },
+      "open": {
+        "hash": "0xe8e7fa6e50f0456b9d5245deb3ac2ae82d84c1d218e59539494df571812e06de",
+        "gasUsed": "281311",
+        "wallMs": 11960,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 6570032,
+          "blockFheTxs": 4,
+          "blockComputed": 6570032,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 281311,
+          "calldataLen": 36,
+          "zeroBytes": 12,
+          "exec": 259879,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "guess": {
+        "hash": "0xbcd8f4f14368b72dcd7b9d1bb7381320f8200fbb33e200441d11050b578b29de",
+        "gasUsed": "844901",
+        "wallMs": 8218,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 2691002,
+          "blockFheTxs": 2,
+          "blockComputed": 2691002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 844901,
+          "calldataLen": 420,
+          "zeroBytes": 158,
+          "exec": 819077,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 4864,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0xe9cf40cc707c8973251e5ff9654e2b0580a84eed687fcf00602c21a7db48031c",
+        "gasUsed": "949563",
+        "wallMs": 6266,
+        "hcu": {
+          "total": 654000,
+          "depth": 654000,
+          "fheOps": 4,
+          "blockMeter": 654000,
+          "blockFheTxs": 1,
+          "blockComputed": 654000,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 949563,
+          "calldataLen": 708,
+          "zeroBytes": 241,
+          "exec": 920127,
+          "hcu": 654000,
+          "hcuDepth": 654000,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xfd7c9208f956bf0c6ab76a667f04361245ad3e0a2d0eff92eb827acfcca68ea9|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xeb6d37bd271abe1395b21d6d78f3487d6584862872c29ffd3f90736ee99b7393|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xc11d62b13c360a83082487064be1ec0878b2f0be4f012bf59f89e128063d47ff|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x60be9d61aad849facc28c38b048cb5c4be3420b8fa2233e08cfa06be1b6d1c3e|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|K",
+            "ACCOUNT|0x9c214811238ea2e5bc966c30d48dcaf4eb8a985e7ccabae45467380fdd8d11d9|2|64|x",
+            "ACCOUNT|0xb4056c5382359a2546a355e166162cca01173326e30c2e562bd82b48eede9ca1|2|0|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "K"
+          ]
+        }
+      },
+      "userDecrypt": {
+        "ms": 4832,
+        "permitMs": 6,
+        "attempts": 1
+      },
+      "seenValue": "9950000000",
+      "expected": "9950000000",
+      "correct": true,
+      "totalMs": 42066
+    }
+  ],
+  "t3views": [
+    {
+      "i": 1,
+      "opId": "14",
+      "block": 12143831,
+      "readyAt": "1794789612",
+      "result": "0xddd6b47c19d0bd96068002cdbec8fb0cd000ca3f57ff0000000000aa36a70500",
+      "doneMs": 36559,
+      "fingerprintMs": 184,
+      "encrypt": {
+        "totalMs": 4734,
+        "relayerHttpMs": 505,
+        "localMs": 4229,
+        "httpCalls": 2
+      },
+      "bond": "1000000000000000",
+      "guessSeen": {
+        "hash": "0xaa3c4b4ac617912628646a5850aa8c16513fcdc2c63b3758a35ab39363222f43",
+        "block": 12143830,
+        "seenAt": 1794789597957,
+        "blockTs": 1794789600
+      },
+      "finSeen": {
+        "hash": "0x75ed90c87808f21dd7f2cff9960201dff46a64ba1541e6781a54de540c7ec09d",
+        "block": 12143831,
+        "seenAt": 1794789610584,
+        "blockTs": 1794789612
+      },
+      "open": {
+        "hash": "0xf65bae09f8677bd0d499f5b703c44136d8f2526c719fe5a3bf8037708bf6bb45",
+        "gasUsed": "281311",
+        "wallMs": 12550,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 281311,
+          "calldataLen": 36,
+          "zeroBytes": 12,
+          "exec": 259879,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "guess": {
+        "hash": "0xaa3c4b4ac617912628646a5850aa8c16513fcdc2c63b3758a35ab39363222f43",
+        "gasUsed": "844893",
+        "wallMs": 6553,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 844893,
+          "calldataLen": 420,
+          "zeroBytes": 159,
+          "exec": 819081,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 4318,
+        "attempts": 2
+      },
+      "finalize": {
+        "hash": "0x75ed90c87808f21dd7f2cff9960201dff46a64ba1541e6781a54de540c7ec09d",
+        "gasUsed": "949575",
+        "wallMs": 8200,
+        "hcu": {
+          "total": 654000,
+          "depth": 654000,
+          "fheOps": 4,
+          "blockMeter": null,
+          "blockFheTxs": 1,
+          "blockComputed": 654000,
+          "meterCheck": "unreadable"
+        },
+        "shape": {
+          "gasUsed": 949575,
+          "calldataLen": 708,
+          "zeroBytes": 240,
+          "exec": 920127,
+          "hcu": 654000,
+          "hcuDepth": 654000,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xfd7c9208f956bf0c6ab76a667f04361245ad3e0a2d0eff92eb827acfcca68ea9|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xeb6d37bd271abe1395b21d6d78f3487d6584862872c29ffd3f90736ee99b7393|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xc11d62b13c360a83082487064be1ec0878b2f0be4f012bf59f89e128063d47ff|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x60be9d61aad849facc28c38b048cb5c4be3420b8fa2233e08cfa06be1b6d1c3e|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|K",
+            "ACCOUNT|0x9c214811238ea2e5bc966c30d48dcaf4eb8a985e7ccabae45467380fdd8d11d9|2|64|x",
+            "ACCOUNT|0xb4056c5382359a2546a355e166162cca01173326e30c2e562bd82b48eede9ca1|2|0|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "K"
+          ]
+        }
+      },
+      "seenValue": "2000000000",
+      "expected": "2000000000",
+      "correct": true
+    },
+    {
+      "i": 2,
+      "opId": "16",
+      "block": 12143841,
+      "readyAt": "1794789732",
+      "result": "0x881ba8795f9c33fc81f1a016f8e438f9a8ceee01cbff0000000000aa36a70500",
+      "doneMs": 37611,
+      "fingerprintMs": 183,
+      "encrypt": {
+        "totalMs": 4734,
+        "relayerHttpMs": 545,
+        "localMs": 4189,
+        "httpCalls": 2
+      },
+      "bond": "1000000000000000",
+      "guessSeen": {
+        "hash": "0xafba11d6745f37baa13d0c123adbdc929d76e47103a3923ceac59da0aedf241c",
+        "block": 12143840,
+        "seenAt": 1794789718547,
+        "blockTs": 1794789720
+      },
+      "finSeen": {
+        "hash": "0x50f00027cc467d0cf16541500620c40224267ea03a36a95c7d0f7933630d034b",
+        "block": 12143841,
+        "seenAt": 1794789732433,
+        "blockTs": 1794789732
+      },
+      "open": {
+        "hash": "0x8599e6b860f6f9c1b9b2ccb04df63529bd1e99aacb4607a2016447258c3ee451",
+        "gasUsed": "281311",
+        "wallMs": 12349,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 281311,
+          "calldataLen": 36,
+          "zeroBytes": 12,
+          "exec": 259879,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "guess": {
+        "hash": "0xafba11d6745f37baa13d0c123adbdc929d76e47103a3923ceac59da0aedf241c",
+        "gasUsed": "844905",
+        "wallMs": 6526,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 844905,
+          "calldataLen": 420,
+          "zeroBytes": 158,
+          "exec": 819081,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 4788,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0x50f00027cc467d0cf16541500620c40224267ea03a36a95c7d0f7933630d034b",
+        "gasUsed": "949575",
+        "wallMs": 8966,
+        "hcu": {
+          "total": 654000,
+          "depth": 654000,
+          "fheOps": 4,
+          "blockMeter": 654000,
+          "blockFheTxs": 1,
+          "blockComputed": 654000,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 949575,
+          "calldataLen": 708,
+          "zeroBytes": 240,
+          "exec": 920127,
+          "hcu": 654000,
+          "hcuDepth": 654000,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xfd7c9208f956bf0c6ab76a667f04361245ad3e0a2d0eff92eb827acfcca68ea9|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xeb6d37bd271abe1395b21d6d78f3487d6584862872c29ffd3f90736ee99b7393|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xc11d62b13c360a83082487064be1ec0878b2f0be4f012bf59f89e128063d47ff|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x60be9d61aad849facc28c38b048cb5c4be3420b8fa2233e08cfa06be1b6d1c3e|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|K",
+            "ACCOUNT|0x9c214811238ea2e5bc966c30d48dcaf4eb8a985e7ccabae45467380fdd8d11d9|2|64|x",
+            "ACCOUNT|0xb4056c5382359a2546a355e166162cca01173326e30c2e562bd82b48eede9ca1|2|0|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "K"
+          ]
+        }
+      },
+      "seenValue": "2000000000",
+      "expected": "2000000000",
+      "correct": true
+    },
+    {
+      "i": 3,
+      "opId": "18",
+      "block": 12143849,
+      "readyAt": "1794789828",
+      "result": "0xf2a6f58b3b5a29cd2fb682a9fbca787151e758c8e1ff0000000000aa36a70500",
+      "doneMs": 36688,
+      "fingerprintMs": 184,
+      "encrypt": {
+        "totalMs": 4773,
+        "relayerHttpMs": 576,
+        "localMs": 4197,
+        "httpCalls": 2
+      },
+      "bond": "1000000000000000",
+      "guessSeen": {
+        "hash": "0xb3ed5ac0d2265a30b7fc9ba012802c2fd346fc844ef2ca04b010eab995035c08",
+        "block": 12143848,
+        "seenAt": 1794789814490,
+        "blockTs": 1794789816
+      },
+      "finSeen": {
+        "hash": "0xc3ccd84dba46d5e4c73e30558f6ac488875c252ee56ef53236b54213b01f8cf3",
+        "block": 12143849,
+        "seenAt": 1794789827123,
+        "blockTs": 1794789828
+      },
+      "open": {
+        "hash": "0xdf4d53301b739307444504724bc7c99789fc7e69b0ee448f49cb039bc2c5744a",
+        "gasUsed": "281311",
+        "wallMs": 11710,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 281311,
+          "calldataLen": 36,
+          "zeroBytes": 12,
+          "exec": 259879,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "guess": {
+        "hash": "0xb3ed5ac0d2265a30b7fc9ba012802c2fd346fc844ef2ca04b010eab995035c08",
+        "gasUsed": "844905",
+        "wallMs": 7443,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 844905,
+          "calldataLen": 420,
+          "zeroBytes": 158,
+          "exec": 819081,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 5989,
+        "attempts": 3
+      },
+      "finalize": {
+        "hash": "0xc3ccd84dba46d5e4c73e30558f6ac488875c252ee56ef53236b54213b01f8cf3",
+        "gasUsed": "949587",
+        "wallMs": 6511,
+        "hcu": {
+          "total": 654000,
+          "depth": 654000,
+          "fheOps": 4,
+          "blockMeter": 654000,
+          "blockFheTxs": 1,
+          "blockComputed": 654000,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 949587,
+          "calldataLen": 708,
+          "zeroBytes": 239,
+          "exec": 920127,
+          "hcu": 654000,
+          "hcuDepth": 654000,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xfd7c9208f956bf0c6ab76a667f04361245ad3e0a2d0eff92eb827acfcca68ea9|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xeb6d37bd271abe1395b21d6d78f3487d6584862872c29ffd3f90736ee99b7393|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xc11d62b13c360a83082487064be1ec0878b2f0be4f012bf59f89e128063d47ff|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x60be9d61aad849facc28c38b048cb5c4be3420b8fa2233e08cfa06be1b6d1c3e|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|K",
+            "ACCOUNT|0x9c214811238ea2e5bc966c30d48dcaf4eb8a985e7ccabae45467380fdd8d11d9|2|64|x",
+            "ACCOUNT|0xb4056c5382359a2546a355e166162cca01173326e30c2e562bd82b48eede9ca1|2|0|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "K"
+          ]
+        }
+      },
+      "seenValue": "2000000000",
+      "expected": "2000000000",
+      "correct": true
+    },
+    {
+      "i": 4,
+      "opId": "20",
+      "block": 12143857,
+      "readyAt": "1794789924",
+      "result": "0xa81873527b285060f71d315aeb58d273d36428596dff0000000000aa36a70500",
+      "doneMs": 33962,
+      "fingerprintMs": 179,
+      "encrypt": {
+        "totalMs": 4709,
+        "relayerHttpMs": 516,
+        "localMs": 4193,
+        "httpCalls": 2
+      },
+      "bond": "1000000000000000",
+      "guessSeen": {
+        "hash": "0xdd4378fe11fa47820b4326a10a18de3637fd2c25c0ddea61f6b9cecaf7aa4f59",
+        "block": 12143856,
+        "seenAt": 1794789910537,
+        "blockTs": 1794789912
+      },
+      "finSeen": {
+        "hash": "0xb41f017097d87dcd29f0ee178082b13765a604fc99c5209cf7d1c9a9e5216626",
+        "block": 12143857,
+        "seenAt": 1794789922776,
+        "blockTs": 1794789924
+      },
+      "open": {
+        "hash": "0xce57a0f773fceb8a6c0f48c1d52c13e86c186edc2420a92ed41e96b046aa09e3",
+        "gasUsed": "281311",
+        "wallMs": 9524,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 281311,
+          "calldataLen": 36,
+          "zeroBytes": 12,
+          "exec": 259879,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "guess": {
+        "hash": "0xdd4378fe11fa47820b4326a10a18de3637fd2c25c0ddea61f6b9cecaf7aa4f59",
+        "gasUsed": "844893",
+        "wallMs": 7388,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 844893,
+          "calldataLen": 420,
+          "zeroBytes": 159,
+          "exec": 819081,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 4726,
+        "attempts": 1
+      },
+      "finalize": {
+        "hash": "0xb41f017097d87dcd29f0ee178082b13765a604fc99c5209cf7d1c9a9e5216626",
+        "gasUsed": "949563",
+        "wallMs": 7423,
+        "hcu": {
+          "total": 654000,
+          "depth": 654000,
+          "fheOps": 4,
+          "blockMeter": 654000,
+          "blockFheTxs": 1,
+          "blockComputed": 654000,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 949563,
+          "calldataLen": 708,
+          "zeroBytes": 241,
+          "exec": 920127,
+          "hcu": 654000,
+          "hcuDepth": 654000,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xfd7c9208f956bf0c6ab76a667f04361245ad3e0a2d0eff92eb827acfcca68ea9|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xeb6d37bd271abe1395b21d6d78f3487d6584862872c29ffd3f90736ee99b7393|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xc11d62b13c360a83082487064be1ec0878b2f0be4f012bf59f89e128063d47ff|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x60be9d61aad849facc28c38b048cb5c4be3420b8fa2233e08cfa06be1b6d1c3e|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|K",
+            "ACCOUNT|0x9c214811238ea2e5bc966c30d48dcaf4eb8a985e7ccabae45467380fdd8d11d9|2|64|x",
+            "ACCOUNT|0xb4056c5382359a2546a355e166162cca01173326e30c2e562bd82b48eede9ca1|2|0|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "K"
+          ]
+        }
+      },
+      "seenValue": "2000000000",
+      "expected": "2000000000",
+      "correct": true
+    },
+    {
+      "i": 5,
+      "opId": "22",
+      "block": 12143865,
+      "readyAt": "1794790020",
+      "result": "0x6ecfaee5f8e237ee65e610ecc3e92b50c4a159f815ff0000000000aa36a70500",
+      "doneMs": 35970,
+      "fingerprintMs": 196,
+      "encrypt": {
+        "totalMs": 4687,
+        "relayerHttpMs": 500,
+        "localMs": 4187,
+        "httpCalls": 2
+      },
+      "bond": "1000000000000000",
+      "guessSeen": {
+        "hash": "0x61605684d5e0a7794022443d8508d5870ea3ed0a04cb240186b7684898e85cc3",
+        "block": 12143864,
+        "seenAt": 1794790006296,
+        "blockTs": 1794790008
+      },
+      "finSeen": {
+        "hash": "0xc1663caef29da96b781438fecb7e3b495b089760619a5b3b4a3c67551accec55",
+        "block": 12143865,
+        "seenAt": 1794790018348,
+        "blockTs": 1794790020
+      },
+      "open": {
+        "hash": "0x10417fd5e658819ff896c5043e285ea2e0f9e2405f44ded258b2dc436c261a14",
+        "gasUsed": "281311",
+        "wallMs": 13102,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 281311,
+          "calldataLen": 36,
+          "zeroBytes": 12,
+          "exec": 259879,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "guess": {
+        "hash": "0x61605684d5e0a7794022443d8508d5870ea3ed0a04cb240186b7684898e85cc3",
+        "gasUsed": "844893",
+        "wallMs": 6007,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 844893,
+          "calldataLen": 420,
+          "zeroBytes": 159,
+          "exec": 819081,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 4313,
+        "attempts": 2
+      },
+      "finalize": {
+        "hash": "0xc1663caef29da96b781438fecb7e3b495b089760619a5b3b4a3c67551accec55",
+        "gasUsed": "949551",
+        "wallMs": 7607,
+        "hcu": {
+          "total": 654000,
+          "depth": 654000,
+          "fheOps": 4,
+          "blockMeter": 654000,
+          "blockFheTxs": 1,
+          "blockComputed": 654000,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 949551,
+          "calldataLen": 708,
+          "zeroBytes": 242,
+          "exec": 920127,
+          "hcu": 654000,
+          "hcuDepth": 654000,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xfd7c9208f956bf0c6ab76a667f04361245ad3e0a2d0eff92eb827acfcca68ea9|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xeb6d37bd271abe1395b21d6d78f3487d6584862872c29ffd3f90736ee99b7393|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xc11d62b13c360a83082487064be1ec0878b2f0be4f012bf59f89e128063d47ff|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x60be9d61aad849facc28c38b048cb5c4be3420b8fa2233e08cfa06be1b6d1c3e|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|K",
+            "ACCOUNT|0x9c214811238ea2e5bc966c30d48dcaf4eb8a985e7ccabae45467380fdd8d11d9|2|64|x",
+            "ACCOUNT|0xb4056c5382359a2546a355e166162cca01173326e30c2e562bd82b48eede9ca1|2|0|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "K"
+          ]
+        }
+      },
+      "seenValue": "2000000000",
+      "expected": "2000000000",
+      "correct": true
+    }
+  ],
+  "wrong": [
+    {
+      "i": 1,
+      "opId": "23",
+      "block": 12143870,
+      "readyAt": "0",
+      "result": null,
+      "doneMs": 35332,
+      "fingerprintMs": 185,
+      "encrypt": {
+        "totalMs": 4870,
+        "relayerHttpMs": 595,
+        "localMs": 4275,
+        "httpCalls": 2
+      },
+      "bond": "1000000000000000",
+      "guessSeen": {
+        "hash": "0x5cdd4f817daeb2a76255e48ecbf349b837be4ff038c3e28bd4ecbdb1744f4f89",
+        "block": 12143869,
+        "seenAt": 1794790066642,
+        "blockTs": 1794790068
+      },
+      "finSeen": {
+        "hash": "0xaece962853ff122ef9612af998f30ed3b726a6bdbcb4e21de85a4cd4474c8a10",
+        "block": 12143870,
+        "seenAt": 1794790079130,
+        "blockTs": 1794790080
+      },
+      "open": {
+        "hash": "0x22fadf80f11effbd2ec2b8d8ac0c5d58dc81c0f4d4e8052197208a7ac673e0c2",
+        "gasUsed": "281311",
+        "wallMs": 10231,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 281311,
+          "calldataLen": 36,
+          "zeroBytes": 12,
+          "exec": 259879,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "guess": {
+        "hash": "0x5cdd4f817daeb2a76255e48ecbf349b837be4ff038c3e28bd4ecbdb1744f4f89",
+        "gasUsed": "844905",
+        "wallMs": 7645,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 555002,
+          "blockFheTxs": 1,
+          "blockComputed": 555002,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 844905,
+          "calldataLen": 420,
+          "zeroBytes": 158,
+          "exec": 819081,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 4252,
+        "attempts": 2
+      },
+      "finalize": {
+        "hash": "0xaece962853ff122ef9612af998f30ed3b726a6bdbcb4e21de85a4cd4474c8a10",
+        "gasUsed": "416877",
+        "wallMs": 8127,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 416877,
+          "calldataLen": 708,
+          "zeroBytes": 239,
+          "exec": 387417,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x"
+          ],
+          "aclAllowed": []
+        }
+      }
+    },
+    {
+      "i": 2,
+      "opId": "24",
+      "block": 12143873,
+      "readyAt": "0",
+      "result": null,
+      "doneMs": 35748,
+      "fingerprintMs": 182,
+      "encrypt": {
+        "totalMs": 4711,
+        "relayerHttpMs": 527,
+        "localMs": 4184,
+        "httpCalls": 2
+      },
+      "bond": "2000000000000000",
+      "guessSeen": {
+        "hash": "0x4b4bf27de1c97b3aa2f1ddf62615eb3741fb6b5d6c6d866770ebc7a1fdb6e7c3",
+        "block": 12143872,
+        "seenAt": 1794790102006,
+        "blockTs": 1794790104
+      },
+      "finSeen": {
+        "hash": "0x879251b8d912c6b9ce98a1e19e5da7d79ef513563326b309f4160345a1dbb200",
+        "block": 12143873,
+        "seenAt": 1794790115803,
+        "blockTs": 1794790116
+      },
+      "open": {
+        "hash": "0x3b7155a057ebf8ba61287ab9790993a3c8ded2256eabce4e1d8098638c556ed2",
+        "gasUsed": "281311",
+        "wallMs": 11245,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 0,
+          "blockFheTxs": 0,
+          "blockComputed": 0,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 281311,
+          "calldataLen": 36,
+          "zeroBytes": 12,
+          "exec": 259879,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0x1026203dbb6b3f182ab96f68cb99eeffccff0899cb861213656f6d05b1dd61fb|2|192|x"
+          ],
+          "aclAllowed": []
+        }
+      },
+      "guess": {
+        "hash": "0x4b4bf27de1c97b3aa2f1ddf62615eb3741fb6b5d6c6d866770ebc7a1fdb6e7c3",
+        "gasUsed": "845031",
+        "wallMs": 5901,
+        "hcu": {
+          "total": 555002,
+          "depth": 278002,
+          "fheOps": 8,
+          "blockMeter": 1141098,
+          "blockFheTxs": 2,
+          "blockComputed": 1141098,
+          "meterCheck": "equal"
+        },
+        "shape": {
+          "gasUsed": 845031,
+          "calldataLen": 420,
+          "zeroBytes": 159,
+          "exec": 819219,
+          "hcu": 555002,
+          "hcuDepth": 278002,
+          "logs": [
+            "0xfffffffffffffffffffffffffffffffffffffffe|0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef|3|32|K|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdc370db33589e73371dc3ee42c789c003d336eefcb7c3f56fe0f51ae5b1d9702|2|448|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xdb9050d65240431621d61d6f94b970e63f53a67a5766614ee6e5c5bbd41c8e2e|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xb3d5c664ec86575818e8d75ff25c5f867250df8954088549c41c848cd10e76cb|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x56df279bbfb03d9ed097bbe2f28d520ca0c1161206327926e98664d70d2c24c4|2|128|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0x55aff4cc7a3d160c83f1f15b818011ede841a0b4597fb14dcd3603df3a11e5e0|2|64|ACCOUNT",
+            "0x92c920834ec8941d2c77d188936e1f7a6f49c127|0xe42486b0ccdbef81a2075c48c8e515c079aea73c8b82429997c72a2fe1bf4fef|2|128|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xd913ac93a959116526793ef772233273d5249597d33cddfdc34f29920541fd0a|2|96|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|ACCOUNT",
+            "0xf0ffdc93b7e186bc2f8cb3daa75d86d1930a433d|0xe2e1decee6e05ee246cd7c7f1337d25cdfd41dcbdcf8c57b61630be56cc7366a|3|32|ACCOUNT|G",
+            "ACCOUNT|0xac4bca71f354979ad4ac0d55881a052530270e6c67bf36f700089d5c501c163a|3|64|x|x"
+          ],
+          "aclAllowed": [
+            "ACCOUNT",
+            "G"
+          ]
+        }
+      },
+      "publicDecrypt": {
+        "waitedMs": 4306,
+        "attempts": 2
+      },
+      "finalize": {
+        "hash": "0x879251b8d912c6b9ce98a1e19e5da7d79ef513563326b309f4160345a1dbb200",
+        "gasUsed": "416865",
+        "wallMs": 9394,
+        "hcu": {
+          "total": 0,
+          "depth": 0,
+          "fheOps": 0,
+          "blockMeter": 5503128,
+          "blockFheTxs": null,
+          "blockComputed": null,
+          "meterCheck": "unreadable"
+        },
+        "shape": {
+          "gasUsed": 416865,
+          "calldataLen": 708,
+          "zeroBytes": 240,
+          "exec": 387417,
+          "hcu": 0,
+          "hcuDepth": 0,
+          "logs": [
+            "ACCOUNT|0xc6366bab028b8d033cb362cfd1f2f3457ef4e92fc738b6788b90d5a7846367a0|1|192",
+            "ACCOUNT|0x1373730770d7f252426082ce2b6f3f8dd9b73f9da51e5b0b8c0edadf2bc4bd80|3|64|x|x"
+          ],
+          "aclAllowed": []
+        }
+      }
+    }
+  ],
+  "wrongLate": {
+    "opId": "25",
+    "bond": "4000000000000000",
+    "guessSeen": {
+      "hash": "0x7fa34af8f11a88cd35b38807fa0f0b7d66dccd089124a3f4f323e40ee6593d32",
+      "block": 12143881,
+      "seenAt": 1794790213228,
+      "blockTs": 1794790212
+    },
+    "finSeen": {
+      "hash": "0x1b6cbc9d3636e41c35f641e71ebe994edcd77b36d5a8639fbe694c2e7cb09f40",
+      "block": 12143889,
+      "seenAt": 1794790320689,
+      "blockTs": 1794790320
+    },
+    "gas": [
+      "281311",
+      "857009",
+      "416415"
+    ],
+    "doneMs": 129191
+  }
+}

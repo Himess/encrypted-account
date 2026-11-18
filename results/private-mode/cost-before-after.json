@@ -1,0 +1,50 @@
+{
+  "generatedAt": "2026-11-15T21:59:33Z",
+  "flow": "K-only private transfer (privateTransfer), steady state (the account's second transfer), cUSDC-like ERC-7984 token",
+  "method": "[Mock] hardhat + @fhevm/hardhat-plugin; protocolGas = gasUsed minus the gas spent inside the mock's cleartext layer (debug_traceTransaction); persistent ACL grants = Allowed events. Before: spike/private-mode @ bf296b0 measured with the same recordTx harness; after: feature/private-mode (test/PrivateMode.test.ts).",
+  "before": {
+    "protocolGas": 1318033,
+    "hcu": 1990100,
+    "hcuDepth": 1058032,
+    "persistentAclGrants": 13,
+    "accountGrants": 6,
+    "tokenGrants": 7
+  },
+  "after": {
+    "protocolGas": 1154630,
+    "hcu": 1996128,
+    "hcuDepth": 1088032,
+    "persistentAclGrants": 9,
+    "accountGrants": 2,
+    "tokenGrants": 7
+  },
+  "delta": {
+    "protocolGas": -163403,
+    "protocolGasPct": -12.4,
+    "hcu": 6028,
+    "hcuPct": 0.3,
+    "hcuDepth": 30000,
+    "persistentAclGrants": -4
+  },
+  "sepolia": {
+    "before_measured": {
+      "gasUsed": 2447568,
+      "newSlots": 13,
+      "evidence": "[M] results/spike/sepolia/private-mode-sepolia.json (T1, N = 5)"
+    },
+    "after_projected": {
+      "newSlots": 9,
+      "gasUsed": 1930013,
+      "evidence": "[I] mock delta plus 4 fewer new slots at Sepolia's schedule (110,983 gas per new slot vs 22,445 on mainnet's); not measured: the burner lacks the funds"
+    },
+    "mainnetScheduleEquivalent": {
+      "before": 1296574,
+      "after_projected": 1133171
+    }
+  },
+  "whatChanged": [
+    "the tripwire is folded into the K-only counter (it saturates to 2^64 - 1) instead of a separate encrypted flag",
+    "the guardian is allowed only the new counter; delivered / silent zero / tripwire follow from its change",
+    "the 7 token grants are inside the ERC-7984 token's own transfer and are not the account's to remove"
+  ]
+}
