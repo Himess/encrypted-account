@@ -1,28 +1,28 @@
 {
   "evidence": "[Mock]",
-  "generatedAt": "2026-11-15T13:21:24.056Z",
+  "generatedAt": "2026-11-21T14:21:25.036Z",
   "rows": [
     {
       "flow": "factory.createAccount (clone + initialize + E_addr EIP-712 consent)",
-      "gas": 295465,
+      "gas": 295683,
       "hcuTotal": 0,
       "hcuDepth": 0
     },
     {
       "flow": "setupPin (fingerprint + duress slot select/rand)",
-      "gas": 813704,
+      "gas": 813680,
       "hcuTotal": 79000,
       "hcuDepth": 79000
     },
     {
       "flow": "setupAsset (L_min, L, L_big + τ draw)",
-      "gas": 1477551,
+      "gas": 1477671,
       "hcuTotal": 1345064,
       "hcuDepth": 1322000
     },
     {
       "flow": "setupKnown (12 eaddress / proof)",
-      "gas": 2062948,
+      "gas": 2062900,
       "hcuTotal": 0,
       "hcuDepth": 0,
       "note": "2048-bit CRS limit: at most 12 eaddress"
@@ -41,37 +41,37 @@
     },
     {
       "flow": "requestTransfer K-only (isIn N=30 + threshold + sticky tripwire)",
-      "gas": 1194866,
+      "gas": 1194906,
       "hcuTotal": 774036,
       "hcuDepth": 634032
     },
     {
       "flow": "finalizeEvaluation (KMS proof + transfer)",
-      "gas": 307441,
+      "gas": 309807,
       "hcuTotal": 0,
       "hcuDepth": 0
     },
     {
       "flow": "requestTransfer PIN path (opens op)",
-      "gas": 127401,
+      "gas": 127376,
       "hcuTotal": 0,
       "hcuDepth": 0
     },
     {
       "flow": "submitGuess (transfer; okAny + isDuress + big)",
-      "gas": 1191237,
+      "gas": 1191807,
       "hcuTotal": 698002,
       "hcuDepth": 302000
     },
     {
       "flow": "finalizeGuess (2-handle KMS proof)",
-      "gas": 306783,
+      "gas": 307161,
       "hcuTotal": 0,
       "hcuDepth": 0
     },
     {
       "flow": "executeOp transfer (+ auto-add to known list: isIn + select)",
-      "gas": 752801,
+      "gas": 755152,
       "hcuTotal": 667032,
       "hcuDepth": 667032
     },
@@ -83,37 +83,37 @@
     },
     {
       "flow": "submitGuess (admin; okAny + isDuress)",
-      "gas": 948399,
+      "gas": 948982,
       "hcuTotal": 555002,
       "hcuDepth": 278002
     },
     {
       "flow": "finalizeGuess + resetTrip (τ redrawn)",
-      "gas": 963491,
+      "gas": 966291,
       "hcuTotal": 1127064,
       "hcuDepth": 1104000
     },
     {
       "flow": "tightenLimits (K-only; 4× min)",
-      "gas": 907407,
+      "gas": 907396,
       "hcuTotal": 876000,
       "hcuDepth": 438000
     },
     {
       "flow": "removeKnown (K-only; select)",
-      "gas": 510127,
+      "gas": 510115,
       "hcuTotal": 83032,
       "hcuDepth": 83032
     },
     {
       "flow": "startEscape (no FHE)",
-      "gas": 42940,
+      "gas": 42892,
       "hcuTotal": 0,
       "hcuDepth": 0
     },
     {
       "flow": "executeEscape (no FHE; ETH + 1 token)",
-      "gas": 50246,
+      "gas": 50250,
       "hcuTotal": 0,
       "hcuDepth": 0
     },
@@ -221,11 +221,11 @@
       "note": "per draw ≈ HCU/16"
     },
     {
-      "flow": "τ distribution: buckets 35/40/26/34/30/29/31/31",
+      "flow": "τ distribution: buckets 30/29/29/33/30/40/40/25",
       "gas": 0,
       "hcuTotal": 0,
       "hcuDepth": 0,
-      "note": "χ²=4.00 (df=7, p=0.001 threshold 24.32)"
+      "note": "χ²=6.38 (df=7, p=0.001 threshold 24.32)"
     }
   ]
 }

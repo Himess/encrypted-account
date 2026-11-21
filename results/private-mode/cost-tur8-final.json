@@ -1,0 +1,91 @@
+{
+ "generatedAt": "2026-11-21T14:21:46.198Z",
+ "evidence": "[Mock] scripts/measure/private-cost.ts (protocol gas = gas without the mock cleartext layer); v1 = the first private-mode build, stage1 = the hidden amount, final = with Disclose, the guardian pause and the two-device checks",
+ "rows": {
+  "kOnlyTransfer": {
+   "protocolGas": {
+    "v1": 1154630,
+    "stage1": 1214441,
+    "final": 1219175
+   },
+   "hcu": {
+    "v1": 1996128,
+    "stage1": 2332128,
+    "final": 2332128
+   },
+   "hcuDepth": {
+    "v1": 1088032,
+    "stage1": 1088032,
+    "final": 1088032
+   }
+  },
+  "viewFinalize_real": {
+   "protocolGas": {
+    "v1": 526858,
+    "stage1": 555430,
+    "final": 562136
+   },
+   "hcu": {
+    "v1": 654000,
+    "stage1": 491000,
+    "final": 491000
+   },
+   "hcuDepth": {
+    "v1": 654000,
+    "stage1": 436000,
+    "final": 436000
+   }
+  },
+  "viewFinalize_duress": {
+   "protocolGas": {
+    "v1": 509770,
+    "stage1": 538366,
+    "final": 545024
+   },
+   "hcu": {
+    "v1": 654000,
+    "stage1": 491000,
+    "final": 491000
+   },
+   "hcuDepth": {
+    "v1": 654000,
+    "stage1": 436000,
+    "final": 436000
+   }
+  },
+  "transferExecute_real": {
+   "protocolGas": {
+    "v1": 642717,
+    "stage1": 562839,
+    "final": 569538
+   },
+   "hcu": {
+    "v1": 1442128,
+    "stage1": 1226096,
+    "final": 1226096
+   },
+   "hcuDepth": {
+    "v1": 1063000,
+    "stage1": 1009000,
+    "final": 1009000
+   }
+  },
+  "transferExecute_duress": {
+   "protocolGas": {
+    "v1": 618948,
+    "stage1": 539070,
+    "final": 545769
+   },
+   "hcu": {
+    "v1": 1442096,
+    "stage1": 1226064,
+    "final": 1226064
+   },
+   "hcuDepth": {
+    "v1": 1063000,
+    "stage1": 1009000,
+    "final": 1009000
+   }
+  }
+ }
+}

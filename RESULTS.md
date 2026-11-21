@@ -1,7 +1,90 @@
 # RESULTS
 
-F0.16 (bond, fee, PIN guidance) is on top, then the hidden-inheritance results (W1 first, then v1 as measured), then Round 2; the Round 1 results are kept unchanged below. Evidence classes: **[M]** measured · **[Mock]** ran on
+Round 8 (private mode on main, security fixes, the guardian pause, two devices) is on top, then F0.16 (bond, fee, PIN guidance), then the hidden-inheritance results (W1 first, then v1 as measured), then Round 2; the Round 1 results are kept unchanged below. Evidence classes: **[M]** measured · **[Mock]** ran on
 Zama's mock · **[V]** verified by reading code or documentation · **[D]** Zama documentation · **[I]** inference.
+
+# Round 8 — private mode on main, security fixes, guardian pause, two devices (21 November 2026)
+
+- **What changed:** private mode merged into `main`, with the duress PIN now keeping a hidden amount out of view
+  (`PRIVATE_MODE_VERSION` 2, [docs/private-mode.md](docs/private-mode.md) §9); the recovery track's bond follows the
+  owner's base bond; I3 checked as an invariant after every flow; every disclosure through `contracts/account/Disclose.sol`;
+  the guardian's temporary pause (`guardianPause`, lifted on the lane with `A_UNPAUSE`); the two-device PIN flow and the
+  optional two-device setting (`A_SET_LANE_ONLY`, [docs/two-device.md](docs/two-device.md)); the watchtower's alarm with
+  the pause step and deadline; the app's phone page, Second device sheet, "Approve on my phone" and the setup choice.
+- **Status:** `npm test` 197/197 [Mock] in 23 files (new: `test/StandardIndistinguishability.test.ts`,
+  `test/PrivateIndistinguishabilityB.test.ts`, `test/DisclosureScan.test.ts`, `test/I3Invariant.test.ts`,
+  `test/GuardianPause.test.ts`, `test/TwoDevice.test.ts`, and new cases in `PrivateMode`, `F016`, `WatchtowerService`);
+  SDK 34/34; watchtower unit 14/14; `web/` type check, vectors and build pass; the app's new screens were checked in a
+  browser (read-only wallet) against Sepolia, including the phone page on a real op of the private-mode test account
+  (its challenge, recomputed on the phone, matched the contract's). Nothing was deployed: not to Sepolia, not to Vercel.
+
+## Indistinguishability [Mock] — `results/private-mode/indistinguishability-*.json`
+
+Every pair traced (`debug_traceTransaction`); execution gas outside the mock's cleartext layer, HCU, HCU depth, EVM
+steps, calldata length, events (the FHE executor's op events included), ACL grants, decryption requests, storage and
+transient writes and external calls compared:
+
+| Pairs | Tx pairs | Differences |
+|---|---:|---:|
+| private mode, real vs duress PIN (views, transfers within and above the duress view, reset, duress setting, PIN change) | 25 | 0 |
+| private mode, a duress PIN set vs not | 5 | 0 |
+| standard account, real vs duress PIN (ETH transfer, admin op, PIN change) | 12 | 0 |
+| private mode, a K-only transfer that passes vs fails | 2 | 0 |
+
+## Cost of the standard flows [Mock] — `results/cost-model-mock-f016.json` → `results/cost-model-mock.json`
+
+`test/CostModel.test.ts` before (F0.16) and after Round 8. **HCU: unchanged in every row. No new storage slot.** Rows that
+changed by more than 300 gas:
+
+| Flow | F0.16 | Round 8 | Δ | Why |
+|---|---:|---:|---:|---|
+| finalizeEvaluation | 307,441 | 309,807 | +2,366 | the guardian-pause check (one cold read) |
+| submitGuess (transfer) | 1,191,237 | 1,191,807 | +570 | Disclose's type checks, the two-device rule |
+| finalizeGuess (2 handles) | 306,783 | 307,161 | +378 | as above |
+| executeOp transfer | 752,801 | 755,152 | +2,351 | the guardian-pause check |
+| submitGuess (admin) | 948,399 | 948,982 | +583 | as submitGuess (transfer) |
+| finalizeGuess + resetTrip | 963,491 | 966,291 | +2,800 | the pause check before an immediate admin op |
+
+## Cost of the private-mode paths [Mock] — `results/private-mode/cost-tur8-final.json`
+
+`scripts/measure/private-cost.ts` on the first private-mode build (decoy cap) and on Round 8, the same account history:
+
+| (protocol gas / HCU) | First build | Round 8 | Δ |
+|---|---:|---:|---:|
+| K-only private transfer | 1,154,630 / 1,996,128 | 1,219,175 / 2,332,128 | +64,545 (+5.6 %) / +336,000 (+16.8 %) |
+| PIN view (its finalize) | 526,858 / 654,000 | 562,136 / 491,000 | +35,278 / −163,000 |
+| PIN private transfer (its execution) | 642,717 / 1,442,128 | 569,538 / 1,226,096 | −73,179 / −216,032 |
+
+The K-only path pays three FHE operations for the hidden-amount rule (`amount + hidden ≤ balance`, one more `and`) and
+two reads for Disclose (the fingerprint handles it refuses). The PIN paths lost the decoy bookkeeping; the view writes the
+clamped hidden amount. The K-only path stays at 11.7 % of the 20M per-transaction HCU limit, with depth unchanged
+(1,088,032). Not measured on Sepolia.
+
+## Contract sizes [V] — `npm run size`
+
+| Contract | F0.16 / first private build | Round 8 | Limit 24,576 |
+|---|---:|---:|---|
+| EncryptedAccount | 23,264 | 23,289 | ok |
+| EncryptedAccountB | 24,476 | 24,480 | ok (96 left) |
+| EncryptedAccountP | 24,153 | 24,144 | ok |
+| PinLib | 10,641 | 11,098 | ok |
+| PolicyLib | 9,277 | 9,356 | ok |
+| OpsLib | 12,760 | 14,006 | ok |
+| OpenLib | 13,993 | 14,292 | ok |
+| PrivateModule | 12,755 | 13,168 | ok |
+
+New features went into the libraries; the account itself gained only `guardianPause`, and lost the unused
+`approvedHash(bytes32)` view (`isValidSignature` answers the same).
+
+## Sepolia: prepared, not run [I] — `scripts/sepolia/r8-deploy.ts`
+
+The libraries, both implementations (on the F0.16 FeeConfig) and both factories are new: 9 deployments. The script's
+read-only check (21 November 2026, gas price ≈ 0.05 gwei) estimated **178.4M gas ≈ 0.0089 ETH** (keep about twice that
+for price swings); the burner holds 0.0871 ETH. Deployments do no FHE operation. Measurements worth running after it
+(estimated): the private-mode pairs on the new module (T1, T2, T3 view and transfer pairs, ≈ 0.01 ETH with bonds), a
+two-device smoke run (lane transfer, the setting on and off, ≈ 15 transactions) and a guardian-pause run, with a few
+dozen FHE transactions in all (each well under the 20M HCU limit), about 30 public and 10 user decryptions through the
+relayer. The first build's pending T3 execution (12 executeOp) is separate, on the old deployment.
 
 # F0.16 — K-track bond, adjustable base bond, protocol fee, PIN guidance (15 November 2026)
 
