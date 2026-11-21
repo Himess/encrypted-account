@@ -21,8 +21,13 @@ import {PrivateStorage as P, IPrivateHooks} from "./PrivateStorage.sol";
 ///  - executeEscapeConfidential: after an escape, the whole encrypted balance of each private token goes to the escape
 ///    address. It needs the FHE host contracts on-chain; the account's ETH / ERC-20 escape (executeEscape) does not.
 ///  Under the duress PIN every PIN path runs the same FHE operations, writes the same slots and emits the same events as
-///  under the real PIN; only encrypted values differ.
+///  under the real PIN; only encrypted values differ. The duress PIN works on the balance minus the hidden amount as if
+///  that were the whole balance, and K alone never reaches the hidden amount either, so deposits, K-only sends and duress
+///  sends show in a duress view exactly as they would in a real one.
 contract PrivateModule is IPrivateHooks, ReentrancyGuardTransient {
+    /// @notice Semantics of this module, for clients: 2 = the duress PIN keeps a hidden amount out of view (1, the first
+    ///         Sepolia build, capped the duress view at a decoy amount instead).
+    uint256 public constant PRIVATE_MODE_VERSION = 2;
     /// @notice The EntryPoint of the account implementation that uses this module (K may also act through it).
     address public immutable entryPoint;
     address private immutable self;
@@ -51,11 +56,11 @@ contract PrivateModule is IPrivateHooks, ReentrancyGuardTransient {
     // ─────────────────────────────── setup ───────────────────────────────
 
     /// @notice Setup (before arming): turns on the private paths for an ERC-7984 token, with its own encrypted limits and
-    ///         the decoy cap. The account must have been created with bigTransfer ≥ 72 h (§17.1).
-    /// @param decoyCap client-encrypted in every account, so the dataflow does not show whether a duress PIN exists.
-    ///        Without a duress PIN its value never matters; the web app sends 0, so that a duress PIN stored by an
-    ///        interrupted earlier setup would show and move nothing.
-    function privateSetupAsset(address token, externalEuint64 lmin, externalEuint64 lmax, externalEuint64 decoyCap, bytes calldata proof)
+    ///         the hidden amount. The account must have been created with bigTransfer ≥ 72 h (§17.1).
+    /// @param hidden the part of the balance the duress PIN never shows or moves, client-encrypted in every account so the
+    ///        dataflow does not show whether a duress PIN exists. Without a duress PIN it must be 0: K alone never moves the
+    ///        hidden amount either. Capped at MAX_LIMIT.
+    function privateSetupAsset(address token, externalEuint64 lmin, externalEuint64 lmax, externalEuint64 hidden, bytes calldata proof)
         external
         viaAccount
     {
@@ -69,19 +74,18 @@ contract PrivateModule is IPrivateHooks, ReentrancyGuardTransient {
         PolicyMath.requireProof(proof);
         euint64 lo = FHE.min(FHE.fromExternal(lmin, proof), P.MAX_LIMIT);
         euint64 hi = FHE.max(FHE.min(FHE.fromExternal(lmax, proof), P.MAX_LIMIT), lo);
-        euint64 cap = FHE.fromExternal(decoyCap, proof);
+        euint64 h = FHE.min(FHE.fromExternal(hidden, proof), P.MAX_LIMIT);
         euint64 zero = FHE.asEuint64(0);
         FHE.allowThis(lo);
         FHE.allowThis(hi);
-        FHE.allowThis(cap);
+        FHE.allowThis(h);
         FHE.allowThis(zero);
         a.configured = true;
         a.epoch = PolicyMath.currentEpoch();
         a.lmin = lo;
         a.l = hi;
-        a.decoyCap = cap;
+        a.hidden = h;
         a.spent = zero;
-        a.decoySpent = zero;
         euint64 tau = _drawTau(a);
         FHE.allowThis(tau);
         a.tau = tau;
@@ -92,10 +96,13 @@ contract PrivateModule is IPrivateHooks, ReentrancyGuardTransient {
     // ─────────────────────────────── K alone: one transaction ───────────────────────────────
 
     /// @notice K-only private transfer, synchronous:
-    ///   room = max(tau, spent) − spent;  fits = amount ≤ room;  pass = isIn(to, recipients) AND fits
+    ///   room = max(tau, spent) − spent;  fits = amount ≤ room;  visible = amount + hidden ≤ balance
+    ///   pass = isIn(to, recipients) AND fits AND visible
     ///   moved = token.transfer(to, select(pass, amount, 0));  spent = fits ? spent + moved : TRIPPED
-    /// A tripped counter (TRIPPED ≥ tau) leaves no room, so the wire stays fired until a PIN-verified reset. Nothing is
-    /// decrypted; only the guardian may read the new counter, so K never learns whether a transfer passed.
+    /// A tripped counter (TRIPPED ≥ tau) leaves no room, so the wire stays fired until a PIN-verified reset. An amount that
+    /// would reach into the hidden amount moves zero without tripping, like a transfer above a balance: K alone never moves
+    /// what the duress PIN keeps hidden, so a coercer holding K cannot probe it. Nothing is decrypted; only the guardian may
+    /// read the new counter, so K never learns whether a transfer passed.
     function privateTransfer(address token, address to, externalEuint64 amount, bytes calldata proof) external viaAccount nonReentrant returns (bytes32) {
         S.Layout storage l = S.layout();
         _onlyK(l);
@@ -111,7 +118,9 @@ contract PrivateModule is IPrivateHooks, ReentrancyGuardTransient {
         euint64 spent = a.spent;
         euint64 room = FHE.sub(FHE.max(a.tau, spent), spent);
         ebool fits = FHE.le(amt, room);
-        ebool pass = FHE.and(FHE.isIn(FHE.asEaddress(to), _recipients(l)), fits);
+        // no overflow where it matters: when `fits`, amount ≤ room ≤ tau < 2^63, and hidden ≤ MAX_LIMIT = 2^62
+        ebool visible = FHE.le(FHE.add(amt, a.hidden), IERC7984(token).confidentialBalanceOf(address(this)));
+        ebool pass = FHE.and(FHE.isIn(FHE.asEaddress(to), _recipients(l)), FHE.and(fits, visible));
         euint64 send = FHE.select(pass, amt, FHE.asEuint64(0));
         FHE.allowTransient(send, token);
         euint64 moved = IERC7984(token).confidentialTransfer(to, send);
@@ -173,9 +182,10 @@ contract PrivateModule is IPrivateHooks, ReentrancyGuardTransient {
         return _openPlain(S.A_PRIVATE_RESET, token);
     }
 
-    /// @notice Sets (use = true) or clears the duress PIN and sets `token`'s decoy cap, after the PIN and the settings
-    ///         delay. Without a duress PIN the slot takes FHE randomness, as at setup, so both cases look the same.
-    function openSetDuress(address token, externalEuint64 candidate, externalEbool use, externalEuint64 decoyCap, bytes calldata proof)
+    /// @notice Sets (use = true) or clears the duress PIN and sets `token`'s hidden amount, after the PIN and the settings
+    ///         delay. Without a duress PIN the slot takes FHE randomness, as at setup, so both cases look the same; the
+    ///         client then sends a hidden amount of 0, since K alone never moves the hidden amount either.
+    function openSetDuress(address token, externalEuint64 candidate, externalEbool use, externalEuint64 hidden, bytes calldata proof)
         external
         viaAccount
         nonReentrant
@@ -187,10 +197,10 @@ contract PrivateModule is IPrivateHooks, ReentrancyGuardTransient {
         if (!P.layout().assets[token].configured) revert Errors.InvalidParams();
         PolicyMath.requireProof(proof);
         euint64 slot = FHE.select(FHE.fromExternal(use, proof), FHE.fromExternal(candidate, proof), FHE.randEuint64());
-        euint64 cap = FHE.fromExternal(decoyCap, proof);
+        euint64 h = FHE.min(FHE.fromExternal(hidden, proof), P.MAX_LIMIT);
         FHE.allowThis(slot);
-        FHE.allowThis(cap);
-        opId = OpenLib.openWithHandles(S.A_PRIVATE_SET_DURESS, token, "", euint64.unwrap(slot), euint64.unwrap(cap), bytes32(0));
+        FHE.allowThis(h);
+        opId = OpenLib.openWithHandles(S.A_PRIVATE_SET_DURESS, token, "", euint64.unwrap(slot), euint64.unwrap(h), bytes32(0));
         _cleanAA();
     }
 
@@ -271,7 +281,7 @@ contract PrivateModule is IPrivateHooks, ReentrancyGuardTransient {
         external
         view
         viaAccount
-        returns (bool configured, uint64 epoch, bytes32 spent, bytes32 lmin, bytes32 lmax, bytes32 tau, bytes32 decoyCap, bytes32 decoySpent, bytes32 lastView)
+        returns (bool configured, uint64 epoch, bytes32 spent, bytes32 lmin, bytes32 lmax, bytes32 tau, bytes32 hidden, bytes32 lastView)
     {
         P.Asset storage a = P.layout().assets[token];
         return (
@@ -281,8 +291,7 @@ contract PrivateModule is IPrivateHooks, ReentrancyGuardTransient {
             euint64.unwrap(a.lmin),
             euint64.unwrap(a.l),
             euint64.unwrap(a.tau),
-            euint64.unwrap(a.decoyCap),
-            euint64.unwrap(a.decoySpent),
+            euint64.unwrap(a.hidden),
             euint64.unwrap(a.lastView)
         );
     }
@@ -329,39 +338,48 @@ contract PrivateModule is IPrivateHooks, ReentrancyGuardTransient {
         } else {
             P.Asset storage a = P.layout().assets[op.target];
             if (sub == S.A_PRIVATE_SET_DURESS) {
+                // Under the duress PIN this changes nothing (the coercer cannot move the duress PIN or the hidden amount).
+                // Limit: a coercer who sets a "new duress PIN" this way and then tries it sees it fail (private-mode.md §8).
                 euint64 dur = FHE.select(dz, l.duressH, euint64.wrap(op.h0));
-                euint64 cap = FHE.select(dz, a.decoyCap, euint64.wrap(op.h1));
+                euint64 h = FHE.select(dz, a.hidden, euint64.wrap(op.h1));
                 FHE.allowThis(dur);
-                FHE.allowThis(cap);
+                FHE.allowThis(h);
                 l.duressH = dur;
-                a.decoyCap = cap;
+                a.hidden = h;
             } else if (sub == S.A_PRIVATE_RESET) {
-                euint64 sp = FHE.select(dz, a.spent, FHE.asEuint64(0));
-                euint64 tau = FHE.select(dz, a.tau, _drawTau(a));
-                FHE.allowThis(sp);
+                // The same under both PINs: a reset that did nothing under the duress PIN would show in the next K-only
+                // send. K alone never reaches the hidden amount, so a coercer gains nothing from a fresh wire.
+                euint64 zero = FHE.asEuint64(0);
+                euint64 tau = _drawTau(a);
+                FHE.allowThis(zero);
                 FHE.allowThis(tau);
-                a.spent = sp;
+                a.spent = zero;
                 a.tau = tau;
             } else {
-                euint64 left = FHE.sub(FHE.max(a.decoyCap, a.decoySpent), a.decoySpent); // decoy left, max-guarded
+                // The duress PIN works on the balance above the hidden amount as if that were the whole balance.
+                euint64 bal = IERC7984(op.target).confidentialBalanceOf(address(this));
+                euint64 hc = FHE.min(a.hidden, bal);
+                euint64 shown = FHE.sub(bal, hc);
                 if (sub == S.A_PRIVATE_VIEW) {
-                    euint64 bal = IERC7984(op.target).confidentialBalanceOf(address(this));
+                    // A duress view clamps the hidden amount to the balance, and it stays so: what the coercer saw is the
+                    // anchor, and a deposit he makes afterwards shows in full, as on a real balance. (A transfer needs no
+                    // clamp: it moves at most `shown`, so the balance stays at or above the hidden amount.)
+                    euint64 h = FHE.select(dz, hc, a.hidden);
+                    FHE.allowThis(h);
+                    a.hidden = h;
                     // a fresh handle in both modes: it never equals the token's stored balance handle
-                    euint64 v = FHE.select(dz, FHE.min(bal, left), bal);
+                    euint64 v = FHE.select(dz, shown, bal);
                     FHE.allowThis(v);
                     FHE.allow(v, l.owner);
                     a.lastView = v;
                     result = euint64.unwrap(v);
                 } else {
-                    // A_PRIVATE_TRANSFER: under duress the decoy acts as the balance — up to `left` moves, more moves
-                    // zero, exactly like an ERC-7984 transfer above the balance (a partial move would give duress away)
+                    // A_PRIVATE_TRANSFER: under duress up to `shown` moves and more moves zero, exactly like an ERC-7984
+                    // transfer above the balance (a partial move would give duress away)
                     euint64 amt = euint64.wrap(op.h0);
-                    euint64 send = FHE.select(dz, FHE.select(FHE.le(amt, left), amt, FHE.asEuint64(0)), amt);
+                    euint64 send = FHE.select(dz, FHE.select(FHE.le(amt, shown), amt, FHE.asEuint64(0)), amt);
                     FHE.allowTransient(send, op.target);
                     euint64 moved = IERC7984(op.target).confidentialTransfer(abi.decode(op.data, (address)), send);
-                    euint64 ds = FHE.add(a.decoySpent, FHE.select(dz, moved, FHE.asEuint64(0)));
-                    FHE.allowThis(ds);
-                    a.decoySpent = ds;
                     result = euint64.unwrap(moved);
                 }
             }

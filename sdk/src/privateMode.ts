@@ -7,12 +7,14 @@
  *     today. Everything else takes the PIN path, which never trips the wire. Without a local record (a new device) the
  *     app cannot know what was sent today and routes every send to the PIN path.
  *
- *  2. Decoy credibility (design doc §17.5, spike T5). Shield (wrap) and unshield amounts are public; the private
- *     transfers themselves are public as events, only their amounts are hidden. A coercer anchors on N = shielded −
- *     unshielded and asks whether the k hidden payments made since the last shield could have brought the balance down
- *     to the decoy D. With payments of mean mu (exponential), his probability that the balance is at most D is
- *     P(Poisson((N − D) / mu) ≤ k − 1). The app shows it next to the duress setting and warns when it is low. It ignores
- *     everything off-chain (exchange leaks, social media, the victim's lifestyle): a guide, not a guarantee.
+ *  2. Credibility of the duress view (design doc §17.5, spike T5). Under the duress PIN the account shows the balance
+ *     minus the hidden amount the owner chose, D = balance − hidden (PrivateModule, PRIVATE_MODE_VERSION 2). Shield (wrap)
+ *     and unshield amounts are public; the private transfers themselves are public as events, only their amounts are
+ *     hidden. A coercer anchors on N = shielded − unshielded and asks whether the k hidden payments made since the last
+ *     shield could have brought the balance down to D. With payments of mean mu (exponential), his probability that the
+ *     balance is at most D is P(Poisson((N − D) / mu) ≤ k − 1). The app shows it next to the duress setting and warns when
+ *     it is low. It ignores everything off-chain (exchange leaks, social media, the victim's lifestyle): a guide, not a
+ *     guarantee.
  */
 
 /** `reason` is a short sentence for the owner, without the path itself (the app names the path). */
@@ -43,7 +45,7 @@ export function sentToday(records: readonly SendRecord[], nowMs: number): bigint
   return records.filter((r) => r.day === d).reduce((s, r) => s + BigInt(r.amount), 0n);
 }
 
-/** P(Poisson(r) ≤ k − 1) = P(Gamma(k, 1) ≥ r): the coercer's credibility of the decoy. */
+/** P(Poisson(r) ≤ k − 1) = P(Gamma(k, 1) ≥ r): the coercer's credibility of the duress view. */
 export function poissonCdfBelow(k: number, r: number): number {
   if (r <= 0) return 1;
   if (k <= 0) return 0;
@@ -57,9 +59,10 @@ export function poissonCdfBelow(k: number, r: number): number {
 }
 
 /**
- * The coercer's probability that the balance is at most the decoy, from public history only.
+ * The coercer's probability that the balance is at most what the duress view shows, from public history only.
  * @param shieldedNet N, in token units: shielded − unshielded (public amounts)
- * @param decoy D, the decoy cap the owner set
+ * @param decoy D, what the duress view shows: the balance minus the hidden amount (N − hidden when nothing was spent,
+ *        which makes the result an upper bound)
  * @param hiddenPayments k, private transfers out of the account since its last shield (their count is public)
  * @param typicalPayment mu, the coercer's idea of one payment (default: 4 % of N, at least 1)
  */
@@ -77,11 +80,11 @@ export function credibilityAdvice(c: number): { level: CredibilityLevel; text: s
   if (c < 0.2) {
     return {
       level: "weak",
-      text: "Someone who reads this account's public history would not believe the decoy yet: more was shielded than could have been spent since. Shield in smaller steps over time, or raise the decoy; the time lock stays your first protection.",
+      text: "Someone who reads this account's public history would not believe the duress view yet: more was shielded than could have been spent since. Shield in smaller steps over time, or keep less hidden; the time lock stays your first protection.",
     };
   }
-  if (c < 0.5) return { level: "fair", text: "The decoy is plausible but not convincing. It becomes more believable with more private payments after your last shield." };
-  return { level: "good", text: "The decoy fits this account's public history." };
+  if (c < 0.5) return { level: "fair", text: "The duress view is plausible but not convincing. It becomes more believable with more private payments after your last shield." };
+  return { level: "good", text: "The duress view fits this account's public history." };
 }
 
 /** Public history of a private account, from the token's events: shields and unshields with their public amounts, and

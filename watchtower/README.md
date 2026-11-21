@@ -19,7 +19,7 @@ An off-chain service that watches accounts on-chain and quietly tells the right 
   freeze), and the contracts emit the same events as for the real PIN. The duress flag is decrypted for **every** guess,
   real or not, through Zama's relayer and KMS (off-chain), so the requests look the same either way.
 - The alarm says only which account, when, and that the duress PIN was used, plus the owner's optional short note. No
-  message from this service ever carries an amount (no balance, no transfer amount, no limit, no decoy).
+  message from this service ever carries an amount (no balance, no transfer amount, no limit, no hidden amount).
 - The owner's messages are the same for a real and a duress PIN.
 - The trusted contacts and channels live in the service's own config file, never on-chain.
 - Run it on a machine the owner does not carry: the fake channel's file and console, and the delivery log, are on the

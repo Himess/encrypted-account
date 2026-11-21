@@ -26,7 +26,8 @@ for (const f of files) {
   let attempt = 0;
   for (;;) {
     attempt++;
-    const r = spawnSync(process.execPath, [cli, "test", f], { cwd: root, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+    // --expose-gc: the traced tests collect each transaction trace before the next one (test/privateHelpers.ts recordTx)
+    const r = spawnSync(process.execPath, ["--expose-gc", cli, "test", f], { cwd: root, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
     const out = (r.stdout ?? "") + (r.stderr ?? "");
     process.stdout.write(out);
     log += `\n===== ${f} (attempt ${attempt}) status=${r.status} signal=${r.signal}\n` + out;

@@ -53,11 +53,13 @@ export const DEMO_DELAYS = {
 
 /**
  * Private mode (optional): accounts created on FACTORY_P (EncryptedAccountP + PrivateModule) hold an ERC-7984 token with
- * hidden balances, a PIN-gated view, a one-transaction K-only private send and an optional duress PIN. Empty until the
- * private-mode contracts are deployed on this network; the setup option stays visible but off and disabled until then.
+ * hidden balances, a PIN-gated view, a one-transaction K-only private send and an optional duress PIN. The app creates
+ * private accounts only when this factory's module is the build it is written for (account.ts, PRIVATE_MODE_VERSION);
+ * otherwise the setup option stays visible but off and disabled. This is the first Sepolia build (version 1): replace both
+ * values with the next deployment's (scripts/sepolia/r8-deploy.ts writes them).
  */
-export const FACTORY_P = "";
-export const FACTORY_P_DEPLOY_BLOCK = 0;
+export const FACTORY_P = "0xE93F23487c9aa1ab5acE4401d7FF957aF85FC92E";
+export const FACTORY_P_DEPLOY_BLOCK = 12_143_705;
 /** Zama's Wrappers Registry and its official cUSDC (Mock) wrapper on Sepolia (docs.zama.org, addresses/testnet/sepolia). */
 export const WRAPPER_REGISTRY = "0x2f0750Bbb0A246059d80e94c454586a7F27a128e";
 export const CUSDC = "0x7c5BF43B851c1dff1a4feE8dB225b87f2C223639";
@@ -66,10 +68,11 @@ export const USDC_MOCK = "0x9b5Cd13b8eFbB58Dc25A05CF411D8056058aDFfF";
 export const CUSDC_UNIT = 10n ** 6n;
 /**
  * Optional watchtower for private-mode accounts: its address becomes the account's guardian (it may read the K-only
- * counter and restrict, never move funds), and the app reads its notices (silent zero, delivery, tripwire) from the URL.
- * Empty: no guardian, and a K-only private send is confirmed only by a PIN-gated view.
+ * counter and the duress flag, and restrict; never move funds), and the app reads its notices (silent zero, delivery,
+ * tripwire) from the URL. The watchtower of the private-mode Sepolia run: its service (watchtower/) must be running for
+ * the alarms to go out. No notices URL: a K-only private send is confirmed only by a PIN-gated view.
  */
-export const WATCHTOWER = { address: "", noticesUrl: "" };
+export const WATCHTOWER = { address: "0x8e98d5e45822b81Ac7dB853480c405E8Ea769B7A", noticesUrl: "" };
 /** Private mode: every PIN-verified private send waits at least this long (design doc §17.1; PrivateStorage.MIN_BIG_DELAY). */
 export const PRIVATE_MIN_BIG_DELAY = 72 * 3600;
 /** Demo delays of a private-mode account: as DEMO_DELAYS, with the long class at the 72-hour minimum. */

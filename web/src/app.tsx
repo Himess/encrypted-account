@@ -17,7 +17,9 @@ import {
   OwnerBond,
   PIN_CHANGE_STEPS,
   PRIVATE_SETUP_STEP,
+  PRIVATE_MODE_VERSION,
   PRIVATE_SUB,
+  privateModeVersionOf,
   PRIVATE_VIEW_STEPS,
   PendingPrivate,
   PrivateInfo,
@@ -668,7 +670,7 @@ function CreateFlow({ ctx, fhe, walletBal, onDone, onCancel, privateDefault }: {
     duress: false,
     dpin: "",
     dpin2: "",
-    decoy: "50",
+    hidden: "1000",
   }));
   const setPfp = (q: Partial<PrivForm>) => setPf((f) => ({ ...f, ...q }));
   const [resume, setResume] = useState(false);
@@ -765,7 +767,7 @@ function CreateFlow({ ctx, fhe, walletBal, onDone, onCancel, privateDefault }: {
         ),
       );
     try {
-      const priv = pf.on ? { limitUnits: parseUsd(pf.limit)!, duressPin: pf.duress ? pf.dpin : null, decoyUnits: pf.duress ? parseUsd(pf.decoy) : null } : undefined;
+      const priv = pf.on ? { limitUnits: parseUsd(pf.limit)!, duressPin: pf.duress ? pf.dpin : null, hiddenUnits: pf.duress ? parseUsd(pf.hidden) : null } : undefined;
       const known = pf.on && pf.known.trim() ? ethers.getAddress(pf.known.trim()) : null;
       const a = await createAndSetup(ctx, { pin, limitEth: limit, known, escapeWallet, bondBase: bondOk ? bondWei! : BASE_BOND, priv }, cb);
       setCreated(a);
@@ -2128,10 +2130,10 @@ function AlertsSheet({ guardian, priv, onClose }: { guardian: string | null; pri
             <span class="k">
               Duress PIN → the person you chose
               <small>
-                To limit the loss if someone forces you to open the account: the account looks normal and shows only the decoy, and the watchtower sends a silent alarm
+                To limit the loss if someone forces you to open the account: the account looks normal and shows only what is above the amount you keep hidden, and the watchtower sends a silent alarm
                 to the person you chose in advance (family, a lawyer or a security company). Never to your own phone or channel, which may be in the attacker&apos;s
                 hands. Nothing happens on-chain: no restriction, no freeze, no event. The alarm says which account, when, and that the duress PIN was used, plus your
-                optional short note; never a balance or the decoy amount.
+                optional short note; never a balance or any amount.
               </small>
             </span>
           </li>
@@ -2181,7 +2183,7 @@ function useBeforeUnload(active: boolean) {
 
 // ── setup ──
 
-type PrivForm = { on: boolean; limit: string; known: string; duress: boolean; dpin: string; dpin2: string; decoy: string };
+type PrivForm = { on: boolean; limit: string; known: string; duress: boolean; dpin: string; dpin2: string; hidden: string };
 
 function privFormError(f: PrivForm, pin: string, owner: string, escape: string): string | null {
   if (!f.on) return null;
@@ -2199,14 +2201,39 @@ function privFormError(f: PrivForm, pin: string, owner: string, escape: string):
     if (!c.ok) return c.reason ?? "Choose another duress PIN.";
     if (f.dpin !== f.dpin2) return "The two duress PINs don't match.";
     if (f.dpin === pin) return "The duress PIN must differ from your PIN.";
-    if (!parseUsd(f.decoy)) return "Enter the decoy amount in cUSDC.";
+    if (!parseUsd(f.hidden)) return "Enter the amount to keep hidden, in cUSDC.";
   }
   return null;
 }
 
+/**
+ * Whether private accounts can be created here: FACTORY_P is set and runs the private-mode build this app is written for
+ * (PRIVATE_MODE_VERSION). "old": deployed, but an older build. Checked once per page.
+ */
+let privateReadyOnce: Promise<"yes" | "no" | "old"> | null = null;
+function usePrivateReady(): "yes" | "no" | "old" | null {
+  const [r, setR] = useState<"yes" | "no" | "old" | null>(FACTORY_P ? null : "no");
+  useEffect(() => {
+    if (!FACTORY_P) return;
+    privateReadyOnce ??= privateModeVersionOf(read, { factory: FACTORY_P }).then((v) => (v === PRIVATE_MODE_VERSION ? "yes" : "old"));
+    let live = true;
+    privateReadyOnce.then((x) => live && setR(x), () => live && setR("no"));
+    return () => {
+      live = false;
+    };
+  }, []);
+  return r;
+}
+
+const PRIVATE_NOT_READY = {
+  no: "Not deployed on Sepolia yet: this option opens once it is.",
+  old: "The private-mode contracts on Sepolia are an older build than this app: this option opens once the current one is deployed.",
+} as const;
+
 /** Setup: the optional private mode, off by default; its duress PIN is a second option, also off by default. */
 function PrivateSetupBox({ f, set, err, resume }: { f: PrivForm; set: (p: Partial<PrivForm>) => void; err: string | null; resume?: boolean }) {
-  const deployed = !!FACTORY_P;
+  const ready = usePrivateReady();
+  const deployed = ready === "yes";
   const half = parseUsd(f.limit);
   return (
     <div class="private-box">
@@ -2219,9 +2246,9 @@ function PrivateSetupBox({ f, set, err, resume }: { f: PrivForm; set: (p: Partia
         </div>
         <Toggle on={f.on} onChange={(on) => set({ on })} disabled={!deployed} label="Private mode" />
       </div>
-      {!deployed && (
+      {(ready === "no" || ready === "old") && (
         <p class="small faint" style={{ margin: "8px 0 0" }}>
-          Not deployed on Sepolia yet: this option opens once it is.
+          {PRIVATE_NOT_READY[ready]}
         </p>
       )}
       {f.on && (
@@ -2254,7 +2281,7 @@ function PrivateSetupBox({ f, set, err, resume }: { f: PrivForm; set: (p: Partia
               <div>
                 <div style={{ fontWeight: 600, fontSize: "14px" }}>Duress PIN (optional)</div>
                 <div class="small faint" style={{ marginTop: "2px" }}>
-                  Limits the loss if someone forces you to open the account: typed instead of your PIN, it shows and sends at most a decoy amount. The chain can't tell which PIN was used, or whether one is set, and this page never stores it.
+                  Limits the loss if someone forces you to open the account: typed instead of your PIN, it shows and sends only what is above the amount you keep hidden, as if that were your whole balance. Deposits and payments show in it as they would in a real balance. The chain can't tell which PIN was used, or whether one is set, and this page never stores it.
                 </div>
               </div>
               <Toggle on={f.duress} onChange={(duress) => set({ duress })} label="Duress PIN" />
@@ -2270,20 +2297,23 @@ function PrivateSetupBox({ f, set, err, resume }: { f: PrivForm; set: (p: Partia
                   <input class="input mono" type="password" inputMode="numeric" autoComplete="off" value={f.dpin2} onInput={(e) => set({ dpin2: (e.target as HTMLInputElement).value.replace(/\D/g, "") })} />
                 </label>
                 <label class="field" style={{ flex: "1 1 140px" }}>
-                  <span>Decoy amount</span>
+                  <span>Keep hidden</span>
                   <div class="input-wrap">
-                    <input class="input" inputMode="decimal" value={f.decoy} onInput={(e) => set({ decoy: (e.target as HTMLInputElement).value })} style={{ paddingRight: "72px" }} />
+                    <input class="input" inputMode="decimal" value={f.hidden} onInput={(e) => set({ hidden: (e.target as HTMLInputElement).value })} style={{ paddingRight: "72px" }} />
                     <div class="suffix">
                       <span class="small faint">cUSDC</span>
                     </div>
                   </div>
                 </label>
+                <p class="small faint" style={{ margin: 0, flexBasis: "100%" }}>
+                  The duress PIN never shows or moves this part of the balance. Your key alone can&apos;t move it either: only your real PIN can.
+                </p>
               </div>
             )}
           </div>
           {resume && (
             <p class="small faint" style={{ margin: 0 }}>
-              Continuing an unfinished setup: if your PIN is already stored, the duress choice of the first attempt stays (without the duress PIN typed again here, its decoy is 0). You can set or remove it later on the account page.
+              Continuing an unfinished setup: your PIN is stored again, with the duress choice made here, before the private token is set up. You can set or remove the duress PIN later on the account page.
             </p>
           )}
           {err && <p class="field-err">{err}</p>}
@@ -2336,7 +2366,7 @@ function PrivateReviewRows({ f }: { f: PrivForm }) {
       {row(
         "Duress PIN",
         <>
-          {f.duress ? `On · decoy ${f.decoy} cUSDC` : "Off"}
+          {f.duress ? `On · ${f.hidden} cUSDC kept hidden` : "Off"}
           <small>never stored on this device</small>
         </>,
       )}
@@ -2943,7 +2973,9 @@ function PrivateSendSheet(p: { ctx: Ctx; account: string; view: AccountView; wal
 
 // ── duress PIN (set or remove; its state is never shown) ──
 
-function CredibilityMeter({ account, decoy }: { account: string; decoy: bigint | null }) {
+/** How believable the duress view is from public data. `hidden` is the amount the duress PIN keeps out of view; the view a
+ *  coercer sees is taken as the shielded net minus it (nothing else left the account), so the real figure is at most this. */
+function CredibilityMeter({ account, hidden }: { account: string; hidden: bigint | null }) {
   const [hist, setHist] = useState<{ n: bigint; k: number } | null | "err">(null);
   useEffect(() => {
     let live = true;
@@ -2960,27 +2992,28 @@ function CredibilityMeter({ account, decoy }: { account: string; decoy: bigint |
   }, [account]);
   if (hist === null) return <div class="cred small faint">Reading this account's public history…</div>;
   if (hist === "err") return <div class="cred small faint">The public history could not be read now; the credibility check is skipped.</div>;
-  if (decoy === null) return null;
+  if (hidden === null) return null;
   if (hist.n === 0n)
     return (
       <div class="cred good">
         <div class="row between">
-          <span style={{ fontWeight: 600 }}>Decoy credibility</span>
+          <span style={{ fontWeight: 600 }}>Credibility of the duress view</span>
           <b>no history yet</b>
         </div>
         <p class="small" style={{ margin: "8px 0 0" }}>
-          Nothing has been shielded into this account yet, so any decoy fits for now. Each shield is public and raises what a coercer expects to find.
+          Nothing has been shielded into this account yet, so any hidden amount fits for now. Each shield is public and raises what a coercer expects to find.
         </p>
       </div>
     );
-  const c = decoyCredibility({ shieldedNet: Number(hist.n) / 1e6, decoy: Number(decoy) / 1e6, hiddenPayments: hist.k });
+  const shown = hist.n > hidden ? hist.n - hidden : 0n;
+  const c = decoyCredibility({ shieldedNet: Number(hist.n) / 1e6, decoy: Number(shown) / 1e6, hiddenPayments: hist.k });
   const adv = credibilityAdvice(c);
   return (
     <div class={`cred ${adv.level}`}>
       <div class="row between">
-        <span style={{ fontWeight: 600 }}>Decoy credibility</span>
+        <span style={{ fontWeight: 600 }}>Credibility of the duress view</span>
         <b>
-          {Math.round(c * 100)}% · {adv.level}
+          at most {Math.round(c * 100)}% · {adv.level}
         </b>
       </div>
       <div class="cred-bar">
@@ -2990,7 +3023,7 @@ function CredibilityMeter({ account, decoy }: { account: string; decoy: bigint |
         {adv.text}
       </p>
       <p class="small faint" style={{ margin: "6px 0 0" }}>
-        From public data only: {fmtUsd(hist.n)} shielded into this account, {hist.k} private payment{hist.k === 1 ? "" : "s"} out since the last shield. Off-chain clues are not counted.
+        From public data only: {fmtUsd(hist.n)} shielded into this account, {hist.k} private payment{hist.k === 1 ? "" : "s"} out since the last shield. Payments made since then make the duress view smaller and this figure lower. Off-chain clues are not counted.
       </p>
     </div>
   );
@@ -3001,7 +3034,8 @@ function DuressSheet({ ctx, account, walletBal, onClose, onSettled }: { ctx: Ctx
   const [mode, setMode] = useState<"set" | "remove">("set");
   const [dpin, setDpin] = useState("");
   const [dpin2, setDpin2] = useState("");
-  const [decoy, setDecoy] = useState("50");
+  const [hidden, setHidden] = useState("1000");
+  const [ver, setVer] = useState<number | null>(null);
   const [pin, setPin] = useState("");
   const [tasks, setTasks] = useState<TaskState[]>(() => freshTasks(DURESS_STEPS.length));
   const [t0, setT0] = useState(0);
@@ -3013,14 +3047,18 @@ function DuressSheet({ ctx, account, walletBal, onClose, onSettled }: { ctx: Ctx
   useBeforeUnload(stage === "run");
   useEffect(() => {
     readPrivate(read, account).then(
-      (i) => setDelay(i.settingsDelay),
+      (i) => {
+        setDelay(i.settingsDelay);
+        setVer(i.version);
+      },
       () => undefined,
     );
   }, [account]);
 
-  const decoyUnits = parseUsd(decoy);
+  const hiddenUnits = parseUsd(hidden);
+  const oldBuild = ver !== null && ver < PRIVATE_MODE_VERSION;
   const c = checkPin(dpin);
-  const err = mode === "remove" ? null : !dpin ? "" : !c.ok ? c.reason ?? "Choose another duress PIN." : dpin !== dpin2 ? (dpin2 ? "The two duress PINs don't match." : "") : !decoyUnits ? "Enter the decoy amount." : null;
+  const err = mode === "remove" ? null : !dpin ? "" : !c.ok ? c.reason ?? "Choose another duress PIN." : dpin !== dpin2 ? (dpin2 ? "The two duress PINs don't match." : "") : !hiddenUnits ? "Enter the amount to keep hidden." : null;
 
   async function go(v: string) {
     if (mode === "set" && v === dpin) {
@@ -3034,7 +3072,7 @@ function DuressSheet({ ctx, account, walletBal, onClose, onSettled }: { ctx: Ctx
     setVerified(false);
     setTasks(freshTasks(DURESS_STEPS.length));
     try {
-      const h = await setDuressWithPin(ctx, account, v, mode === "set" ? { pin: dpin, decoyUnits: decoyUnits! } : null, taskCb(setTasks, 5, () => setVerified(true)), info?.bond?.required);
+      const h = await setDuressWithPin(ctx, account, v, mode === "set" ? { pin: dpin, hiddenUnits: hiddenUnits! } : null, taskCb(setTasks, 5, () => setVerified(true)), info?.bond?.required);
       setResult({ kind: "ok", value: h });
     } catch (e) {
       setResult(asPinFailure(e));
@@ -3052,7 +3090,7 @@ function DuressSheet({ ctx, account, walletBal, onClose, onSettled }: { ctx: Ctx
       {stage === "choose" && (
         <div class="stack">
           <p class="small muted" style={{ margin: 0 }}>
-            A duress PIN <b>limits the loss</b> if someone forces you to open your account. Typed instead of your PIN, it works the same way, but the balance view shows at most the decoy and a private send moves at most what is left of it. On-chain both PINs look the same: nobody can tell which one was used, or whether a duress PIN is set. This page never stores it, so it can't show it either.
+            A duress PIN <b>limits the loss</b> if someone forces you to open your account. Typed instead of your PIN, it works the same way, but on the balance minus the amount you keep hidden, as if that were the whole balance: the view shows it, a private send moves at most that, and deposits and payments show in it as they would in a real balance. On-chain both PINs look the same: nobody can tell which one was used, or whether a duress PIN is set. This page never stores it, so it can't show it either.
           </p>
           <div class="seg">
             <button type="button" class={`chip-btn ${mode === "set" ? "on" : ""}`} onClick={() => setMode("set")}>
@@ -3075,16 +3113,16 @@ function DuressSheet({ ctx, account, walletBal, onClose, onSettled }: { ctx: Ctx
                 </label>
               </div>
               <label class="field">
-                <span>Decoy amount</span>
+                <span>Keep hidden</span>
                 <div class="input-wrap">
-                  <input class="input" inputMode="decimal" value={decoy} onInput={(e) => setDecoy((e.target as HTMLInputElement).value)} style={{ paddingRight: "72px" }} />
+                  <input class="input" inputMode="decimal" value={hidden} onInput={(e) => setHidden((e.target as HTMLInputElement).value)} style={{ paddingRight: "72px" }} />
                   <div class="suffix">
                     <span class="small faint">cUSDC</span>
                   </div>
                 </div>
-                <span class="field-hint">What a coercer would see and could take. Keep it believable for this account.</span>
+                <span class="field-hint">A coercer sees and could take only what is above it. Your key alone can&apos;t move it either: only your real PIN can.</span>
               </label>
-              <CredibilityMeter account={account} decoy={decoyUnits} />
+              <CredibilityMeter account={account} hidden={hiddenUnits} />
               {err && <p class="field-err">{err}</p>}
             </>
           ) : (
@@ -3097,7 +3135,13 @@ function DuressSheet({ ctx, account, walletBal, onClose, onSettled }: { ctx: Ctx
             <IconClock />
             <span>It takes effect after the settings delay{delay !== null ? ` (${fmtWait(delay)})` : ""}, once your PIN is checked.</span>
           </div>
-          <button type="button" class="btn btn-primary btn-lg btn-block" disabled={mode === "set" && err !== null} onClick={() => setStage("pin")}>
+          {oldBuild && (
+            <div class="notice">
+              <IconInfo />
+              <span>This account runs the first private-mode build, where the duress PIN showed a fixed decoy amount. This app changes the duress PIN only on the current build.</span>
+            </div>
+          )}
+          <button type="button" class="btn btn-primary btn-lg btn-block" disabled={oldBuild || (mode === "set" && err !== null)} onClick={() => setStage("pin")}>
             Continue
           </button>
         </div>
@@ -3231,7 +3275,7 @@ function FaucetSheet({ ctx, account, onClose, onSettled }: { ctx: Ctx; account: 
         <div class="notice warn">
           <IconInfo />
           <span>
-            <b>Wrapping is public:</b> the amount that goes in shows on-chain, and a coercer can read it. If you use a duress PIN, several smaller deposits over time make its decoy more believable than one big one.
+            <b>Wrapping is public:</b> the amount that goes in shows on-chain, and a coercer can read it. If you use a duress PIN, several smaller deposits over time make its view more believable than one big one.
           </span>
         </div>
         {state === "run" && <p class="small faint">{text}</p>}
@@ -3255,7 +3299,8 @@ function FaucetSheet({ ctx, account, onClose, onSettled }: { ctx: Ctx; account: 
 // ── standard accounts: private mode needs a new account ──
 
 function PrivateModeOffer({ onCreate, onSwitch }: { onCreate: () => void; onSwitch: () => void }) {
-  const deployed = !!FACTORY_P;
+  const ready = usePrivateReady();
+  const deployed = ready === "yes";
   return (
     <section class="card card-pad">
       <h3 class="card-title">
@@ -3276,9 +3321,9 @@ function PrivateModeOffer({ onCreate, onSwitch }: { onCreate: () => void; onSwit
           Switch account
         </button>
       </div>
-      {!deployed && (
+      {(ready === "no" || ready === "old") && (
         <p class="small faint" style={{ margin: "8px 0 0" }}>
-          Not deployed on Sepolia yet.
+          {PRIVATE_NOT_READY[ready]}
         </p>
       )}
     </section>
@@ -3286,6 +3331,7 @@ function PrivateModeOffer({ onCreate, onSwitch }: { onCreate: () => void; onSwit
 }
 
 function AccountsSheet({ ctx, current, onPick, onNew, onClose }: { ctx: Ctx; current: string; onPick: (a: string) => void; onNew: (priv: boolean) => void; onClose: () => void }) {
+  const privateReady = usePrivateReady();
   const [rows, setRows] = useState<{ a: string; priv: boolean; armed: boolean; bal: bigint }[] | null>(null);
   useEffect(() => {
     let live = true;
@@ -3337,7 +3383,7 @@ function AccountsSheet({ ctx, current, onPick, onNew, onClose }: { ctx: Ctx; cur
         <button type="button" class="btn btn-ghost" onClick={() => onNew(false)}>
           New standard account
         </button>
-        {FACTORY_P && (
+        {privateReady === "yes" && (
           <button type="button" class="btn btn-secondary" onClick={() => onNew(true)}>
             New private-mode account
           </button>

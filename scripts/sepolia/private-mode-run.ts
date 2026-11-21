@@ -18,6 +18,10 @@
  *
  * Resumable (results/private-mode/sepolia/state.json). The keys are read only from .env.sepolia and never printed:
  * addresses, hashes, gas and times only.
+ *
+ * This run's contracts are PRIVATE_MODE_VERSION 1 (the duress view capped at a decoy amount; the main branch now keeps a
+ * hidden amount instead). Once deployed, every step talks to them with the ABI saved in build.json at deployment, never
+ * with the current artifacts, so `t3exec` and `summary` keep working on this deployment after the contracts changed.
  */
 import { ethers } from "ethers";
 import * as fs from "fs";
@@ -187,7 +191,9 @@ async function main() {
   if (!hasWatchtowerKey(env)) throw new Error("no watchtower key in .env.sepolia (the guardian of the test account)");
   const guardian = new ManagedWallet(sepoliaWatchtowerKey(env), provider);
   const st = load();
-  const build = await snapshot();
+  // the deployed build's ABI once the contracts exist (they are version 1 for good); a fresh snapshot only before that
+  const saved = path.join(OUT, "build.json");
+  const build: Build = st.contracts?.PrivateModule && fs.existsSync(saved) ? JSON.parse(fs.readFileSync(saved, "utf8")) : await snapshot();
   const fee = await provider.getFeeData();
   const log = (s: string) => console.log(s);
   log(`burner ${user.address} · ${eth(await provider.getBalance(user.address))} ETH · guardian ${guardian.address} · gas price ≈ ${gwei(fee.gasPrice!).toFixed(4)} gwei`);

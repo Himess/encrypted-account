@@ -36,7 +36,7 @@ contract EncryptedAccountP is EncryptedAccount {
     }
 
     /// @notice A generic call can never reach one of the account's private tokens (no transfer, unwrap or operator around
-    ///         the hidden limit and, under the duress PIN, the decoy).
+    ///         the hidden limit and, under the duress PIN, around the hidden amount).
     function openCall(address target, uint256 value, bytes calldata data) external override onlyK whenArmed returns (uint256) {
         if (PrivateStorage.layout().assets[target].configured) revert Errors.ForbiddenTarget();
         return OpenLib.openCall(target, value, data, aclAddress, executorAddress, feeConfig);

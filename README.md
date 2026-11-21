@@ -195,11 +195,12 @@ No dates; the order may change.
 - **Web app:** live at [encrypted-account.vercel.app](https://encrypted-account.vercel.app) (landing page and app, code
   in `web/`); next: key-only transfers to known addresses, the escape, and the phone flow.
 - **Private mode (optional):** encrypted balances and amounts with ERC-7984 tokens, viewing with the PIN, an optional
-  duress PIN; chosen at account creation, standard accounts unchanged. On the `feature/private-mode` branch, not merged:
+  duress PIN that keeps a hidden amount out of view; chosen at account creation, standard accounts unchanged. In the
+  contracts and the app; on Sepolia as a first build, and the app opens private setup once the current build is deployed:
   [docs/private-mode.md](docs/private-mode.md).
 - **Watchtower service:** an off-chain notifier: a wrong PIN and a key-only private send that moved zero go to the
   owner; the duress PIN raises a silent alarm to a trusted contact only, with nothing done on-chain. Telegram and e-mail,
-  local for now ([watchtower/](watchtower/README.md)); on the `feature/private-mode` branch.
+  local for now ([watchtower/](watchtower/README.md)).
 - **Hidden inheritance:** on Sepolia, with claim codes, payout rounds and escape withdrawal: see
   [Hidden inheritance](#hidden-inheritance). Next: ETH and ERC-20 through an ERC-7984 wrapper, and an optional relayer
   for claims.

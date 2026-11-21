@@ -10,7 +10,7 @@ import { Channel, FakeChannel } from "../watchtower/src/channels";
 import type { ServiceConfig } from "../watchtower/src/config";
 import { WatchtowerService } from "../watchtower/src/service";
 import { ethers, finalizeGuess, guess } from "./helpers";
-import { DECOY, DURESS, FUND, PIN, StackP, WRONG, createAccountP, deployStackP, encAmount, opIdOf, tc } from "./privateHelpers";
+import { DURESS, FUND, HIDDEN, PIN, SHOWN, StackP, WRONG, createAccountP, deployStackP, encAmount, opIdOf, tc } from "./privateHelpers";
 
 type Got = { via: string; dest: string; role: string; kind: string; text: string };
 
@@ -138,7 +138,7 @@ describe("Watchtower service: wrong PIN, silent zero, silent duress alarm (mock 
     expect(alarm).to.include(addr);
     expect(alarm).to.include("The duress PIN was used on this account.");
     expect(alarm).to.include("Note from the owner: Call me on the landline.");
-    for (const n of [FUND, DECOY, FUND - DECOY]) expect(alarm).to.not.include(n.toString());
+    for (const n of [FUND, HIDDEN, SHOWN]) expect(alarm).to.not.include(n.toString());
     expect(alarm.split("\n").length).to.eq(5); // header, account, time, the fact, the note: nothing else
     // the owner's channel never hears of it, and sees the same thing as for the real PIN
     expect(got.filter((g) => g.role === "owner" && g.kind === "duress")).to.deep.eq([]);

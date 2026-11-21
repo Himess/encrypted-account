@@ -1,5 +1,5 @@
 /**
- * Message texts. Rules: no amount ever (no balance, no transfer amount, no limit, no decoy); the silent alarm says only
+ * Message texts. Rules: no amount ever (no balance, no transfer amount, no limit, no hidden amount); the silent alarm says only
  * which account, when, that the duress PIN was used, and the owner's optional note. The owner's texts are the same for a
  * real and a duress PIN: nothing the owner's channel shows depends on which PIN was used.
  */

@@ -89,7 +89,7 @@ describe("watchtower service: routing", () => {
 });
 
 describe("watchtower service: message texts", () => {
-  it("no message carries an amount (balances, transfer amounts, allowances, counters, decoy)", () => {
+  it("no message carries an amount (balances, transfer amounts, allowances, counters, hidden amounts)", () => {
     for (const a of ALL) {
       const texts = route(a, ACCT, AT, REF).map((x) => x.text);
       for (const t of texts) for (const n of AMOUNTS) expect(t, a.kind).to.not.include(n.toString());

@@ -15,12 +15,13 @@ import * as path from "path";
 import { randomUint64 } from "../sdk/src";
 import { DAY, FhevmType, N_RECIPIENTS, N_SPENDERS, RECORD, alignDecay, escapeConsent, ethers, finalizeGuess, fingerprint, guess, setupKnownList, time } from "./helpers";
 import {
-  DECOY,
   DURESS,
   FUND,
+  HIDDEN,
   MIN_BIG_DELAY,
   PIN,
   PRIVATE_LIMITS,
+  SHOWN,
   Roles,
   StackP,
   TxRec,
@@ -107,7 +108,7 @@ describe("Private mode: indistinguishability (real vs duress PIN, duress set or 
     expect(diffs, j(diffs.slice(0, 3))).to.have.length(0);
   }
 
-  it("real PIN vs duress PIN: views, transfers (within and above the decoy), reset, duress setting, PIN change", async () => {
+  it("real PIN vs duress PIN: views, transfers (within and above what the duress view shows), reset, duress setting, PIN change", async () => {
     const real = await createAccountP(s, owner, escape.address, guardian.address, { known: [R1.address], duressPin: DURESS, salt: E.id("ind-real") });
     const dur = await createAccountP(s, owner, escape.address, guardian.address, { known: [R1.address], duressPin: DURESS, salt: E.id("ind-duress") });
     await (await s.token.mint(await real.getAddress(), FUND)).wait();
@@ -134,7 +135,7 @@ describe("Private mode: indistinguishability (real vs duress PIN, duress set or 
         await hre.fhevm.userDecryptEuint(FhevmType.euint64, eventArgs(real, v.fins[0], "PrivateOpExecuted").result, real.target as string, owner),
         await hre.fhevm.userDecryptEuint(FhevmType.euint64, eventArgs(dur, v.fins[1], "PrivateOpExecuted").result, dur.target as string, owner),
       ];
-      const amount = round === 0 ? tc(1500) : tc(800); // the second is above the 500 the decoy has left
+      const amount = round === 0 ? tc(1500) : tc(800); // the second is above the 500 the duress view then shows
       const t = await pinOp(`round ${round + 1} · transfer`, async (acct) => {
         const enc = await encAmount(acct, owner, amount);
         return acct.openPrivateTransfer(token, R1.address, enc.handles[0], enc.inputProof);
@@ -148,7 +149,7 @@ describe("Private mode: indistinguishability (real vs duress PIN, duress set or 
       const inp = hre.fhevm.createEncryptedInput(acct.target as string, owner.address);
       inp.add64(await fingerprint(DURESS, s.chainId, acct.target as string));
       inp.addBool(true);
-      inp.add64(DECOY);
+      inp.add64(HIDDEN);
       const enc = await inp.encrypt();
       return acct.openSetDuress(token, enc.handles[0], enc.handles[1], enc.handles[2], enc.inputProof);
     });
@@ -165,7 +166,7 @@ describe("Private mode: indistinguishability (real vs duress PIN, duress set or 
     await both("PIN change · execute", async (acct, w) => (await acct.executeOp(pc.ids[w])).wait());
 
     // what each side saw and moved
-    expect(seen.view0).to.deep.eq([FUND, DECOY]);
+    expect(seen.view0).to.deep.eq([FUND, SHOWN]);
     expect(seen.view1).to.deep.eq([FUND - tc(1500), tc(500)]);
     expect(await balanceOf(s, real.target as string)).to.eq(FUND - tc(2300));
     expect(await balanceOf(s, dur.target as string)).to.eq(FUND - tc(1500));
@@ -190,7 +191,7 @@ describe("Private mode: indistinguishability (real vs duress PIN, duress set or 
       const inp2 = hre.fhevm.createEncryptedInput(addr, owner.address);
       inp2.add64(PRIVATE_LIMITS.lmin);
       inp2.add64(PRIVATE_LIMITS.lmax);
-      inp2.add64(duress ? DECOY : randomUint64() & ((1n << 62n) - 1n));
+      inp2.add64(duress ? HIDDEN : 0n); // the hidden amount, encrypted either way
       const e2 = await inp2.encrypt();
       recs.push(await recordTx("privateSetupAsset", await (await acct.privateSetupAsset(token, e2.handles[0], e2.handles[1], e2.handles[2], e2.inputProof)).wait(), roles, CLEAR));
       await setupKnownList(acct, owner, false, [R1.address], N_RECIPIENTS);

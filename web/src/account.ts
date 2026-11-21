@@ -255,7 +255,7 @@ export async function readAccount(read: ethers.JsonRpcProvider, address: string,
 // ───────────────────────────── creation and setup ─────────────────────────────
 
 /** Private mode in a resumable plan: only the private token's daily limit (token units). Whether a duress PIN is set,
- *  and the decoy, are never stored on this device. */
+ *  and the hidden amount, are never stored on this device. */
 export type PrivatePlan = { limitUnits: string };
 export type Plan = { account: string; escape: string; salt: string; limitUnits: string; known: string | null; bondBase?: string; private?: PrivatePlan };
 const planKey = (owner: string) => `ea:plan:${owner.toLowerCase()}`;
@@ -293,12 +293,34 @@ export const SETUP_STEPS = [
   "Turn the account on",
 ] as const;
 
-/** Private mode adds one step before the bond: the private token's encrypted limits and decoy cap. */
+/** Private mode adds one step before the bond: the private token's encrypted limits and hidden amount. */
 export const PRIVATE_SETUP_STEP = 7;
 export const setupStepCount = (priv: boolean) => SETUP_STEPS.length + (priv ? 1 : 0);
 
-/** Private mode at setup. The duress PIN and the decoy are passed on every run and never stored. */
-export type PrivateSetup = { limitUnits: bigint; duressPin: string | null; decoyUnits: bigint | null };
+/** Private mode at setup. The duress PIN and the hidden amount are passed on every run and never stored. */
+export type PrivateSetup = { limitUnits: bigint; duressPin: string | null; hiddenUnits: bigint | null };
+
+/**
+ * The private-mode semantics this app is written for (PrivateModule.PRIVATE_MODE_VERSION): 2 = the duress PIN keeps a
+ * hidden amount out of view. The first Sepolia build (1) capped the duress view at a decoy amount instead, so a duress
+ * setting sent from this app would mean something else there: the app sets up and changes duress only on version 2.
+ */
+export const PRIVATE_MODE_VERSION = 2;
+
+/** The private-mode version behind a private-mode factory or account (1 when the module predates the version getter). */
+export async function privateModeVersionOf(read: ethers.Provider, at: { factory?: string; account?: string }): Promise<number> {
+  try {
+    let module: string;
+    if (at.account) module = await pacct(at.account, read).privateModule();
+    else {
+      const impl: string = await new ethers.Contract(at.factory!, FACTORY_ABI as any, read).implementation();
+      module = await pacct(impl, read).privateModule();
+    }
+    return Number(await pacct(module, read).PRIVATE_MODE_VERSION());
+  } catch {
+    return 1;
+  }
+}
 
 export type StepCb = (i: number, state: "run" | "done" | "skip" | "fail", text?: string, hash?: string) => void;
 
@@ -316,6 +338,9 @@ export async function createAndSetup(
   if (limitUnits < 2n) throw new Error("The limit must be at least 0.000002 ETH.");
   if (opts.priv && !FACTORY_P) throw new Error("Private mode is not deployed on this network yet.");
   if (opts.priv && opts.priv.limitUnits < 2n) throw new Error("The private limit is too small.");
+  if (opts.priv && (await privateModeVersionOf(ctx.read, { factory: FACTORY_P })) !== PRIVATE_MODE_VERSION) {
+    throw new Error("The private-mode contracts on this network are an older build than this app; private mode waits for the new deployment.");
+  }
 
   let plan = loadPlan(owner);
   if (plan) {
@@ -384,11 +409,13 @@ export async function createAndSetup(
   );
 
   // 2. PIN: Enc(h), a random duress candidate (never selected) and useDuress = false. Private mode with a duress PIN:
-  //    the duress fingerprint and useDuress = true (both encrypted: the transaction looks the same either way).
+  //    the duress fingerprint and useDuress = true (both encrypted: the transaction looks the same either way). In a
+  //    private-mode account this step runs again on every run until the private token is set up, so the duress PIN and
+  //    the hidden amount always come from the same run (an interrupted earlier run cannot leave its duress PIN behind).
   const duressPin = priv ? (opts.priv?.duressPin ?? null) : null;
   await run(
     1,
-    async () => (await a.encryptedHandles(ETH))[0] !== ZERO32,
+    async () => (await a.encryptedHandles(ETH))[0] !== ZERO32 && (!priv || Boolean((await pacct(A, ctx.read).privateState(CUSDC))[0])),
     async (st) => {
       st("Deriving the fingerprint (Argon2id)…");
       const fp = await pinFingerprint(opts.pin, CHAIN_ID, A);
@@ -442,18 +469,18 @@ export async function createAndSetup(
     },
   );
 
-  // 8 (private mode only). The private token: L_min = L/2 and L of its own hidden limit (token units), and the decoy cap.
-  //    The cap is always encrypted, so the setup looks the same either way. Without a duress PIN in this run it is 0: if
-  //    an earlier, interrupted run already stored a duress PIN, the duress PIN then shows and moves nothing (fail closed).
+  // 8 (private mode only). The private token: L_min = L/2 and L of its own hidden limit (token units), and the hidden
+  //    amount: the part of the balance the duress PIN never shows or moves. Always encrypted, so the setup looks the same
+  //    either way; 0 without a duress PIN, because the key alone never moves the hidden amount either.
   if (priv) {
     await run(
       PRIVATE_SETUP_STEP,
-      async () => Boolean((await pacct(A, ctx.read).privateState(CUSDC)).configured),
+      async () => Boolean((await pacct(A, ctx.read).privateState(CUSDC))[0]),
       async (st) => {
         const l = BigInt(plan!.private!.limitUnits);
-        const decoy = duressPin && opts.priv?.decoyUnits != null ? opts.priv.decoyUnits : 0n;
+        const hidden = duressPin && opts.priv?.hiddenUnits != null ? opts.priv.hiddenUnits : 0n;
         st("Encrypting…");
-        const enc = await encrypt(ctx.read, [{ type: "euint64", value: l / 2n }, { type: "euint64", value: l }, { type: "euint64", value: decoy }], A, owner);
+        const enc = await encrypt(ctx.read, [{ type: "euint64", value: l / 2n }, { type: "euint64", value: l }, { type: "euint64", value: hidden }], A, owner);
         const data = PIFACE.encodeFunctionData("privateSetupAsset", [CUSDC, enc.handles[0], enc.handles[1], enc.handles[2], enc.inputProof]);
         return sendTx(ctx.w, ctx.read, { to: A, data }, st);
       },
@@ -832,22 +859,25 @@ export type PrivateInfo = {
   /** Seconds a PIN-verified private send waits (at least 72 hours) and a duress change waits. */
   transferDelay: number;
   settingsDelay: number;
+  /** PrivateModule.PRIVATE_MODE_VERSION behind the account: the app changes the duress setting only on PRIVATE_MODE_VERSION. */
+  version: number;
 };
 
 export async function readPrivate(read: ethers.JsonRpcProvider, account: string): Promise<PrivateInfo> {
   const a = pacct(account, read);
-  const [ps, bal, dT, dS] = await Promise.all([
+  const [ps, bal, dT, dS, version] = await Promise.all([
     a.privateState(CUSDC),
     new ethers.Contract(CUSDC, CTOKEN_ABI, read).confidentialBalanceOf(account),
     a.privateDelay(PRIVATE_SUB.transfer),
     a.privateDelay(PRIVATE_SUB.setDuress),
+    privateModeVersionOf(read, { account }),
   ]);
-  return { configured: Boolean(ps[0]), balanceHandle: String(bal), transferDelay: Number(dT), settingsDelay: Number(dS) };
+  return { configured: Boolean(ps[0]), balanceHandle: String(bal), transferDelay: Number(dT), settingsDelay: Number(dS), version };
 }
 
 /**
  * What this device keeps for a private-mode account: L_min and the known recipient (to route sends), today's key-only
- * sends (amounts within L_min), and scheduled PIN sends WITHOUT their amounts. Never the duress setting, the decoy or a
+ * sends (amounts within L_min), and scheduled PIN sends WITHOUT their amounts. Never the duress setting, the hidden amount or a
  * balance: someone who forces the owner to open this app must not find the real figures here.
  */
 export type PendingPrivate = { opId: string; to: string; readyAt: number; hash: string };
@@ -916,7 +946,7 @@ export const PRIVATE_VIEW_STEPS = [
 
 /**
  * PIN-gated balance view: the correct PIN makes a fresh encrypted snapshot that only the owner may decrypt (no delay).
- * Under the duress PIN the snapshot shows at most the decoy, with the same transactions and events.
+ * Under the duress PIN the snapshot shows the balance minus the hidden amount, with the same transactions and events.
  */
 export async function privateViewWithPin(ctx: Ctx, account: string, pin: string, cb: StepCb, bondShown?: bigint): Promise<bigint> {
   const step = stepper(cb);
@@ -1014,10 +1044,10 @@ export const DURESS_STEPS = [
 ] as const;
 
 /**
- * Sets (with a decoy cap) or removes the duress PIN: the current PIN, then the settings delay. Both look the same on-chain
+ * Sets (with a hidden amount) or removes the duress PIN: the current PIN, then the settings delay. Both look the same on-chain
  * (without a duress PIN the slot takes on-chain randomness). Run under the duress PIN, it changes nothing.
  */
-export async function setDuressWithPin(ctx: Ctx, account: string, pin: string, duress: { pin: string; decoyUnits: bigint } | null, cb: StepCb, bondShown?: bigint): Promise<string> {
+export async function setDuressWithPin(ctx: Ctx, account: string, pin: string, duress: { pin: string; hiddenUnits: bigint } | null, cb: StepCb, bondShown?: bigint): Promise<string> {
   const step = stepper(cb);
   const open = async (st: Status) => {
     st(duress ? "Deriving the duress fingerprint (Argon2id)…" : "Preparing…");
@@ -1028,7 +1058,7 @@ export async function setDuressWithPin(ctx: Ctx, account: string, pin: string, d
       [
         { type: "euint64", value: cand },
         { type: "ebool", value: duress !== null },
-        { type: "euint64", value: duress ? duress.decoyUnits : 0n }, // removed: the cap no longer matters (0, fail closed)
+        { type: "euint64", value: duress ? duress.hiddenUnits : 0n }, // removed: 0, the key alone may then reach the whole balance again
       ],
       account,
       ctx.w.address,
@@ -1094,7 +1124,7 @@ export async function getTestCusdc(ctx: Ctx, account: string, units: bigint, st:
 
 /**
  * The account's public cUSDC history, from the token's events: shields (wraps into the account, public amounts) and
- * private transfers out and in (amounts hidden). This is what a coercer can read; the decoy is judged against it.
+ * private transfers out and in (amounts hidden). This is what a coercer can read; the duress view is judged against it.
  */
 export async function privateHistory(read: ethers.JsonRpcProvider, account: string): Promise<PrivateHistoryEvent[]> {
   const topic = CIFACE.getEvent("ConfidentialTransfer")!.topicHash;

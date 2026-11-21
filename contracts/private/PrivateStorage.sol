@@ -12,7 +12,8 @@ library PrivateStorage {
     /// @dev `spent` saturates to this value when a K-only transfer does not fit under tau: the tripwire. It stays set
     ///      across day boundaries until a PIN-verified reset; a tripped `spent` leaves no room for any amount above zero.
     uint64 internal constant TRIPPED = type(uint64).max;
-    /// @dev Upper bound of L_min / L after setup and tightening, so that tau (≤ L_min + 2^48) never reaches TRIPPED.
+    /// @dev Upper bound of L_min / L after setup and tightening, so that tau (≤ L_min + 2^48) never reaches TRIPPED, and of
+    ///      the hidden amount, so that a K-only amount within tau plus the hidden amount never overflows 64 bits.
     uint64 internal constant MAX_LIMIT = uint64(1) << 62;
     /// @dev Design doc §17.1: in a private-mode account every PIN-verified outflow of a private token waits at least this
     ///      long, and so does every public outflow in the long class (the account's bigTransfer delay). The rule is public
@@ -26,8 +27,9 @@ library PrivateStorage {
         euint64 lmin; // L_min (the owner knows it)
         euint64 l; // L (the owner knows it), upper end of tau's range
         euint64 tau; // hidden K-only threshold in [L_min, L), drawn with FHE randomness: nobody knows it
-        euint64 decoyCap; // duress view and spend cap (a random client value when no duress PIN is set)
-        euint64 decoySpent; // what left the account under the duress PIN
+        // The part of the balance the duress PIN never shows or moves (0 without a duress PIN), at most MAX_LIMIT. The
+        // duress PIN works on the rest as if it were the whole balance, and K alone never reaches it either.
+        euint64 hidden;
         euint64 lastView; // latest PIN-gated balance snapshot, allowed to K
     }
 

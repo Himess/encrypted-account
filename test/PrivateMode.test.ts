@@ -13,10 +13,11 @@ import * as path from "path";
 import { Alert, Watchtower } from "../sdk/src/watchtower";
 import { DAY, FhevmType, R, RECORD, Status, alignDecay, debugU64, defaultDelays, escapeConsent, ethers, finalizeGuess, fingerprint, guess, setupPinOf, time } from "./helpers";
 import {
-  DECOY,
   DURESS,
   FUND,
+  HIDDEN,
   MIN_BIG_DELAY,
+  SHOWN,
   PIN,
   StackP,
   TRIPPED,
@@ -67,6 +68,36 @@ describe("Private mode (optional): EncryptedAccountP + PrivateModule", function 
     await guess(acct, owner, s.chainId, id, pin);
     const fin = await finalizeGuess(acct, id);
     return { id, fin };
+  }
+
+  /** A PIN-gated balance view under `pin`, decrypted as K would decrypt it. */
+  async function viewAs(acct: any, pin: string): Promise<bigint> {
+    const { fin } = await pinOp(acct, () => acct.openPrivateView(token), pin);
+    const ev = eventArgs(acct, fin, "PrivateOpExecuted");
+    if (!ev) throw new Error(`the view did not run under ${pin}`);
+    return await hre.fhevm.userDecryptEuint(FhevmType.euint64, ev.result, await acct.getAddress(), owner);
+  }
+
+  /** A PIN private transfer to `other` under `pin`, executed after the long delay; returns what moved. */
+  async function xferAs(acct: any, pin: string, amount: bigint): Promise<bigint> {
+    const enc = await encAmount(acct, owner, amount);
+    const { id } = await pinOp(acct, () => acct.openPrivateTransfer(token, other.address, enc.handles[0], enc.inputProof), pin);
+    await time.increase(MIN_BIG_DELAY + 1);
+    const rc = await (await acct.executeOp(id)).wait();
+    return await debugU64(eventArgs(acct, rc, "PrivateOpExecuted").result);
+  }
+
+  /** Sets (use) or clears the duress PIN `duressPin` with the hidden amount, verified under `pinUsed`, after the settings delay. */
+  async function setDuress(acct: any, pinUsed: string, duressPin: string, use: boolean, hidden: bigint) {
+    const addr = await acct.getAddress();
+    const inp = hre.fhevm.createEncryptedInput(addr, owner.address);
+    inp.add64(await fingerprint(duressPin, s.chainId, addr));
+    inp.addBool(use);
+    inp.add64(hidden);
+    const enc = await inp.encrypt();
+    const { id } = await pinOp(acct, () => acct.openSetDuress(token, enc.handles[0], enc.handles[1], enc.handles[2], enc.inputProof), pinUsed);
+    await time.increase(Number((await acct.delays()).settings) + 1);
+    await (await acct.executeOp(id)).wait();
   }
 
   describe("setup", () => {
@@ -216,24 +247,16 @@ describe("Private mode (optional): EncryptedAccountP + PrivateModule", function 
       expect((await balanceOf(s, other.address)) - o0).to.eq(tc(500));
     });
 
-    it("duress: the view shows the decoy; a duress transfer moves up to the decoy left, all or nothing", async () => {
+    it("duress: the view shows the balance minus the hidden amount; a duress transfer moves up to that, all or nothing", async () => {
       const acct = await createAccountP(s, owner, escape.address, guardian.address, { known: [], duressPin: DURESS });
       const addr = await acct.getAddress();
       await (await s.token.mint(addr, FUND)).wait();
-      const v = await pinOp(acct, () => acct.openPrivateView(token), DURESS);
-      expect(await hre.fhevm.userDecryptEuint(FhevmType.euint64, eventArgs(acct, v.fin, "PrivateOpExecuted").result, addr, owner)).to.eq(DECOY);
-      const xfer = async (amount: bigint) => {
-        const enc = await encAmount(acct, owner, amount);
-        const { id } = await pinOp(acct, () => acct.openPrivateTransfer(token, other.address, enc.handles[0], enc.inputProof), DURESS);
-        await time.increase(MIN_BIG_DELAY + 1);
-        const rc = await (await acct.executeOp(id)).wait();
-        return await debugU64(eventArgs(acct, rc, "PrivateOpExecuted").result);
-      };
-      expect(await xfer(tc(1500))).to.eq(tc(1500));
-      expect(await xfer(tc(800))).to.eq(0n); // 500 left: more than that moves zero, as a real balance would
-      expect(await balanceOf(s, addr)).to.eq(FUND - tc(1500)); // the real balance never went below FUND − decoy
-      const v2 = await pinOp(acct, () => acct.openPrivateView(token), DURESS);
-      expect(await hre.fhevm.userDecryptEuint(FhevmType.euint64, eventArgs(acct, v2.fin, "PrivateOpExecuted").result, addr, owner)).to.eq(tc(500));
+      expect(await viewAs(acct, DURESS)).to.eq(SHOWN);
+      expect(await xferAs(acct, DURESS, tc(1500))).to.eq(tc(1500));
+      expect(await xferAs(acct, DURESS, tc(800))).to.eq(0n); // 500 shown: more than that moves zero, as a real balance would
+      expect(await balanceOf(s, addr)).to.eq(FUND - tc(1500)); // the hidden amount never moved
+      expect(await viewAs(acct, DURESS)).to.eq(tc(500));
+      expect(await viewAs(acct, PIN)).to.eq(FUND - tc(1500));
     });
 
     it("a PIN change under the duress PIN changes only the duress fingerprint; the real PIN keeps working", async () => {
@@ -251,37 +274,107 @@ describe("Private mode (optional): EncryptedAccountP + PrivateModule", function 
         await (await acct.executeOp(id)).wait();
       };
       await change(DURESS);
-      const real = await pinOp(acct, () => acct.openPrivateView(token), PIN);
-      expect(await hre.fhevm.userDecryptEuint(FhevmType.euint64, eventArgs(acct, real.fin, "PrivateOpExecuted").result, addr, owner)).to.eq(FUND);
-      const asDuress = await pinOp(acct, () => acct.openPrivateView(token), NEW);
-      expect(await hre.fhevm.userDecryptEuint(FhevmType.euint64, eventArgs(acct, asDuress.fin, "PrivateOpExecuted").result, addr, owner)).to.eq(DECOY);
+      expect(await viewAs(acct, PIN)).to.eq(FUND);
+      expect(await viewAs(acct, NEW)).to.eq(SHOWN); // the coercer's "new PIN" is the new duress PIN
+      await alignDecay();
+      const old = await pinOp(acct, () => acct.openPrivateView(token), DURESS);
+      expect(eventArgs(acct, old.fin, "GuessFinalized").ok).to.eq(false); // and his old one stopped working, as after a real change
+      await alignDecay();
       // with the real PIN the change lands on the real PIN
       await change(PIN);
-      const now = await pinOp(acct, () => acct.openPrivateView(token), NEW);
-      expect(await hre.fhevm.userDecryptEuint(FhevmType.euint64, eventArgs(acct, now.fin, "PrivateOpExecuted").result, addr, owner)).to.eq(FUND);
+      expect(await viewAs(acct, NEW)).to.eq(FUND);
     });
 
     it("the duress PIN can be set later, and cleared, with the PIN and the settings delay", async () => {
       const acct = await createAccountP(s, owner, escape.address, guardian.address, { known: [] });
       const addr = await acct.getAddress();
       await (await s.token.mint(addr, FUND)).wait();
-      const set = async (use: boolean) => {
-        const inp = hre.fhevm.createEncryptedInput(addr, owner.address);
-        inp.add64(await fingerprint(DURESS, s.chainId, addr));
-        inp.addBool(use);
-        inp.add64(DECOY);
-        const enc = await inp.encrypt();
-        const { id } = await pinOp(acct, () => acct.openSetDuress(token, enc.handles[0], enc.handles[1], enc.handles[2], enc.inputProof), PIN);
-        await time.increase(Number((await acct.delays()).settings) + 1);
-        await (await acct.executeOp(id)).wait();
-      };
-      await set(true);
-      const d1 = await pinOp(acct, () => acct.openPrivateView(token), DURESS);
-      expect(await hre.fhevm.userDecryptEuint(FhevmType.euint64, eventArgs(acct, d1.fin, "PrivateOpExecuted").result, addr, owner)).to.eq(DECOY);
-      await set(false);
+      await setDuress(acct, PIN, DURESS, true, HIDDEN);
+      expect(await viewAs(acct, DURESS)).to.eq(SHOWN);
+      await setDuress(acct, PIN, DURESS, false, 0n);
       await alignDecay();
       const d2 = await pinOp(acct, () => acct.openPrivateView(token), DURESS);
       expect(eventArgs(acct, d2.fin, "GuessFinalized").ok).to.eq(false);
+    });
+  });
+
+  /**
+   * What a coercer who holds K and the duress PIN sees when he checks the duress view against what he did himself. The
+   * duress PIN works on the balance minus the hidden amount as if that were the whole balance, and K alone never moves the
+   * hidden amount, so every step below shows as it would on a real balance of that size (docs/private-mode.md §8).
+   */
+  describe("duress consistency (what a coercer can check)", () => {
+    it("a second duress view shows the same; a deposit shows in full, also when the hidden amount exceeded the balance", async () => {
+      const acct = await createAccountP(s, owner, escape.address, guardian.address, { known: [], duressPin: DURESS });
+      const addr = await acct.getAddress();
+      await (await s.token.mint(addr, FUND)).wait();
+      expect(await viewAs(acct, DURESS)).to.eq(SHOWN);
+      expect(await viewAs(acct, DURESS)).to.eq(SHOWN);
+      await (await s.token.mint(addr, tc(300))).wait(); // the coercer sends 300 to the account
+      expect(await viewAs(acct, DURESS)).to.eq(SHOWN + tc(300));
+      expect(await viewAs(acct, PIN)).to.eq(FUND + tc(300));
+      // hidden amount above the balance: the duress view shows 0, and the next deposit still shows in full
+      const poor = await createAccountP(s, owner, escape.address, guardian.address, { known: [], duressPin: DURESS, hidden: FUND * 2n });
+      const pa = await poor.getAddress();
+      await (await s.token.mint(pa, FUND)).wait();
+      expect(await viewAs(poor, DURESS)).to.eq(0n);
+      await (await s.token.mint(pa, tc(300))).wait();
+      expect(await viewAs(poor, DURESS)).to.eq(tc(300));
+      expect(await viewAs(poor, PIN)).to.eq(FUND + tc(300));
+    });
+
+    it("K alone never reaches the hidden amount: a K-only send above the shown part moves zero without tripping", async () => {
+      // shown 200 is below L_min (300): without this rule a K-only send of 250 would pass and the duress view would drop to 0
+      const acct = await createAccountP(s, owner, escape.address, guardian.address, { known: [R1.address], duressPin: DURESS, hidden: FUND - tc(200) });
+      const addr = await acct.getAddress();
+      await (await s.token.mint(addr, FUND)).wait();
+      const send = async (amount: bigint) => {
+        const enc = await encAmount(acct, owner, amount);
+        await (await acct.privateTransfer(token, R1.address, enc.handles[0], enc.inputProof)).wait();
+      };
+      expect(await viewAs(acct, DURESS)).to.eq(tc(200));
+      const r0 = await balanceOf(s, R1.address);
+      await send(tc(250));
+      expect(await balanceOf(s, R1.address)).to.eq(r0); // as a transfer above a 200 balance
+      expect(await debugU64((await acct.privateState(token)).spent)).to.eq(0n); // no trip
+      expect(await viewAs(acct, DURESS)).to.eq(tc(200));
+      await send(tc(150));
+      expect((await balanceOf(s, R1.address)) - r0).to.eq(tc(150));
+      expect(await viewAs(acct, DURESS)).to.eq(tc(50));
+      expect(await viewAs(acct, PIN)).to.eq(FUND - tc(150));
+    });
+
+    it("a reset under the duress PIN resets the wire as the real PIN would; the next K-only send passes", async () => {
+      const acct = await createAccountP(s, owner, escape.address, guardian.address, { known: [R1.address], duressPin: DURESS });
+      const addr = await acct.getAddress();
+      await (await s.token.mint(addr, FUND)).wait();
+      const send = async (amount: bigint) => {
+        const enc = await encAmount(acct, owner, amount);
+        await (await acct.privateTransfer(token, R1.address, enc.handles[0], enc.inputProof)).wait();
+      };
+      await send(tc(5000)); // above the hidden limit: the wire fires
+      expect(await debugU64((await acct.privateState(token)).spent)).to.eq(TRIPPED);
+      await alignDecay();
+      await pinOp(acct, () => acct.openPrivateReset(token), DURESS);
+      expect(await debugU64((await acct.privateState(token)).spent)).to.eq(0n);
+      const r0 = await balanceOf(s, R1.address);
+      await send(tc(100));
+      expect((await balanceOf(s, R1.address)) - r0).to.eq(tc(100));
+      expect(await viewAs(acct, DURESS)).to.eq(SHOWN - tc(100));
+    });
+
+    it("limit (documented): a duress PIN set under the duress PIN changes nothing, so it fails when tried", async () => {
+      const acct = await createAccountP(s, owner, escape.address, guardian.address, { known: [], duressPin: DURESS });
+      const addr = await acct.getAddress();
+      await (await s.token.mint(addr, FUND)).wait();
+      const X = "135790";
+      await setDuress(acct, DURESS, X, true, 0n);
+      await alignDecay();
+      const x = await pinOp(acct, () => acct.openPrivateView(token), X);
+      expect(eventArgs(acct, x.fin, "GuessFinalized").ok).to.eq(false);
+      await alignDecay();
+      expect(await viewAs(acct, DURESS)).to.eq(SHOWN); // the duress PIN and the hidden amount are unchanged
+      expect(await viewAs(acct, PIN)).to.eq(FUND);
     });
   });
 

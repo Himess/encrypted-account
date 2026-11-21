@@ -15,7 +15,7 @@ affected by any of this.
 |---|---|---|
 | Implementation | `EncryptedAccount` (A) or `EncryptedAccountB`, unchanged | `EncryptedAccountP` = A + three overrides + a fallback to `PrivateModule` |
 | Factory | the existing `EncryptedAccountFactory` deployments | its own `EncryptedAccountFactory(implP)` |
-| Setup | 8 transactions (9 with a raised bond) | one more: `privateSetupAsset` (the private token's encrypted limits and decoy cap) |
+| Setup | 8 transactions (9 with a raised bond) | one more: `privateSetupAsset` (the private token's encrypted limits and hidden amount) |
 | Big transfers | `delays.bigTransfer` as chosen | at least 72 hours (enforced at `privateSetupAsset`) |
 
 The default contracts are byte-for-byte the code on `main`: the runtime bytecode of `EncryptedAccount`,
@@ -117,6 +117,22 @@ contracts (2026-11-16, steady state): **1,909,842 gas** (−22.0 %); with mainne
 Evidence: [results/private-mode/sepolia/summary.json](../results/private-mode/sepolia/summary.json).
 Evidence: [results/private-mode/cost-before-after.json](../results/private-mode/cost-before-after.json).
 
+**The hidden amount (§9) costs the key-only path three FHE operations** (`amount + hidden`, `≤ balance`, one more `and`)
+and a balance read, and saves the PIN paths the decoy bookkeeping (mock, the same account history on both builds):
+
+| (mock) | Decoy cap (first build) | Hidden amount | Change |
+|---|---|---|---|
+| Key-only transfer: protocol gas | 1,154,630 | 1,214,441 | +59,811 (+5.2 %) |
+| Key-only transfer: HCU | 1,996,128 | 2,332,128 | +336,000 (+16.8 %) |
+| PIN view (its finalize): protocol gas / HCU | 526,858 / 654,000 | 555,430 / 491,000 | +28,572 / −163,000 |
+| PIN transfer (its execution): protocol gas / HCU | 642,717 / 1,442,128 | 562,839 / 1,226,096 | −79,878 / −216,032 |
+
+HCU depth is unchanged on the key-only path (1,088,032). The view writes the (clamped) hidden amount each time, one more
+ACL grant; the transfer no longer keeps a decoy counter. Not measured on Sepolia: no new persistent slot on the key-only
+path, so the 1,909,842 gas above should grow by roughly the three operations' executor cost (about 60–90k, a projection).
+Evidence: [results/private-mode/hidden-amount-cost.json](../results/private-mode/hidden-amount-cost.json)
+(`scripts/measure/private-cost.ts`).
+
 ## 6. Indistinguishability test on every run
 
 `test/PrivateIndistinguishability.test.ts` is part of `npm test`. It traces every transaction
@@ -126,15 +142,17 @@ calldata length, events, ACL grants, decryption requests, storage writes, transi
 
 | Pairs | Transactions | Differences outside the cleartext layer | Raw differences (all inside it) |
 |---|---|---|---|
-| real PIN vs duress PIN: views, transfers within and above the decoy, reset, duress setting, PIN change | 25 | 0 | 14 |
-| a duress PIN set vs not set: setup and a real-PIN view | 5 | 0 | 2 |
+| real PIN vs duress PIN: views, transfers within and above what the duress view shows, reset, duress setting, PIN change | 25 | 0 | 13 |
+| a duress PIN set vs not set: setup and a real-PIN view | 5 | 0 | 3 |
+| standard account (open mode): real vs duress PIN on an ETH transfer, an admin op and a PIN change | 12 | 0 | 3 |
 | a key-only transfer that passes vs one that fails | 2 | 0 | 2 |
 
 Total gas differs by at most 36 gas between pairs, and every such difference is explained by the zero bytes of random
 handles and proofs in the calldata. The mock leaks values through gas (its cleartext layer stores plaintext results);
 the production executor has no such layer.
 
-On Sepolia (production executor, 2026-11-16, these contracts): 6 PIN-gated transfer pairs (their execution is due
+On Sepolia (production executor, 2026-11-16, the first build of these contracts, with a decoy cap instead of the hidden
+amount, §9): 6 PIN-gated transfer pairs (their execution is due
 72 hours later) and 5 view pairs, 33 transaction pairs compared. HCU, HCU depth, events, ACL grants and calldata length
 are identical in every pair. The 5 execution-gas differences are either the first use of a storage slot (the account's
 first op, first guess and first view; the real-PIN half ran first) or within the ±4 gas spread seen among transactions
@@ -154,21 +172,55 @@ the amount is encrypted, and sorting sends by size in public would decrypt a bit
 
 Shielding (wrapping) amounts are public and the private transfers are public events with hidden amounts. A coercer
 anchors on N = shielded − unshielded and asks whether the k private payments since the last shield could have brought the
-balance down to the decoy D. With payments of mean μ, the probability is P(Poisson((N − D)/μ) ≤ k − 1); the app takes μ
-as 4 % of N. The web shows this next to the duress setting (weak below 0.2, fair below 0.5, good above), from the
+balance down to what the duress view shows, D = balance − hidden. With payments of mean μ, the probability is
+P(Poisson((N − D)/μ) ≤ k − 1); the app takes μ as 4 % of N and D as N − hidden (nothing spent), so the figure it shows is
+an upper bound. The web shows this next to the duress setting (weak below 0.2, fair below 0.5, good above), from the
 account's own public history, and the test-token screen says that wrapping is public. It ignores everything off-chain:
 a guide, not a guarantee.
 
 ## 9. Duress PIN semantics
 
 Under the duress PIN every PIN path runs the same operations, writes the same slots and emits the same events; only
-encrypted values differ:
+encrypted values differ. The duress PIN works on the balance minus the **hidden amount** H (the part the owner keeps out
+of view, 0 without a duress PIN) as if that were the whole balance:
 
-- view: `select(isDuress, min(balance, decoyLeft), balance)`;
-- private send: up to `decoyLeft` moves, more moves zero (all or nothing, as a real balance above its value);
+- view: `select(isDuress, balance − min(H, balance), balance)`; a duress view also clamps H to the balance, and it stays
+  so (what the coercer saw is the anchor: a deposit he makes afterwards shows in full);
+- private send: under duress up to `balance − min(H, balance)` moves, more moves zero (all or nothing, as a real
+  balance above its value);
+- key-only private send (no PIN, the same for anyone holding K): it moves only if `amount + H ≤ balance`, so K alone
+  never reaches H either; an amount that would reach into H moves zero without tripping the wire;
 - PIN change: lands on the duress fingerprint, the real PIN stays;
-- setting or removing the duress PIN, and the tripwire reset: change nothing;
-- generic calls can never reach a private token (`openCall` refuses it), so no unwrap or operator around the decoy.
+- tripwire reset: the same under both PINs;
+- setting or removing the duress PIN: changes nothing under the duress PIN;
+- generic calls can never reach a private token (`openCall` refuses it), so no unwrap or operator around H.
+
+**Consistency: what a coercer can check.** Someone holding K and the duress PIN can compare the duress view with what
+he did himself. The first build capped the duress view at a fixed decoy amount instead of keeping H out of view; it
+failed three of these checks, which is why the semantics changed (`PRIVATE_MODE_VERSION` 1 → 2, a public constant of the
+module, so the app knows which one an account runs):
+
+| He does, then views under the duress PIN | First build (decoy cap) | Now | Test (`test/PrivateMode.test.ts`) |
+|---|---|---|---|
+| nothing (a second view) | same value | same value | a second duress view shows the same |
+| sends a deposit to the account | unchanged while the balance was above the decoy: gives duress away | the deposit shows in full, also when H was above the balance (the first duress view clamps H) | a deposit shows in full |
+| a duress send within / above the view | drops by the amount / unchanged | drops by the amount / unchanged | duress view and transfer |
+| a key-only send to a known recipient | did not drop; a send above the decoy but within the key-only limit moved real funds | drops by what moved; above the view it moves zero and does not trip | K alone never reaches the hidden amount |
+| trips the wire, resets it under duress, sends with K | the reset did nothing: the next send moved zero | the reset works as under the real PIN | a reset under the duress PIN |
+| changes "the PIN" under duress, then uses the new and the old one | new works, old fails | new works, old fails | PIN change under the duress PIN |
+| sets a "new duress PIN" under duress and tries it | it fails | it fails (limit 1 below) | limit (documented) |
+
+Limits that remain:
+
+1. A duress PIN set under the duress PIN changes nothing, so a coercer who knows the protocol can set one and try it.
+   Two fingerprint slots cannot give him a working third PIN without exposing the real one. The settings delay (24 h by
+   default) is the time the trusted contact has.
+2. Outside the private token the duress PIN is a full PIN, as in the standard account: ETH and ERC-20 balances are public
+   anyway, and PIN-verified ops on them (sends, a new known recipient, a key rotation, a guardian or escape change, a
+   generic call) run after their delays as under the real PIN. The silent alarm tells the trusted contact in time.
+3. The owner's own key-only sends come from the part above H too: a large H also limits what K alone can send.
+4. If the owner spends below H with the real PIN, the duress view shows 0, as an empty balance.
+5. Public history (§8) is the other check a coercer has; the app shows how believable the view is against it.
 
 The watchtower can read the duress flag of a PIN check (as in the standard account); it is the owner's chosen helper.
 
@@ -182,7 +234,7 @@ company), and to nobody else:
 - nothing on-chain: the service sends no transaction around a PIN entry (it never finalizes; no restriction, no
   freeze), and the contracts emit the same events as for the real PIN;
 - the alarm says which account, when, that the duress PIN was used, and the owner's optional short note; never a
-  balance or the decoy amount (no message of the service carries an amount);
+  balance or the hidden amount (no message of the service carries an amount);
 - the owner's own notices are the same for a real and a duress PIN;
 - the trusted contacts and channels live in the service's config file, never on-chain.
 
@@ -197,16 +249,17 @@ was finalized), a silent zero 7.4 s after the transfer.
 
 For a private-mode account the web app stores: L_min and the known recipient (to route sends), today's key-only send
 amounts (each within L_min, older days dropped), and scheduled PIN sends without their amounts. It never stores whether a
-duress PIN is set, the decoy, or any balance; a viewed balance stays on screen for a minute and only in memory. Someone
+duress PIN is set, the hidden amount, or any balance; a viewed balance stays on screen for a minute and only in memory. Someone
 who forces the owner to open the app should not find the real figures there.
 
 ## 11. Tests
 
-- `test/PrivateMode.test.ts` (16): setup rules; key-only delivery, silent zero, sticky tripwire and reset, unknown
+- `test/PrivateMode.test.ts` (20): setup rules; key-only delivery, silent zero, sticky tripwire and reset, unknown
   recipient, tighten; PIN view, 72-hour transfer, duress view and transfer, PIN change and duress setting under duress;
-  guards; the three escape cases (both escapes, a scheduled transfer cancelled by an escape, the executor down); the SDK
-  watchtower.
-- `test/PrivateIndistinguishability.test.ts` (3): the pairs above.
+  the consistency checks of §9 (a second view, a deposit, a key-only send against the hidden amount, a reset under
+  duress, the documented limit); guards; the three escape cases (both escapes, a scheduled transfer cancelled by an
+  escape, the executor down); the SDK watchtower.
+- `test/PrivateIndistinguishability.test.ts` (4): the pairs above, the standard account's included.
 - `test/WatchtowerService.test.ts` (5): the service against the contracts on the mock FHEVM: a wrong PIN reported at
   submit (also when nobody finalizes it) and not again at finalize; a silent zero and a delivery reported without the
   amount; the duress alarm to the trusted contact only, with no transaction and no new block while it is handled, five

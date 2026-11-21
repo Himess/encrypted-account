@@ -5,13 +5,14 @@
 import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import { ethers as E } from "ethers";
 import * as hre from "hardhat";
-import { randomUint64 } from "../sdk/src";
 import { DAY, N_RECIPIENTS, N_SPENDERS, Stack, debugU64, defaultDelays, deployStack, escapeConsent, ethers, setupKnownList, setupPinOf } from "./helpers";
 
 export const tc = (x: number) => BigInt(Math.round(x * 1e6)); // 6-decimal confidential units
 export const PRIVATE_LIMITS = { lmin: tc(300), lmax: tc(1000) };
-export const DECOY = tc(2000);
 export const FUND = tc(10_000);
+/** The amount the duress PIN keeps hidden in the tests: of FUND, the duress PIN shows SHOWN. */
+export const HIDDEN = tc(8000);
+export const SHOWN = FUND - HIDDEN;
 export const PIN = "482915";
 export const DURESS = "771203";
 export const WRONG = "000111";
@@ -70,7 +71,7 @@ export async function delaysP(s: Stack): Promise<Record<string, bigint>> {
 
 export interface AcctOptsP {
   duressPin?: string; // optional, off by default
-  decoy?: bigint;
+  hidden?: bigint; // default: HIDDEN with a duress PIN, 0 without (K alone never moves the hidden amount either)
   known: string[];
   salt?: string;
   delays?: Record<string, bigint>;
@@ -89,8 +90,8 @@ export async function createAccountP(s: StackP, owner: HardhatEthersSigner, esca
   const inp = hre.fhevm.createEncryptedInput(predicted, owner.address);
   inp.add64(PRIVATE_LIMITS.lmin);
   inp.add64(PRIVATE_LIMITS.lmax);
-  // the client always encrypts a decoy cap; without a duress PIN it is a random value that never matters
-  inp.add64(o.decoy ?? (o.duressPin ? DECOY : randomUint64() & ((1n << 62n) - 1n)));
+  // the client always encrypts a hidden amount (the dataflow is the same either way); without a duress PIN it is 0
+  inp.add64(o.hidden ?? (o.duressPin ? HIDDEN : 0n));
   const enc = await inp.encrypt();
   await (await acct.privateSetupAsset(await s.token.getAddress(), enc.handles[0], enc.handles[1], enc.handles[2], enc.inputProof)).wait();
   await setupKnownList(acct, owner, false, o.known, N_RECIPIENTS);
@@ -209,6 +210,9 @@ export class Roles {
 const hex2big = (x: string) => BigInt(x.startsWith("0x") ? x : "0x" + x);
 
 export async function recordTx(label: string, rc: any, roles: Roles, cleartextArith: string): Promise<TxRec> {
+  // A trace of an FHE-heavy transaction is hundreds of MB of JSON: collect the previous one first (run-tests.mjs starts
+  // node with --expose-gc), so a file with many traced pairs fits in a machine's memory.
+  (globalThis as any).gc?.();
   const tx = await ethers.provider.getTransaction(rc.hash);
   const data = E.getBytes(tx!.data);
   const zeros = data.filter((b) => b === 0).length;

@@ -1,0 +1,93 @@
+{
+ "generatedAt": "2026-11-21T13:12:44.368Z",
+ "evidence": "[Mock] scripts/measure/private-cost.ts on both builds (protocol gas = gas without the mock cleartext layer); the same account history in both runs",
+ "before": "PRIVATE_MODE_VERSION 1 (duress view capped at a decoy amount)",
+ "after": "PRIVATE_MODE_VERSION 2 (the duress PIN keeps a hidden amount out of view; K alone never reaches it)",
+ "rows": {
+  "kOnlyTransfer": {
+   "protocolGas": {
+    "before": 1154630,
+    "after": 1214441,
+    "change": 59811
+   },
+   "hcu": {
+    "before": 1996128,
+    "after": 2332128,
+    "change": 336000
+   },
+   "hcuDepth": {
+    "before": 1088032,
+    "after": 1088032,
+    "change": 0
+   }
+  },
+  "viewFinalize_real": {
+   "protocolGas": {
+    "before": 526858,
+    "after": 555430,
+    "change": 28572
+   },
+   "hcu": {
+    "before": 654000,
+    "after": 491000,
+    "change": -163000
+   },
+   "hcuDepth": {
+    "before": 654000,
+    "after": 436000,
+    "change": -218000
+   }
+  },
+  "viewFinalize_duress": {
+   "protocolGas": {
+    "before": 509770,
+    "after": 538366,
+    "change": 28596
+   },
+   "hcu": {
+    "before": 654000,
+    "after": 491000,
+    "change": -163000
+   },
+   "hcuDepth": {
+    "before": 654000,
+    "after": 436000,
+    "change": -218000
+   }
+  },
+  "transferExecute_real": {
+   "protocolGas": {
+    "before": 642717,
+    "after": 562839,
+    "change": -79878
+   },
+   "hcu": {
+    "before": 1442128,
+    "after": 1226096,
+    "change": -216032
+   },
+   "hcuDepth": {
+    "before": 1063000,
+    "after": 1009000,
+    "change": -54000
+   }
+  },
+  "transferExecute_duress": {
+   "protocolGas": {
+    "before": 618948,
+    "after": 539070,
+    "change": -79878
+   },
+   "hcu": {
+    "before": 1442096,
+    "after": 1226064,
+    "change": -216032
+   },
+   "hcuDepth": {
+    "before": 1063000,
+    "after": 1009000,
+    "change": -54000
+   }
+  }
+ }
+}

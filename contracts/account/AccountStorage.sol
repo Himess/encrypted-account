@@ -61,7 +61,7 @@ library AccountStorage {
     uint8 internal constant A_PRIVATE_TRANSFER = 22; // K+P transfer of an ERC-7984 token, encrypted amount (long delay, ≥ 72 h)
     uint8 internal constant A_PRIVATE_VIEW = 23; // K+P balance view: an encrypted snapshot allowed to K (no delay)
     uint8 internal constant A_PRIVATE_RESET = 24; // K+P: clears a private token's tripwire and redraws its tau (no delay)
-    uint8 internal constant A_PRIVATE_SET_DURESS = 25; // K+P: sets or clears the duress PIN and a token's decoy cap (settings delay)
+    uint8 internal constant A_PRIVATE_SET_DURESS = 25; // K+P: sets or clears the duress PIN and a token's hidden amount (settings delay)
 
     uint8 internal constant TRACK_OWNER = 0; // K-track: guesses from K (EOA or EntryPoint) — anonymous (anyone with K)
     uint8 internal constant TRACK_RECOVERY = 1; // anonymous track (relayer), bonded; only Recovery / Freeze ops
