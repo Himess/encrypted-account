@@ -75,7 +75,20 @@ library OpsLib {
             emit IAccountEvents.GuessFinalized(opId, track, ok, 0);
             return;
         }
-        uint64 readyAt = uint64(block.timestamp) + delayFor(l, op, big);
+        bool lane = track == S.TRACK_LANE;
+        if (big && op.kind == S.Kind.Outflow && !lane && l.laneOnly && PolicyMath.hasCosigner(l)) {
+            // the two-device setting: a transfer in the long class needs the lane; the op stays open for a lane guess
+            op.status = S.Status.NeedsPin;
+            emit IAccountEvents.LaneRequired(opId);
+            emit IAccountEvents.GuessFinalized(opId, track, true, 0);
+            return;
+        }
+        uint64 d = delayFor(l, op, big);
+        // without the second device (K-track, setting on): a device or helper change takes the long no-device delay
+        if (!lane && l.laneOnly && op.kind == S.Kind.Admin && (op.sub == S.A_SET_DEVICE || op.sub == S.A_SET_HELPER) && d < l.delays.recoveryNoDevice) {
+            d = l.delays.recoveryNoDevice;
+        }
+        uint64 readyAt = uint64(block.timestamp) + d;
         op.status = S.Status.Delayed;
         op.readyAt = readyAt;
         if (op.kind == S.Kind.Outflow) {
@@ -241,6 +254,9 @@ library OpsLib {
             uint256 t = abi.decode(op.data, (uint256));
             l.pausedAt[t] = 1; // lifted; and never again (one pause per op)
             emit IAccountEvents.PauseLifted(t);
+        } else if (a == S.A_SET_LANE_ONLY) {
+            l.laneOnly = false; // only "off" is ever an op (on is applied at once by openAdmin)
+            emit IAccountEvents.LaneOnlySet(false);
         }
         return true;
     }
@@ -268,6 +284,7 @@ library OpsLib {
         if (a == S.A_ADD_KNOWN_R || a == S.A_ADD_KNOWN_S) return d.knownAdd;
         if (a == S.A_SET_ESCAPE) return d.escapeChange;
         if (a == S.A_APPROVE_HASH) return d.genericCall;
+        if (a == S.A_SET_LANE_ONLY) return d.loosen > PolicyMath.LANE_ONLY_OFF_DELAY ? d.loosen : PolicyMath.LANE_ONLY_OFF_DELAY;
         return d.loosen; // SET_LIMITS, SET_PULSE, SET_RECOVERY, SET_AUTOKNOWN, SET_INSTANT
     }
 

@@ -134,6 +134,15 @@ library OpenLib {
             if (!l.assets[asset].configured) revert Errors.InvalidParams();
         } else if (a == S.A_SET_OWNER_BOND) {
             PolicyMath.ownerBondUnits(abi.decode(p, (uint256))); // F0.16: BASE_BOND .. MAX_OWNER_BOND, multiple of BASE_BOND
+        } else if (a == S.A_SET_LANE_ONLY) {
+            // on: tightening, K alone, at once (no op: returns 0); it needs a co-signer, or the lane could never be used
+            if (abi.decode(p, (bool))) {
+                if (!PolicyMath.hasCosigner(l)) revert Errors.InvalidParams();
+                l.laneOnly = true;
+                emit IAccountEvents.LaneOnlySet(true);
+                return 0;
+            }
+            if (!l.laneOnly) revert Errors.InvalidParams(); // off: an op (lane + PIN + the loosen delay, at least 72 h)
         } else if (a == S.A_UNPAUSE) {
             // only an op the guardian holds back now; verifiable on the lane only, so without D and helper it just waits
             uint256 t = abi.decode(p, (uint256));

@@ -19,6 +19,8 @@ import { asBool, encrypt, publicDecrypt } from "./fhe";
 import { guessValue, pinFingerprint, randomUint64 } from "./pin";
 import { BASE_BOND } from "../../sdk/src/bondFee";
 import { PrivateHistoryEvent, SendRecord, utcDay } from "../../sdk/src/privateMode";
+import { challengeOf, decodeApproval, encodeApproval, laneMessage, opContentHash } from "../../sdk/src/lane";
+import { minDelayOf } from "../../sdk/src/watchtower";
 import { Status, sendTx } from "./tx";
 import type { Wallet } from "./wallet";
 
@@ -261,7 +263,7 @@ export async function readAccount(read: ethers.JsonRpcProvider, address: string,
 /** Private mode in a resumable plan: only the private token's daily limit (token units). Whether a duress PIN is set,
  *  and the hidden amount, are never stored on this device. */
 export type PrivatePlan = { limitUnits: string };
-export type Plan = { account: string; escape: string; salt: string; limitUnits: string; known: string | null; bondBase?: string; private?: PrivatePlan };
+export type Plan = { account: string; escape: string; salt: string; limitUnits: string; known: string | null; bondBase?: string; private?: PrivatePlan; device?: string };
 const planKey = (owner: string) => `ea:plan:${owner.toLowerCase()}`;
 export const loadPlan = (owner: string): Plan | null => {
   try {
@@ -334,7 +336,7 @@ export type StepCb = (i: number, state: "run" | "done" | "skip" | "fail", text?:
  */
 export async function createAndSetup(
   ctx: Ctx,
-  opts: { pin: string; limitEth: string; known: string | null; escapeWallet: ethers.HDNodeWallet | ethers.Wallet; bondBase?: bigint; priv?: PrivateSetup },
+  opts: { pin: string; limitEth: string; known: string | null; escapeWallet: ethers.HDNodeWallet | ethers.Wallet; bondBase?: bigint; priv?: PrivateSetup; device?: string | null },
   cb: StepCb,
 ): Promise<string> {
   const owner = ctx.w.address;
@@ -367,6 +369,7 @@ export async function createAndSetup(
   const iBond = priv ? PRIVATE_SETUP_STEP + 1 : PRIVATE_SETUP_STEP;
   const iArm = iBond + 1;
   plan.bondBase = (opts.bondBase ?? BASE_BOND).toString(); // the latest choice wins until the account is armed
+  if (opts.device !== undefined) plan.device = opts.device ?? undefined; // two devices: the phone, registered just before arming
   savePlan(owner, plan);
   const A = plan.account;
   const a = acct(A, ctx.read);
@@ -503,11 +506,18 @@ export async function createAndSetup(
     async (st) => sendTx(ctx.w, ctx.read, { to: A, data: IFACE.encodeFunctionData("setupOwnerBond", [bondBase]) }, st),
   );
 
-  // 10. arm
+  // 10. two devices (recommended): the phone as the second device, set while still in setup; then arm
+  const device = plan.device ?? null;
   await run(
     iArm,
     async () => Boolean((await a.status())[0]),
-    async (st) => sendTx(ctx.w, ctx.read, { to: A, data: IFACE.encodeFunctionData("arm", []) }, st),
+    async (st) => {
+      if (device && String((await a.roles())[2]).toLowerCase() !== device.toLowerCase()) {
+        st("Registering your phone as the second device…");
+        await sendTx(ctx.w, ctx.read, { to: A, data: IFACE.encodeFunctionData("setupRoles", [device, ethers.ZeroAddress, 90 * 86400, true]) }, st);
+      }
+      return sendTx(ctx.w, ctx.read, { to: A, data: IFACE.encodeFunctionData("arm", []) }, st);
+    },
   );
 
   // private mode: what this device needs to route sends (L_min and the known recipient; never the duress setting)
@@ -1183,4 +1193,226 @@ export async function loadWatchtowerNotices(account: string): Promise<PrivateNot
   if (!r.ok) throw new Error("The watchtower answered " + r.status);
   const j = await r.json();
   return (Array.isArray(j) ? j : []).filter((n: any) => n && typeof n.kind === "string" && n.kind.startsWith("private-"));
+}
+
+// ───────────────────────────── two devices: the key here, the PIN on the phone ─────────────────────────────
+
+/** The account's key K, second device D and recovery helper (zero address: none). */
+export async function readCosigners(read: ethers.Provider, account: string): Promise<{ owner: string; device: string; helper: string }> {
+  const r = await acct(account, read).roles();
+  return { owner: String(r[0]), device: String(r[2]), helper: String(r[3]) };
+}
+
+/** The two-device setting (A_SET_LANE_ONLY), from the account's LaneOnlySet events: there is no view for it. */
+export async function readLaneOnly(read: ethers.JsonRpcProvider, account: string): Promise<boolean> {
+  const ev = IFACE.getEvent("LaneOnlySet");
+  if (!ev) return false;
+  const logs = await getLogsChunked(read, { address: account, topics: [ev.topicHash] }, LOGS_FROM_BLOCK, await read.getBlockNumber());
+  return logs.length > 0 && Boolean(IFACE.parseLog(logs[logs.length - 1])!.args.on);
+}
+
+/** Whether the account's build has the two-device setting (newer than the deployed F0.16 one): a simulated call from the
+ *  key, nothing sent. A build without it, or an account without a second device or helper, refuses it. */
+export async function laneOnlySupported(read: ethers.JsonRpcProvider, account: string, owner: string): Promise<boolean> {
+  try {
+    await acct(account, read).openAdmin.staticCall(27, ethers.AbiCoder.defaultAbiCoder().encode(["bool"], [true]), { from: owner });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** This phone's device key: it co-signs PIN entries (the lane) for the accounts that name it, and holds no funds. One per
+ *  browser, so a phone can be paired before its account exists (at setup). Only in this browser. */
+const DEVICE_KEY = "ea:device";
+export function loadDeviceKey(): ethers.Wallet | null {
+  try {
+    const k = localStorage.getItem(DEVICE_KEY);
+    return k ? new ethers.Wallet(k) : null;
+  } catch {
+    return null;
+  }
+}
+export function createDeviceKey(): ethers.Wallet {
+  const w = new ethers.Wallet(ethers.Wallet.createRandom().privateKey);
+  try {
+    localStorage.setItem(DEVICE_KEY, w.privateKey);
+  } catch {
+    /* private window: the pairing lasts this session only */
+  }
+  return w;
+}
+
+/** The phone's links (the fragment never reaches a server): pairing (an account is optional), and approving one op. */
+export const pairLink = (origin: string, account?: string | null) => `${origin}/app#pair${account ? "=" + account : ""}`;
+export const approveLink = (origin: string, account: string, opId: bigint) => `${origin}/app#approve=${account}:${opId}`;
+export type PhoneLink = { kind: "pair"; account: string | null } | { kind: "approve"; account: string; opId: bigint };
+export function parsePhoneLink(hash: string): PhoneLink | null {
+  const p = /^#pair(?:=(0x[0-9a-fA-F]{40}))?$/.exec(hash);
+  if (p) return { kind: "pair", account: p[1] ? ethers.getAddress(p[1]) : null };
+  const a = /^#approve=(0x[0-9a-fA-F]{40}):(\d{1,12})$/.exec(hash);
+  if (a) return { kind: "approve", account: ethers.getAddress(a[1]), opId: BigInt(a[2]) };
+  return null;
+}
+
+/** What the phone shows before the PIN, read from the chain; the challenge is recomputed here, not taken from the computer. */
+export type PhoneOp = { kind: number; sub: number; target: string; to: string; amount: bigint; data: string; fee: bigint; status: number; c: bigint; owner: string; device: string; helper: string; delay: number };
+export async function readOpForPhone(read: ethers.JsonRpcProvider, account: string, opId: bigint): Promise<PhoneOp> {
+  const a = acct(account, read);
+  const [op, roles, d, onChain] = await Promise.all([a.getOp(opId), a.roles(), a.delays(), a.challengeOf(opId)]);
+  const c = challengeOf(CHAIN_ID, account, opId, opContentHash(opId, op));
+  if (c !== BigInt(onChain)) throw new Error("This operation does not match its own challenge. Do not approve it.");
+  const kind = Number(op.kind);
+  const sub = Number(op.sub);
+  return {
+    kind,
+    sub,
+    target: String(op.target),
+    to: String(op.counterparty),
+    amount: BigInt(op.amount),
+    data: String(op.data),
+    fee: BigInt(op.fee) + BigInt(op.callFee),
+    status: Number(op.status),
+    c,
+    owner: String(roles[0]),
+    device: String(roles[2]),
+    helper: String(roles[3]),
+    delay: Number(minDelayOf(kind, sub, BigInt(op.amount), d)),
+  };
+}
+
+/** The phone: the approval code for `opId` under `pin`. The PIN and its fingerprint never leave this device. */
+export async function buildApproval(read: ethers.JsonRpcProvider, account: string, opId: bigint, pin: string, key: ethers.Wallet, st: (t: string) => void): Promise<string> {
+  const op = await readOpForPhone(read, account, opId);
+  if (op.status !== 2) throw new Error(op.status === 3 ? "A PIN check for this operation is already in flight." : "This operation no longer waits for a PIN.");
+  st("Deriving the fingerprint (Argon2id)…");
+  const fp = await pinFingerprint(pin, CHAIN_ID, account);
+  st("Encrypting for your key's address…");
+  const enc = await encrypt(read, [{ type: "euint64", value: guessValue(fp, op.c) }], account, op.owner);
+  const guess = ethers.hexlify(enc.handles[0]);
+  st("Signing with this phone…");
+  const cosig = await key.signMessage(ethers.getBytes(laneMessage(CHAIN_ID, account, opId, guess)));
+  return encodeApproval({ account, opId, c: op.c, guess, proof: ethers.hexlify(enc.inputProof), cosig });
+}
+
+/** The computer: the lane part of a PIN check. Takes the phone's code, submits it with K (no bond: the lane has its own
+ *  score, outside the key-track budget), decrypts the yes / no result, finalizes. Steps `first` .. `first + 3`. */
+async function laneVerify(ctx: Ctx, account: string, opId: bigint, getCode: (opId: bigint) => Promise<string>, cb: StepCb, step: Step, first: number) {
+  const a = await step(first, async (st) => {
+    st("Waiting for the code from your phone…");
+    const x = decodeApproval(await getCode(opId));
+    if (x.account.toLowerCase() !== account.toLowerCase() || x.opId !== opId) throw new Error("That code is for another operation.");
+    cb(first, "done");
+    return x;
+  });
+  const handles = await step(first + 1, async (st) => {
+    const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("submitGuessWithCosign", [a.opId, a.c, a.guess, a.proof, a.cosig]) }, st);
+    const ev = eventOf(r, account, "GuessSubmitted");
+    cb(first + 1, "done", undefined, r.hash);
+    return ev.args.bigHandle === ZERO32 ? [String(ev.args.okHandle)] : [String(ev.args.okHandle), String(ev.args.bigHandle)];
+  });
+  const dec = await step(first + 2, async (st) => {
+    const d = await publicDecrypt(ctx.read, handles, (s) => st(`Waiting for the threshold network… ${s} s`));
+    cb(first + 2, "done", asBool(d.clear[0]) ? "Result: correct PIN" : "Result: wrong PIN");
+    return d;
+  });
+  const fin = await step(first + 3, async (st) => {
+    const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("finalizeGuess", [opId, dec.cleartexts, dec.proof]) }, st);
+    const ev = eventOf(r, account, "GuessFinalized");
+    cb(first + 3, "done", undefined, r.hash);
+    return { ok: Boolean(ev.args.ok), readyAt: Number(ev.args.readyAt) };
+  });
+  if (!fin.ok) {
+    const ts = await acct(account, ctx.read).trackState(2);
+    throw new WrongPin(Number(ts[1]), Number(ts[0]));
+  }
+  return fin;
+}
+
+async function waitThenRun(ctx: Ctx, account: string, opId: bigint, readyAt: number, st: Status): Promise<string> {
+  for (;;) {
+    const now = (await ctx.read.getBlock("latest"))?.timestamp ?? 0;
+    if (now >= readyAt) break;
+    st(`Waiting period: ${readyAt - now} s`);
+    await sleep(4000);
+  }
+  const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("executeOp", [opId]) }, st);
+  eventOf(r, account, "OpExecuted");
+  return r.hash;
+}
+
+export const PHONE_SEND_STEPS = ["Open the transfer", "Approve it on your phone", "Submit the phone's approval with your key", "Zama decrypts only the yes/no result", "Record the result on-chain", "Send the ETH"] as const;
+
+/** The computer: an ETH transfer approved on the phone. The PIN is typed on the phone; this page never sees it. */
+export async function sendWithPhone(ctx: Ctx, account: string, to: string, amountWei: bigint, getCode: (opId: bigint) => Promise<string>, cb: StepCb): Promise<string> {
+  const step = stepper(cb);
+  const opId = await step(0, async (st) => {
+    await finalizePending(ctx, account, st);
+    const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("requestTransfer", [ETH, to, amountWei, true]) }, st);
+    const ev = eventOf(r, account, "OpOpened");
+    cb(0, "done", undefined, r.hash);
+    return BigInt(ev.args.opId);
+  });
+  let fin: { ok: boolean; readyAt: number };
+  try {
+    fin = await laneVerify(ctx, account, opId, getCode, cb, step, 1);
+  } catch (e) {
+    if (e instanceof WrongPin) cb(5, "skip", "Not sent: wrong PIN");
+    throw e;
+  }
+  return await step(5, async (st) => {
+    const h = await waitThenRun(ctx, account, opId, fin.readyAt, st);
+    cb(5, "done", undefined, h);
+    return h;
+  });
+}
+
+export const PAIR_STEPS = ["Open the device change", "Encrypt your PIN guess", "Submit the encrypted guess with its bond", "Zama decrypts only the yes/no result", "Record the result on-chain", "Wait the settings delay, then switch"] as const;
+
+/** Registers (or replaces) the second device: A_SET_DEVICE with the PIN typed here, then the settings delay. */
+export async function pairDeviceWithPin(ctx: Ctx, account: string, device: string, pin: string, cb: StepCb, bondShown?: bigint): Promise<string> {
+  const step = stepper(cb);
+  const data = IFACE.encodeFunctionData("openAdmin", [11, ethers.AbiCoder.defaultAbiCoder().encode(["address"], [device])]);
+  let op: Awaited<ReturnType<typeof verifyWithPin>>;
+  try {
+    op = await verifyWithPin(ctx, account, (st) => sendTx(ctx.w, ctx.read, { to: account, data }, st), pin, cb, step, bondShown);
+  } catch (e) {
+    if (e instanceof WrongPin) cb(5, "skip", "Not changed: wrong PIN");
+    throw e;
+  }
+  return await step(5, async (st) => {
+    const h = await waitThenRun(ctx, account, op.opId, op.readyAt, st);
+    cb(5, "done", undefined, h);
+    return h;
+  });
+}
+
+/** The two-device setting on: one transaction with the key alone, at once (it only tightens). */
+export async function enableLaneOnly(ctx: Ctx, account: string, st: Status): Promise<string> {
+  const data = IFACE.encodeFunctionData("openAdmin", [27, ethers.AbiCoder.defaultAbiCoder().encode(["bool"], [true])]);
+  const r = await sendTx(ctx.w, ctx.read, { to: account, data }, st);
+  return r.hash;
+}
+
+export const LANE_OFF_STEPS = ["Open the switch-off", "Approve it on your phone", "Submit the phone's approval with your key", "Zama decrypts only the yes/no result", "Record the result on-chain"] as const;
+
+/** The two-device setting off: an op approved on the phone (the lane only), then at least 72 hours; returns the op and its
+ *  ready time, to be run with executeOp later (permissionless). */
+export async function disableLaneOnlyWithPhone(ctx: Ctx, account: string, getCode: (opId: bigint) => Promise<string>, cb: StepCb): Promise<{ opId: bigint; readyAt: number }> {
+  const step = stepper(cb);
+  const opId = await step(0, async (st) => {
+    const data = IFACE.encodeFunctionData("openAdmin", [27, ethers.AbiCoder.defaultAbiCoder().encode(["bool"], [false])]);
+    const r = await sendTx(ctx.w, ctx.read, { to: account, data }, st);
+    cb(0, "done", undefined, r.hash);
+    return BigInt(eventOf(r, account, "OpOpened").args.opId);
+  });
+  const fin = await laneVerify(ctx, account, opId, getCode, cb, step, 1);
+  return { opId, readyAt: fin.readyAt };
+}
+
+/** Runs a verified op whose delay is over (permissionless). */
+export async function runDueOp(ctx: Ctx, account: string, opId: bigint, st: Status): Promise<string> {
+  const r = await sendTx(ctx.w, ctx.read, { to: account, data: IFACE.encodeFunctionData("executeOp", [opId]) }, st);
+  eventOf(r, account, "OpExecuted");
+  return r.hash;
 }

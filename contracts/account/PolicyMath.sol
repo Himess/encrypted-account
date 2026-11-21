@@ -13,6 +13,8 @@ library PolicyMath {
     uint256 internal constant BASE_BOND = 0.001 ether;
     /// @notice The longest the guardian can hold a pending op back, once per op.
     uint64 internal constant GUARDIAN_PAUSE = 72 hours;
+    /// @notice Turning the two-device setting off waits at least this long (it loosens the account).
+    uint32 internal constant LANE_ONLY_OFF_DELAY = 72 hours;
 
     /// @dev Encrypted limits live in "scaled units" so that 18-decimal tokens fit the 64-bit
     ///      FHE comparison: scaled = ceil(amount / unit). Rounding up is conservative (counts more).
@@ -123,6 +125,26 @@ library PolicyMath {
 
     function hasCosigner(S.Layout storage l) internal view returns (bool) {
         return l.deviceSigner != address(0) || l.recoveryHelper != address(0);
+    }
+
+    /// @notice With the two-device setting on (and a co-signer registered), ops known at opening to need the lane: generic
+    ///         calls and ERC-1271 approvals, loosening ops, private transfers (always in the long class) and turning the
+    ///         setting off. A big transfer is known only after its delay class is decrypted (OpsLib.afterGuess).
+    function laneOnlyOp(S.Layout storage l, S.Op storage op) internal view returns (bool) {
+        if (!l.laneOnly || !hasCosigner(l)) return false;
+        if (op.kind == S.Kind.Call) return true;
+        if (op.kind != S.Kind.Admin) return false;
+        uint8 a = op.sub;
+        return
+            a == S.A_SET_LIMITS ||
+            a == S.A_SET_PULSE ||
+            a == S.A_SET_RECOVERY ||
+            a == S.A_SET_AUTOKNOWN ||
+            a == S.A_SET_INSTANT ||
+            a == S.A_SET_OPEN_LIMIT ||
+            a == S.A_APPROVE_HASH ||
+            a == S.A_PRIVATE_TRANSFER ||
+            a == S.A_SET_LANE_ONLY;
     }
 
     // ─────────────────────────────── op liveness (K54) and counter generation ───────────────────────────────

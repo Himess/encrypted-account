@@ -53,6 +53,8 @@ export type Alert =
   | { kind: "duress"; opId: bigint; earliestRun?: bigint }
   | { kind: "op-paused"; opId: bigint; at: bigint }
   | { kind: "pause-lifted"; opId: bigint }
+  | { kind: "device-change"; opId: bigint; helper: boolean }
+  | { kind: "lane-only"; on: boolean }
   | { kind: "recovery-opened"; opId: bigint }
   | { kind: "escape-started"; readyAt: bigint; to: string }
   | { kind: "escape-unverified"; days: number }
@@ -119,11 +121,15 @@ export function minDelayOf(kind: number, sub: number, amount: bigint, d: Record<
   if (kind === 2) return amount > 0n && n(d.bigTransfer) > n(d.genericCall) ? n(d.bigTransfer) : n(d.genericCall);
   if (kind === 4) return n(d.recovery) < n(d.recoveryNoDevice) ? n(d.recovery) : n(d.recoveryNoDevice);
   if (kind === 5) return n(d.pinReset);
-  if ([1, 2, 3, 7, 19, 26].includes(sub)) return 0n; // cancel, unrestrict, freeze, reset trip, cancel escape, unpause
-  if ([4, 5, 10, 11, 12, 21].includes(sub)) return n(d.settings);
+  // cancel, unrestrict, freeze, reset trip, cancel escape, private view, private reset, unpause
+  if ([1, 2, 3, 7, 19, 23, 24, 26].includes(sub)) return 0n;
+  if ([4, 5, 10, 11, 12, 21, 25].includes(sub)) return n(d.settings); // 25: the private duress setting
   if (sub === 8 || sub === 9) return n(d.knownAdd);
   if (sub === 13) return n(d.escapeChange);
   if (sub === 17) return n(d.genericCall);
+  const H72 = 72n * 3600n;
+  if (sub === 22) return n(d.bigTransfer) > H72 ? n(d.bigTransfer) : H72; // a private send: max(bigTransfer, 72 h)
+  if (sub === 27) return n(d.loosen) > H72 ? n(d.loosen) : H72; // the two-device setting off
   return n(d.loosen);
 }
 
@@ -294,6 +300,11 @@ export class Watchtower {
           notify({ kind: "pause-lifted", opId: args.opId });
         } else if (name === "RestrictionChanged") {
           notify({ kind: "restriction", reasons: Number(args.reasons) });
+        } else if (name === "OpOpened" && Number(args.kind) === KIND_ADMIN && (Number(args.sub) === 11 || Number(args.sub) === 12)) {
+          // a change of the second device or the recovery helper: without the device it waits the long no-device delay
+          notify({ kind: "device-change", opId: args.opId, helper: Number(args.sub) === 12 });
+        } else if (name === "LaneOnlySet") {
+          notify({ kind: "lane-only", on: Boolean(args.on) });
         } else if (name === "OpOpened" && Number(args.kind) === 4) {
           notify({ kind: "recovery-opened", opId: args.opId });
         } else if (name === "OpOpened" && Number(args.kind) === 1 && Number(args.sub) === 2) {

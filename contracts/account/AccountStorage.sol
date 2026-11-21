@@ -63,6 +63,9 @@ library AccountStorage {
     uint8 internal constant A_PRIVATE_RESET = 24; // K+P: clears a private token's tripwire and redraws its tau (no delay)
     uint8 internal constant A_PRIVATE_SET_DURESS = 25; // K+P: sets or clears the duress PIN and a token's hidden amount (settings delay)
     uint8 internal constant A_UNPAUSE = 26; // K + second device or helper + P (lane only): lifts the guardian's pause of an op
+    // Two-device setting (optional): with a second device or helper registered, big transfers, generic calls and loosening
+    // ops accept only lane guesses. On: K alone, at once (tightening; openAdmin opens no op). Off: lane + P + max(loosen, 72 h).
+    uint8 internal constant A_SET_LANE_ONLY = 27;
 
     uint8 internal constant TRACK_OWNER = 0; // K-track: guesses from K (EOA or EntryPoint) — anonymous (anyone with K)
     uint8 internal constant TRACK_RECOVERY = 1; // anonymous track (relayer), bonded; only Recovery / Freeze ops
@@ -196,6 +199,7 @@ library AccountStorage {
         bool recoveryEnabled;
         bool autoKnown;
         bool openMode; // B variant (F0.11): set by EncryptedAccountB only (F0.15: in the flags slot, no slot of its own)
+        bool laneOnly; // A_SET_LANE_ONLY: big transfers, calls and loosening ops need the lane (in the flags slot too)
         uint8 restrictedReasons;
         uint32 ownerEpoch;
         uint32 pulsePeriod; // 0 = off
@@ -319,4 +323,9 @@ interface IAccountEvents {
     event GuardianPaused(uint256 indexed opId, uint64 pausedAt);
     /// @notice The owner lifted the guardian's pause on the lane.
     event PauseLifted(uint256 indexed opId);
+    /// @notice The two-device setting: big transfers, generic calls and loosening ops accept only lane guesses (on).
+    event LaneOnlySet(bool on);
+    /// @notice A correct PIN on the K-track for a transfer in the long class while the two-device setting is on: the op
+    ///         stays open and needs a lane guess (K + second device or helper + PIN).
+    event LaneRequired(uint256 indexed opId);
 }

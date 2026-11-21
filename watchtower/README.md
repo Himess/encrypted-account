@@ -5,10 +5,11 @@ An off-chain service that watches accounts on-chain and quietly tells the right 
 
 | Event | Who is told | How it is known |
 |---|---|---|
-| Wrong PIN (any account) | the owner | `GuessFinalized(ok = false)`, public |
+| Wrong PIN (any account) | the owner | the guess's public yes / no result, decrypted off-chain as soon as the guess is in (so an unfinalized one is reported too) |
 | A key-only private send moved zero (private mode) | the owner | the K-only counter the account shares with the watchtower, decrypted off-chain |
 | The duress PIN was used (private mode) | the trusted contacts only | the encrypted duress flag of every guess, allowed to the watchtower only, decrypted off-chain |
 | PIN-approved operation, restriction, escape, recovery, … | the owner | public events |
+| A change of the second device or recovery helper; the two-device setting on or off | the owner | public events |
 
 ## Rules of the silent alarm
 

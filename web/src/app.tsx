@@ -20,6 +20,25 @@ import {
   PRIVATE_MODE_VERSION,
   PRIVATE_SUB,
   privateModeVersionOf,
+  LANE_OFF_STEPS,
+  PAIR_STEPS,
+  PHONE_SEND_STEPS,
+  PhoneLink,
+  PhoneOp,
+  approveLink,
+  buildApproval,
+  createDeviceKey,
+  disableLaneOnlyWithPhone,
+  enableLaneOnly,
+  loadDeviceKey,
+  pairDeviceWithPin,
+  pairLink,
+  parsePhoneLink,
+  readCosigners,
+  readLaneOnly,
+  laneOnlySupported,
+  readOpForPhone,
+  sendWithPhone,
   PRIVATE_VIEW_STEPS,
   PendingPrivate,
   PrivateInfo,
@@ -92,6 +111,7 @@ import {
   willUrl,
 } from "./will";
 import qrcode from "qrcode-generator";
+import { decodeApproval } from "../../sdk/src/lane";
 
 // ───────────────────────────── shared state and helpers ─────────────────────────────
 
@@ -500,12 +520,12 @@ function TryCost(p: { info: TryInfo | null; fee?: bigint | null; amount?: bigint
       )}
       {b && b.base > BASE_BOND && (
         <p class="small faint" style={{ margin: "8px 0 0" }}>
-          You raised your PIN-try bond to {fmtEth(b.base)} ETH: every PIN entry sends at least that much from your wallet, and it comes back when the PIN is right (claim it on the account page). PIN tries from a new device (recovery, freeze) need the same. The lane (your key plus a second device or a recovery helper) needs no bond; this demo app has no lane yet.
+          You raised your PIN-try bond to {fmtEth(b.base)} ETH: every PIN entry sends at least that much from your wallet, and it comes back when the PIN is right (claim it on the account page). PIN tries from a new device (recovery, freeze) need the same. A PIN approved on your phone (Second device) needs no bond.
         </p>
       )}
       {b && b.base <= BASE_BOND && p.info.score >= 1 && (
         <p class="small faint" style={{ margin: "8px 0 0" }}>
-          The bond doubles with each wrong PIN still counted. The lane (your key plus a second device or a recovery helper) needs no bond; this demo app has no lane yet.
+          The bond doubles with each wrong PIN still counted. A PIN approved on your phone (Second device) needs no bond.
         </p>
       )}
       {b && p.walletBal != null && p.walletBal < b.required && (
@@ -660,7 +680,23 @@ function downloadEscapeKey() {
   a.click();
 }
 
-function CreateFlow({ ctx, fhe, walletBal, onDone, onCancel, privateDefault }: { ctx: Ctx; fhe: Fhe; walletBal: bigint | null; onDone: (account: string) => void; onCancel?: () => void; privateDefault?: boolean }) {
+function CreateFlow({
+  ctx,
+  fhe,
+  walletBal,
+  onDone,
+  onCancel,
+  privateDefault,
+  notify,
+}: {
+  ctx: Ctx;
+  fhe: Fhe;
+  walletBal: bigint | null;
+  onDone: (account: string) => void;
+  onCancel?: () => void;
+  privateDefault?: boolean;
+  notify: Notify;
+}) {
   const plan = useMemo(() => loadPlan(ctx.w.address), [ctx.w.address]);
   // private mode: off unless an unfinished private setup is resumed, or "Create a private-mode account" opened this flow
   const [pf, setPf] = useState<PrivForm>(() => ({
@@ -673,6 +709,8 @@ function CreateFlow({ ctx, fhe, walletBal, onDone, onCancel, privateDefault }: {
     hidden: "1000",
   }));
   const setPfp = (q: Partial<PrivForm>) => setPf((f) => ({ ...f, ...q }));
+  // two devices (recommended, not required): the PIN on the phone, the key here
+  const [dev, setDev] = useState<{ two: boolean; addr: string }>(() => ({ two: true, addr: plan?.device ?? "" }));
   const [resume, setResume] = useState(false);
   useEffect(() => {
     if (plan) read.getCode(plan.account).then((c) => setResume(c !== "0x"), () => undefined);
@@ -747,7 +785,17 @@ function CreateFlow({ ctx, fhe, walletBal, onDone, onCancel, privateDefault }: {
   const bondWei = parseEth(bond);
   const bondOk = bondWei !== null && isValidOwnerBaseBond(bondWei);
   const privErr = privFormError(pf, pin, ctx.w.address, escapeWallet.address);
-  const txCount = (bondOk && bondWei! > BASE_BOND ? 9 : 8) + (pf.on ? 1 : 0);
+  const devAddr = dev.addr.trim();
+  const devErr = !dev.two
+    ? null
+    : !devAddr
+      ? "Paste your phone's device address, or choose this device only."
+      : !ethers.isAddress(devAddr)
+        ? "That is not a device address."
+        : [ctx.w.address, escapeWallet.address].some((x) => x.toLowerCase() === devAddr.toLowerCase())
+          ? "Use the phone's own device address (not your wallet or the escape address)."
+          : null;
+  const txCount = (bondOk && bondWei! > BASE_BOND ? 9 : 8) + (pf.on ? 1 : 0) + (dev.two ? 1 : 0);
 
   async function run() {
     setStep(4);
@@ -769,7 +817,7 @@ function CreateFlow({ ctx, fhe, walletBal, onDone, onCancel, privateDefault }: {
     try {
       const priv = pf.on ? { limitUnits: parseUsd(pf.limit)!, duressPin: pf.duress ? pf.dpin : null, hiddenUnits: pf.duress ? parseUsd(pf.hidden) : null } : undefined;
       const known = pf.on && pf.known.trim() ? ethers.getAddress(pf.known.trim()) : null;
-      const a = await createAndSetup(ctx, { pin, limitEth: limit, known, escapeWallet, bondBase: bondOk ? bondWei! : BASE_BOND, priv }, cb);
+      const a = await createAndSetup(ctx, { pin, limitEth: limit, known, escapeWallet, bondBase: bondOk ? bondWei! : BASE_BOND, priv, device: dev.two ? ethers.getAddress(devAddr) : null }, cb);
       setCreated(a);
       setPfp({ dpin: "", dpin2: "" });
       setStep(5);
@@ -957,12 +1005,13 @@ function CreateFlow({ ctx, fhe, walletBal, onDone, onCancel, privateDefault }: {
                 )}
               </div>
               <PrivateSetupBox f={pf} set={setPfp} err={privErr} resume={resume} />
+              <DeviceSetupBox dev={dev} set={setDev} err={devErr} notify={notify} />
             </div>
             <div class="flow-actions">
               <button type="button" class="btn btn-ghost" onClick={() => setStep(0)}>
                 Back
               </button>
-              <button type="button" class="btn btn-primary" disabled={!limitOk || !bondOk || privErr !== null} onClick={() => setStep(3)}>
+              <button type="button" class="btn btn-primary" disabled={!limitOk || !bondOk || privErr !== null || devErr !== null} onClick={() => setStep(3)}>
                 Continue
               </button>
             </div>
@@ -1020,6 +1069,16 @@ function CreateFlow({ ctx, fhe, walletBal, onDone, onCancel, privateDefault }: {
                   </span>
                 </div>
                 {pf.on && <PrivateReviewRows f={pf} />}
+                <div class="review-row">
+                  <span class="check">
+                    <IconCheck />
+                  </span>
+                  <span class="k">Second device</span>
+                  <span class="v">
+                    {dev.two ? `Phone ${short(devAddr)}` : "This device only"}
+                    <small>{dev.two ? "your PIN is typed on the phone; this computer never sees it" : "you can pair a phone later on the account page"}</small>
+                  </span>
+                </div>
                 {feeRow && feeRow.bps > 0 && (
                   <div class="review-row">
                     <span class="check">
@@ -1161,6 +1220,15 @@ function SendSheet({ ctx, account, view, walletBal, onClose, onSettled }: { ctx:
   const offer = useRefundOffer(ctx, account, verified, view.bond !== null, onSettled);
   const running = stage === "run";
   const now = useNow(1000);
+  // two devices: with a phone registered, the PIN can be typed there instead (the lane: no bond)
+  const [device, setDevice] = useState<string | null>(null);
+  const [viaPhone, setViaPhone] = useState(false);
+  const [laneOp, setLaneOp] = useState<bigint | null>(null);
+  const laneResolver = useRef<((c: string) => void) | null>(null);
+  useEffect(() => {
+    readCosigners(read, account).then((c) => setDevice(c.device), () => undefined);
+  }, [account]);
+  const hasPhone = !!device && device !== ethers.ZeroAddress;
 
   useEffect(() => {
     if (!running) return;
@@ -1194,8 +1262,36 @@ function SendSheet({ ctx, account, view, walletBal, onClose, onSettled }: { ctx:
   const waitUntil = result?.kind === "wrong" ? result.next : view.nextAllowedAt;
   const locked = waitUntil > nowS;
 
+  async function goPhone() {
+    if (!wei || !toOk) return;
+    setViaPhone(true);
+    setStage("run");
+    setT0(Date.now());
+    setResult(null);
+    setTasks(freshTasks(PHONE_SEND_STEPS.length));
+    const cb = taskCb(setTasks, 5);
+    try {
+      const getCode = (opId: bigint) =>
+        new Promise<string>((res) => {
+          laneResolver.current = res;
+          setLaneOp(opId);
+        });
+      const h = await sendWithPhone(ctx, account, ethers.getAddress(toTrim), wei, getCode, cb);
+      setResult({ kind: "ok", hash: h });
+    } catch (e) {
+      if (e instanceof WrongPin) setResult({ kind: "wrong", score: e.score, next: e.nextAllowedAt });
+      else setResult({ kind: "err", text: explainError(e) });
+    } finally {
+      setLaneOp(null);
+      laneResolver.current = null;
+      setStage("result");
+      onSettled();
+    }
+  }
+
   async function go(p = pin) {
     if (p.length < 6 || !wei || !toOk) return;
+    setViaPhone(false);
     setStage("run");
     setT0(Date.now());
     setResult(null);
@@ -1260,9 +1356,23 @@ function SendSheet({ ctx, account, view, walletBal, onClose, onSettled }: { ctx:
               <span>After several wrong PINs, the next attempt is possible in {fmtWait(waitUntil - nowS)}.</span>
             </div>
           )}
-          <button type="button" class="btn btn-primary btn-lg btn-block" disabled={!toOk || !wei || !enough || locked} onClick={() => setStage("pin")}>
-            Continue
-          </button>
+          {hasPhone ? (
+            <div class="stack">
+              <button type="button" class="btn btn-primary btn-lg btn-block" disabled={!toOk || !wei || !enough} onClick={() => void goPhone()}>
+                Approve on my phone
+              </button>
+              <button type="button" class="btn btn-secondary btn-block" disabled={!toOk || !wei || !enough || locked} onClick={() => setStage("pin")}>
+                Enter the PIN here instead
+              </button>
+              <p class="small faint" style={{ margin: 0 }}>
+                On the phone your PIN never reaches this computer, and the phone's approval needs no bond (its own wrong-PIN count, outside the key&apos;s).
+              </p>
+            </div>
+          ) : (
+            <button type="button" class="btn btn-primary btn-lg btn-block" disabled={!toOk || !wei || !enough || locked} onClick={() => setStage("pin")}>
+              Continue
+            </button>
+          )}
         </div>
       )}
 
@@ -1295,16 +1405,28 @@ function SendSheet({ ctx, account, view, walletBal, onClose, onSettled }: { ctx:
           <div class="progress-head">
             <Ring done={done} total={SEND_STEPS.length} />
             <div>
-              <div class="progress-title">Checking your PIN</div>
-              <div class="progress-sub">{current >= 0 ? SEND_LABELS[current] : "Preparing…"}</div>
+              <div class="progress-title">{viaPhone ? "Approving on your phone" : "Checking your PIN"}</div>
+              <div class="progress-sub">{current >= 0 ? (viaPhone ? PHONE_SEND_STEPS : SEND_LABELS)[current] : "Preparing…"}</div>
               <div class="timer">{mmss(now - t0)}</div>
             </div>
           </div>
           <ul class="tasks">
             {tasks.map((t, i) => (
-              <Task label={SEND_LABELS[i]} t={t} extra={t.s === "run" && (i === 1 || i === 3) ? <Cipher n={12} /> : undefined} />
+              <Task label={(viaPhone ? PHONE_SEND_STEPS : SEND_LABELS)[i]} t={t} extra={t.s === "run" && (i === 1 || i === 3) && !viaPhone ? <Cipher n={12} /> : undefined} />
             ))}
           </ul>
+          {viaPhone && laneOp !== null && (
+            <LanePanel
+              account={account}
+              opId={laneOp}
+              notify={() => undefined}
+              onCode={(c) => {
+                laneResolver.current?.(c);
+                laneResolver.current = null;
+                setLaneOp(null);
+              }}
+            />
+          )}
           <div class="notice" style={{ marginTop: "14px" }}>
             <IconInfo />
             <span>Up to 4 wallet confirmations. The yes / no decryption takes about half a minute.</span>
@@ -1755,8 +1877,9 @@ function Dashboard({
   const [view, setView] = useState<AccountView | null>(null);
   const [escape, setEscape] = useState<string | null>(null);
   const [activity, setActivity] = useState<Activity[] | null>(null);
-  const [sheet, setSheet] = useState<null | "send" | "deposit" | "pin" | "accounts" | "alerts" | PrivSheet>(null);
+  const [sheet, setSheet] = useState<null | "send" | "deposit" | "pin" | "accounts" | "alerts" | "device" | PrivSheet>(null);
   const [guardian, setGuardian] = useState<string | null>(null);
+  const [device, setDevice] = useState<string | null>(null);
   // private mode: whether this account has it (its own implementation), the last PIN view of this page session, and
   // what the key alone sent since (memory only: nothing about balances is ever stored)
   const [priv, setPriv] = useState<boolean | null>(null);
@@ -1794,6 +1917,7 @@ function Dashboard({
     void refresh(true);
     retry(() => readEscape(read, account)).then(setEscape, () => undefined);
     retry(() => readGuardian(read, account)).then(setGuardian, () => undefined);
+    retry(() => readCosigners(read, account)).then((c) => setDevice(c.device), () => undefined);
     const id = setInterval(() => void refresh(false), 15000);
     return () => clearInterval(id);
   }, [account]);
@@ -1926,6 +2050,16 @@ function Dashboard({
                 <span class="v">Set</span>
               </li>
               <li>
+                <span class="check">{device && device !== ethers.ZeroAddress ? <IconCheck /> : <IconInfo />}</span>
+                <span class="k">
+                  Second device
+                  <small>{device === null ? "…" : device !== ethers.ZeroAddress ? `Phone ${short(device)}: approve your PIN there` : "Recommended: your PIN on your phone, the key here"}</small>
+                </span>
+                <button type="button" class="link-btn v" onClick={() => setSheet("device")} disabled={!view?.armed || !!view?.escapeReadyAt}>
+                  {device && device !== ethers.ZeroAddress ? "Manage" : "Pair a phone"}
+                </button>
+              </li>
+              <li>
                 <span class="check">{guardian && guardian !== ethers.ZeroAddress ? <IconCheck /> : <IconInfo />}</span>
                 <span class="k">
                   Alerts
@@ -2037,6 +2171,19 @@ function Dashboard({
         />
       )}
       {sheet === "alerts" && <AlertsSheet guardian={guardian} priv={!!priv} onClose={() => setSheet(null)} />}
+      {sheet === "device" && (
+        <SecondDeviceSheet
+          ctx={ctx}
+          account={account}
+          walletBal={walletBal}
+          notify={notify}
+          onClose={() => setSheet(null)}
+          onSettled={() => {
+            void refresh(true);
+            readCosigners(read, account).then((c) => setDevice(c.device), () => undefined);
+          }}
+        />
+      )}
       {sheet === "pview" && <PrivateViewSheet ctx={ctx} account={account} walletBal={walletBal} onClose={() => setSheet(null)} onViewed={onViewed} />}
       {sheet === "psend" && view && (
         <PrivateSendSheet
@@ -2232,6 +2379,53 @@ const PRIVATE_NOT_READY = {
   no: "Not deployed on Sepolia yet: this option opens once it is.",
   old: "The private-mode contracts on Sepolia are an older build than this app: this option opens once the current one is deployed.",
 } as const;
+
+/** Setup: two devices (recommended) — the PIN on the phone, the key here — or this device only. Never required. */
+function DeviceSetupBox({ dev, set, err, notify }: { dev: { two: boolean; addr: string }; set: (d: { two: boolean; addr: string }) => void; err: string | null; notify: Notify }) {
+  const link = pairLink(location.origin);
+  return (
+    <div class="private-box">
+      <div style={{ fontWeight: 600, fontSize: "14px" }}>Where you type your PIN</div>
+      <div class="seg" style={{ marginTop: "10px" }}>
+        <button type="button" class={`chip-btn ${dev.two ? "on" : ""}`} onClick={() => set({ ...dev, two: true })}>
+          On my phone (recommended)
+        </button>
+        <button type="button" class={`chip-btn ${!dev.two ? "on" : ""}`} onClick={() => set({ ...dev, two: false })}>
+          On this device only
+        </button>
+      </div>
+      {dev.two ? (
+        <div class="stack" style={{ marginTop: "12px" }}>
+          <div class="small faint">
+            Your key stays here and your PIN is typed on your phone, which signs each PIN entry with its own device key. Malware on one device then gets the key
+            or the PIN, not both. The phone can move nothing by itself.
+          </div>
+          <div class="row wrap" style={{ gap: "16px", alignItems: "center" }}>
+            <div style={{ width: "140px", background: "#fff", padding: "6px", borderRadius: "10px" }} dangerouslySetInnerHTML={{ __html: qrSvg(link) }} />
+            <div class="small muted" style={{ flex: "1 1 200px" }}>
+              Scan with your phone (or open the link there), make its device key, and paste its device address here.
+              <div style={{ marginTop: "6px" }}>
+                <button type="button" class="link-btn" onClick={() => copy(link, notify, "Link")}>
+                  Copy the link
+                </button>
+              </div>
+            </div>
+          </div>
+          <label class="field">
+            <span>Your phone's device address</span>
+            <input class="input mono" placeholder="0x…" value={dev.addr} spellcheck={false} autoComplete="off" onInput={(e) => set({ ...dev, addr: (e.target as HTMLInputElement).value })} />
+          </label>
+          {err && <p class="field-err">{err}</p>}
+        </div>
+      ) : (
+        <p class="small faint" style={{ margin: "10px 0 0" }}>
+          Simpler, and everything works the same; malware that takes over this device could get both the key and the PIN. You can pair a phone later on the
+          account page.
+        </p>
+      )}
+    </div>
+  );
+}
 
 /** Setup: the optional private mode, off by default; its duress PIN is a second option, also off by default. */
 function PrivateSetupBox({ f, set, err, resume }: { f: PrivForm; set: (p: Partial<PrivForm>) => void; err: string | null; resume?: boolean }) {
@@ -4414,6 +4608,433 @@ async function pickAccount(owner: string): Promise<string | null> {
   return null;
 }
 
+// ───────────────────────────── two devices: the key here, the PIN on the phone ─────────────────────────────
+
+const qrSvg = (text: string) => {
+  const q = qrcode(0, "M");
+  q.addData(text);
+  q.make();
+  return q.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+};
+
+const ADMIN_NAMES: Record<number, string> = {
+  1: "Cancel an operation",
+  2: "Lift a restriction",
+  4: "Replace the account key",
+  5: "Change the PIN",
+  6: "Change the hidden limits",
+  10: "Change the watchtower",
+  11: "Change the second device",
+  12: "Change the recovery helper",
+  13: "Change the escape address",
+  14: "Change the PIN pulse",
+  15: "Turn seedless recovery on or off",
+  16: "Turn auto-known on or off",
+  17: "Approve a signature",
+  18: "Change the instant budget",
+  19: "Cancel the escape",
+  21: "Change the PIN-try bond",
+  22: "Private send (amount hidden)",
+  23: "View the private balance",
+  24: "Reset the private tripwire",
+  25: "Change the duress setting",
+  26: "Lift the watchtower's pause",
+  27: "Turn the two-device setting off",
+};
+
+/** One line that says what an op does, as the phone shows it before the PIN (from the chain, not from the computer). */
+function describeOp(op: PhoneOp): string {
+  if (op.kind === 1) {
+    if (op.sub === 0) return `Send ${fmtEth(op.amount)} ETH to ${op.to}`;
+    if (op.sub === 1) return `Send ${op.amount.toString()} base units of token ${op.target} to ${op.to}`;
+    return `Let ${op.to} spend ${op.amount.toString()} base units of token ${op.target}`;
+  }
+  if (op.kind === 2) return `Call ${op.target}${op.amount > 0n ? ` with ${fmtEth(op.amount)} ETH` : ""}`;
+  if (op.kind === 3) {
+    const name = ADMIN_NAMES[op.sub] ?? `Account setting #${op.sub}`;
+    if (op.sub === 22) {
+      try {
+        return `${name} to ${ethers.AbiCoder.defaultAbiCoder().decode(["address"], op.data)[0]}`;
+      } catch {
+        return name;
+      }
+    }
+    if (op.sub === 11 || op.sub === 4) {
+      try {
+        return `${name} to ${ethers.AbiCoder.defaultAbiCoder().decode(["address"], op.data)[0]}`;
+      } catch {
+        return name;
+      }
+    }
+    return name;
+  }
+  if (op.kind === 4) return `Recover the account to a new key ${op.to}`;
+  return "An account operation";
+}
+
+/** The phone's page (#pair= or #approve=): no wallet; the device key and the PIN stay in this browser. */
+function PhoneView({ link, fhe, notify }: { link: PhoneLink; fhe: Fhe; notify: Notify }) {
+  return link.kind === "pair" ? <PhonePair account={link.account} notify={notify} /> : <PhoneApprove account={link.account} opId={link.opId} fhe={fhe} notify={notify} />;
+}
+
+function PhonePair({ account, notify }: { account: string | null; notify: Notify }) {
+  const [key, setKey] = useState<ethers.Wallet | null>(() => loadDeviceKey());
+  const [device, setDevice] = useState<string | null>(null);
+  useEffect(() => {
+    if (!account) return;
+    readCosigners(read, account).then(
+      (c) => setDevice(c.device),
+      () => undefined,
+    );
+  }, [account]);
+  const paired = !!key && !!device && device.toLowerCase() === key.address.toLowerCase();
+  return (
+    <section class="card card-pad stack" style={{ maxWidth: "560px", margin: "0 auto" }}>
+      <h2 class="card-title">This phone as your second device</h2>
+      <p class="small muted" style={{ margin: 0 }}>
+        {account ? (
+          <>
+            Account <span class="mono">{short(account)}</span>.{" "}
+          </>
+        ) : null}
+        With two devices, your key stays on the computer and your PIN is typed only here: someone who
+        takes over one device gets either the key or the PIN, not both. This phone keeps a device key that signs your PIN entries; it can move nothing by
+        itself.
+      </p>
+      {!key ? (
+        <button type="button" class="btn btn-primary btn-lg btn-block" onClick={() => setKey(createDeviceKey())}>
+          Make this phone's device key
+        </button>
+      ) : (
+        <>
+          <div class="field">
+            <span>This phone's device address</span>
+            <div class="mono" style={{ wordBreak: "break-all", fontSize: "15px" }}>
+              {key.address}
+            </div>
+          </div>
+          <button type="button" class="btn btn-secondary" onClick={() => copy(key.address, notify, "Device address")}>
+            Copy the device address
+          </button>
+          <div class={`notice ${paired ? "ok" : "info"}`}>
+            <IconInfo />
+            <span>
+              {paired
+                ? "Paired: the account names this phone as its second device."
+                : "On your computer, paste this address where it asks for your phone's device address (at setup, or under Second device for an existing account)."}
+            </span>
+          </div>
+          <p class="small faint" style={{ margin: 0 }}>
+            The device key lives only in this browser. If you clear it or lose the phone, register a new one: with the two-device setting on, a change without
+            this phone waits the long no-device delay, and your watchtower tells you.
+          </p>
+        </>
+      )}
+    </section>
+  );
+}
+
+function PhoneApprove({ account, opId, fhe, notify }: { account: string; opId: bigint; fhe: Fhe; notify: Notify }) {
+  const key = useMemo(() => loadDeviceKey(), []);
+  const [op, setOp] = useState<PhoneOp | null>(null);
+  const [err, setErr] = useState("");
+  const [pin, setPin] = useState("");
+  const [busy, setBusy] = useState("");
+  const [code, setCode] = useState("");
+  useEffect(() => {
+    readOpForPhone(read, account, opId).then(setOp, (e) => setErr(explainError(e)));
+  }, [account, opId]);
+  const mine = !!key && !!op && [op.device, op.helper].some((a) => a.toLowerCase() === key.address.toLowerCase());
+  async function approve(v: string) {
+    if (!key || !op || v.length < 6) return;
+    setErr("");
+    try {
+      setCode(await buildApproval(read, account, opId, v, key, setBusy));
+    } catch (e) {
+      setErr(explainError(e));
+    } finally {
+      setBusy("");
+      setPin("");
+    }
+  }
+  return (
+    <section class="card card-pad stack" style={{ maxWidth: "560px", margin: "0 auto" }}>
+      <h2 class="card-title">Approve on this phone</h2>
+      {err && <p class="field-err">{err}</p>}
+      {!op && !err && (
+        <div class="empty">
+          <span class="spinner" style={{ margin: "0 auto" }} />
+        </div>
+      )}
+      {op && (
+        <>
+          <div class="sum" style={{ flexDirection: "column", alignItems: "flex-start", gap: "6px" }}>
+            <b style={{ wordBreak: "break-all" }}>{describeOp(op)}</b>
+            <span class="small faint">
+              Account {short(account)} · operation #{opId.toString()}
+              {op.fee > 0n ? ` · fee ${fmtEth(op.fee)} ETH` : ""} · {op.delay > 0 ? `then waits at least ${fmtWait(op.delay)}` : "runs once approved"}
+            </span>
+          </div>
+          <p class="small faint" style={{ margin: 0 }}>
+            Read from the chain by this phone, and the PIN challenge was recomputed here: the computer cannot change what you approve.
+          </p>
+          {!key && <div class="notice warn">This phone has no device key yet. Open the pairing link from your computer first.</div>}
+          {key && !mine && <div class="notice warn">This phone's device key is not this account's second device (yet): an approval from it will be refused.</div>}
+          {!code ? (
+            <>
+              <p class="center muted" style={{ margin: "10px 0 4px" }}>
+                Enter your PIN
+              </p>
+              <PinPad value={pin} onChange={setPin} onEnter={(v) => void approve(v)} active={!busy && fhe === "ready"} />
+              {busy && <p class="center small muted">{busy}</p>}
+              <button type="button" class="btn btn-primary btn-lg btn-block" disabled={!key || pin.length < 6 || !!busy || fhe !== "ready"} onClick={() => void approve(pin)}>
+                Make the approval code
+              </button>
+            </>
+          ) : (
+            <>
+              <label class="field">
+                <span>Approval code: give it to your computer</span>
+                <textarea class="input mono" rows={5} readOnly value={code} style={{ wordBreak: "break-all" }} />
+              </label>
+              <div class="row wrap" style={{ gap: "10px" }}>
+                <button type="button" class="btn btn-primary" onClick={() => copy(code, notify, "Approval code")}>
+                  Copy
+                </button>
+                {typeof navigator !== "undefined" && (navigator as any).share && (
+                  <button type="button" class="btn btn-secondary" onClick={() => void (navigator as any).share({ text: code }).catch(() => undefined)}>
+                    Share
+                  </button>
+                )}
+              </div>
+              <p class="small faint" style={{ margin: 0 }}>
+                It holds your encrypted PIN entry and this phone's signature for operation #{opId.toString()} only. It is useless for anything else.
+              </p>
+            </>
+          )}
+        </>
+      )}
+    </section>
+  );
+}
+
+/** On the computer, while an op waits for the phone: the link as a QR code for the phone's camera, and a box for its code. */
+function LanePanel({ account, opId, onCode, notify }: { account: string; opId: bigint; onCode: (code: string) => void; notify: Notify }) {
+  const [code, setCode] = useState("");
+  const link = approveLink(location.origin, account, opId);
+  let ok = false;
+  try {
+    const a = decodeApproval(code);
+    ok = a.opId === opId && a.account.toLowerCase() === account.toLowerCase();
+  } catch {
+    ok = false;
+  }
+  return (
+    <div class="stack" style={{ marginTop: "12px" }}>
+      <div class="row wrap" style={{ gap: "16px", alignItems: "center" }}>
+        <div style={{ width: "160px", background: "#fff", padding: "6px", borderRadius: "10px" }} dangerouslySetInnerHTML={{ __html: qrSvg(link) }} />
+        <div class="small muted" style={{ flex: "1 1 200px" }}>
+          Scan with your phone's camera (or open the link there), check what it shows, enter your PIN on the phone, then paste its approval code here.
+          <div style={{ marginTop: "8px" }}>
+            <button type="button" class="link-btn" onClick={() => copy(link, notify, "Link")}>
+              Copy the link
+            </button>
+          </div>
+        </div>
+      </div>
+      <textarea class="input mono" rows={3} placeholder="EA1.…" value={code} onInput={(e) => setCode((e.target as HTMLTextAreaElement).value.trim())} />
+      {code && !ok && <span class="field-err">That is not the approval code of operation #{opId.toString()}.</span>}
+      <button type="button" class="btn btn-primary btn-block" disabled={!ok} onClick={() => onCode(code)}>
+        Use the phone's approval
+      </button>
+    </div>
+  );
+}
+
+/** The second device: pairing, and the optional two-device setting. */
+function SecondDeviceSheet({ ctx, account, walletBal, notify, onClose, onSettled }: { ctx: Ctx; account: string; walletBal: bigint | null; notify: Notify; onClose: () => void; onSettled: () => void }) {
+  const [stage, setStage] = useState<"view" | "pin" | "run" | "result" | "off">("view");
+  const [cos, setCos] = useState<{ device: string; helper: string } | null>(null);
+  const [laneOnly, setLaneOnly] = useState<boolean | null>(null);
+  const [laneSupported, setLaneSupported] = useState(false);
+  const [addr, setAddr] = useState("");
+  const [pin, setPin] = useState("");
+  const [tasks, setTasks] = useState<TaskState[]>(() => freshTasks(PAIR_STEPS.length));
+  const [t0, setT0] = useState(0);
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [laneOp, setLaneOp] = useState<bigint | null>(null);
+  const resolver = useRef<((c: string) => void) | null>(null);
+  const info = useTryInfo(account);
+  useBeforeUnload(stage === "run" || stage === "off");
+  const load = () => {
+    readCosigners(read, account).then((c) => setCos({ device: c.device, helper: c.helper }), () => undefined);
+    readLaneOnly(read, account).then(setLaneOnly, () => setLaneOnly(null));
+    laneOnlySupported(read, account, ctx.w.address).then(setLaneSupported, () => setLaneSupported(false));
+  };
+  useEffect(load, [account]);
+  const hasDevice = !!cos && cos.device !== ethers.ZeroAddress;
+  const addrOk = ethers.isAddress(addr.trim()) && addr.trim().toLowerCase() !== ctx.w.address.toLowerCase() && addr.trim().toLowerCase() !== account.toLowerCase();
+
+  async function pair(v: string) {
+    setStage("run");
+    setT0(Date.now());
+    setTasks(freshTasks(PAIR_STEPS.length));
+    try {
+      await pairDeviceWithPin(ctx, account, ethers.getAddress(addr.trim()), v, taskCb(setTasks, 5), info?.bond?.required);
+      setMsg({ ok: true, text: "Your phone is the second device now. From here on you can approve on the phone." });
+    } catch (e) {
+      setMsg({ ok: false, text: e instanceof WrongPin ? "Wrong PIN: nothing changed." : explainError(e) });
+    } finally {
+      setPin("");
+      setStage("result");
+      load();
+      onSettled();
+    }
+  }
+  async function turnOn() {
+    try {
+      await enableLaneOnly(ctx, account, () => undefined);
+      notify("Two-device setting on", "ok");
+      load();
+    } catch (e) {
+      notify(explainError(e), "err");
+    }
+  }
+  async function turnOff() {
+    setStage("off");
+    setT0(Date.now());
+    setTasks(freshTasks(LANE_OFF_STEPS.length));
+    try {
+      const r = await disableLaneOnlyWithPhone(
+        ctx,
+        account,
+        (opId) =>
+          new Promise<string>((res) => {
+            setLaneOp(opId);
+            resolver.current = res;
+          }),
+        taskCb(setTasks, 4),
+      );
+      setMsg({ ok: true, text: `Approved. The setting switches off ${fmtWait(Math.max(0, r.readyAt - Math.floor(Date.now() / 1000)))} from now (operation #${r.opId}); anyone can run it then.` });
+    } catch (e) {
+      setMsg({ ok: false, text: e instanceof WrongPin ? "Wrong PIN on the phone: nothing changed." : explainError(e) });
+    } finally {
+      setLaneOp(null);
+      setStage("result");
+      load();
+    }
+  }
+
+  return (
+    <Sheet title="Second device" onClose={onClose} locked={stage === "run" || stage === "off"}>
+      {stage === "view" && (
+        <div class="stack">
+          <p class="small muted" style={{ margin: 0 }}>
+            <b>Recommended:</b> keep your key here and type your PIN on your phone. Someone who takes over one device then has the key or the PIN, not both. The
+            phone signs each PIN entry with its own device key; it can move nothing by itself.
+          </p>
+          <div class="kv">
+            <span>Second device</span>
+            <b class="mono">{cos ? (hasDevice ? short(cos.device) : "none") : "…"}</b>
+          </div>
+          <div class="row wrap" style={{ gap: "16px", alignItems: "center" }}>
+            <div style={{ width: "150px", background: "#fff", padding: "6px", borderRadius: "10px" }} dangerouslySetInnerHTML={{ __html: qrSvg(pairLink(location.origin, account)) }} />
+            <div class="small muted" style={{ flex: "1 1 200px" }}>
+              1. Scan this with your phone (or open the link there) and make its device key. 2. Paste the phone's device address below. 3. Confirm with your PIN.
+              <div style={{ marginTop: "6px" }}>
+                <button type="button" class="link-btn" onClick={() => copy(pairLink(location.origin, account), notify, "Link")}>
+                  Copy the link
+                </button>
+              </div>
+            </div>
+          </div>
+          <label class="field">
+            <span>{hasDevice ? "Replace with the device address from the phone" : "Device address from the phone"}</span>
+            <input class="input mono" placeholder="0x…" value={addr} spellcheck={false} onInput={(e) => setAddr((e.target as HTMLInputElement).value)} />
+            {addr.trim() && !addrOk && <span class="field-err">Enter the phone's device address (not your wallet, not the account).</span>}
+          </label>
+          <button type="button" class="btn btn-primary btn-block" disabled={!addrOk} onClick={() => setStage("pin")}>
+            {hasDevice ? "Replace the second device" : "Register the phone"}
+          </button>
+          {hasDevice && (laneSupported || laneOnly) && (
+            <div class="duress-box">
+              <div class="row between" style={{ alignItems: "flex-start", gap: "14px" }}>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: "14px" }}>Two-device setting (optional)</div>
+                  <div class="small faint" style={{ marginTop: "2px" }}>
+                    Big sends, calls to other contracts and loosening changes then accept only a PIN approved on the phone. Turning it on is immediate; turning
+                    it off needs the phone and waits 72 hours. Losing the phone does not lock you out: the device can be replaced with the key and the PIN after
+                    the long no-device delay, and your watchtower tells you.
+                  </div>
+                </div>
+                <b>{laneOnly === null ? "…" : laneOnly ? "On" : "Off"}</b>
+              </div>
+              <div style={{ marginTop: "10px" }}>
+                {laneOnly ? (
+                  <button type="button" class="btn btn-secondary btn-sm" onClick={() => void turnOff()}>
+                    Turn off with the phone
+                  </button>
+                ) : (
+                  <button type="button" class="btn btn-secondary btn-sm" onClick={() => void turnOn()}>
+                    Turn on
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+      {stage === "pin" && (
+        <PinStage
+          summary={
+            <div class="sum">
+              <b>Second device</b>
+              <span class="faint">→</span>
+              <span class="mono">{short(addr.trim())}</span>
+            </div>
+          }
+          info={info}
+          walletBal={walletBal}
+          pin={pin}
+          setPin={setPin}
+          onGo={(v) => void pair(v)}
+          onBack={() => setStage("view")}
+          label="Register with PIN"
+        />
+      )}
+      {stage === "run" && <RunStage title="Registering the phone" labels={PAIR_STEPS} tasks={tasks} t0={t0} />}
+      {stage === "off" && (
+        <div>
+          <RunStage title="Turning the two-device setting off" labels={LANE_OFF_STEPS} tasks={tasks} t0={t0} />
+          {laneOp !== null && resolver.current && (
+            <LanePanel
+              account={account}
+              opId={laneOp}
+              notify={notify}
+              onCode={(c) => {
+                resolver.current?.(c);
+                resolver.current = null;
+                setLaneOp(null);
+              }}
+            />
+          )}
+        </div>
+      )}
+      {stage === "result" && msg && (
+        <div class="result">
+          <div class={`result-icon ${msg.ok ? "ok" : "bad"}`}>{msg.ok ? <OkIcon /> : <BadIcon />}</div>
+          <p>{msg.text}</p>
+          <div class="flow-actions">
+            <button type="button" class="btn btn-primary btn-lg" onClick={onClose}>
+              Done
+            </button>
+          </div>
+        </div>
+      )}
+    </Sheet>
+  );
+}
+
 function App() {
   const [fhe, setFhe] = useState<Fhe>("loading");
   const [phase, setPhase] = useState<"boot" | "connect" | "create" | "account" | "claim">("boot");
@@ -4428,6 +5049,8 @@ function App() {
     if (m) history.replaceState(history.state, "", location.pathname + location.search);
     return m ? m[1] : "";
   }, []);
+  // the phone's page of the two-device flow (#pair= / #approve=): no wallet; the device key and the PIN stay on the phone
+  const phoneLink = useMemo(() => parsePhoneLink(location.hash), []);
   const [ctx, setCtx] = useState<Ctx | null>(null);
   const [walletBal, setWalletBal] = useState<bigint | null>(null);
   const [account, setAccount] = useState<string | null>(null);
@@ -4467,6 +5090,7 @@ function App() {
       () => setFhe("ready"),
       () => setFhe("error"),
     );
+    if (phoneLink) return;
     void (async () => {
       const eth = (window as any).ethereum;
       if (eth) {
@@ -4482,6 +5106,23 @@ function App() {
   }, []);
 
   const onWalletBal = useCallback((b: bigint) => setWalletBal(b), []);
+
+  const toastEl = toast && (
+    <div class={`toast ${toast.kind}`} role="status">
+      <span class={`dot ${toast.kind === "err" ? "bad" : toast.kind === "ok" ? "live" : ""}`} />
+      {toast.text}
+    </div>
+  );
+  if (phoneLink)
+    return (
+      <>
+        <TopBar fhe={fhe} address={null} walletBal={null} showConnect={false} connecting={false} onConnect={() => undefined} />
+        <main class="app-main">
+          <PhoneView link={phoneLink} fhe={fhe} notify={notify} />
+        </main>
+        {toastEl}
+      </>
+    );
 
   return (
     <>
@@ -4512,6 +5153,7 @@ function App() {
             }}
             onCancel={account ? () => setPhase("account") : undefined}
             privateDefault={privDefault}
+            notify={notify}
           />
         )}
         {phase === "account" && ctx && account && (

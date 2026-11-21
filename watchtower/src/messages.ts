@@ -79,6 +79,15 @@ export function ownerMessage(a: Alert, c: MessageCtx): string | null {
       return `${head}\nA key-only private send went above the hidden limit at ${t}. Key-only private sends now move zero until a reset with your PIN.`;
     case "op-paused":
       return `${head}\nOperation #${a.opId} was paused by your watchtower at ${isoS(a.at)}: it can run no earlier than 72 hours after its own waiting time ends. With your second device and PIN you can lift the pause sooner.`;
+    case "device-change":
+      return `${head}
+A change of your ${a.helper ? "recovery helper" : "second device"} was opened at ${t} (operation #${a.opId}). It needs your PIN and then waits; made without your second device, it waits the long no-device delay. If it was not you, cancel it before it runs.`;
+    case "lane-only":
+      return a.on
+        ? `${head}
+The two-device setting was turned on at ${t}: big sends, calls and loosening changes now need a PIN approved on your second device.`
+        : `${head}
+The two-device setting was turned off at ${t}.`;
     case "pause-lifted":
       return `${head}\nThe pause of operation #${a.opId} was lifted at ${t} (second device and PIN).`;
     case "duress":

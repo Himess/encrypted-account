@@ -32,6 +32,12 @@ holds the account key (K). The PIN is asked only for unusual operations.
    minutes up to 7 days), which leaves about 12 guesses in 30 days. Each guess made with the key alone also carries a
    refundable bond, so a thief pays for every wrong one.
 
+**Two devices (recommended, not required).** The key can stay on one device (a computer or a hardware wallet) while the
+PIN is typed on another (a phone registered as the account's second device). The phone reads the operation from the
+chain, recomputes its challenge, derives the fingerprint, encrypts the guess for the key's address and signs it; the
+computer submits that approval with the key ([docs/two-device.md](docs/two-device.md)). The PIN never reaches the
+key's device, and malware on one device gets the key or the PIN, not both.
+
 If the key is stolen, the owner starts an **escape**: after a delay the funds can only go to a pre-set escape address,
 and that path needs no FHE. A signature made with the key alone cannot authorize anything (ERC-1271 accepts only hashes
 approved through a PIN-verified operation), so a phished permit is void.
@@ -53,6 +59,9 @@ Sepolia ETH, send with your PIN, or try a wrong one and watch it get counted on-
 | Large account | The owner sets a higher base bond at setup (0.001–100 ETH, public), so every guess, the first included, costs a thief at least that much; the owner's own PIN entries send it too and get it back. Changing it later needs the PIN, K alone cannot |
 | Choosing a PIN | The user picks it. The app offers a random PIN (shown large, typed twice to confirm), a short note, and warnings that never block for dates, repeats, sequences and keypad patterns; only a short list of very common PINs is refused |
 | Duress PIN typed under coercion | The op runs as if the real PIN were used (open mode; private mode shows the balance minus a hidden amount), nothing visible happens on-chain, and the watchtower sends a silent alarm to a trusted contact only. That person can then pause any pending op (once per op): it runs no earlier than 72 h after its own waiting time. The guardian moves no funds and changes no setting; the owner lifts a pause with the second device + PIN |
+| Device fully taken over by malware, **one device** (the key and the PIN on it) | The malware has the key and can watch the PIN being typed: it can do what the PIN path allows, after each delay. The K-only limits, the delays, the watchtower's notice of every PIN-approved op and the escape (to the pre-set escape address) are what is left |
+| Device fully taken over by malware, **two devices** | The computer's malware has the key but not the PIN (typed on the phone); the phone's malware has the PIN and the phone's device key but not the account key. Either alone gets only what the key alone may do (hidden limit, known list, tripwire). With the optional two-device setting on, big sends, calls to other contracts and loosening changes need both devices. Both devices taken over is the one-device case |
+| Two-device setting (optional) | Turning it on: the key alone, at once (it only tightens). Off: an approval on the phone, then 72 h. The phone lost: the second device can be replaced with the key and the PIN after the long no-device delay (30 days by default), and the watchtower tells the owner |
 | Key stolen (panic button) | Escape: K alone, immediately. Every pending op is cancelled and PIN guessing closes; after 30 days the funds can go only to the pre-set escape address. Only the second device or recovery helper + PIN can cancel it |
 | Key rotation in progress | With a second device or recovery helper, PIN guesses with the old key are closed until the rotation executes or is cancelled |
 | Phone lost | PIN from a new device + bond (the owner's base bond, doubling like the K-track's) → 7 days → new key; K alone cannot cancel it |
@@ -175,6 +184,13 @@ for today's mainnet. Package codes such as F0.9, F0.10 and F0.11 name the measur
   ciphertext (`PolicyMath.requireProof`). `contracts/test/NaivePinVerifier.sol` and `test/Exploits.test.ts` show why.
 - **Governance.** Zama governance can deny-list an account in the ACL or pause the ACL; the escape path is not affected
   (tested).
+- **Two devices, as built.** The phone's device key lives in its browser storage (a passkey would be better; not
+  built). The approval travels from the phone to the computer as a short text code (copy, share or a chat with oneself):
+  there is no relay server. It is useless for any other op: the challenge binds the op's content, the phone's signature
+  binds the op and the encrypted guess, and the same input is refused twice in a row. The phone shows what the op does
+  only as well as it can read it (ETH transfers, token amounts in base units, calls by target and value, settings by
+  name). Without the optional setting, the key alone can still use the K-track with the PIN: two devices protect the PIN
+  from the key's device, the setting is what makes the phone required.
 - **The guardian's pause is visible.** Whoever watches the account sees an op paused. Because the guardian can pause any
   pending op, for any reason, a pause does not prove that the duress PIN was used, but a coercer may still guess that the
   watchtower acted: the trusted contact decides whether to pause. One pause per op, 72 h beyond the op's own waiting time,
@@ -212,7 +228,8 @@ No dates; the order may change.
 - **"Steal this wallet" (next):** a Sepolia account whose seed phrase is public. Without the PIN, the funds should still
   not move.
 - **Web app:** live at [encrypted-account.vercel.app](https://encrypted-account.vercel.app) (landing page and app, code
-  in `web/`); next: key-only transfers to known addresses, the escape, and the phone flow.
+  in `web/`), with the two-device flow (pairing a phone, approving a send on it); next: key-only transfers to known
+  addresses and the escape.
 - **Private mode (optional):** encrypted balances and amounts with ERC-7984 tokens, viewing with the PIN, an optional
   duress PIN that keeps a hidden amount out of view; chosen at account creation, standard accounts unchanged. In the
   contracts and the app; on Sepolia as a first build, and the app opens private setup once the current build is deployed:
