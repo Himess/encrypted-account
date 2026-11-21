@@ -4,6 +4,9 @@
  *   npx ts-node watchtower/src/main.ts --config watchtower/config.json           run until stopped (Ctrl+C)
  *   npx ts-node watchtower/src/main.ts --config watchtower/config.json --check   check the config and the channels, exit
  *   npx ts-node watchtower/src/main.ts --config watchtower/config.json --once    one pass, wait for deliveries, exit
+ *   npx ts-node watchtower/src/main.ts --config watchtower/config.json --pause <account> [opId …]
+ *        the trusted contact's brake after a silent alarm: pauses the account's pending ops (or the given ones) with the
+ *        guardian key, each once, for up to 72 hours. The service never does this by itself.
  *
  * The key, the bot token and the SMTP login are read from env files and never printed. A channel without its secret is
  * replaced by the fake channel (messages go to its JSONL file), so the service runs before any real channel is set up.
@@ -13,7 +16,8 @@ import { ethers } from "ethers";
 import { Channel, EmailChannel, FakeChannel, TelegramChannel } from "./channels";
 import { ChannelKind, loadConfig, readEnvFile, validateConfig } from "./config";
 import { sepoliaDecryptor } from "./fhevm";
-import { WatchtowerService } from "./service";
+import { WatchtowerService, pausePending } from "./service";
+import { ACCOUNT_P_ABI } from "../../web/src/abi";
 
 function arg(name: string): string | undefined {
   const i = process.argv.indexOf(name);
@@ -84,9 +88,19 @@ async function main() {
     provider.destroy();
     return;
   }
+  const pauseAt = process.argv.indexOf("--pause");
+  if (pauseAt > 0) {
+    const target = ethers.getAddress(process.argv[pauseAt + 1] ?? "");
+    const ids = process.argv.slice(pauseAt + 2).filter((x) => /^\d+$/.test(x)).map((x) => BigInt(x));
+    const res = await pausePending(new ethers.Contract(target, ACCOUNT_P_ABI as any, guardian), ids.length ? ids : undefined);
+    if (res.length === 0) console.log("no pending operation to pause");
+    for (const r of res) console.log(r.hash ? `paused op ${r.opId}: ${r.hash}` : `op ${r.opId}: not paused (${r.error})`);
+    provider.destroy();
+    return;
+  }
   if (cfg.network.fhevm !== "sepolia") throw new Error('only fhevm = "sepolia" is wired for a live run');
   const dec = await sepoliaDecryptor(provider, guardian); // keeps its own provider for the relayer's reads
-  const make = (p: ethers.JsonRpcProvider) => new WatchtowerService({ config: cfg, guardian: guardian.connect(p), ...dec, channels, fallback: fake });
+  const make = (p: ethers.JsonRpcProvider) => new WatchtowerService({ config: cfg, configFile: file, guardian: guardian.connect(p), ...dec, channels, fallback: fake });
   let svc = make(provider);
   if (process.argv.includes("--once")) {
     await svc.tickAll();

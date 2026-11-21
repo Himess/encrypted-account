@@ -327,6 +327,12 @@ contract EncryptedAccount is IAccount, IERC1271, ReentrancyGuardTransient, IAcco
         _addRestriction(l, S.R_GUARDIAN);
     }
 
+    /// @notice The guardian holds a pending op back: 72 h beyond its own waiting time, once per op; the owner lifts it on
+    ///         the lane (A_UNPAUSE).
+    function guardianPause(uint256 opId) external {
+        OpsLib.guardianPause(opId);
+    }
+
     /// @notice K + D veto (oracle-independent, Section 16.7): D is verified directly on-chain.
     function cancelWithDevice(uint256 opId, bytes calldata deviceSig) external onlyK nonReentrant {
         OpenLib.checkDeviceCancel(opId, deviceSig);
@@ -540,10 +546,6 @@ contract EncryptedAccount is IAccount, IERC1271, ReentrancyGuardTransient, IAcco
         S.Layout storage l = S.layout();
         if (spenders) return (eaddress.unwrap(l.knownS[slot]), l.knownSActiveAt[slot]);
         return (eaddress.unwrap(l.knownR[slot]), l.knownRActiveAt[slot]);
-    }
-
-    function approvedHash(bytes32 h) external view returns (bool) {
-        return S.layout().approvedHashes[h];
     }
 
     function refundOf(address a) external view returns (uint256) {

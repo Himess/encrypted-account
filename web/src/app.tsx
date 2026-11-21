@@ -1719,7 +1719,10 @@ function ActivityList({ items, priv }: { items: Activity[] | null; priv?: boolea
             </span>
             <div class="act-main">
               <div class="act-title">{m.title(a)}</div>
-              <div class="act-sub">{m.sub(a)}</div>
+              <div class="act-sub">
+                {m.sub(a)}
+                {a.paused ? " · paused by the watchtower" : ""}
+              </div>
             </div>
             <div class="act-side">
               <div>{timeAgo(a.time)}</div>

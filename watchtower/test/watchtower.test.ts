@@ -40,6 +40,9 @@ const ALL: Alert[] = [
   { kind: "restriction", reasons: 0 },
   { kind: "tripwire", asset: T },
   { kind: "duress", opId: 3n },
+  { kind: "duress", opId: 3n, earliestRun: 1_900_000_000n },
+  { kind: "op-paused", opId: 3n, at: 1_900_000_000n },
+  { kind: "pause-lifted", opId: 3n },
   { kind: "recovery-opened", opId: 3n },
   { kind: "escape-started", readyAt: 1_900_000_000n, to: X },
   { kind: "escape-unverified", days: 91 },
@@ -96,12 +99,40 @@ describe("watchtower service: message texts", () => {
     }
   });
 
-  it("the silent alarm has the account, the time, 'duress PIN used' and the owner's note — nothing else", () => {
+  it("the silent alarm has the account, the time, 'duress PIN used', the pause step and deadline, the owner's note — nothing else", () => {
     const t = duressMessage({ label: ACCT.label, address: ACCT.address, at: AT }, ACCT.duressNote);
     expect(t).to.eq(
       ["Silent alarm (watchtower)", `Account: Main account (${ACCT.address})`, "Time: 2026-11-16T14:03:12Z", "The duress PIN was used on this account.", "Note from the owner: Call me on the landline."].join("\n"),
     );
     expect(duressMessage({ label: "A", address: ACCT.address, at: AT })).to.not.include("Note");
+    const cmd = "npm run watchtower -- --config watchtower/config.json --pause " + ACCT.address;
+    const run = Math.floor(AT.getTime() / 1000) + 3600; // an hour after the alarm
+    const runIso = new Date(run * 1000).toISOString().replace(/\.\d{3}Z$/, "Z");
+    const later = duressMessage({ label: ACCT.label, address: ACCT.address, at: AT }, ACCT.duressNote, { opId: 12n, earliestRun: BigInt(run), command: cmd });
+    expect(later.split("\n")).to.deep.eq([
+      "Silent alarm (watchtower)",
+      `Account: Main account (${ACCT.address})`,
+      "Time: 2026-11-16T14:03:12Z",
+      "The duress PIN was used on this account.",
+      `Operation #12 was approved with it and can run from ${runIso}: pause before then.`,
+      `To pause the account's pending operations (each once, for up to 72 hours), run on the watchtower's computer: ${cmd}`,
+      "Note from the owner: Call me on the landline.",
+    ]);
+    const now = duressMessage({ label: "A", address: ACCT.address, at: AT }, undefined, { opId: 5n, earliestRun: BigInt(Math.floor(AT.getTime() / 1000)), command: cmd });
+    expect(now).to.include("Operation #5 was approved with it and can run at once: a pause cannot hold it.");
+    // the router builds the step from the alert and the config file's path
+    const d = route({ kind: "duress", opId: 9n, earliestRun: 2_000_000_000n }, ACCT, AT, REF, "my/config.json")[0];
+    expect(d.text).to.include("--config my/config.json --pause " + ACCT.address);
+    expect(d.text).to.include("Operation #9");
+  });
+
+  it("the owner hears of a pause and of its lifting, with no amount and nothing about which PIN was used", () => {
+    const c = { label: "A", address: ACCT.address, at: AT };
+    expect(ownerMessage({ kind: "op-paused", opId: 4n, at: 1_900_000_000n }, c)).to.include("Operation #4 was paused");
+    expect(ownerMessage({ kind: "pause-lifted", opId: 4n }, c)).to.include("pause of operation #4 was lifted");
+    for (const k of ["op-paused", "pause-lifted"] as const) {
+      expect(route(k === "op-paused" ? { kind: k, opId: 4n, at: 1_900_000_000n } : { kind: k, opId: 4n }, ACCT, AT).every((x) => x.role === "owner")).to.eq(true);
+    }
   });
 
   it("the owner's silent-zero text is the same whatever the reason (a fired tripwire is not singled out)", () => {

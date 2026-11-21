@@ -6,6 +6,9 @@ import type { Alert, AlertRef } from "../../sdk/src/watchtower";
 import { AccountConfig, Destination, normalizeDest } from "./config";
 import { duressMessage, ownerMessage } from "./messages";
 
+/** The command a trusted contact runs to pause an account's pending ops (watchtower/src/main.ts --pause). */
+export const pauseCommand = (configFile: string, address: string) => `npm run watchtower -- --config ${configFile} --pause ${address}`;
+
 export type Role = "owner" | "trusted";
 
 export interface Delivery {
@@ -17,12 +20,12 @@ export interface Delivery {
   ref?: AlertRef;
 }
 
-export function route(a: Alert, acct: AccountConfig, at: Date, ref?: AlertRef): Delivery[] {
+export function route(a: Alert, acct: AccountConfig, at: Date, ref?: AlertRef, configFile = "watchtower/config.json"): Delivery[] {
   const ctx = { label: acct.label, address: acct.address, at };
   if (a.kind === "error") return [];
   if (a.kind === "duress") {
     const owner = new Set((acct.owner ?? []).map(normalizeDest));
-    const text = duressMessage(ctx, acct.duressNote);
+    const text = duressMessage(ctx, acct.duressNote, { opId: a.opId, earliestRun: a.earliestRun, command: pauseCommand(configFile, acct.address) });
     return (acct.trusted ?? []).filter((d) => !owner.has(normalizeDest(d))).map((dest) => ({ account: acct.address, role: "trusted" as const, dest, kind: a.kind, text, ref }));
   }
   if (a.kind === "pin-ok" && acct.notifyPinOk === false) return [];

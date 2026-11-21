@@ -241,7 +241,11 @@ company), and to nobody else:
 - the owner's own notices are the same for a real and a duress PIN;
 - the trusted contacts and channels live in the service's config file, never on-chain.
 
-It does not call anyone by itself: it sends a message, and what happens next is up to the person who gets it.
+It does not call anyone by itself: it sends a message, and what happens next is up to the person who gets it. The
+alarm says which operation the duress PIN approved and the earliest time it can run, and how to pause it: the trusted
+contact can pause any pending op of the account once (`guardianPause`, sent from the watchtower's computer by their
+decision, never automatically), and it then runs no earlier than 72 hours after its own waiting time; private ops too.
+The owner lifts a pause with the second device and the PIN.
 
 On Sepolia (fake channel, 2026-11-16) the alarm was written 11 times out of 11 duress guesses, p50 5.7 s / p95 8.2 s
 after the client saw the guess transaction; no alarm for a real PIN, nothing about it to the owner, and the watchtower's

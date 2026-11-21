@@ -8,9 +8,9 @@ import { expect } from "chai";
 import * as hre from "hardhat";
 import { Channel, FakeChannel } from "../watchtower/src/channels";
 import type { ServiceConfig } from "../watchtower/src/config";
-import { WatchtowerService } from "../watchtower/src/service";
-import { ethers, finalizeGuess, guess } from "./helpers";
-import { DURESS, FUND, HIDDEN, PIN, SHOWN, StackP, WRONG, createAccountP, deployStackP, encAmount, opIdOf, tc } from "./privateHelpers";
+import { WatchtowerService, pausePending } from "../watchtower/src/service";
+import { ethers, finalizeGuess, guess, time } from "./helpers";
+import { DURESS, FUND, HIDDEN, MIN_BIG_DELAY, PIN, SHOWN, StackP, WRONG, createAccountP, deployStackP, encAmount, opIdOf, tc } from "./privateHelpers";
 
 type Got = { via: string; dest: string; role: string; kind: string; text: string };
 
@@ -139,11 +139,37 @@ describe("Watchtower service: wrong PIN, silent zero, silent duress alarm (mock 
     expect(alarm).to.include("The duress PIN was used on this account.");
     expect(alarm).to.include("Note from the owner: Call me on the landline.");
     for (const n of [FUND, HIDDEN, SHOWN]) expect(alarm).to.not.include(n.toString());
-    expect(alarm.split("\n").length).to.eq(5); // header, account, time, the fact, the note: nothing else
+    // header, account, time, the fact, the approved op and its earliest run, the pause command, the note: nothing else
+    expect(alarm.split("\n").length).to.eq(7);
     // the owner's channel never hears of it, and sees the same thing as for the real PIN
     expect(got.filter((g) => g.role === "owner" && g.kind === "duress")).to.deep.eq([]);
     expect(duress.afterFinalize.map((g) => [g.kind, g.role, noTime(g.text)])).to.deep.eq(real.afterFinalize.map((g) => [g.kind, g.role, noTime(g.text)]));
     expect(real.afterFinalize.map((g) => g.kind)).to.deep.eq(["pin-ok"]);
+  });
+
+  it("the trusted contact's pause: the alarm names the op, its earliest run and the command; the command, with the watchtower key, holds the op back", async () => {
+    const { acct, addr, svc, got } = await watched();
+    const enc = await encAmount(acct, owner, tc(100));
+    const id = opIdOf(acct, await (await acct.openPrivateTransfer(token, stranger.address, enc.handles[0], enc.inputProof)).wait());
+    await guess(acct, owner, s.chainId, id, DURESS);
+    const nonce = await ethers.provider.getTransactionCount(guardian.address);
+    await pass(svc);
+    expect(await ethers.provider.getTransactionCount(guardian.address)).to.eq(nonce); // the alarm alone sends nothing
+    const alarm = got.find((g) => g.kind === "duress")!;
+    expect(alarm.role).to.eq("trusted");
+    expect(alarm.text).to.match(new RegExp(`Operation #${id} was approved with it and can run from \\S+: pause before then\\.`));
+    expect(alarm.text).to.include(`--pause ${addr}`);
+    for (const n of [FUND, HIDDEN, SHOWN, tc(100)]) expect(alarm.text).to.not.include(n.toString());
+    await finalizeGuess(acct, id);
+    // a person decides to pause: the --pause command's helper, with the watchtower key
+    const res = await pausePending(acct.connect(guardian));
+    expect(res.map((r) => [r.opId, !!r.hash])).to.deep.eq([[id, true]]);
+    await time.increaseTo(Number((await acct.getOp(id)).readyAt) + 1);
+    await expect(acct.executeOp(id)).to.be.reverted; // OpPaused: 72 h beyond its own waiting time
+    await time.increase(MIN_BIG_DELAY);
+    await (await acct.executeOp(id)).wait();
+    await pass(svc);
+    expect(got.filter((g) => g.kind === "op-paused").map((g) => g.role)).to.deep.eq(["owner"]);
   });
 
   it("a PIN-gated private transfer under the duress PIN: one alarm, and still no transaction from the watchtower", async () => {

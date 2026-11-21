@@ -52,6 +52,7 @@ Sepolia ETH, send with your PIN, or try a wrong one and watch it get counted on-
 | PIN guess with the key (K-track) | Carries a bond paid by K in a direct transaction, never by the account: the account's base bond (0.001 ETH by default), doubling with each wrong guess still counted. Right PIN: the bond comes back (`claimRefund`); wrong PIN: it stays in the account. The lane (K + second device or helper) and the escape need no bond |
 | Large account | The owner sets a higher base bond at setup (0.001–100 ETH, public), so every guess, the first included, costs a thief at least that much; the owner's own PIN entries send it too and get it back. Changing it later needs the PIN, K alone cannot |
 | Choosing a PIN | The user picks it. The app offers a random PIN (shown large, typed twice to confirm), a short note, and warnings that never block for dates, repeats, sequences and keypad patterns; only a short list of very common PINs is refused |
+| Duress PIN typed under coercion | The op runs as if the real PIN were used (open mode; private mode shows the balance minus a hidden amount), nothing visible happens on-chain, and the watchtower sends a silent alarm to a trusted contact only. That person can then pause any pending op (once per op): it runs no earlier than 72 h after its own waiting time. The guardian moves no funds and changes no setting; the owner lifts a pause with the second device + PIN |
 | Key stolen (panic button) | Escape: K alone, immediately. Every pending op is cancelled and PIN guessing closes; after 30 days the funds can go only to the pre-set escape address. Only the second device or recovery helper + PIN can cancel it |
 | Key rotation in progress | With a second device or recovery helper, PIN guesses with the old key are closed until the rotation executes or is cancelled |
 | Phone lost | PIN from a new device + bond (the owner's base bond, doubling like the K-track's) → 7 days → new key; K alone cannot cancel it |
@@ -174,6 +175,11 @@ for today's mainnet. Package codes such as F0.9, F0.10 and F0.11 name the measur
   ciphertext (`PolicyMath.requireProof`). `contracts/test/NaivePinVerifier.sol` and `test/Exploits.test.ts` show why.
 - **Governance.** Zama governance can deny-list an account in the ACL or pause the ACL; the escape path is not affected
   (tested).
+- **The guardian's pause is visible.** Whoever watches the account sees an op paused. Because the guardian can pause any
+  pending op, for any reason, a pause does not prove that the duress PIN was used, but a coercer may still guess that the
+  watchtower acted: the trusted contact decides whether to pause. One pause per op, 72 h beyond the op's own waiting time,
+  so a misbehaving guardian can hold each op back once. A coercer who also holds the second device can lift a pause with
+  the lane and the duress PIN; the escape (K alone, funds only to the escape address) stays the last brake.
 - **Shared PIN budget, on purpose.** The K-track and the anonymous recovery track share one wrong-guess budget (one
   back-off, from the sum of their scores). Split, a thief holding a stolen K would get about 24 guesses a month instead of
   about 12. The price: anyone can burn guesses on the recovery track (each one costs at least the owner's base bond, kept

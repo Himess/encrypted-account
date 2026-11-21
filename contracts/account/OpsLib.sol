@@ -40,8 +40,8 @@ library OpsLib {
         S.AssetCfg storage cfg = l.assets[op.target];
         PolicyMath.sync(l, cfg);
         cfg.reserved -= uint112(op.amount); // fits: PolicyLib.evaluate reserved it only within uint112
-        // A restriction or an expired pulse that happened meanwhile also stops K-only execution.
-        if (ok && l.restrictedReasons == 0 && PolicyMath.pulseOk(l)) {
+        // A restriction, an expired pulse or a guardian pause that happened meanwhile also stops K-only execution.
+        if (ok && l.restrictedReasons == 0 && PolicyMath.pulseOk(l) && !PolicyMath.paused(l, op, opId)) {
             PolicyMath.rollEpoch(cfg);
             if (cfg.epoch == op.epochDay) cfg.spent = PolicyMath.counterAdd(cfg.spent, op.amount);
             op.status = S.Status.Executed;
@@ -86,7 +86,8 @@ library OpsLib {
             l.rotationsPending += 1; // K45: closes the K-track (if D / helper exists) until it runs or is cancelled
         }
         emit IAccountEvents.GuessFinalized(opId, track, true, readyAt);
-        if (readyAt == block.timestamp && op.kind == S.Kind.Admin) {
+        // an op the guardian paused waits for executeOp after the pause, even with no delay of its own
+        if (readyAt == block.timestamp && op.kind == S.Kind.Admin && !PolicyMath.paused(l, op, opId)) {
             op.status = S.Status.Executed;
             _execute(l, opId, op, address(0)); // admin ops carry no fee
         }
@@ -100,7 +101,7 @@ library OpsLib {
         S.Op storage op = l.ops[opId];
         if (PolicyMath.status(l, op) != S.Status.Delayed) revert Errors.BadStatus(); // escape-cancelled → Cancelled
         if (block.timestamp < op.readyAt) revert Errors.NotReady();
-        if (op.paused) revert Errors.OpPaused();
+        if (op.paused || PolicyMath.paused(l, op, opId)) revert Errors.OpPaused();
         if (op.kind == S.Kind.Recovery) {
             if (l.escapeReadyAt != 0) revert Errors.EscapeActive(); // escape pre-empts recovery (16.7)
             if (!l.recoveryEnabled) revert Errors.RecoveryDisabled();
@@ -236,6 +237,10 @@ library OpsLib {
             uint256 base = abi.decode(op.data, (uint256));
             l.ownerBondUnits = PolicyMath.ownerBondUnits(base);
             emit IAccountEvents.OwnerBondSet(base);
+        } else if (a == S.A_UNPAUSE) {
+            uint256 t = abi.decode(op.data, (uint256));
+            l.pausedAt[t] = 1; // lifted; and never again (one pause per op)
+            emit IAccountEvents.PauseLifted(t);
         }
         return true;
     }
@@ -249,7 +254,7 @@ library OpsLib {
             return op.viaDevice || l.deviceSigner == address(0) ? d.recovery : d.recoveryNoDevice;
         }
         uint8 a = op.sub;
-        if (a == S.A_CANCEL || a == S.A_UNRESTRICT || a == S.A_FREEZE || a == S.A_CANCEL_ESCAPE || a == S.A_RESET_TRIP) return 0;
+        if (a == S.A_CANCEL || a == S.A_UNRESTRICT || a == S.A_FREEZE || a == S.A_CANCEL_ESCAPE || a == S.A_RESET_TRIP || a == S.A_UNPAUSE) return 0;
         if (
             a == S.A_ROTATE_OWNER ||
             a == S.A_PIN_CHANGE ||
@@ -264,6 +269,22 @@ library OpsLib {
         if (a == S.A_SET_ESCAPE) return d.escapeChange;
         if (a == S.A_APPROVE_HASH) return d.genericCall;
         return d.loosen; // SET_LIMITS, SET_PULSE, SET_RECOVERY, SET_AUTOKNOWN, SET_INSTANT
+    }
+
+    // ─────────────────────────────── guardian pause ───────────────────────────────
+
+    /// @notice The guardian holds a pending op back: it then runs no earlier than GUARDIAN_PAUSE after the later of its own
+    ///         readyAt and the pause; once per op (e.g. after a silent duress alarm, by the trusted contact's decision; never
+    ///         automatically at the PIN entry). It moves no funds and changes no setting. The owner lifts it on the lane
+    ///         (A_UNPAUSE: K + second device or helper + PIN). Any pending op, so a pause proves nothing about which PIN
+    ///         approved it.
+    function guardianPause(uint256 opId) external {
+        S.Layout storage l = S.layout();
+        if (msg.sender != l.guardian || msg.sender == address(0)) revert Errors.NotAuthorized();
+        if (!PolicyMath.cancellable(PolicyMath.status(l, l.ops[opId]))) revert Errors.BadStatus();
+        if (l.pausedAt[opId] != 0) revert Errors.OpPaused();
+        l.pausedAt[opId] = uint64(block.timestamp);
+        emit IAccountEvents.GuardianPaused(opId, uint64(block.timestamp));
     }
 
     // ─────────────────────────────── cancellation ───────────────────────────────

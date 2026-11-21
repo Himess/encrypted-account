@@ -18,8 +18,9 @@ An off-chain service that watches accounts on-chain and quietly tells the right 
 - Nothing visible happens on-chain when the duress PIN is used: the service sends no transaction (no restriction, no
   freeze), and the contracts emit the same events as for the real PIN. The duress flag is decrypted for **every** guess,
   real or not, through Zama's relayer and KMS (off-chain), so the requests look the same either way.
-- The alarm says only which account, when, and that the duress PIN was used, plus the owner's optional short note. No
-  message from this service ever carries an amount (no balance, no transfer amount, no limit, no hidden amount).
+- The alarm says which account, when, that the duress PIN was used, which operation it approved and the earliest time
+  that operation can run, how to pause it (below), and the owner's optional short note. No message from this service ever
+  carries an amount (no balance, no transfer amount, no limit, no hidden amount).
 - The owner's messages are the same for a real and a duress PIN.
 - The trusted contacts and channels live in the service's own config file, never on-chain.
 - Run it on a machine the owner does not carry: the fake channel's file and console, and the delivery log, are on the
@@ -29,9 +30,23 @@ The service does not call anyone by itself; it sends messages, and what happens 
 
 ## What it sends on-chain
 
-Nothing around a PIN entry: it never finalizes a guess (the owner's app does). The only transaction it can send is
+Nothing around a PIN entry: it never finalizes a guess (the owner's app does). The only transaction it sends by itself is
 `guardianRestrict` when a key-only tripwire fires (key theft probing the hidden limit), as the design always had it; set
 `restrictOnTripwire: false` to turn that off. That needs a little ETH on the watchtower key; decrypting needs none.
+
+## The trusted contact's pause
+
+The silent alarm also says which operation the duress PIN approved, the earliest time it can run, and how to pause:
+
+```bash
+npm run watchtower -- --config watchtower/config.json --pause <account>            # every pending op of the account
+npm run watchtower -- --config watchtower/config.json --pause <account> 12 13      # these ops only
+```
+
+Run on the watchtower's computer, by a person's decision: the service never pauses by itself. It sends `guardianPause`
+with the watchtower key for each op: the op then runs no earlier than 72 hours after its own waiting time ends. Each op
+can be paused once; the owner lifts a pause with the second device and the PIN. The guardian can move no funds and change
+no setting. A pause is public: whoever watches the account sees it.
 
 ## Run it locally
 

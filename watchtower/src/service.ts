@@ -20,6 +20,8 @@ import { Delivery, route } from "./router";
 
 export interface ServiceDeps {
   config: ServiceConfig;
+  /** The config file's path, as the trusted contact passes it to the pause command (default watchtower/config.json). */
+  configFile?: string;
   /** The guardian signer, connected to the chain's provider. */
   guardian: ethers.Signer;
   userDecryptBool: (handle: string, contract: string) => Promise<boolean>;
@@ -44,6 +46,34 @@ export interface DeliveryRecord {
   ok: boolean;
   attempts: number;
   error?: string;
+}
+
+/**
+ * The trusted contact's brake: pauses an account's pending ops with the guardian key (guardianPause, each op once, for up
+ * to 72 hours). Never called by the service itself; only by the --pause command, on a person's decision. Without `ids` it
+ * pauses every pending op among the account's latest `scan` ops that is not paused yet. Returns what it did per op.
+ */
+export async function pausePending(account: Contract, ids?: bigint[], scan = 50): Promise<{ opId: bigint; hash?: string; error?: string }[]> {
+  let list = ids ?? [];
+  if (!ids) {
+    const n = Number(await account.opCount());
+    for (let id = n; id >= 1 && id > n - scan; id--) {
+      const st = Number((await account.getOp(id)).status);
+      if (st >= 1 && st <= 4) list.push(BigInt(id)); // Evaluating, NeedsPin, Guessing, Delayed
+    }
+    list = list.reverse();
+  }
+  const out: { opId: bigint; hash?: string; error?: string }[] = [];
+  for (const opId of list) {
+    try {
+      const tx = await account.guardianPause(opId);
+      await tx.wait();
+      out.push({ opId, hash: tx.hash });
+    } catch (e: any) {
+      out.push({ opId, error: String(e?.shortMessage ?? e?.message ?? e).slice(0, 160) });
+    }
+  }
+  return out;
 }
 
 export class WatchtowerService {
@@ -87,7 +117,7 @@ export class WatchtowerService {
       this.log(`[error] ${cfg.label}: ${a.message}`);
       return;
     }
-    for (const dl of route(a, cfg, (this.d.now ?? (() => new Date()))(), ref)) this.enqueue(dl);
+    for (const dl of route(a, cfg, (this.d.now ?? (() => new Date()))(), ref, this.d.configFile)) this.enqueue(dl);
   }
 
   private enqueue(dl: Delivery) {

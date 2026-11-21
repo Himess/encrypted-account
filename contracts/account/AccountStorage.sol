@@ -62,6 +62,7 @@ library AccountStorage {
     uint8 internal constant A_PRIVATE_VIEW = 23; // K+P balance view: an encrypted snapshot allowed to K (no delay)
     uint8 internal constant A_PRIVATE_RESET = 24; // K+P: clears a private token's tripwire and redraws its tau (no delay)
     uint8 internal constant A_PRIVATE_SET_DURESS = 25; // K+P: sets or clears the duress PIN and a token's hidden amount (settings delay)
+    uint8 internal constant A_UNPAUSE = 26; // K + second device or helper + P (lane only): lifts the guardian's pause of an op
 
     uint8 internal constant TRACK_OWNER = 0; // K-track: guesses from K (EOA or EntryPoint) — anonymous (anyone with K)
     uint8 internal constant TRACK_RECOVERY = 1; // anonymous track (relayer), bonded; only Recovery / Freeze ops
@@ -229,6 +230,10 @@ library AccountStorage {
         // and never used, is visible on-chain (OpenKnownChanged).
         mapping(address => uint64) openKnownR; // activation time; 0 = not on the list
         mapping(address => uint64) openKnownS;
+        // Guardian pause: op id → when the guardian paused it. 0 = never paused; 1 = paused once and lifted by the owner.
+        // A paused op runs no earlier than GUARDIAN_PAUSE after max(its own readyAt, the pause). One pause per op, so a
+        // malicious guardian can hold an op back once, by GUARDIAN_PAUSE at most beyond its own waiting time.
+        mapping(uint256 => uint64) pausedAt;
     }
 
     // keccak256(abi.encode(uint256(keccak256("encrypted-account.account.v1")) - 1)) & ~bytes32(uint256(0xff))
@@ -309,4 +314,9 @@ interface IAccountEvents {
     ///         its recipient failed (a broken fee module never blocks a verified transfer).
     event FeePaid(uint256 indexed opId, address indexed recipient, uint256 fee);
     event FeeSkipped(uint256 indexed opId, uint256 fee);
+    /// @notice The guardian paused a pending op: it runs no earlier than 72 h after max(its readyAt, pausedAt); once per op.
+    ///         (Not named `at`: ethers' Result is an array, and `at` would read Array.prototype.at.)
+    event GuardianPaused(uint256 indexed opId, uint64 pausedAt);
+    /// @notice The owner lifted the guardian's pause on the lane.
+    event PauseLifted(uint256 indexed opId);
 }

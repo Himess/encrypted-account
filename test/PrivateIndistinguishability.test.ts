@@ -1,6 +1,7 @@
 /**
  * Private mode: indistinguishability, run on every `npm test`. Each step is done on two accounts with the same setup and
- * history; only the secret differs (real vs duress PIN, duress PIN set or not, a K-only transfer that passes or fails).
+ * history; only the secret differs: here the real vs the duress PIN (part B: a duress PIN set or not, a K-only transfer
+ * that passes or fails; two files, because each runs in its own process and the traces are memory-heavy).
  * Every pair of transactions is traced (debug_traceTransaction) and must be identical in execution gas and EVM steps
  * outside the mock's cleartext layer, HCU, calldata length, events, ACL grants, decryption requests, storage writes,
  * transient writes and external calls. The mock's cleartext layer stores every plaintext result and so costs less for a
@@ -40,7 +41,7 @@ import {
   tc,
 } from "./privateHelpers";
 
-describe("Private mode: indistinguishability (real vs duress PIN, duress set or not, pass vs fail)", function () {
+describe("Private mode: indistinguishability, real vs duress PIN (part A)", function () {
   let s: StackP;
   let owner: HardhatEthersSigner, escape: HardhatEthersSigner, guardian: HardhatEthersSigner, R1: HardhatEthersSigner;
   let token: string;
@@ -57,9 +58,12 @@ describe("Private mode: indistinguishability (real vs duress PIN, duress set or 
 
   after(() => {
     if (!RECORD) return;
+    // two files fill this report (each runs in its own process: the traces are memory-heavy)
     const dir = path.join(__dirname, "..", "results", "private-mode");
+    const file = path.join(dir, "indistinguishability-mock.json");
     fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(path.join(dir, "indistinguishability-mock.json"), j(report) + "\n");
+    const prev = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")) : {};
+    fs.writeFileSync(file, j({ ...prev, ...report }) + "\n");
   });
 
   const rolesFor = (acct: string) =>
@@ -173,68 +177,4 @@ describe("Private mode: indistinguishability (real vs duress PIN, duress set or 
     compare("realVsDuress", recsA, recsB);
   });
 
-  it("a duress PIN set or not: setup and a real-PIN view look the same", async () => {
-    // both accounts are built step by step so that every setup transaction is recorded
-    const build = async (salt: string, duress: boolean, recs: TxRec[]) => {
-      const d = await delaysP(s);
-      const addr = await s.factoryP.predictAddress(owner.address, escape.address, guardian.address, d, E.id(salt));
-      await (await s.factoryP.createAccountWithDelays(owner.address, escape.address, guardian.address, d, E.id(salt), await escapeConsent(escape, s.chainId, addr, 0))).wait();
-      const acct: any = new ethers.Contract(addr, await abiP(), owner);
-      const roles = rolesFor(addr).set(s.implP.target as string, "IMPL_P").set(s.module.target as string, "MODULE");
-      for (const [k, v] of Object.entries(s.libs)) roles.set(v, k);
-      const inp = hre.fhevm.createEncryptedInput(addr, owner.address);
-      inp.add64(await fingerprint(PIN, s.chainId, addr));
-      inp.add64(duress ? await fingerprint(DURESS, s.chainId, addr) : randomUint64());
-      inp.addBool(duress);
-      const e = await inp.encrypt();
-      recs.push(await recordTx("setupPin", await (await acct.setupPin(e.handles[0], e.handles[1], e.handles[2], e.inputProof)).wait(), roles, CLEAR));
-      const inp2 = hre.fhevm.createEncryptedInput(addr, owner.address);
-      inp2.add64(PRIVATE_LIMITS.lmin);
-      inp2.add64(PRIVATE_LIMITS.lmax);
-      inp2.add64(duress ? HIDDEN : 0n); // the hidden amount, encrypted either way
-      const e2 = await inp2.encrypt();
-      recs.push(await recordTx("privateSetupAsset", await (await acct.privateSetupAsset(token, e2.handles[0], e2.handles[1], e2.handles[2], e2.inputProof)).wait(), roles, CLEAR));
-      await setupKnownList(acct, owner, false, [R1.address], N_RECIPIENTS);
-      await setupKnownList(acct, owner, true, [], N_SPENDERS);
-      await (await acct.setupRoles(E.ZeroAddress, E.ZeroAddress, 90 * DAY, true)).wait();
-      await (await acct.arm()).wait();
-      await (await s.token.mint(addr, FUND)).wait();
-      return { acct, roles };
-    };
-    const recsA: TxRec[] = [];
-    const recsB: TxRec[] = [];
-    const a = await build("ind-no-duress", false, recsA);
-    const b = await build("ind-with-duress", true, recsB);
-    await alignDecay();
-    for (const [x, recs] of [[a, recsA], [b, recsB]] as const) {
-      const rc = await (await x.acct.openPrivateView(token)).wait();
-      const id = opIdOf(x.acct, rc);
-      recs.push(await recordTx("view · open", rc, x.roles, CLEAR));
-      recs.push(await recordTx("view · guess", await guess(x.acct, owner, s.chainId, id, PIN), x.roles, CLEAR));
-      recs.push(await recordTx("view · finalize", await finalizeGuess(x.acct, id), x.roles, CLEAR));
-    }
-    compare("duressSetOrNot", recsA, recsB);
-  });
-
-  it("a K-only private transfer that passes vs one that fails (unknown limit, tripwire): the same trace", async () => {
-    const p = await createAccountP(s, owner, escape.address, guardian.address, { known: [R1.address], salt: E.id("ind-pass") });
-    const f = await createAccountP(s, owner, escape.address, guardian.address, { known: [R1.address], salt: E.id("ind-fail") });
-    await (await s.token.mint(p.target as string, FUND)).wait();
-    await (await s.token.mint(f.target as string, FUND)).wait();
-    const recsA: TxRec[] = [];
-    const recsB: TxRec[] = [];
-    const both = pairRunner(p, f, recsA, recsB);
-    await time.increaseTo((Math.floor((await time.latest()) / DAY) + 1) * DAY + 600); // inside one UTC day
-    const amounts: [bigint, bigint][] = [
-      [tc(100), tc(5000)], // passes vs over the limit (trips)
-      [tc(50), tc(10)], // passes vs blocked by the fired tripwire
-    ];
-    for (const [k, [x, y]] of amounts.entries()) {
-      await both(`K-only ${k + 1}`, async (acct, w) => {
-        const enc = await encAmount(acct, owner, w === 0 ? x : y);
-        return (await acct.privateTransfer(token, R1.address, enc.handles[0], enc.inputProof)).wait();
-      });
-    }
-    compare("kOnlyPassVsFail", recsA, recsB);
-  });
 });

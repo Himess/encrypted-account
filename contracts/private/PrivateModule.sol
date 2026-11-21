@@ -233,7 +233,7 @@ contract PrivateModule is IPrivateHooks, ReentrancyGuardTransient {
         op.readyAt = readyAt;
         op.h2 = l.trackGuesses[track].duressFlagH;
         emit IAccountEvents.GuessFinalized(opId, track, true, readyAt);
-        if (readyAt == block.timestamp) {
+        if (readyAt == block.timestamp && !PolicyMath.paused(l, op, opId)) {
             op.status = S.Status.Executed;
             _run(l, opId, op);
         }
@@ -246,7 +246,7 @@ contract PrivateModule is IPrivateHooks, ReentrancyGuardTransient {
         S.Op storage op = l.ops[opId];
         if (PolicyMath.status(l, op) != S.Status.Delayed) revert Errors.BadStatus(); // escape-cancelled → Cancelled
         if (block.timestamp < op.readyAt) revert Errors.NotReady();
-        if (op.paused) revert Errors.OpPaused();
+        if (op.paused || PolicyMath.paused(l, op, opId)) revert Errors.OpPaused();
         if (op.ownerEpoch != l.ownerEpoch) revert Errors.StaleOp();
         op.status = S.Status.Executed;
         _run(l, opId, op);

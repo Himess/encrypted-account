@@ -11,6 +11,15 @@ export interface MessageCtx {
   at: Date;
 }
 
+/** What the trusted contact can do about a duress-approved op: its number, the earliest time it can run, and the command. */
+export interface PauseStep {
+  opId: bigint;
+  /** Unix seconds; absent when it could not be read. */
+  earliestRun?: bigint;
+  /** The command that pauses the account's pending ops, as the trusted contact runs it on the watchtower's computer. */
+  command: string;
+}
+
 /** 2026-11-16T14:03:12Z (UTC, seconds). */
 export const iso = (d: Date) => d.toISOString().replace(/\.\d{3}Z$/, "Z");
 const isoS = (s: bigint) => iso(new Date(Number(s) * 1000));
@@ -68,15 +77,32 @@ export function ownerMessage(a: Alert, c: MessageCtx): string | null {
       return `${head}\nA private send made with your key alone moved zero at ${t}: an unknown recipient, more than the key alone may send, or a fired tripwire.`;
     case "private-tripwire":
       return `${head}\nA key-only private send went above the hidden limit at ${t}. Key-only private sends now move zero until a reset with your PIN.`;
+    case "op-paused":
+      return `${head}\nOperation #${a.opId} was paused by your watchtower at ${isoS(a.at)}: it can run no earlier than 72 hours after its own waiting time ends. With your second device and PIN you can lift the pause sooner.`;
+    case "pause-lifted":
+      return `${head}\nThe pause of operation #${a.opId} was lifted at ${t} (second device and PIN).`;
     case "duress":
     case "error":
       return null;
   }
 }
 
-/** The silent alarm: account, time, that the duress PIN was used, and the owner's optional note. Nothing else. */
-export function duressMessage(c: MessageCtx, note?: string): string {
+/**
+ * The silent alarm: account, time, that the duress PIN was used, what the trusted contact can do (pause the pending ops
+ * before the earliest time the approved one can run), and the owner's optional note. No amount, ever.
+ */
+export function duressMessage(c: MessageCtx, note?: string, pause?: PauseStep): string {
   const lines = ["Silent alarm (watchtower)", `Account: ${c.label} (${c.address})`, `Time: ${iso(c.at)}`, "The duress PIN was used on this account."];
+  if (pause) {
+    lines.push(
+      pause.earliestRun === undefined
+        ? `Operation #${pause.opId} was approved with it.`
+        : pause.earliestRun * 1000n <= BigInt(c.at.getTime())
+          ? `Operation #${pause.opId} was approved with it and can run at once: a pause cannot hold it.`
+          : `Operation #${pause.opId} was approved with it and can run from ${isoS(pause.earliestRun)}: pause before then.`,
+    );
+    lines.push(`To pause the account's pending operations (each once, for up to 72 hours), run on the watchtower's computer: ${pause.command}`);
+  }
   const n = (note ?? "").trim();
   if (n) lines.push(`Note from the owner: ${n}`);
   return lines.join("\n");

@@ -134,6 +134,11 @@ library OpenLib {
             if (!l.assets[asset].configured) revert Errors.InvalidParams();
         } else if (a == S.A_SET_OWNER_BOND) {
             PolicyMath.ownerBondUnits(abi.decode(p, (uint256))); // F0.16: BASE_BOND .. MAX_OWNER_BOND, multiple of BASE_BOND
+        } else if (a == S.A_UNPAUSE) {
+            // only an op the guardian holds back now; verifiable on the lane only, so without D and helper it just waits
+            uint256 t = abi.decode(p, (uint256));
+            if (!PolicyMath.paused(l, l.ops[t], t)) revert Errors.InvalidParams();
+            if (!PolicyMath.hasCosigner(l)) revert Errors.NotAuthorized();
         } else {
             revert Errors.InvalidParams(); // CANCEL, FREEZE, PIN_CHANGE, SET_LIMITS, ADD_KNOWN have dedicated openers
         }

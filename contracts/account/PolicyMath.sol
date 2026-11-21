@@ -11,6 +11,8 @@ library PolicyMath {
     /// @notice K-track score at which the account is restricted (R_STRIKES).
     uint32 internal constant STRIKE_SCORE = 3;
     uint256 internal constant BASE_BOND = 0.001 ether;
+    /// @notice The longest the guardian can hold a pending op back, once per op.
+    uint64 internal constant GUARDIAN_PAUSE = 72 hours;
 
     /// @dev Encrypted limits live in "scaled units" so that 18-decimal tokens fit the 64-bit
     ///      FHE comparison: scaled = ceil(amount / unit). Rounding up is conservative (counts more).
@@ -124,6 +126,15 @@ library PolicyMath {
     }
 
     // ─────────────────────────────── op liveness (K54) and counter generation ───────────────────────────────
+
+    /// @notice Whether the guardian's pause still holds the op back: until GUARDIAN_PAUSE after the later of its own readyAt
+    ///         and the pause, so a pause always adds its full length to the op's waiting time.
+    function paused(S.Layout storage l, S.Op storage op, uint256 opId) internal view returns (bool) {
+        uint64 at = l.pausedAt[opId];
+        if (at <= 1) return false;
+        uint64 from = op.readyAt > at ? op.readyAt : at;
+        return block.timestamp < uint256(from) + GUARDIAN_PAUSE;
+    }
 
     function cancellable(S.Status st) internal pure returns (bool) {
         return st == S.Status.Evaluating || st == S.Status.NeedsPin || st == S.Status.Guessing || st == S.Status.Delayed;

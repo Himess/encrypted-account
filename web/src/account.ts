@@ -112,13 +112,15 @@ export type Activity = {
   /** The op's kind and sub-type (OpOpened); private ops (sub 22-25) carry no public amount or recipient. */
   opKind?: number;
   sub?: number;
+  /** The watchtower paused it (GuardianPaused) and the pause was not lifted: it runs 72 h after its own wait at the earliest. */
+  paused?: boolean;
 };
 
 /** The account's history from its own events: PIN transfers (sent, wrong PIN, pending) and activation. */
 export async function loadActivity(read: ethers.JsonRpcProvider, address: string, limit = 12): Promise<Activity[]> {
   const latest = await read.getBlockNumber();
   const logs = await getLogsChunked(read, { address }, LOGS_FROM_BLOCK, latest);
-  type OpRec = { amount: bigint; to: string; block: number; hash: string; opKind: number; sub: number; ok?: boolean; fin?: [number, string]; exec?: [number, string]; cancel?: [number, string] };
+  type OpRec = { amount: bigint; to: string; block: number; hash: string; opKind: number; sub: number; ok?: boolean; fin?: [number, string]; exec?: [number, string]; cancel?: [number, string]; paused?: boolean };
   const ops = new Map<string, OpRec>();
   const items: Activity[] = [];
   for (const log of logs) {
@@ -144,6 +146,8 @@ export async function loadActivity(read: ethers.JsonRpcProvider, address: string
     else if (ev.name === "GuessFinalized" && ops.has(id)) Object.assign(ops.get(id)!, { ok: Boolean(ev.args.ok), fin: at });
     else if (ev.name === "OpExecuted" && ops.has(id)) ops.get(id)!.exec = at;
     else if (ev.name === "OpCancelled" && ops.has(id)) ops.get(id)!.cancel = at;
+    else if (ev.name === "GuardianPaused" && ops.has(id)) ops.get(id)!.paused = true;
+    else if (ev.name === "PauseLifted" && ops.has(id)) ops.get(id)!.paused = false;
     else if (ev.name === "Armed") items.push({ kind: "armed", block: at[0], hash: at[1] });
   }
   for (const o of ops.values()) {
@@ -156,7 +160,7 @@ export async function loadActivity(read: ethers.JsonRpcProvider, address: string
           : o.ok === true
             ? ["approved", o.fin!]
             : ["pending", [o.block, o.hash]];
-    items.push({ kind, amount: o.amount, to: o.to, block, hash, opKind: o.opKind, sub: o.sub });
+    items.push({ kind, amount: o.amount, to: o.to, block, hash, opKind: o.opKind, sub: o.sub, paused: !!o.paused && !o.exec && !o.cancel });
   }
   items.sort((a, b) => b.block - a.block);
   const top = items.slice(0, limit);

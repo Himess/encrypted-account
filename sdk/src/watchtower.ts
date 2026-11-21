@@ -50,7 +50,9 @@ export type Alert =
   | { kind: "policy-said-no"; opId: bigint }
   | { kind: "restriction"; reasons: number }
   | { kind: "tripwire"; asset: string }
-  | { kind: "duress"; opId: bigint }
+  | { kind: "duress"; opId: bigint; earliestRun?: bigint }
+  | { kind: "op-paused"; opId: bigint; at: bigint }
+  | { kind: "pause-lifted"; opId: bigint }
   | { kind: "recovery-opened"; opId: bigint }
   | { kind: "escape-started"; readyAt: bigint; to: string }
   | { kind: "escape-unverified"; days: number }
@@ -107,6 +109,24 @@ export interface WatchtowerState {
   wrongAtSubmit?: string[];
 }
 
+/**
+ * The shortest delay an op of this kind can get after a correct PIN (OpsLib.delayFor): the trusted contact's deadline for
+ * a pause. An outflow may still land in the longer class once its delay class is decrypted. Private ops ask the account.
+ */
+export function minDelayOf(kind: number, sub: number, amount: bigint, d: Record<string, any>): bigint {
+  const n = (x: any) => BigInt(x);
+  if (kind === 1) return n(d.pinTransfer);
+  if (kind === 2) return amount > 0n && n(d.bigTransfer) > n(d.genericCall) ? n(d.bigTransfer) : n(d.genericCall);
+  if (kind === 4) return n(d.recovery) < n(d.recoveryNoDevice) ? n(d.recovery) : n(d.recoveryNoDevice);
+  if (kind === 5) return n(d.pinReset);
+  if ([1, 2, 3, 7, 19, 26].includes(sub)) return 0n; // cancel, unrestrict, freeze, reset trip, cancel escape, unpause
+  if ([4, 5, 10, 11, 12, 21].includes(sub)) return n(d.settings);
+  if (sub === 8 || sub === 9) return n(d.knownAdd);
+  if (sub === 13) return n(d.escapeChange);
+  if (sub === 17) return n(d.genericCall);
+  return n(d.loosen);
+}
+
 export interface WatchtowerDeps {
   account: Contract; // EncryptedAccount, connected to the guardian signer
   publicDecrypt: (handles: string[]) => Promise<PublicDecryptResult>;
@@ -159,6 +179,17 @@ export class Watchtower {
   }
   constructor(private readonly d: WatchtowerDeps) {
     this.lastBlock = (d.fromBlock ?? 0) - 1;
+  }
+
+  /** The earliest time an op approved in `blockNumber` can run: that block's time plus the shortest delay of its class. */
+  private async earliestRun(acct: Contract, opId: bigint, blockNumber: number): Promise<bigint> {
+    const provider = acct.runner?.provider;
+    if (!provider) throw new Error("no provider");
+    const [op, d, b] = await Promise.all([acct.getOp(opId), acct.delays(), provider.getBlock(blockNumber)]);
+    const kind = Number(op.kind);
+    const sub = Number(op.sub);
+    const delay = kind === KIND_ADMIN && sub >= 22 && sub <= 25 ? BigInt(await acct.privateDelay(sub)) : minDelayOf(kind, sub, BigInt(op.amount), d);
+    return BigInt(b!.timestamp) + delay;
   }
 
   exportState(): WatchtowerState {
@@ -247,7 +278,7 @@ export class Watchtower {
           // then reported even if nobody ever finalizes it)
           const atSubmit = this.d.wrongPinAtSubmit === true || this.d.finalize !== false;
           const [duress, pub] = await Promise.all([this.d.userDecryptBool(flag, addr), atSubmit ? this.d.publicDecrypt(hs) : Promise.resolve(null)]);
-          if (duress) notify({ kind: "duress", opId: args.opId });
+          if (duress) notify({ kind: "duress", opId: args.opId, earliestRun: await this.earliestRun(acct, args.opId, log.blockNumber).catch(() => undefined) });
           if (pub && this.d.wrongPinAtSubmit && !clearBool(clearOf(pub, args.okHandle))) {
             this.wrongAtSubmit.add(String(args.opId));
             notify({ kind: "wrong-pin", opId: args.opId, track: Number(args.track) });
@@ -257,6 +288,10 @@ export class Watchtower {
         } else if (name === "GuessFinalized") {
           if (args.ok) notify({ kind: "pin-ok", opId: args.opId, readyAt: args.readyAt });
           else if (!this.wrongAtSubmit.delete(String(args.opId))) notify({ kind: "wrong-pin", opId: args.opId, track: Number(args.track) });
+        } else if (name === "GuardianPaused") {
+          notify({ kind: "op-paused", opId: args.opId, at: BigInt(args.pausedAt) });
+        } else if (name === "PauseLifted") {
+          notify({ kind: "pause-lifted", opId: args.opId });
         } else if (name === "RestrictionChanged") {
           notify({ kind: "restriction", reasons: Number(args.reasons) });
         } else if (name === "OpOpened" && Number(args.kind) === 4) {

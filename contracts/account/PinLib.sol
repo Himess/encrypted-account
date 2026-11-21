@@ -76,9 +76,10 @@ library PinLib {
         bool strangerOp = PolicyMath.strangerOp(op);
         if ((track == S.TRACK_RECOVERY) != strangerOp) revert Errors.BadTrack();
         if (!strangerOp && op.ownerEpoch != l.ownerEpoch) revert Errors.StaleOp();
-        // K54 / I22: CANCEL_ESCAPE is verified on the authenticated lane only (K + D or helper + P) ...
+        // K54 / I22: CANCEL_ESCAPE is verified on the authenticated lane only (K + D or helper + P), and so is lifting a
+        // guardian pause (a coercer holding K and a PIN must not undo the trusted contact's brake) ...
         bool cancelEscape = op.kind == S.Kind.Admin && op.sub == S.A_CANCEL_ESCAPE;
-        if (cancelEscape && track != S.TRACK_LANE) revert Errors.BadTrack();
+        if ((cancelEscape || (op.kind == S.Kind.Admin && op.sub == S.A_UNPAUSE)) && track != S.TRACK_LANE) revert Errors.BadTrack();
         // ... and while an escape runs it is the only guess accepted at all (I21: anonymous tracks are closed).
         if (l.escapeReadyAt != 0 && !cancelEscape) revert Errors.EscapeActive();
         // K45: with D / helper registered, a PIN-verified key rotation closes the K-track until it runs or is cancelled.
