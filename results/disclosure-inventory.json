@@ -1,0 +1,50 @@
+{
+ "generatedAt": "2026-11-21T13:39:31.201Z",
+ "sites": [
+  {
+   "file": "contracts/account/PinLib.sol",
+   "line": 130,
+   "call": "publicBool"
+  },
+  {
+   "file": "contracts/account/PinLib.sol",
+   "line": 132,
+   "call": "guardianBool"
+  },
+  {
+   "file": "contracts/account/PinLib.sol",
+   "line": 173,
+   "call": "publicBool"
+  },
+  {
+   "file": "contracts/account/PolicyLib.sol",
+   "line": 103,
+   "call": "guardianBool"
+  },
+  {
+   "file": "contracts/account/PolicyLib.sol",
+   "line": 164,
+   "call": "publicBool"
+  },
+  {
+   "file": "contracts/private/PrivateModule.sol",
+   "line": 126,
+   "call": "tokenTransient"
+  },
+  {
+   "file": "contracts/private/PrivateModule.sol",
+   "line": 130,
+   "call": "guardianU64"
+  },
+  {
+   "file": "contracts/private/PrivateModule.sol",
+   "line": 374,
+   "call": "ownerU64"
+  },
+  {
+   "file": "contracts/private/PrivateModule.sol",
+   "line": 382,
+   "call": "tokenTransient"
+  }
+ ]
+}

@@ -95,20 +95,15 @@ library PolicyMath {
         return score(l.tracks[S.TRACK_OWNER]) + score(l.tracks[S.TRACK_RECOVERY]);
     }
 
-    /// @notice Recovery-track bond: doubles with every point of the recovery-track score.
-    function bondFor(uint32 s) internal pure returns (uint256) {
-        return BASE_BOND << (s > 20 ? 20 : s);
-    }
-
     // ─────────────────────────────── F0.16: K-track bond ───────────────────────────────
 
     /// @notice Upper bound of the K-track base bond: high enough for any account, low enough that a typo (a value meant
     ///         in another unit) cannot price the owner out of the K-track for good.
     uint256 internal constant MAX_OWNER_BOND = 100 ether;
 
-    /// @notice K-track bond at score `s` (counted at submission, before this guess's +1): ownerBaseBond << min(s, 20).
-    ///         The first guess costs the base too, so on a large account no guess is cheap; the owner gets every bond of
-    ///         a correct PIN back. With the default base (BASE_BOND) this is bondFor(s), the recovery track's doubling.
+    /// @notice Bond at score `s` (counted at submission, before this guess's +1): ownerBaseBond << min(s, 20). The K-track
+    ///         and the recovery track both use it (each with its own score), so no anonymous track is a cheaper door to the
+    ///         PIN; the first guess costs the base too, and the payer of a correct PIN gets the bond back.
     function ownerBondFor(uint32 s, uint256 base) internal pure returns (uint256) {
         return base << (s > 20 ? 20 : s);
     }

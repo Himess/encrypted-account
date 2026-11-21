@@ -7,6 +7,7 @@ import {IERC7984} from "../vendor/openzeppelin-confidential/interfaces/IERC7984.
 import {AccountStorage as S, Errors, IAccountEvents} from "../account/AccountStorage.sol";
 import {PolicyMath} from "../account/PolicyMath.sol";
 import {OpenLib} from "../account/OpenLib.sol";
+import {Disclose} from "../account/Disclose.sol";
 import {PrivateStorage as P, IPrivateHooks} from "./PrivateStorage.sol";
 
 /// @title PrivateModule — the optional private mode for ERC-7984 tokens ("deniable account", design doc v0.4 Phase 2)
@@ -122,11 +123,11 @@ contract PrivateModule is IPrivateHooks, ReentrancyGuardTransient {
         ebool visible = FHE.le(FHE.add(amt, a.hidden), IERC7984(token).confidentialBalanceOf(address(this)));
         ebool pass = FHE.and(FHE.isIn(FHE.asEaddress(to), _recipients(l)), FHE.and(fits, visible));
         euint64 send = FHE.select(pass, amt, FHE.asEuint64(0));
-        FHE.allowTransient(send, token);
+        Disclose.tokenTransient(l, send, token);
         euint64 moved = IERC7984(token).confidentialTransfer(to, send);
         euint64 next = FHE.select(fits, FHE.add(spent, moved), FHE.asEuint64(P.TRIPPED));
         FHE.allowThis(next);
-        if (l.guardian != address(0)) FHE.allow(next, l.guardian); // the watchtower's view: what moved, and the tripwire
+        Disclose.guardianU64(l, next); // the watchtower's view: what moved, and the tripwire
         a.spent = next;
         _cleanAA();
         emit PrivateTransfer(token, to, euint64.unwrap(next), a.epoch);
@@ -370,7 +371,7 @@ contract PrivateModule is IPrivateHooks, ReentrancyGuardTransient {
                     // a fresh handle in both modes: it never equals the token's stored balance handle
                     euint64 v = FHE.select(dz, shown, bal);
                     FHE.allowThis(v);
-                    FHE.allow(v, l.owner);
+                    Disclose.ownerU64(l, v);
                     a.lastView = v;
                     result = euint64.unwrap(v);
                 } else {
@@ -378,7 +379,7 @@ contract PrivateModule is IPrivateHooks, ReentrancyGuardTransient {
                     // transfer above the balance (a partial move would give duress away)
                     euint64 amt = euint64.wrap(op.h0);
                     euint64 send = FHE.select(dz, FHE.select(FHE.le(amt, shown), amt, FHE.asEuint64(0)), amt);
-                    FHE.allowTransient(send, op.target);
+                    Disclose.tokenTransient(l, send, op.target);
                     euint64 moved = IERC7984(op.target).confidentialTransfer(abi.decode(op.data, (address)), send);
                     result = euint64.unwrap(moved);
                 }

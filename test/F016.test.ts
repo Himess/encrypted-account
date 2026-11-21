@@ -24,7 +24,9 @@ import {
   finalizeGuess,
   guess,
   laneGuess,
+  opIdFromReceipt,
   ownerBondFor,
+  personalSign,
   requestTransfer,
   time,
   accountAt,
@@ -271,6 +273,39 @@ describe("F0.16 — adjustable base bond", function () {
     await expect(
       armed.connect(owner).openAdmin.staticCall(A.SET_OWNER_BOND, coder.encode(["uint256"], [E.parseEther("101")])),
     ).to.be.revertedWithCustomError(ERR, "InvalidParams");
+  });
+
+  it("the recovery track follows the base bond: a cheaper recovery or freeze guess reverts; a correct one is refunded to its payer", async () => {
+    await alignDecay();
+    const signers = await ethers.getSigners();
+    const [newKey, relayer] = [signers[7], signers[8]];
+    const base = E.parseEther("0.05");
+    const acct = await createAccount(stack, owner, escape.address, guardian.address, { knownRecipients: [alice.address], ownerBaseBond: base });
+    const addr = await acct.getAddress();
+    expect(await acct.recoveryBond()).to.eq(base); // not BASE_BOND: no cheaper door to the same PIN
+    expect(await acct.bondFor(2)).to.eq(4n * base);
+    // P alone may freeze: anyone opens it, and a guess on the recovery track below the base reverts, counting nothing
+    const frId = await opIdFromReceipt(acct, await (await acct.connect(relayer).openFreeze()).wait());
+    const encF = await encGuess(acct, relayer.address, stack.chainId, frId, WRONG);
+    await expect(
+      acct.connect(relayer).submitRecoveryGuess.staticCall(frId, encF.c, encF.handles[0], encF.inputProof, { value: BASE_BOND }),
+    ).to.be.revertedWithCustomError(ERR, "BondTooLow").withArgs(base);
+    // a recovery to a new key with the right PIN, bonded at the base: refunded to the relayer that paid it
+    const payload = E.keccak256(coder.encode(["address", "uint32"], [newKey.address, (await acct.status()).ownerEpoch]));
+    const sig = await personalSign(newKey, "encrypted-account/recovery/v1", stack.chainId, addr, payload);
+    const recId = await opIdFromReceipt(acct, await (await acct.connect(relayer).openRecovery(newKey.address, sig, "0x")).wait());
+    const enc = await encGuess(acct, relayer.address, stack.chainId, recId, PIN);
+    await expect(
+      acct.connect(relayer).submitRecoveryGuess.staticCall(recId, enc.c, enc.handles[0], enc.inputProof, { value: base - 1n }),
+    ).to.be.revertedWithCustomError(ERR, "BondTooLow").withArgs(base);
+    await (await acct.connect(relayer).submitRecoveryGuess(recId, enc.c, enc.handles[0], enc.inputProof, { value: base })).wait();
+    await finalizeGuess(acct, recId);
+    expect((await acct.getOp(recId)).status).to.eq(Status.Delayed);
+    expect(await acct.refundOf(relayer.address)).to.eq(base);
+    const b0 = await ethers.provider.getBalance(relayer.address);
+    const rc = await (await acct.connect(relayer).claimRefund()).wait();
+    expect((await ethers.provider.getBalance(relayer.address)) - b0 + BigInt(rc.gasUsed) * BigInt(rc.gasPrice)).to.eq(base);
+    expect(await acct.recoveryBond()).to.eq(base); // a correct guess leaves the recovery score where it was
   });
 
   it("no lock-out at a high score: the owner continues on the unbonded lane, and the escape needs no PIN", async () => {

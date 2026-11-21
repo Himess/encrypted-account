@@ -271,6 +271,7 @@ library Errors {
     error RotationLock(); // K45: K-track closed while a PIN-verified key rotation is pending (account has D / helper)
     error DirectBondRequired(); // F0.16: a K-track bond comes from a direct call by K, never through the EntryPoint or the account
     error InsufficientBalance(uint256 needed); // F0.16: amount + fee not covered; the op stays delayed
+    error NotDisclosable(); // Disclose: a PIN fingerprint, an uninitialised handle, or a handle of the wrong type
 }
 
 /// @notice Events shared by the account and its libraries (libraries emit them in the account's context).

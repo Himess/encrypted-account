@@ -54,7 +54,7 @@ Sepolia ETH, send with your PIN, or try a wrong one and watch it get counted on-
 | Choosing a PIN | The user picks it. The app offers a random PIN (shown large, typed twice to confirm), a short note, and warnings that never block for dates, repeats, sequences and keypad patterns; only a short list of very common PINs is refused |
 | Key stolen (panic button) | Escape: K alone, immediately. Every pending op is cancelled and PIN guessing closes; after 30 days the funds can go only to the pre-set escape address. Only the second device or recovery helper + PIN can cancel it |
 | Key rotation in progress | With a second device or recovery helper, PIN guesses with the old key are closed until the rotation executes or is cancelled |
-| Phone lost | PIN from a new device + bond → 7 days → new key; K alone cannot cancel it |
+| Phone lost | PIN from a new device + bond (the owner's base bond, doubling like the K-track's) → 7 days → new key; K alone cannot cancel it |
 | PIN forgotten | K + second device or recovery helper → 30 days; with neither, escape |
 | Zama down / account censored | Escape: K alone + 30 days, funds only to the escape address (no FHE needed) |
 | Escape address | Set and changed only with its own signature (EIP-712; ERC-1271 for contract wallets); optional signed ping |
@@ -174,6 +174,19 @@ for today's mainnet. Package codes such as F0.9, F0.10 and F0.11 name the measur
   ciphertext (`PolicyMath.requireProof`). `contracts/test/NaivePinVerifier.sol` and `test/Exploits.test.ts` show why.
 - **Governance.** Zama governance can deny-list an account in the ACL or pause the ACL; the escape path is not affected
   (tested).
+- **Shared PIN budget, on purpose.** The K-track and the anonymous recovery track share one wrong-guess budget (one
+  back-off, from the sum of their scores). Split, a thief holding a stolen K would get about 24 guesses a month instead of
+  about 12. The price: anyone can burn guesses on the recovery track (each one costs at least the owner's base bond, kept
+  by the account when wrong) and so slow down the owner's K + PIN path with the back-off. The second-device path (the
+  authenticated lane: K plus a co-signature of the second device or the recovery helper) has its own score and clock and
+  is not affected.
+- **Disclosures go through one door.** Every value the account lets anyone decrypt or use goes through
+  `contracts/account/Disclose.sol`: public yes/no results (a PIN guess's okAny and delay class, a key-only evaluation),
+  the duress flag and a public asset's tripwire for the guardian, the private K-only counter for the guardian, a private
+  balance snapshot for the owner key, and transfer amounts for the token within one transaction. The helpers check each
+  handle's type and refuse the PIN fingerprints; a source scan test fails on any other path, and
+  `test/I3Invariant.test.ts` checks after every flow that no fingerprint was ever allowed to another address or made
+  publicly decryptable.
 - **K-track guesses need a direct transaction.** The bond must come from K's own funds, so a K-track PIN guess cannot
   go through a UserOp or a paymaster; a paymaster-only wallet sends that one transaction from K's address or uses the
   lane. Nobody else can post the bond for K.

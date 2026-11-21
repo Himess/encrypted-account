@@ -500,7 +500,7 @@ function TryCost(p: { info: TryInfo | null; fee?: bigint | null; amount?: bigint
       )}
       {b && b.base > BASE_BOND && (
         <p class="small faint" style={{ margin: "8px 0 0" }}>
-          You raised your PIN-try bond to {fmtEth(b.base)} ETH: every PIN entry sends at least that much from your wallet, and it comes back when the PIN is right (claim it on the account page). The lane (your key plus a second device or a recovery helper) needs no bond; this demo app has no lane yet.
+          You raised your PIN-try bond to {fmtEth(b.base)} ETH: every PIN entry sends at least that much from your wallet, and it comes back when the PIN is right (claim it on the account page). PIN tries from a new device (recovery, freeze) need the same. The lane (your key plus a second device or a recovery helper) needs no bond; this demo app has no lane yet.
         </p>
       )}
       {b && b.base <= BASE_BOND && p.info.score >= 1 && (
@@ -920,7 +920,7 @@ function CreateFlow({ ctx, fhe, walletBal, onDone, onCancel, privateDefault }: {
               <div class="bond-box">
                 <div style={{ fontWeight: 600, fontSize: "14px" }}>PIN-try bond</div>
                 <div class="small faint" style={{ marginTop: "2px" }}>
-                  A thief holding your key locks this much for every PIN try and loses it on a wrong one. Your own PIN entries send it too, and get it back when the PIN is right.
+                  A thief holding your key locks this much for every PIN try and loses it on a wrong one; PIN tries from a new device (recovery, freeze) cost the same. Your own PIN entries send it too, and get it back when the PIN is right.
                 </div>
                 <div class="row wrap" style={{ gap: "10px", marginTop: "12px", alignItems: "flex-end" }}>
                   <label class="field" style={{ flex: "1 1 150px" }}>

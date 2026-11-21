@@ -4,9 +4,10 @@
  *
  *  - Bond (PolicyMath.ownerBondFor): a K-track guess carries a bond, paid by K's EOA in a direct call (never by the
  *    account, never through the EntryPoint). A wrong guess leaves it in the account; a correct one credits it back to
- *    the owner key (claimRefund). bond = ownerBaseBond << min(score, 20): the first guess costs the base too. With
- *    the default ownerBaseBond (= BASE_BOND) this is the recovery track's doubling. The lane (TRACK_LANE) and the
- *    escape stay unbonded.
+ *    the owner key (claimRefund). bond = ownerBaseBond << min(score, 20): the first guess costs the base too. The
+ *    recovery track (Recovery and Freeze guesses from a new device) uses the same base with its own score, so it is
+ *    never a cheaper door to the same PIN; its bond goes back to the payer of a correct PIN. The lane (TRACK_LANE) and
+ *    the escape stay unbonded.
  *  - Fee (FeeConfig.quote): PIN-verified ETH / ERC-20 transfers pay clamp(amount · bps / 10 000, minFee, maxFee),
  *    never more than 1% of the amount, on top of the amount (the payee gets the exact amount). The fee is bound to the
  *    op when it opens (op.fee); read it from getOp(opId).fee rather than recomputing it.
@@ -19,9 +20,9 @@ export const MAX_FEE_BPS = 100n; // 1%
 
 const shift = (s: number) => BigInt(Math.min(Math.max(0, Math.floor(s)), MAX_BOND_SHIFT));
 
-/** The recovery track's bond at a score (PolicyMath.bondFor). */
-export function recoveryBondFor(score: number): bigint {
-  return BASE_BOND << shift(score);
+/** The recovery track's bond at its score (EncryptedAccount.bondFor): the owner's base bond, doubled per point. */
+export function recoveryBondFor(score: number, base: bigint = BASE_BOND): bigint {
+  return base << shift(score);
 }
 
 /** The K-track bond at the score counted when the guess is submitted: base << min(score, 20) (PolicyMath.ownerBondFor). */

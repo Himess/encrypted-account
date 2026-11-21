@@ -4,6 +4,7 @@ pragma solidity ^0.8.28;
 import {FHE, euint64, ebool, eaddress, externalEuint64, externalEaddress, externalEbool} from "@fhevm/solidity/lib/FHE.sol";
 import {AccountStorage as S, Errors, IAccountEvents} from "./AccountStorage.sol";
 import {PolicyMath} from "./PolicyMath.sol";
+import {Disclose} from "./Disclose.sol";
 
 /// @title PolicyLib — encrypted policy (ERC-B draft, Section 14 of the design)
 /// @notice Hidden limit, random tripwire, encrypted known recipient/spender sets, anomaly evaluation.
@@ -99,7 +100,7 @@ library PolicyLib {
 
     function _setTripped(S.Layout storage l, S.AssetEnc storage e, ebool v) private {
         FHE.allowThis(v);
-        if (l.guardian != address(0)) FHE.allow(v, l.guardian); // silent alarm: guardian user-decrypts privately
+        Disclose.guardianBool(l, v); // silent alarm: guardian user-decrypts privately
         e.tripped = v;
     }
 
@@ -160,7 +161,7 @@ library PolicyLib {
         ebool fits = FHE.ge(e.tau, uint64(sc));
         ebool ok = FHE.and(FHE.and(known, FHE.not(e.tripped)), fits);
         _setTripped(l, e, FHE.or(e.tripped, FHE.not(fits)));
-        FHE.makePubliclyDecryptable(ok);
+        Disclose.publicBool(ok);
 
         op.h0 = ebool.unwrap(ok);
         cfg.reserved += uint112(op.amount); // N concurrent ops cannot use the threshold N times (S20)

@@ -4,6 +4,7 @@ pragma solidity ^0.8.28;
 import {FHE, euint64, ebool, externalEuint64, externalEbool} from "@fhevm/solidity/lib/FHE.sol";
 import {AccountStorage as S, Errors, IAccountEvents} from "./AccountStorage.sol";
 import {PolicyMath} from "./PolicyMath.sol";
+import {Disclose} from "./Disclose.sol";
 
 /// @title PinLib — encrypted secret factor (ERC-A draft, Section 13 of the design)
 /// @notice External library executed via DELEGATECALL in the account's context.
@@ -126,9 +127,9 @@ library PinLib {
         // Real PIN takes precedence: if both fingerprints coincide the account behaves normally.
         // (This replaces the doc's on-chain ne(pinH, duressPinH) check and its extra public decryption.)
         ebool isDuress = FHE.and(okDur, FHE.not(okReal));
-        FHE.makePubliclyDecryptable(okAny);
+        Disclose.publicBool(okAny);
         FHE.allowThis(isDuress);
-        if (l.guardian != address(0)) FHE.allow(isDuress, l.guardian); // silent alarm (17.3), never public
+        Disclose.guardianBool(l, isDuress); // silent alarm (17.3), never public
 
         gs.okH = ebool.unwrap(okAny);
         gs.duressFlagH = ebool.unwrap(isDuress);
@@ -169,7 +170,7 @@ library PinLib {
         } else {
             big = FHE.and(okAny, FHE.lt(l.assetEnc[op.target].big, uint64(sc)));
         }
-        FHE.makePubliclyDecryptable(big);
+        Disclose.publicBool(big);
     }
 
     /// @notice Phase 2: verifies the KMS decryption proof and updates counters. Permissionless.

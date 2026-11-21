@@ -223,6 +223,9 @@ Limits that remain:
 5. Public history (§8) is the other check a coercer has; the app shows how believable the view is against it.
 
 The watchtower can read the duress flag of a PIN check (as in the standard account); it is the owner's chosen helper.
+Everything the module lets another address decrypt or use goes through the account's one door,
+`contracts/account/Disclose.sol`: the K-only counter for the guardian, the balance snapshot for the owner key, and the
+transfer amount for the token within the transaction (type-checked; the PIN fingerprints are refused).
 
 **Silent alarm.** The watchtower service ([`watchtower/`](../watchtower/README.md)) decrypts the duress flag of every
 guess off-chain, through Zama's relayer and KMS, real PIN or not, so its requests look the same either way. When the flag

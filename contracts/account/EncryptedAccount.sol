@@ -273,20 +273,22 @@ contract EncryptedAccount is IAccount, IERC1271, ReentrancyGuardTransient, IAcco
     }
 
     /// @notice Anonymous recovery track (new device via a relayer): only Recovery / Freeze ops, bonded.
-    ///         The bond doubles with every point of the recovery-track score and is kept by the account on failure.
+    ///         The bond is the owner's base bond, doubled with every point of the recovery-track score (as the K-track's), so
+    ///         the recovery track is never a cheaper door to the same PIN; the account keeps it on failure.
     function submitRecoveryGuess(uint256 opId, uint64 c, externalEuint64 guess, bytes calldata proof) external payable whenArmed nonReentrant {
         uint256 req = recoveryBond();
         if (msg.value < req) revert Errors.BondTooLow(req);
         PinLib.submitGuess(opId, c, guess, proof, S.TRACK_RECOVERY, msg.sender, msg.value);
     }
 
-    function bondFor(uint32 score_) public pure returns (uint256) {
-        return PolicyMath.bondFor(score_);
+    /// @notice Recovery-track bond at a recovery-track score: ownerBaseBond << min(score, 20), at least BASE_BOND.
+    function bondFor(uint32 score_) public view returns (uint256) {
+        return PolicyMath.ownerBondFor(score_, PolicyMath.ownerBaseBond(S.layout()));
     }
 
     /// @notice Bond required for the next recovery-track guess.
     function recoveryBond() public view returns (uint256) {
-        return PolicyMath.bondFor(PolicyMath.score(S.layout().tracks[S.TRACK_RECOVERY]));
+        return bondFor(PolicyMath.score(S.layout().tracks[S.TRACK_RECOVERY]));
     }
 
     /// @notice F0.16: bond required for the next K-track guess, and the account's public base bond.

@@ -93,6 +93,8 @@ describe("SDK — F0.16 bond and fee (mirrors PolicyMath and FeeConfig)", () => 
   it("default base: the K-track bond equals the recovery doubling; a higher base prices every guess, the first included", () => {
     for (let s = 0; s <= 25; s++) expect(ownerBondFor(s), `score ${s}`).to.eq(recoveryBondFor(s));
     expect(recoveryBondFor(25)).to.eq(BASE_BOND << 20n);
+    // the recovery track follows the owner's base bond too (no cheaper door to the same PIN)
+    for (let s = 0; s <= 25; s++) expect(recoveryBondFor(s, 5n * BASE_BOND), `score ${s}`).to.eq(ownerBondFor(s, 5n * BASE_BOND));
     const base = eth("0.1");
     expect(ownerBondFor(0, base)).to.eq(base);
     expect(ownerBondFor(1, base)).to.eq(2n * base);
